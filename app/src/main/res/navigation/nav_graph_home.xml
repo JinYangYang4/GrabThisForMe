@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph_home"
+    app:startDestination="@id/fragmentHome">
+
+    <keep_state_fragment
+        android:id="@+id/fragmentHome"
+        android:name="com.example.grabthisforme.activity.homeFragment.view.FragmentHome"
+        android:label="FragmentHome" />
+    <keep_state_fragment
+        android:id="@+id/fragmentHome1"
+        android:name="com.example.grabthisforme.activity.homeFragment.view.FragmentHome1"
+        android:label="FragmentHome1" />
+</navigation>

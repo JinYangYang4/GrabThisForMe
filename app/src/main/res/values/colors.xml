@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="white_fff8">#FFF8F8F8</color>
+    <color name="green_primary">#4CAF50</color>    <!-- 标准绿色 -->
+    <color name="green_dark">#388E3C</color>       <!-- 深绿色 -->
+    <color name="green_light">#81C784</color>      <!-- 浅绿色 -->
+    <color name="green_accent">#69F0AE</color>     <!-- 亮绿色（强调色） -->
+    <color name="orange_primary">#FF9800</color>    <!-- 标准橙色（Material Design主色） -->
+    <color name="orange_dark">#E67C00</color>       <!-- 深橙色（主色加深） -->
+    <color name="orange_light">#FFCC80</color>      <!-- 浅橙色（主色减淡） -->
+    <!-- 1. 极浅暖橙（最接近白色，仅带一丝橙调，适合整体页面背景） -->
+    <color name="orange_ultra_light">#FFF9E6</color>
+    <color name="red_intense">#C41E3A</color> <!-- 浓郁深红，比正红更深，适合重点色 -->
+    <color name="red_cherry">#D32F2F</color>
+    <!-- 2. 奶油浅橙（比上一个稍暖，适合卡片/模块背景） -->
+    <color name="orange_cream">#FFF5E0</color>
+    <!-- 灰色略带透明（透明度 80%，灰色偏浅，视觉柔和） -->
+    <color name="gray_translucent">#CCE0E0E0</color>
+
+    <!-- 备选：透明度 70%，灰色稍深，适用更多场景 -->
+    <color name="gray_translucent_dark">#B3D0D0D0</color>
+
+    <!-- 备选：透明度 90%，接近实色的浅灰透明 -->
+    <color name="gray_translucent_light">#E6F0F0F0</color>
+</resources>
