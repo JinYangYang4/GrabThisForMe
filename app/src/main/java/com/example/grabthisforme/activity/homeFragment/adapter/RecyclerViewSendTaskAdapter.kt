@@ -6,20 +6,21 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.example.grabthisforme.databinding.TaskRvItemBinding
+import com.example.grabthisforme.databinding.TaskRvItemSendBinding
 import com.example.grabthisforme.model.Order.Order
+
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class RecyclerViewTaskAdapter(val clickListener:(taskId : Long) -> Unit) : ListAdapter<Order,
-        RecyclerViewTaskAdapter.ViewHolder>(
-    ViewHolder.TaskDiffItemCallback()){
+class RecyclerViewSendTaskAdapter(private val clickListener:(taskId : Long) -> Unit) : ListAdapter<Order, RecyclerViewSendTaskAdapter.ViewHolder>(
+    SendTaskDiffItemCallback()){
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): ViewHolder= ViewHolder.inflateFrom(parent)
+    ): ViewHolder {
+        return ViewHolder.inflate(parent)
+    }
 
     override fun onBindViewHolder(
         holder: ViewHolder,
@@ -28,42 +29,26 @@ class RecyclerViewTaskAdapter(val clickListener:(taskId : Long) -> Unit) : ListA
         val task = getItem(position)
         holder.bind(task,clickListener)
     }
-    class ViewHolder(val binding: TaskRvItemBinding) : RecyclerView.ViewHolder(binding.root){
+
+    class ViewHolder(val binding : TaskRvItemSendBinding): RecyclerView.ViewHolder(binding.root){
         companion object{
-            fun inflateFrom(parent: ViewGroup): ViewHolder{
+            fun inflate(parent: ViewGroup): ViewHolder{
                 val layoutInflater = LayoutInflater.from(parent.context)
-                val binding = TaskRvItemBinding.inflate(layoutInflater,parent,false)
+                val binding = TaskRvItemSendBinding.inflate(layoutInflater,parent,false)
                 return ViewHolder(binding)
             }
-
         }
-        fun bind(task: Order, clickListener: (Long) -> Unit) {
+        fun bind(task: Order,clickListener: (Long) -> Unit){
             binding.sendTime.text = "配送时间: ${formatTime(task.goods.startTime)} - ${formatTime(task.goods.endTime)}"
-            binding.timeLeft.text = formatTimeLeft(task.goods.startTime, task.goods.endTime)
+            binding.timeLeft.text = formatTimeLeft(task.goods.startTime, task.goods.startTime)
             binding.goodsName.text = task.goods.name
-            binding.goodsPrice.text = String.format(Locale.getDefault(), "￥%.2f 取货价", task.goods.price)
-
+            binding.goodsPrice.text = String.format(Locale.getDefault(), "￥%.2f 取货价(含商品费用)", task.goods.price)
+            binding.aimPosition.text = task.goods.aim_position
+            binding.shelfNumber.text = task.goods.shelf_number
         }
 
-        class TaskDiffItemCallback : DiffUtil.ItemCallback<Order>(){
-            override fun areItemsTheSame(
-                oldItem: Order,
-                newItem: Order
-            ): Boolean {
-                return oldItem == newItem
-            }
-
-            @SuppressLint("DiffUtilEquals")
-            override fun areContentsTheSame(
-                oldItem: Order,
-                newItem: Order
-            ): Boolean {
-                return oldItem == newItem
-            }
-        }
         private fun formatTime(timeStamp: Long): String {
             return try {
-                // 格式可自定义：如 "MM-dd HH:mm"（只显示月日时分）、"yyyy-MM-dd HH:mm:ss"（含秒）
                 val sdf = SimpleDateFormat("MM-dd HH:mm", Locale.getDefault())
                 sdf.format(Date(timeStamp))
             } catch (e: Exception) {
@@ -82,6 +67,22 @@ class RecyclerViewTaskAdapter(val clickListener:(taskId : Long) -> Unit) : ListA
                 hours > 0 -> "${hours}小时内送达"
                 else -> "${minutes}分钟内送达"
             }
+        }
+    }
+    class SendTaskDiffItemCallback : DiffUtil.ItemCallback<Order>(){
+        override fun areItemsTheSame(
+            oldItem: Order,
+            newItem: Order
+        ): Boolean {
+            return oldItem == newItem
+        }
+
+        @SuppressLint("DiffUtilEquals")
+        override fun areContentsTheSame(
+            oldItem: Order,
+            newItem: Order
+        ): Boolean {
+            return oldItem == newItem
         }
     }
 }

@@ -4,7 +4,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_arc_gradient"
+        android:background="@drawable/bg_arc_gradient_green"
         android:layout_marginVertical="5dp"
         android:layout_marginHorizontal="3dp"
         android:elevation="1dp"
@@ -27,16 +27,17 @@
                 android:layout_weight="1"/>
             <TextView
                 android:id="@+id/time_left"
-                android:layout_width="wrap_content"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:padding="3dp"
                 android:layout_marginEnd="15dp"
-                android:text="3小时内送达"/>
+                android:text="3小时内送达"
+                android:singleLine="true" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="70dp"
+            android:layout_height="wrap_content"
             android:elevation = "20dp"
             android:backgroundTint="@color/white"
             android:background="@drawable/bg_round_rect_top_small_bottom_large"
@@ -53,7 +54,7 @@
             </ImageView>
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <TextView
                     android:id="@+id/goods_name"
@@ -63,20 +64,37 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="10dp"
                     android:maxLines="2"
+                    android:text="商品名"
                     android:ellipsize="end"/>
                 <TextView
+                    android:id="@+id/shelf_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1">
-                </TextView>
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="10dp"
+                    android:maxLines="2"
+                    android:text="货架/店铺(不限)"
+                    android:ellipsize="end"/>
+                <TextView
+                    android:id="@+id/aim_position"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="10dp"
+                    android:maxLines="2"
+                    android:text="目的地"
+                    android:ellipsize="end"/>
                 <TextView
                     android:id="@+id/goods_price"
-                    android:layout_gravity="end"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="￥ 3 取货价"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginRight="10dp"/>
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:text="￥ 3 取货价" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

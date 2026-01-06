@@ -37,7 +37,7 @@ class RecyclerViewGoodsAdapter(
         }
         fun bind(goods : Goods,clickListener: (Long) -> Unit){
             binding.goodsPrice.text = goods.price.toString()
-            binding.goodsSales.text = goods.sale.toString()
+            binding.goodsSales.text = goods.sale_number.toString()
             binding.goodsMessage.text = goods.name
         }
 

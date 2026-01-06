@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
@@ -14,21 +13,18 @@ import android.view.animation.Animation
 import android.view.animation.AnimationSet
 import android.view.animation.TranslateAnimation
 import android.widget.Toast
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_SETTLING
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.MainActivity.viewModel.MainViewModel
 import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewGoodsAdapter
 import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewTaskAdapter
 import com.example.grabthisforme.activity.homeFragment.viewModel.FragmentHomeViewModel
 import com.example.grabthisforme.databinding.FragmentHomeBinding
+import com.example.grabthisforme.model.Order.Order
 import com.example.grabthisforme.model.goos.Goods
-import com.example.grabthisforme.model.rv_task.RecyclerviewTask
-import com.example.grabthisforme.model.user.User
 
 class FragmentHome : Fragment() {
     private var _binding : FragmentHomeBinding ?= null
@@ -52,7 +48,7 @@ class FragmentHome : Fragment() {
 
         initRecyclerViewTask()
         initRecyclerViewGoods()
-        binding.ivDropdown.setOnClickListener {
+        binding.llDropdown.setOnClickListener {
             if (viewModel.GetRvTaskIsOpen()){
                 closeRvTaskAnimation()
             }else{
@@ -73,52 +69,13 @@ class FragmentHome : Fragment() {
 
 
     fun shareViewModelObserve(){
+
     }
 
     @SuppressLint("ClickableViewAccessibility")
     fun initRecyclerViewTask(){
 
-        val taskList: List<RecyclerviewTask> = listOf(
-            RecyclerviewTask(
-                Id = 1,
-                name = "代购 Mylikes 麦丽素",
-                price = 5.0, // 任务酬劳（代购费）
-                startTime = 1770000000000, // 配送开始时间：2026-06-03 12:00:00
-                endTime = 1770007200000    // 配送截止时间：2026-06-03 14:00:00
-            ),
-            // 任务2：矿泉水代购（1小时内配送）
-            RecyclerviewTask(
-                Id = 2,
-                name = "买 500ml 矿泉水",
-                price = 3.0,
-                startTime = 1770003600000, // 2026-06-03 13:00:00
-                endTime = 1770007200000    // 2026-06-03 14:00:00
-            ),
-            // 任务3：零食大礼包（4小时内配送）
-            RecyclerviewTask(
-                Id = 3,
-                name = "代购零食大礼包（含薯片+饼干）",
-                price = 10.0,
-                startTime = 1770000000000, // 2026-06-03 12:00:00
-                endTime = 1770014400000    // 2026-06-03 16:00:00
-            ),
-            // 任务4：咖啡代购（30分钟内配送）
-            RecyclerviewTask(
-                Id = 4,
-                name = "买一杯冰美式咖啡（不加糖）",
-                price = 4.5,
-                startTime = 1770005400000, // 2026-06-03 13:30:00
-                endTime = 1770007200000    // 2026-06-03 14:00:00
-            ),
-            // 任务5：水果代购（半天内配送）
-            RecyclerviewTask(
-                Id = 5,
-                name = "买 1 斤草莓（新鲜无坏果）",
-                price = 8.0,
-                startTime = 1770000000000, // 2026-06-03 12:00:00
-                endTime = 1770043200000    // 2026-06-03 22:00:00
-            )
-        )
+        val taskList = Order.getOrderList()
         adapter1 = RecyclerViewTaskAdapter() { taskId ->
             Toast.makeText(requireContext(), "点击了", Toast.LENGTH_SHORT).show()
         }

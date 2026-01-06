@@ -1,13 +1,19 @@
 package com.example.grabthisforme.model.goos
 
-class Goods(
+import com.example.grabthisforme.model.store.Store
+
+open class Goods(
     val id: Long,
     val name: String,
     val message: String,
+    var shelf_number : String = "",
+    var aim_position : String= "",
     val price: Double,
-    val shop: String,
-    val sale: Long,
-    val pic: String
+    val store: Store?=null,
+    val sale_number: Long,
+    val pic: String,
+    var startTime: Long = 0,
+    var endTime: Long= 0
 ) {
     companion object {
         fun get20RepeatGoods(): List<Goods> {
@@ -16,8 +22,7 @@ class Goods(
                 name = "经典麦丽素",
                 message = "一口酥脆，满心甜蜜！买一送一",
                 price = 60.00,
-                shop = "零食优选旗舰店",
-                sale = 500000,
+                sale_number = 500000,
                 pic = "food_pic"
             )
             val goodsList = mutableListOf<Goods>()
@@ -27,8 +32,7 @@ class Goods(
                     name = "经典麦丽素",
                     message = "一口酥脆，满心甜蜜！买一送一",
                     price = 60.00,
-                    shop = "零食优选旗舰店",
-                    sale = 500000,
+                    sale_number = 500000,
                     pic = "food_pic"
                 )
                 goodsList.add(newGoods)

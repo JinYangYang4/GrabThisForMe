@@ -240,17 +240,24 @@
                             android:padding="8dp"
                             android:layout_height="230dp">
                         </androidx.recyclerview.widget.RecyclerView>
-                        <ImageView
-                            android:visibility="gone"
-                            android:id="@+id/iv_dropdown"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:scaleType="centerCrop"
-                            android:layout_margin="5dp"
-                            android:src="@drawable/ic_dropdown"
-                            android:layout_marginVertical="5dp"
-                            android:layout_gravity="center">
-                        </ImageView>
+                        <LinearLayout
+                            android:id="@+id/ll_dropdown"
+                            android:layout_width="match_parent"
+                            android:gravity="center"
+                            android:layout_height="wrap_content">
+                            <ImageView
+                                android:visibility="gone"
+                                android:id="@+id/iv_dropdown"
+                                android:layout_width="25dp"
+                                android:layout_height="25dp"
+                                android:scaleType="centerCrop"
+                                android:layout_margin="5dp"
+                                android:src="@drawable/ic_dropdown"
+                                android:layout_marginVertical="5dp"
+                                android:layout_gravity="center">
+                            </ImageView>
+                        </LinearLayout>
+
 
                     </LinearLayout>
                     <LinearLayout
