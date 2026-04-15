@@ -9,7 +9,7 @@ appcompat = "1.6.1"
 material = "1.13.0"
 activity = "1.11.0"
 constraintlayout = "2.1.4"
-
+navigation-safe-args = "2.7.5"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -23,4 +23,3 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-

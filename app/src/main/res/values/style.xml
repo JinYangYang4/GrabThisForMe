@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
+
+    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="behavior_peekHeight">500dp</item>
+
+    </style>
+    <style name="BottomSheetStyle_black" parent="Widget.Design.BottomSheet.Modal">
+        <item name="behavior_peekHeight">500dp</item>
+        <item name="android:background">@android:color/black</item>
+    </style>
+    <style name="RoundedBackgroundStyle">
+        <item name="cornerFamily">rounded</item> <!-- 圆角类型：rounded（普通圆角）/cut（切角） -->
+        <item name="cornerSize">20dp</item> <!-- 圆角大小，根据需求调整 -->
+    </style>
+</resources>

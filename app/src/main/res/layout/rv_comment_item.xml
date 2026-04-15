@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/iv_comment_avatar"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/cat"
+                android:clipToOutline="true"
+                android:scaleType="centerCrop"
+                android:background="@drawable/bg_circle"
+                />
+
+            <!-- 用户名 + 评论内容 -->
+            <LinearLayout
+                android:id="@+id/ll_main_comment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/iv_comment_avatar"
+                android:layout_toEndOf="@id/iv_comment_avatar"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:orientation="vertical">
+
+                <!-- 用户名 -->
+                <TextView
+                    android:id="@+id/tv_comment_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="用户名"
+                    android:textSize="14sp"
+                    android:textColor="#333333"
+                    android:textStyle="bold"/>
+
+                <!-- 评论内容 -->
+                <TextView
+                    android:id="@+id/tv_comment_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="这是一条测试评论，内容可以多行展示~"
+                    android:textSize="13sp"
+                    android:textColor="#666666"
+                    android:layout_marginTop="4dp"
+                    android:maxWidth="280dp"/>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_comment_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10分钟前"
+            android:textSize="12sp"
+            android:textColor="#999999"
+            android:layout_marginLeft="44dp"
+            android:layout_marginStart="44dp"
+            android:layout_marginTop="6dp"/>
+
+        <TextView
+            android:id="@+id/tv_toggle_reply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="44dp"
+            android:layout_marginTop="4dp"
+            android:text="展开回复(2)"
+            android:textColor="#0088ff"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_comment_replies"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="4dp"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <TextView
+                android:id="@+id/tv_load_more_reply"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="展开更多回复"
+                android:layout_marginStart="44dp"
+                android:textColor="#0088ff"
+                android:textSize="11sp"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <TextView
+                android:id="@+id/tv_collapse_extra_reply"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="收起回复"
+                android:textColor="#999999"
+                android:textSize="11sp" />
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_marginTop="8dp"
+            android:background="#f0f0f0"/>
+    </LinearLayout>
+</layout>

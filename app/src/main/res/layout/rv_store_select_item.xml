@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout
+        android:layout_width="80dp"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:background="@color/gray_mid_light">
+        <TextView
+            android:id="@+id/tv_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="商品类型"
+            android:textSize="14sp"
+            android:textColor="#333333" />
+    </LinearLayout>
+</layout>

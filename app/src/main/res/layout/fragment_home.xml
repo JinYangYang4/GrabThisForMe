@@ -90,6 +90,7 @@
 
                 </LinearLayout>
                 <LinearLayout
+                    android:id="@+id/ll_search"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="4dp"
@@ -112,6 +113,99 @@
                         android:textSize="16sp"/>
 
                 </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:elevation="8dp"
+                    android:backgroundTint="@color/white"
+                    android:background="@drawable/bg_round_stripe"
+                    android:id="@+id/select"
+                    app:layout_constraintTop_toBottomOf="@+id/toolbar_back"
+                    android:layout_margin="9dp"
+                    android:gravity="center">
+                    <LinearLayout
+                        android:id="@+id/ll_item_order"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="1"
+                        android:gravity="center">
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/order">
+                        </ImageView>
+                        <TextView
+                            android:id="@+id/tv_item_order"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="我的订单"
+                            android:textSize="10sp">
+                        </TextView>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/ll_sign_in"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="1"
+                        android:gravity="center">
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/ic_task">
+                        </ImageView>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="任务"
+                            android:textSize="10sp">
+                        </TextView>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/ll_create_order"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/ic_goods">
+                        </ImageView>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/tv_create_order"
+                            android:text="请帮我带"
+                            android:textSize="10sp">
+                        </TextView>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/ll_show_coupon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/ic_voucher">
+                        </ImageView>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="优惠券"
+                            android:textSize="10sp">
+                        </TextView>
+                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
 
 
@@ -126,93 +220,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="80dp"
-                        android:elevation="8dp"
-                        android:backgroundTint="@color/white"
-                        android:background="@drawable/bg_round_stripe"
-                        android:id="@+id/select"
-                        app:layout_constraintTop_toBottomOf="@+id/toolbar_back"
-                        android:layout_margin="9dp"
-                        android:gravity="center">
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_weight="1"
-                            android:gravity="center">
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/order">
-                            </ImageView>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="订单"
-                                android:textSize="10sp">
-                            </TextView>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_weight="1"
-                            android:gravity="center">
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/ic_task">
-                            </ImageView>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="任务"
-                                android:textSize="10sp">
-                            </TextView>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center">
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/ic_goods">
-                            </ImageView>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="商品"
-                                android:textSize="10sp">
-                            </TextView>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center">
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/ic_voucher">
-                            </ImageView>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="优惠券"
-                                android:textSize="10sp">
-                            </TextView>
-                        </LinearLayout>
-                    </LinearLayout>
                     <LinearLayout
                         android:id="@+id/dropContainer"
                         android:layout_width="match_parent"

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginHorizontal="4dp"
+        android:padding= "6dp"
+        android:background="@drawable/bg_rounded_white_radius_small"
+        android:backgroundTint="@color/gray_mid_light">
+        <TextView
+            android:id="@+id/tv_condition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="99新"
+            android:paddingHorizontal="10dp"
+            android:textSize="11sp"/>
+    </LinearLayout>
+</layout>

@@ -6,14 +6,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
+import com.example.grabthisforme.R
 import com.example.grabthisforme.databinding.TaskRvItemBinding
 import com.example.grabthisforme.model.Order.Order
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class RecyclerViewTaskAdapter(val clickListener:(taskId : Long) -> Unit) : ListAdapter<Order,
+class RecyclerViewTaskAdapter( var userId: Long? = null,val clickListener:(taskId : Long) -> Unit) : ListAdapter<Order,
         RecyclerViewTaskAdapter.ViewHolder>(
     ViewHolder.TaskDiffItemCallback()){
     override fun onCreateViewHolder(
@@ -25,8 +25,8 @@ class RecyclerViewTaskAdapter(val clickListener:(taskId : Long) -> Unit) : ListA
         holder: ViewHolder,
         position: Int
     ) {
-        val task = getItem(position)
-        holder.bind(task,clickListener)
+        val order = getItem(position)
+        holder.bind(order,clickListener,userId)
     }
     class ViewHolder(val binding: TaskRvItemBinding) : RecyclerView.ViewHolder(binding.root){
         companion object{
@@ -37,11 +37,28 @@ class RecyclerViewTaskAdapter(val clickListener:(taskId : Long) -> Unit) : ListA
             }
 
         }
-        fun bind(task: Order, clickListener: (Long) -> Unit) {
-            binding.sendTime.text = "配送时间: ${formatTime(task.goods.startTime)} - ${formatTime(task.goods.endTime)}"
-            binding.timeLeft.text = formatTimeLeft(task.goods.startTime, task.goods.endTime)
-            binding.goodsName.text = task.goods.name
-            binding.goodsPrice.text = String.format(Locale.getDefault(), "￥%.2f 取货价", task.goods.price)
+        fun bind(order: Order, clickListener: (Long) -> Unit, userId: Long? = null) {
+            binding.sendTime.text = "配送时间: ${formatTime(order.startTime)} - ${formatTime(order.endTime)}"
+            binding.timeLeft.text = formatTimeLeft(order.startTime, order.endTime)
+            binding.goodsName.text = order.goods.name
+            binding.goodsPrice.text = String.format(Locale.getDefault(), "￥%.2f 取货价", order.goods.price)
+            if (userId != null){
+                if (order.buyer.id ==  userId){
+                    binding.llTaskItem.setBackgroundResource(R.drawable.bg_arc_gradient)
+                    binding.ivState.setImageResource(R.drawable.ic_wait_receive)
+                }else{
+                    binding.llTaskItem.setBackgroundResource(R.drawable.bg_arc_gradient_green)
+                    binding.ivState.setImageResource(R.drawable.ic_wait_send)
+                }
+            }
+            itemView.setOnClickListener {
+                val taskId = try {
+                    order.orderId.toLong()
+                } catch (e: NumberFormatException) {
+                    0L
+                }
+                clickListener.invoke(taskId)
+            }
 
         }
 
@@ -83,5 +100,6 @@ class RecyclerViewTaskAdapter(val clickListener:(taskId : Long) -> Unit) : ListA
                 else -> "${minutes}分钟内送达"
             }
         }
+
     }
 }

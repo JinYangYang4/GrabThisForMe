@@ -11,6 +11,13 @@ class FragmentHomeViewModel : ViewModel() {
     private var _rvTaskIsOpen = MutableLiveData<Boolean>(false)
     val rvTaskIsOpen : LiveData<Boolean> get() = _rvTaskIsOpen
 
+    //home1的RV部分
+    private val _outerRvAtBottom = MutableLiveData(false)
+    val  outerRvAtBottom : LiveData<Boolean> get() = _outerRvAtBottom
+    fun setOuterRvAtBottom(atBottom : Boolean){
+        _outerRvAtBottom.value = atBottom
+    }
+
     fun setRvTaskHeight(height : Int){
         rvTaskHeight = height
     }

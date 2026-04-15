@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="1dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation ="2dp"
+        app:cardUseCompatPadding="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+            <TextView
+                android:id="@+id/tv_hot_tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:background="#FF4081"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp"
+                android:text="热门"
+                android:textColor="@android:color/white"
+                android:textSize="10sp" />
+            <TextView
+                android:id="@+id/tv_coupon_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="满100减20优惠券"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:id="@+id/tv_coupon_denomination"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="4dp"
+                android:text="20.0元"
+                android:textColor="#FFD700"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:id="@+id/tv_coupon_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:text="全场通用 | 有效期7天"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="10sp"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="8dp"
+                android:background="#F5F5F5"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
+                <TextView
+                    android:id="@+id/tv_need_coin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="需100金币"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+            <Button
+                android:id="@+id/btn_exchange"
+                android:layout_width="70dp"
+                android:layout_height="26dp"
+                android:background="@drawable/bg_rounded_white"
+                android:text="兑换"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                android:padding="0dp"/>
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</layout>

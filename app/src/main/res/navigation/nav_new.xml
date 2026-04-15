@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_new"
+    app:startDestination="@id/blankFragment">
+
+    <fragment
+        android:id="@+id/orderExecutorFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.all_executor.view.OrderExecutorFragment"
+        android:label="OrderBottomSheetFragment"
+        tools:layout="@layout/fragment_order_bottom_sheet">
+        <argument
+            android:name="orderId"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/createOrderFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.create.view.CreateOrderFragment"
+        android:label="CreateOrderFragment" />
+    <fragment
+        android:id="@+id/blankFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.default_entry.view.BlankFragment"
+        android:label="fragment_blank"
+        tools:layout="@layout/fragment_blank">
+        <action
+            android:id="@+id/action_blankFragment_to_orderExecutorFragment"
+            app:destination="@id/orderExecutorFragment" />
+        <action
+            android:id="@+id/action_blankFragment_to_createOrderFragment"
+            app:destination="@id/createOrderFragment" />
+        <action
+            android:id="@+id/action_blankFragment_to_fragmentSignIn"
+            app:destination="@id/fragmentSignIn" />
+        <action
+            android:id="@+id/action_blankFragment_to_couponFragment"
+            app:destination="@id/couponFragment" />
+        <action
+            android:id="@+id/action_blankFragment_to_createSecondHandGoods"
+            app:destination="@id/createSecondHandGoods" />
+        <action
+            android:id="@+id/action_blankFragment_to_secondHandGoodFragment"
+            app:destination="@id/secondHandGoodFragment" />
+        <action
+            android:id="@+id/action_blankFragment_to_postDetailFragment"
+            app:destination="@id/postDetailFragment" />
+        <action
+            android:id="@+id/action_blankFragment_to_fragmentChat"
+            app:destination="@id/fragmentChat" />
+        <action
+            android:id="@+id/action_blankFragment_to_myLoveFragment"
+            app:destination="@id/myLoveFragment" />
+        <action
+            android:id="@+id/action_blankFragment_to_myTopicFragment"
+            app:destination="@id/myTopicFragment" />
+        <action
+            android:id="@+id/action_blankFragment_to_setFragment"
+            app:destination="@id/setFragment" />
+        <action
+            android:id="@+id/action_blankFragment_to_searchGoodsFragment"
+            app:destination="@id/searchGoodsFragment" />
+        <action
+            android:id="@+id/action_blankFragment_to_searchCommunityFragment"
+            app:destination="@id/searchCommunityFragment" />
+        <action
+            android:id="@+id/action_blankFragment_to_fragmentSearchFriendOrGroupOrConversation"
+            app:destination="@id/fragmentSearchFriendOrGroupOrConversation" />
+        <action
+            android:id="@+id/action_blankFragment_to_storeFragment"
+            app:destination="@id/storeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentSignIn"
+        android:name="com.example.grabthisforme.activity.fragment_misc.sign_inFragment.view.FragmentSignIn"
+        android:label="FragmentSignIn" />
+    <fragment
+        android:id="@+id/couponFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.couponFragment.view.CouponFragment"
+        android:label="CouponFragment" />
+    <fragment
+        android:id="@+id/createSecondHandGoods"
+        android:name="com.example.grabthisforme.activity.fragment_misc.create.view.CreateSecondHandGoods"
+        android:label="CreateSecondHandGoods" />
+    <fragment
+        android:id="@+id/secondHandGoodFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.secondhand_goodsFragment.view.SecondHandGoodFragment"
+        android:label="SecondHandGoodFragment" >
+        <action
+            android:id="@+id/action_secondHandGoodFragment_to_searchGoodsFragment"
+            app:destination="@id/searchGoodsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/postDetailFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.postDetailFragment.view.PostDetailFragment"
+        android:label="PostDetailFragment" />
+    <fragment
+        android:id="@+id/fragmentChat"
+        android:name="com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.FragmentChat"
+        android:label="FragmentChat"
+        tools:layout="@layout/fragment_chat"/>
+    <fragment
+        android:id="@+id/myLoveFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.my_love.view.MyLoveFragment"
+        android:label="MyLoveFragment" >
+        <action
+            android:id="@+id/action_myLoveFragment_to_postDetailFragment"
+            app:destination="@id/postDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/myTopicFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.my_topic.view.MyTopicFragment"
+        android:label="MyTopicFragment" >
+        <action
+            android:id="@+id/action_myTopicFragment_to_postDetailFragment"
+            app:destination="@id/postDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/setFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.setFragment.view.FragmentSet"
+        android:label="SetFragment" >
+        <action
+            android:id="@+id/action_setFragment_to_personalInformation"
+            app:destination="@id/personalInformation" />
+        <action
+            android:id="@+id/action_setFragment_to_fragmentAccountSecurity"
+            app:destination="@id/fragmentAccountSecurity" />
+        <action
+            android:id="@+id/action_setFragment_to_fragmentChatBackground"
+            app:destination="@id/fragmentChatBackground" />
+    </fragment>
+    <fragment
+        android:id="@+id/personalInformation"
+        android:name="com.example.grabthisforme.activity.fragment_misc.setFragment.view.FragmentPersonalInformation"
+        android:label="PersonalInformation" />
+    <fragment
+        android:id="@+id/fragmentAccountSecurity"
+        android:name="com.example.grabthisforme.activity.fragment_misc.setFragment.view.FragmentAccountSecurity"
+        android:label="FragmentAccountSecurity" />
+    <fragment
+        android:id="@+id/fragmentChatBackground"
+        android:name="com.example.grabthisforme.activity.fragment_misc.setFragment.view.FragmentChatBackground"
+        android:label="FragmentChatBackground"
+        tools:layout="@layout/fragment_chat_backgroud"/>
+    <fragment
+        android:id="@+id/searchGoodsFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.searchFragment.view.SearchGoodsFragment"
+        android:label="SearchGoodsFragment" />
+    <fragment
+        android:id="@+id/searchCommunityFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.searchCommunityFragment.view.SearchCommunityFragment"
+        android:label="SearchCommunityFragment" />
+    <fragment
+        android:id="@+id/fragmentSearchFriendOrGroupOrConversation"
+        android:name="com.example.grabthisforme.activity.fragment_misc.searchFriendOrGroupOrConversation.view.FragmentSearchFriendOrGroupOrConversation"
+        android:label="FragmentSearchFriendOrGroupOrConversation" />
+    <fragment
+        android:id="@+id/storeFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.storeFragment.view.StoreFragment"
+        android:label="StoreFragment" >
+        <action
+            android:id="@+id/action_storeFragment_to_storeSearchFragment"
+            app:destination="@id/storeSearchFragment" />
+        <action
+            android:id="@+id/action_storeFragment_to_fragmentChat"
+            app:destination="@id/fragmentChat" />
+    </fragment>
+    <fragment
+        android:id="@+id/storeSearchFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.storeFragment.view.StoreSearchFragment"
+        android:label="StoreSearchFragment" />
+</navigation>

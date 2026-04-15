@@ -1,5 +1,6 @@
 package com.example.grabthisforme.model.store
 
+import com.example.grabthisforme.model.goods.Goods
 import java.math.BigDecimal
 import java.util.UUID
 
@@ -7,7 +8,7 @@ data class Store(
     val name: String,
     val type: String,
     val address: String,
-    val id: Long = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE, // 生成唯一非负Long ID
+    val id: Long = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE,
     val phone: String? = null,
     val businessHours: String? = null,
     val latitude: Double? = null,
@@ -17,7 +18,9 @@ data class Store(
     val isOpen: Boolean = true,
     val pic: String? = null,
     val rating: Float = 0.0f,
-    val tags: List<String> = emptyList()
+    val tags: List<String> = emptyList(),
+    var goods_all : List<Goods>?= null,
+    var salesVolume : Long = 0
 ) {
 
     fun getLocationInfo(): String {

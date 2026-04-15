@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="coin_color">#FFD700</color> <!-- 金币黄色 -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="white_fff8">#FFF8F8F8</color>
@@ -14,6 +15,7 @@
     <color name="orange_ultra_light">#FFF9E6</color>
     <color name="red_intense">#C41E3A</color> <!-- 浓郁深红，比正红更深，适合重点色 -->
     <color name="red_cherry">#D32F2F</color>
+    <color name="red_light">#FF4081</color>
     <!-- 2. 奶油浅橙（比上一个稍暖，适合卡片/模块背景） -->
     <color name="orange_cream">#FFF5E0</color>
     <!-- 灰色略带透明（透明度 80%，灰色偏浅，视觉柔和） -->
@@ -24,4 +26,20 @@
 
     <!-- 备选：透明度 90%，接近实色的浅灰透明 -->
     <color name="gray_translucent_light">#E6F0F0F0</color>
+    <color name="gray_600">#999999</color>
+    <color name="gray_700">#777777</color>
+    <color name="gray_800">#555555</color>
+    <!-- 浅灰色系列 -->
+    <color name="gray_ultra_light">#F8F8F8</color> <!-- 超浅灰 -->
+    <color name="gray_light">#F5F5F5</color>       <!-- 浅灰 -->
+    <color name="gray_mid_light">#EEEEEE</color>   <!-- 中度浅灰 -->
+    <color name="gray_mid">#999999</color>
+
+    <color name="primary_gradient">#6200EE</color>
+    <color name="secondary_gradient">#03DAC6</color>
+    <color name="text_primary">#2D3748</color>
+    <color name="text_secondary">#718096</color>
+    <color name="background_light">#F5F7FA</color>
+
+    <color name="blue_light">#2196F3</color>
 </resources>

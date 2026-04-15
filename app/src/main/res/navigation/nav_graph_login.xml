@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph_login"
+    app:startDestination="@id/fragmentLogin">
+
+    <fragment
+        android:id="@+id/fragmentLogin"
+        android:name="com.example.grabthisforme.activity.LoginActivity.view.FragmentLogin"
+        android:label="FragmentLogin" >
+        <action
+            android:id="@+id/action_fragmentLogin_to_fragmentRegister"
+            app:destination="@id/fragmentRegister" />
+
+        <action
+            android:id="@+id/action_fragmentLogin_to_fragmentFindPassword2"
+            app:destination="@id/fragmentFindPassword2" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentRegister"
+        android:name="com.example.grabthisforme.activity.LoginActivity.view.FragmentRegister"
+        android:label="FragmentRegister" />
+    <fragment
+        android:id="@+id/fragmentFindPassword2"
+        android:name="com.example.grabthisforme.activity.LoginActivity.view.FragmentFindPassword"
+        android:label="FragmentFindPassword" />
+</navigation>

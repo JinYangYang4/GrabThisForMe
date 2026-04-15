@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="secondhand_category">
+        <item>请选择商品类别</item>
+        <item>数码产品</item>
+        <item>服饰鞋帽</item>
+        <item>家居用品</item>
+        <item>图书文具</item>
+        <item>美妆护肤</item>
+        <item>运动器材</item>
+        <item>其他物品</item>
+    </string-array>
+</resources>

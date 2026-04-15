@@ -1,16 +1,18 @@
 package com.example.grabthisforme.activity.homeFragment.adapter
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.grabthisforme.R
 import com.example.grabthisforme.databinding.RvOrderItemBinding
 import com.example.grabthisforme.model.Order.Order
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class RecyclerViewOrderAdapter(private val clickListener:(taskId : Long )-> Unit): ListAdapter<Order, RecyclerViewOrderAdapter.ViewHolder>(
+class RecyclerViewOrderAdapter(var userId: Long? = null,private val clickListener:(taskId : Long )-> Unit): ListAdapter<Order, RecyclerViewOrderAdapter.ViewHolder>(
     ViewHolder.OrderDiffItemCallback()) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -24,7 +26,7 @@ class RecyclerViewOrderAdapter(private val clickListener:(taskId : Long )-> Unit
         position: Int
     ) {
         val order = getItem(position)
-        return holder.bind(order,clickListener)
+        return holder.bind(order,clickListener,userId)
     }
 
     class ViewHolder(val binding: RvOrderItemBinding): RecyclerView.ViewHolder(binding.root){
@@ -35,13 +37,35 @@ class RecyclerViewOrderAdapter(private val clickListener:(taskId : Long )-> Unit
                 return ViewHolder(binding)
             }
         }
-        fun bind(order : Order,clickListener: (Long) -> Unit){
+        fun bind(order : Order,clickListener: (Long) -> Unit,userId: Long?){
             binding.goodsPrice.text = order.goods.price.toString()
-            binding.shelfNumber.text = order.goods.shelf_number
-            binding.aimPosition.text = order.goods.aim_position
+            binding.shelfNumber.text = order.shelf_number
+            binding.aimPosition.text = order.aim_position
             binding.goodsName.text = order.goods.name
-            binding.sendTime.text = "配送时间: ${formatTime(order.goods.startTime)} - ${formatTime(order.goods.endTime)}"
-            binding.timeLeft.text =  formatTimeLeft(order.goods.startTime, order.goods.endTime)
+            binding.sendTime.text = "配送时间: ${formatTime(order.startTime)} - ${formatTime(order.endTime)}"
+            binding.timeLeft.text =  formatTimeLeft(order.startTime, order.endTime)
+            if (userId != null){
+                if (order.buyer.id ==  userId){
+                    binding.llOrderItem.setBackgroundResource(R.drawable.bg_arc_gradient)
+                    binding.ivState.setImageResource(R.drawable.ic_wait_receive)
+                }else{
+                    binding.ivState.setBackgroundResource(R.drawable.bg_arc_gradient_green)
+                    binding.ivState.setImageResource(R.drawable.ic_wait_send)
+                }
+                if (checkOrderStatus(order.endTime)){
+                    binding.ivState.setImageResource(R.drawable.ic_already_over)
+                }
+            }else{
+                binding.ivState.visibility = View.GONE
+            }
+            itemView.setOnClickListener {
+                val taskId = order.orderId.toLongOrNull() ?: 0L
+                println("点击了Item，taskId: $taskId, orderId: ${order.orderId}")
+                clickListener.invoke(taskId)
+            }
+            itemView.isClickable = true
+            itemView.isFocusable = true
+
         }
         private fun formatTime(timeStamp: Long): String {
             return try {
@@ -50,6 +74,10 @@ class RecyclerViewOrderAdapter(private val clickListener:(taskId : Long )-> Unit
             } catch (e: Exception) {
                 "时间格式错误"
             }
+        }
+        fun checkOrderStatus(endTime: Long): Boolean {
+            val currentTime = System.currentTimeMillis()
+            return currentTime <= endTime
         }
         private fun formatTimeLeft(startTime: Long, endTime: Long): String {
             val duration = endTime - startTime

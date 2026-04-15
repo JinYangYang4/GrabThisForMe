@@ -82,6 +82,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/ll_search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="4dp"
@@ -104,290 +105,223 @@
                 android:textSize="16sp"/>
 
         </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:elevation="8dp"
+            android:backgroundTint="@color/white"
+            android:background="@drawable/bg_round_stripe"
+            android:id="@+id/select"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar_back"
+            android:layout_margin="9dp"
+            android:gravity="center">
+            <LinearLayout
+                android:id="@+id/ll_item_order"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/order">
+                </ImageView>
 
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/nestedScrollView"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="待配送"
+                    android:textSize="10sp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/ll_sign_in"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_task">
+                </ImageView>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="任务"
+                    android:textSize="10sp">
+                </TextView>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ll_go_to_secondhand_fill_info"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_goods">
+                </ImageView>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="出二手"
+                    android:textSize="10sp">
+                </TextView>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ll_go_to_secondhand"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_receive">
+                </ImageView>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="逛逛二手"
+                    android:textSize="10sp">
+                </TextView>
+            </LinearLayout>
+        </LinearLayout>
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1">
-
-            <LinearLayout
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appBar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_round_stripe">
+
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="80dp"
-                    android:elevation="8dp"
-                    android:backgroundTint="@color/white"
-                    android:background="@drawable/bg_round_stripe"
-                    android:id="@+id/select"
-                    app:layout_constraintTop_toBottomOf="@+id/toolbar_back"
-                    android:layout_margin="9dp"
-                    android:gravity="center">
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1"
-                        android:gravity="center">
-                        <ImageView
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/order">
-                        </ImageView>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="订单"
-                            android:textSize="10sp">
-                        </TextView>
-                    </LinearLayout>
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_weight="1"
-                        android:gravity="center">
-                        <ImageView
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/ic_task">
-                        </ImageView>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="任务"
-                            android:textSize="10sp">
-                        </TextView>
-                    </LinearLayout>
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
-                        <ImageView
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/ic_goods">
-                        </ImageView>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="商品"
-                            android:textSize="10sp">
-                        </TextView>
-                    </LinearLayout>
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
-                        <ImageView
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/ic_payment_qr_code">
-                        </ImageView>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="收款码"
-                            android:textSize="10sp">
-                        </TextView>
-                    </LinearLayout>
-                </LinearLayout>
-                <LinearLayout
-                    android:id="@+id/dropContainer"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/bg_round_stripe"
-                    android:backgroundTint="@color/white"
-                    android:layout_marginLeft="9dp"
-                    android:layout_marginRight="9dp"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="15dp"
-                        android:layout_marginTop="3dp"
-                        android:textSize="17sp"
-                        android:text="执行订单"/>
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_task"
-                        android:layout_width="match_parent"
-                        android:layout_margin="5dp"
-                        android:elevation="20dp"
-                        android:background="@drawable/bg_round_stripe"
-                        android:clipChildren="true"
-                        android:clipToPadding="true"
-                        android:padding="8dp"
-                        android:layout_height="230dp">
-                    </androidx.recyclerview.widget.RecyclerView>
+                    app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                    android:orientation="horizontal">
                     <LinearLayout
-                        android:id="@+id/ll_dropdown"
-                        android:layout_width="match_parent"
-                        android:gravity="center"
-                        android:layout_height="wrap_content">
-                        <ImageView
-                            android:visibility="gone"
-                            android:id="@+id/iv_dropdown"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:scaleType="centerCrop"
-                            android:layout_margin="5dp"
-                            android:src="@drawable/ic_dropdown"
-                            android:layout_marginVertical="5dp"
-                            android:layout_gravity="center">
-                        </ImageView>
-                    </LinearLayout>
-
-
-                </LinearLayout>
-                <LinearLayout
-                    android:id="@+id/ll_send_order"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/bg_round_stripe"
-                    android:backgroundTint="@color/white"
-                    android:layout_marginLeft="9dp"
-                    android:layout_marginRight="9dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="15dp"
-                        android:layout_marginTop="3dp"
-                        android:textSize="17sp"
-                        android:text="去接单"/>
-                    <HorizontalScrollView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="10dp"
+                        android:layout_marginStart="9dp"
+                        android:layout_marginEnd="4.5dp"
                         android:background="@drawable/bg_round_stripe"
                         android:backgroundTint="@color/white"
-                        android:padding="8dp"
-                        android:scrollbars="none">
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:padding="12dp">
 
-                        <LinearLayout
+                        <!-- 标题 -->
+                        <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                            android:text="跑腿能力评估"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/black" />
 
-                            <!-- 筛选标签：全部任务 -->
-                            <TextView
-                                android:id="@+id/tv_filter_all"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginHorizontal="8dp"
-                                android:background="@drawable/bg_round_stripe"
-                                android:backgroundTint="@color/green_primary"
-                                android:paddingHorizontal="12dp"
-                                android:paddingVertical="4dp"
-                                android:text="全部任务"
-                                android:textColor="@color/white"
-                                android:textSize="14sp" />
+                        <!-- 雷达图 -->
+                        <com.github.mikephil.charting.charts.RadarChart
+                            android:id="@+id/radarChart"
+                            android:layout_width="match_parent"
+                            android:layout_height="150dp"
+                            android:layout_marginTop="4dp" />
 
-                            <!-- 筛选标签：附近任务 -->
-                            <TextView
-                                android:id="@+id/tv_filter_near"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginHorizontal="8dp"
-                                android:background="@drawable/bg_round_stripe"
-                                android:backgroundTint="@color/white"
-                                android:paddingHorizontal="12dp"
-                                android:paddingVertical="4dp"
-                                android:text="附近任务"
-                                android:textColor="@color/black"
-                                android:textSize="14sp" />
-
-                            <!-- 筛选标签：紧急任务 -->
-                            <TextView
-                                android:id="@+id/tv_filter_urgent"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginHorizontal="8dp"
-                                android:background="@drawable/bg_round_stripe"
-                                android:backgroundTint="@color/white"
-                                android:paddingHorizontal="12dp"
-                                android:paddingVertical="4dp"
-                                android:text="紧急任务"
-                                android:textColor="@color/black"
-                                android:textSize="14sp" />
-
-                            <!-- 新增更多筛选标签（示例） -->
-                            <TextView
-                                android:id="@+id/tv_filter_food"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginHorizontal="8dp"
-                                android:background="@drawable/bg_round_stripe"
-                                android:backgroundTint="@color/white"
-                                android:paddingHorizontal="12dp"
-                                android:paddingVertical="4dp"
-                                android:text="食品类"
-                                android:textColor="@color/black"
-                                android:textSize="14sp" />
-
-                            <TextView
-                                android:id="@+id/tv_filter_file"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginHorizontal="8dp"
-                                android:background="@drawable/bg_round_stripe"
-                                android:backgroundTint="@color/white"
-                                android:paddingHorizontal="12dp"
-                                android:paddingVertical="4dp"
-                                android:text="文件类"
-                                android:textColor="@color/black"
-                                android:textSize="14sp" />
-
-                            <TextView
-                                android:id="@+id/tv_filter_package"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginHorizontal="8dp"
-                                android:background="@drawable/bg_round_stripe"
-                                android:backgroundTint="@color/white"
-                                android:paddingHorizontal="12dp"
-                                android:paddingVertical="4dp"
-                                android:text="包裹类"
-                                android:textColor="@color/black"
-                                android:textSize="14sp" />
-                        </LinearLayout>
-                    </HorizontalScrollView>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/black">
 
                     </LinearLayout>
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_order"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:elevation="20dp"
+                        android:orientation="vertical"
+                        android:layout_marginStart="4.5dp"
+                        android:layout_marginEnd="9dp"
                         android:background="@drawable/bg_round_stripe"
-                        android:clipChildren="true"
-                        android:clipToPadding="true"
-                        android:padding="8dp">
-                    </androidx.recyclerview.widget.RecyclerView>
+                        android:layout_weight="1"
+                        android:backgroundTint="@color/white"
+                        android:padding="12dp">
+
+                        <!-- 标题 -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="跑腿能力评估"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/black" />
+
+
+                        <com.github.mikephil.charting.charts.HorizontalBarChart
+                            android:id="@+id/barChart"
+                            android:layout_width="match_parent"
+                            android:layout_height="150dp"
+                            android:layout_marginTop="7dp"/>
+
+                    </LinearLayout>
+
 
                 </LinearLayout>
+
+
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <LinearLayout
+
+                android:id="@+id/ll_send_order"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_round_stripe"
+                android:backgroundTint="@color/white"
+                android:layout_marginLeft="9dp"
+                android:layout_marginRight="9dp"
+                android:orientation="vertical"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="3dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="去接单"/>
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tabLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp"
+                    android:background="@drawable/bg_round_stripe"
+                    android:backgroundTint="@color/white"
+                    app:tabMode="scrollable"
+                    app:tabIndicatorColor="@color/green_primary"
+                    app:tabIndicatorHeight="3dp"
+                    app:tabTextColor="@color/black"
+                    app:tabSelectedTextColor="@color/green_primary"
+                    app:tabRippleColor="@null"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/black">
+                </LinearLayout>
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/viewpager2"/>
             </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
 
-
-
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
     </LinearLayout>
 </layout>

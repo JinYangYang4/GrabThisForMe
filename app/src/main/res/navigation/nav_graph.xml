@@ -7,22 +7,26 @@
 
     <keep_state_fragment
         android:id="@+id/fragmentCommunity"
-        android:name="com.example.grabthisforme.activity.communityFragment.FragmentCommunity"
+        android:name="com.example.grabthisforme.activity.communityFragment.view.FragmentCommunity"
         tools:layout="@layout/fragment_community" />
 
     <keep_state_fragment
         android:id="@+id/fragmentInformation"
-        android:name="com.example.grabthisforme.activity.informationFragment.FragmentInformation"
+        android:name="com.example.grabthisforme.activity.informationFragment.view.FragmentInformation"
         tools:layout="@layout/fragment_information" />
 
     <keep_state_fragment
         android:id="@+id/fragmentMy"
         android:name="com.example.grabthisforme.activity.myFragment.FragmentMy"
-        tools:layout="@layout/fragment_my" />
+        tools:layout="@layout/fragment_my" >
+    </keep_state_fragment>
     <keep_state_fragment
         android:id="@+id/fragmentHomeContainer"
         android:name="com.example.grabthisforme.activity.homeFragment.view.FragmentHomeContainer"
-        android:label="FragmentHomeContainer" />
+        android:label="FragmentHomeContainer" >
+
+    </keep_state_fragment>
+
 
 
 </navigation>

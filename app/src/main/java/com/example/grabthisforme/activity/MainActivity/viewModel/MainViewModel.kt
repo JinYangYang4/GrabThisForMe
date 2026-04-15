@@ -8,6 +8,14 @@ import androidx.lifecycle.ViewModel
 class MainViewModel : ViewModel() {
     private  var _drawerOpenState = MutableLiveData<Boolean>(false)
     val drawerOpenState : LiveData<Boolean> get() = _drawerOpenState
+    private var _openNewFragment = MutableLiveData<Boolean>(false)
+    val openNewFragment : LiveData<Boolean> get()= _openNewFragment
+    fun openNewFragment_ture(){
+        _openNewFragment.value = true
+    }
+    fun openNewFragment_false(){
+        _openNewFragment.value = false
+    }
     fun drawerOpenStateToClose(){
         _drawerOpenState.value = false
     }

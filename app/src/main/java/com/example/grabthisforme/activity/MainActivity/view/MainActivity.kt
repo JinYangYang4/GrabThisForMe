@@ -2,14 +2,13 @@ package com.example.grabthisforme.activity.MainActivity.view
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.app.DirectAction
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.view.animation.DecelerateInterpolator
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.addCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -19,6 +18,10 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.ActionOnlyNavDirections
+import androidx.navigation.NavDirections
+import androidx.navigation.NavGraphNavigator
+import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.grabthisforme.R
@@ -26,15 +29,21 @@ import com.example.grabthisforme.activity.MainActivity.adapter.RVRecentStoreAdap
 import com.example.grabthisforme.activity.MainActivity.adapter.RVRecentlyUserAdapter
 import com.example.grabthisforme.activity.MainActivity.core.navigation.AppNavigator
 import com.example.grabthisforme.activity.MainActivity.viewModel.MainViewModel
+import com.example.grabthisforme.activity.fragment_misc.all_executor.view.OrderExecutorFragmentArgs
+import com.example.grabthisforme.activity.fragment_misc.default_entry.view.BlankFragment
+import com.example.grabthisforme.activity.fragment_misc.default_entry.view.BlankFragmentDirections
 import com.example.grabthisforme.databinding.ActivityMainBinding
 import com.example.grabthisforme.model.store.Store
 import com.example.grabthisforme.model.user.User
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
 import kotlin.math.log
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding : ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
     private var isTouching = false
     private var originalImgHeight = 0
@@ -45,13 +54,26 @@ class MainActivity : AppCompatActivity() {
     private val targetScale = 0.97f
     private var currentPullDistance = 0f
     private var lastBackPressTime = 0L
+    private var isOrderBottomSheetFragment = false
+    private var isOpenNewFragment = false
+
     private lateinit var backCallback: OnBackPressedCallback
+    private lateinit var navHostFragment : NavHostFragment
+    private lateinit var navNewFragment : NavHostFragment
+    private val cachedFragments = setOf(
+        "com.example.grabthisforme.activity.communityFragment.view.FragmentCommunity",
+        "com.example.grabthisforme.activity.informationFragment.view.FragmentInformation",
+        "com.example.grabthisforme.activity.myFragment.FragmentMy",
+        "com.example.grabthisforme.activity.homeFragment.view.FragmentHomeContainer"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+
         initNavigationBottom()
         drawerAnimation()
         viewModelObserve()
@@ -60,7 +82,6 @@ class MainActivity : AppCompatActivity() {
         initRvUser()
         initRvStore()
         nestedScrollviewTouchListener()
-        setContentView(binding.root)
     }
     fun viewModelObserve(){
         viewModel.drawerOpenState.observe(this){ openState ->
@@ -89,10 +110,17 @@ class MainActivity : AppCompatActivity() {
                 getDrawable(this,R.drawable.bg_arc_gradient_green)
             }
         }
+        viewModel.openNewFragment.observe(this){value ->
+            if (value){
+                isOpenNewFragment = true
+            }else{
+                isOpenNewFragment = false
+            }
+        }
+
     }
     fun initNavigationBottom(){
-        val navHostFragment = supportFragmentManager.findFragmentById(binding.navHostFragment.id) as NavHostFragment
-
+        navHostFragment = supportFragmentManager.findFragmentById(binding.navHostFragment.id) as NavHostFragment
         navHostFragment.navController.navigatorProvider.addNavigator(
             AppNavigator(
                 this,
@@ -101,7 +129,6 @@ class MainActivity : AppCompatActivity() {
             )
         )
         navHostFragment.navController.setGraph(R.navigation.nav_graph)
-
         binding.llCommunity.setOnClickListener {
             navHostFragment.navController.navigate(R.id.fragmentCommunity)
             bottomUiAlpha(binding.llCommunity)
@@ -118,31 +145,80 @@ class MainActivity : AppCompatActivity() {
             navHostFragment.navController.navigate(R.id.fragmentMy)
             bottomUiAlpha(binding.llMy)
         }
-        backCallback = object : OnBackPressedCallback(true){
-            override fun handleOnBackPressed() {
-                val startId = navHostFragment.navController.graph.startDestinationId
-                val currentId = navHostFragment.navController.currentDestination?.id
 
-                val now = System.currentTimeMillis()
-                if (currentId != null && currentId != startId) {
-                    navHostFragment.navController.navigate(startId)
-                    bottomUiAlpha(binding.llHome)
-                } else if (now - lastBackPressTime < 2000) {
-                    isEnabled = false
-                    onBackPressed()
-                    lifecycleScope.launch {
-                        delay(500)
-                        isEnabled = true
-                    }
+        //零散片段
+        navNewFragment = supportFragmentManager.findFragmentById(binding.navNewFragment.id) as NavHostFragment
+        navNewFragment.navController.setGraph(R.navigation.nav_new)
 
-                }else{
-                    lastBackPressTime = now
-                    Toast.makeText(this@MainActivity, "再次返回退出", Toast.LENGTH_SHORT).show()
-                }
+        val navController = navNewFragment.navController
+        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            if (BlankFragment::class.java.name.contains(destination.label.toString())) {
+                isOrderBottomSheetFragment = true
+            } else {
+                isOrderBottomSheetFragment = false
             }
         }
-        onBackPressedDispatcher.addCallback(this,backCallback)
+            backCallback = object : OnBackPressedCallback(true){
+                override fun handleOnBackPressed() {
 
+                    if (isOrderBottomSheetFragment && isOpenNewFragment){
+                        showBottomBar()
+                    }else if (isOpenNewFragment){
+                        isEnabled = false
+                        onBackPressed()
+                        lifecycleScope.launch {
+                            delay(200)
+                            isEnabled = true
+                        }
+                    } else{
+                        val currentFragmentClass = navHostFragment.navController.currentDestination?.let { destination ->
+                            if (destination is FragmentNavigator.Destination) {
+                                destination.className
+                            } else {
+                                null
+                            }
+                        }
+
+                        if (currentFragmentClass in cachedFragments) {
+                            Log.d("test11", "initNavigationBottom: ${currentFragmentClass in cachedFragments}")
+                            val startId = navHostFragment.navController.graph.startDestinationId
+                            val currentId = navHostFragment.navController.currentDestination?.id
+
+                            val now = System.currentTimeMillis()
+                            if (currentId != null && currentId != startId) {
+                                navHostFragment.navController.navigate(startId)
+                                bottomUiAlpha(binding.llHome)
+                            } else if (now - lastBackPressTime < 2000) {
+                                isEnabled = false
+                                onBackPressed()
+                                lifecycleScope.launch {
+                                    delay(200)
+                                    isEnabled = true
+                                }
+
+                            }else{
+                                lastBackPressTime = now
+                                Toast.makeText(this@MainActivity, "再次返回退出", Toast.LENGTH_SHORT).show()
+                            }
+                        }else{
+                            isEnabled = false
+                        }
+                    }
+                }
+            }
+            onBackPressedDispatcher.addCallback(this,backCallback)
+
+
+    }
+
+    fun intentToMiscFragment(id : Int){
+        val navController = navNewFragment.navController
+        navController.navigate(id)
+    }
+    fun intentToMiscFragment_ac(ac : Int){
+        val navController = navNewFragment.navController
+        val action = BlankFragmentDirections.actionBlankFragmentToOrderExecutorFragment(ac)
+        navController.navigate(action)
     }
     fun bottomUiAlpha(targetView : View){
         binding.llMy.alpha = 0.5f
@@ -150,6 +226,18 @@ class MainActivity : AppCompatActivity() {
         binding.llCommunity.alpha = 0.5f
         binding.llInformation.alpha = 0.5f
         targetView.alpha = 1f
+    }
+    fun innerBottomBar(){
+        viewModel.openNewFragment_ture()
+        binding.navNewFragment.visibility = View.VISIBLE
+        binding.bottomBar.visibility = View.GONE
+        binding.navHostFragment.visibility = View.GONE
+    }
+    fun showBottomBar(){
+        viewModel.openNewFragment_false()
+        binding.navNewFragment.visibility = View.GONE
+        binding.bottomBar.visibility = View.VISIBLE
+        binding.navHostFragment.visibility = View.VISIBLE
     }
 
     fun initRvUser(){
@@ -159,7 +247,7 @@ class MainActivity : AppCompatActivity() {
             layoutManager = gridlayoutManager
             adapter = adapter1
         }
-        val templateUser = User("李华",1,"")
+        val templateUser = User(name = "李华", id = 1, headPic = "")
         val recentUserList = User.createVirtualUsers(templateUser,10)
         adapter1.submitList(recentUserList)
     }
@@ -193,7 +281,6 @@ class MainActivity : AppCompatActivity() {
                 mainContent.translationX = 0f
                 viewModel.drawerOpenStateToClose()
             }
-
         })
 
     }
