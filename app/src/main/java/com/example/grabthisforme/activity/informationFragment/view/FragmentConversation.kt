@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.grabthisforme.R
-import com.example.grabthisforme.activity.MainActivity.view.MainActivity
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentMessageBinding
 import com.example.grabthisforme.activity.informationFragment.adapter.ConversationRecyclerViewAdapter
 import com.example.grabthisforme.model.conversation.Conversation

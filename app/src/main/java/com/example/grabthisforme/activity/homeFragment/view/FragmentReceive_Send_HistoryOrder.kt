@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.grabthisforme.activity.MainActivity.view.OrderMessageBottomSheetFragment
+import com.example.grabthisforme.activity.mainactivity.view.OrderMessageBottomSheetFragment
 import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewOrderAdapter
 import com.example.grabthisforme.databinding.FragmentReceiveOrderBinding
 import com.example.grabthisforme.model.Order.Order

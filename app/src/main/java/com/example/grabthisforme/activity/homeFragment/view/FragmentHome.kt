@@ -12,15 +12,14 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.AnimationSet
 import android.view.animation.TranslateAnimation
-import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.grabthisforme.R
-import com.example.grabthisforme.activity.MainActivity.view.MainActivity
-import com.example.grabthisforme.activity.MainActivity.view.OrderMessageBottomSheetFragment
-import com.example.grabthisforme.activity.MainActivity.viewModel.MainViewModel
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
+import com.example.grabthisforme.activity.mainactivity.view.OrderMessageBottomSheetFragment
+import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
 
 import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewStoreAdapter
 import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewTaskAdapter
@@ -48,6 +47,8 @@ class FragmentHome : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater,container,false)
         viewModel = ViewModelProvider(this).get(FragmentHomeViewModel::class.java)
         sharedViewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
 
         initRecyclerViewTask()
         initRecyclerViewStore()
@@ -65,10 +66,15 @@ class FragmentHome : Fragment() {
         binding.IGet.setOnClickListener {
             Log.d("test1", "onCreateView: ")
             sharedViewModel.toPage(1)
+            viewModel.setGiveMode(true)
+        }
+        binding.iHelpMeGet.setOnClickListener {
+            viewModel.setGiveMode(false)
         }
         initOperationBar()
         return binding.root
     }
+
     fun initOperationBar(){
         binding.llItemOrder.setOnClickListener {
             (requireActivity() as MainActivity).intentToMiscFragment_ac(0)
@@ -123,8 +129,8 @@ class FragmentHome : Fragment() {
                 binding.rvTask.isNestedScrollingEnabled = false
                 binding.ivDropdown.setImageResource(R.drawable.ic_pull_up)
             }else{
-                binding.ivDropdown.setImageResource(R.drawable.ic_dropdown)
                 binding.rvTask.isNestedScrollingEnabled = true
+                binding.ivDropdown.setImageResource(R.drawable.ic_dropdown)
             }
         }
         binding.rvTask.post {
@@ -159,7 +165,6 @@ class FragmentHome : Fragment() {
     private fun showDropdownWithSlideAnimation() {
         if (!viewModel.GetAlreadyShow()){
             viewModel.MakeIsAnimatingTrue()
-            binding.ivDropdown.visibility = View.VISIBLE
 
             // 动画参数：从上方（-自身高度）滑到当前位置（0），透明度从 0→1
             val slideAnimation = TranslateAnimation(

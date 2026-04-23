@@ -6,14 +6,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import com.example.grabthisforme.R
-import com.example.grabthisforme.activity.MainActivity.core.navigation.AppNavigator
-import com.example.grabthisforme.activity.MainActivity.viewModel.MainViewModel
+import com.example.grabthisforme.activity.mainactivity.core.navigation.AppNavigator
+import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
 import com.example.grabthisforme.databinding.FragmentHomeContainerBinding
-import kotlin.math.log
 
 class FragmentHomeContainer : Fragment() {
     private var _binding : FragmentHomeContainerBinding ?= null

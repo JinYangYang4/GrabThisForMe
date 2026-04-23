@@ -1,7 +1,6 @@
 package com.example.grabthisforme.activity.fragment_misc.searchFriendOrGroupOrConversation.view
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.grabthisforme.R
-import com.example.grabthisforme.activity.MainActivity.view.MainActivity
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.fragment_misc.searchFriendOrGroupOrConversation.viewModel.SearchFriendOrGroupOrConversationFactory
 import com.example.grabthisforme.activity.fragment_misc.searchFriendOrGroupOrConversation.viewModel.SearchFriendOrGroupOrConversationViewModel
 import com.example.grabthisforme.activity.homeFragment.adapter.SearchHistoryRecyclerViewAdapter
@@ -19,10 +18,8 @@ import com.example.grabthisforme.model.AppDataBase.AppDatabase
 
 class FragmentSearchFriendOrGroupOrConversation : Fragment() {
     private var _binding: FragmentSearchFriendGroupConversationBinding? = null
-    private var searchInput : String = ""
     private lateinit var searchAdapterHistory : SearchHistoryRecyclerViewAdapter
     private val binding get() = _binding!!
-    private var isShow = false
     lateinit var viewModel: SearchFriendOrGroupOrConversationViewModel
     interface OnItemComponentShowListener {
         fun onComponentShowChanged(isShow: Boolean)
@@ -47,6 +44,8 @@ class FragmentSearchFriendOrGroupOrConversation : Fragment() {
         val searchHistoryDao = AppDatabase.getInstance(requireContext()).searchDao()
         val factory = SearchFriendOrGroupOrConversationFactory(searchHistoryDao)
         viewModel = ViewModelProvider(this,factory)[SearchFriendOrGroupOrConversationViewModel::class.java]
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
         initView()
         initObserve()
         initListener()
@@ -56,12 +55,12 @@ class FragmentSearchFriendOrGroupOrConversation : Fragment() {
     private fun initView() {
         viewModel.loadSearchHistory()
         searchAdapterHistory = SearchHistoryRecyclerViewAdapter() { searchContent ->
-            if (isShow) {
+            if (viewModel.deleteMode.value == true) {
                 viewModel.deleteByContent(searchContent.content)
             }else{
-                searchInput = searchContent.content
-                viewModel.addSearchHistory(searchInput)
+                viewModel.addSearchHistory(searchContent.content)
                 viewModel.deleteHistory(searchContent.content)
+                viewModel.clearSearchInput()
             }
         }
         setOnItemComponentShowListener(searchAdapterHistory)
@@ -70,23 +69,17 @@ class FragmentSearchFriendOrGroupOrConversation : Fragment() {
     }
     private fun initObserve(){
         viewModel.searchHistoryList.observe(viewLifecycleOwner){list ->
-            if (list.size == 0){
-                binding.tvNotHistory.visibility = View.VISIBLE
-            }else{
-                binding.tvNotHistory.visibility = View.GONE
-            }
             searchAdapterHistory.submitList(ArrayList(list))
         }
         viewModel.isExpanded.observe(viewLifecycleOwner){
+            viewModel.refreshLimitedList()
             if (it){
-                binding.tvExpand.text = "收起"
                 binding.ivExpand.setImageResource(R.drawable.ic_pull_up)
             }else{
-                binding.tvExpand.text = "展开"
                 binding.ivExpand.setImageResource(R.drawable.ic_dropdown)
             }
-            viewModel.refreshLimitedList()
         }
+
     }
 
     private fun initListener() {
@@ -95,38 +88,28 @@ class FragmentSearchFriendOrGroupOrConversation : Fragment() {
         }
 
         binding.llSearch.setOnClickListener {
-            binding.llSearch.setOnClickListener {
-                searchInput = binding.etSearch.text?.toString()?.trim() ?: ""
-                viewModel.addSearchHistory(searchInput)
-                binding.etSearch.text = null
-            }
+            val searchInput = binding.etSearch.text?.toString()?.trim() ?: ""
+            viewModel.addSearchHistory(searchInput)
+            viewModel.clearSearchInput()
         }
         binding.llExpand.setOnClickListener {
-            Log.d("test11", "initListener: ")
-            if (viewModel.isExpanded.value!!) {
-                binding.tvExpand.text = "收起"
-                viewModel.setExpand(false)
-            } else {
-                viewModel.setExpand(true)
-            }
+            viewModel.setExpand(!(viewModel.isExpanded.value ?: false))
+            viewModel.refreshLimitedList()
         }
         binding.tvDeleteAll.setOnClickListener {
-            isShow = false
             viewModel.clearAllHistories()
-            searchAdapterHistory.onComponentShowChanged(isShow)
-            binding.llDelete.visibility = View.GONE
+            viewModel.setDeleteMode(false)
+            searchAdapterHistory.onComponentShowChanged(false)
         }
 
         binding.tvComplete.setOnClickListener {
-            binding.llDelete.visibility = View.GONE
-            isShow = false
-            searchAdapterHistory.onComponentShowChanged(isShow)
+            viewModel.setDeleteMode(false)
+            searchAdapterHistory.onComponentShowChanged(false)
         }
 
         binding.ivClear.setOnClickListener {
-            binding.llDelete.visibility = View.VISIBLE
-            isShow = true
-            searchAdapterHistory.onComponentShowChanged(isShow)
+            viewModel.setDeleteMode(true)
+            searchAdapterHistory.onComponentShowChanged(true)
         }
     }
 
@@ -139,8 +122,7 @@ class FragmentSearchFriendOrGroupOrConversation : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        isShow = false
-
+        searchAdapterHistory.onComponentShowChanged(false)
         _binding = null
     }
 }

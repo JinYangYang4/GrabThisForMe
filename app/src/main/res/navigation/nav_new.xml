@@ -116,7 +116,7 @@
     </fragment>
     <fragment
         android:id="@+id/setFragment"
-        android:name="com.example.grabthisforme.activity.fragment_misc.setFragment.view.FragmentSet"
+        android:name="com.example.grabthisforme.activity.fragment_misc.setfragment.view.FragmentSet"
         android:label="SetFragment" >
         <action
             android:id="@+id/action_setFragment_to_personalInformation"
@@ -130,15 +130,15 @@
     </fragment>
     <fragment
         android:id="@+id/personalInformation"
-        android:name="com.example.grabthisforme.activity.fragment_misc.setFragment.view.FragmentPersonalInformation"
+        android:name="com.example.grabthisforme.activity.fragment_misc.setfragment.view.FragmentPersonalInformation"
         android:label="PersonalInformation" />
     <fragment
         android:id="@+id/fragmentAccountSecurity"
-        android:name="com.example.grabthisforme.activity.fragment_misc.setFragment.view.FragmentAccountSecurity"
+        android:name="com.example.grabthisforme.activity.fragment_misc.setfragment.view.FragmentAccountSecurity"
         android:label="FragmentAccountSecurity" />
     <fragment
         android:id="@+id/fragmentChatBackground"
-        android:name="com.example.grabthisforme.activity.fragment_misc.setFragment.view.FragmentChatBackground"
+        android:name="com.example.grabthisforme.activity.fragment_misc.setfragment.view.FragmentChatBackground"
         android:label="FragmentChatBackground"
         tools:layout="@layout/fragment_chat_backgroud"/>
     <fragment

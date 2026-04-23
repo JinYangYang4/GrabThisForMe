@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.fragment_misc.searchFragment.model.SearchContent
 import com.example.grabthisforme.activity.fragment_misc.searchFragment.model.SearchDao
 import kotlinx.coroutines.flow.first
@@ -16,6 +17,15 @@ class SearchFriendOrGroupOrConversationViewModel(private val searchDao: SearchDa
 
     private val _isExpanded = MutableLiveData<Boolean>(false)
     val isExpanded: LiveData<Boolean> = _isExpanded
+    private val _expandLabel = MutableLiveData("展开")
+    val expandLabel: LiveData<String> get() = _expandLabel
+
+    private val _deleteMode = MutableLiveData(false)
+    val deleteMode: LiveData<Boolean> get() = _deleteMode
+    private val _historyEmpty = MutableLiveData(true)
+    val historyEmpty: LiveData<Boolean> get() = _historyEmpty
+    private val _searchInput = MutableLiveData("")
+    val searchInput: LiveData<String> get() = _searchInput
 
     var fullList: MutableList<SearchContent> = mutableListOf()
     var limitedList: MutableList<SearchContent> = mutableListOf()
@@ -31,6 +41,7 @@ class SearchFriendOrGroupOrConversationViewModel(private val searchDao: SearchDa
             }
         }
         _searchHistoryList.postValue(limitedList)
+        _historyEmpty.postValue(limitedList.isEmpty())
     }
     fun loadSearchHistory() {
         viewModelScope.launch {
@@ -45,10 +56,12 @@ class SearchFriendOrGroupOrConversationViewModel(private val searchDao: SearchDa
                 }
             }
             _searchHistoryList.postValue(limitedList)
+            _historyEmpty.postValue(limitedList.isEmpty())
         }
     }
     fun setExpand(isExpand : Boolean){
         _isExpanded.value = isExpand
+        _expandLabel.value = if (isExpand) "收起" else "展开"
     }
 
     fun addSearchHistory(content: String) {
@@ -76,6 +89,7 @@ class SearchFriendOrGroupOrConversationViewModel(private val searchDao: SearchDa
                 }
             }
             _searchHistoryList.postValue(limitedList)
+            _historyEmpty.postValue(limitedList.isEmpty())
         }
     }
 
@@ -95,6 +109,7 @@ class SearchFriendOrGroupOrConversationViewModel(private val searchDao: SearchDa
                 }
             }
             _searchHistoryList.postValue(limitedList)
+            _historyEmpty.postValue(limitedList.isEmpty())
         }
     }
 
@@ -110,5 +125,18 @@ class SearchFriendOrGroupOrConversationViewModel(private val searchDao: SearchDa
             fullList.clear()
         }
         _searchHistoryList.postValue(mutableListOf())
+        _historyEmpty.postValue(true)
+    }
+
+    fun setDeleteMode(enabled: Boolean) {
+        _deleteMode.value = enabled
+    }
+
+    fun updateSearchInput(content: String) {
+        _searchInput.value = content
+    }
+
+    fun clearSearchInput() {
+        _searchInput.value = ""
     }
 }

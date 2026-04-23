@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.example.grabthisforme.R
-import com.example.grabthisforme.activity.MainActivity.view.MainActivity
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.informationFragment.adapter.InformationPagerAdapter
 import com.example.grabthisforme.databinding.FragmentInformationBinding
 import com.google.android.material.tabs.TabLayoutMediator

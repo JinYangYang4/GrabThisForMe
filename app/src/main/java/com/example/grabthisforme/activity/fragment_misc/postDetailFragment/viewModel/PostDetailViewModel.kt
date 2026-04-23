@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.model.Comment
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.model.Reply
 import com.example.grabthisforme.model.user.User
@@ -15,6 +16,20 @@ class PostDetailViewModel : ViewModel() {
     private val _addLike = MutableLiveData<Boolean>(false)
     val addLike : LiveData<Boolean> get() = _addLike
     val likeCount: LiveData<Int> = _likeCount
+    private val _inputVisible = MutableLiveData(false)
+    val inputVisible: LiveData<Boolean> get() = _inputVisible
+    private val _headerCovered = MutableLiveData(false)
+    val headerCovered: LiveData<Boolean> get() = _headerCovered
+    private val _postUserName = MutableLiveData("数码达人_小李")
+    val postUserName: LiveData<String> get() = _postUserName
+    private val _postTimeText = MutableLiveData("2小时前 发布于 二手数码社区")
+    val postTimeText: LiveData<String> get() = _postTimeText
+    private val _postContentText = MutableLiveData("新买的二手平板到了，成色99新，续航超给力，追剧一整天无压力，分享给有需要的小伙伴~")
+    val postContentText: LiveData<String> get() = _postContentText
+    private val _loveIconRes = MutableLiveData(false)
+    val loveIconRes: LiveData<Boolean> get() = _loveIconRes
+    private val _inputText = MutableLiveData("")
+    val inputText: LiveData<String> get() = _inputText
     init {
         _commentList.value = Comment.MockDataUtils.getMockCommentList()
     }
@@ -22,13 +37,27 @@ class PostDetailViewModel : ViewModel() {
         val current = _likeCount.value ?: 0
         _likeCount.value = current + 1
         _addLike.value = true
+        _loveIconRes.value = true
     }
     fun removeLike() {
         val current = _likeCount.value ?: 0
         if (current > 0) {
             _likeCount.value = current - 1
             _addLike.value = false
+            _loveIconRes.value = false
         }
+    }
+    fun setInputVisible(visible: Boolean) {
+        _inputVisible.value = visible
+    }
+    fun setHeaderCovered(covered: Boolean) {
+        _headerCovered.value = covered
+    }
+    fun updateInputText(value: String) {
+        _inputText.value = value
+    }
+    fun clearInputText() {
+        _inputText.value = ""
     }
     fun addComment(comment: Comment) {
         val list = _commentList.value ?: mutableListOf()

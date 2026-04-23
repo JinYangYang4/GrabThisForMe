@@ -17,6 +17,14 @@ class SearchCommunityViewModel(private val searchDao: SearchDao) : ViewModel() {
     val searchRecomment : LiveData<List<SearchContent>> get() = _searchRecomment
 
     var fullList : MutableList<SearchContent> = mutableListOf()
+    private val _deleteMode = MutableLiveData(false)
+    val deleteMode: LiveData<Boolean> get() = _deleteMode
+    private val _historyEmpty = MutableLiveData(true)
+    val historyEmpty: LiveData<Boolean> get() = _historyEmpty
+    private val _searchInput = MutableLiveData("")
+    val searchInput: LiveData<String> get() = _searchInput
+    private val _recommendVisible = MutableLiveData(true)
+    val recommendVisible: LiveData<Boolean> get() = _recommendVisible
 
     fun initSearchRecomment(){
         _searchRecomment.value = SearchContent.SearchRecommendations.getGuessYouSearch().subList(0,12)
@@ -31,6 +39,7 @@ class SearchCommunityViewModel(private val searchDao: SearchDao) : ViewModel() {
                 fullList.toMutableList()
             }
             _searchHistoryList.postValue(limitedList)
+            _historyEmpty.postValue(limitedList.isEmpty())
         }
     }
 
@@ -53,6 +62,7 @@ class SearchCommunityViewModel(private val searchDao: SearchDao) : ViewModel() {
                 fullList
             }
             _searchHistoryList.postValue(limitedList)
+            _historyEmpty.postValue(limitedList.isEmpty())
         }
     }
 
@@ -66,6 +76,7 @@ class SearchCommunityViewModel(private val searchDao: SearchDao) : ViewModel() {
                 fullList
             }
             _searchHistoryList.postValue(limitedList)
+            _historyEmpty.postValue(limitedList.isEmpty())
         }
     }
 
@@ -81,5 +92,22 @@ class SearchCommunityViewModel(private val searchDao: SearchDao) : ViewModel() {
             fullList.clear()
         }
         _searchHistoryList.postValue(mutableListOf())
+        _historyEmpty.postValue(true)
+    }
+
+    fun setDeleteMode(enabled: Boolean) {
+        _deleteMode.value = enabled
+    }
+
+    fun updateSearchInput(content: String) {
+        _searchInput.value = content
+    }
+
+    fun clearSearchInput() {
+        _searchInput.value = ""
+    }
+
+    fun toggleRecommendVisible() {
+        _recommendVisible.value = !(_recommendVisible.value ?: true)
     }
 }

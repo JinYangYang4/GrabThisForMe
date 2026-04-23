@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 
 import com.example.grabthisforme.R
-import com.example.grabthisforme.activity.MainActivity.view.MainActivity
-import com.example.grabthisforme.activity.MainActivity.viewModel.MainViewModel
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
+import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
 
 import com.example.grabthisforme.activity.homeFragment.adapter.HomePagerAdapter
 import com.example.grabthisforme.activity.homeFragment.viewModel.FragmentHomeViewModel

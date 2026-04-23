@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.grabthisforme.activity.MainActivity.view.MainActivity
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentCreateSecondhandGoodsBinding
 
 class CreateSecondHandGoods : Fragment() {

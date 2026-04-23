@@ -6,11 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.transition.Visibility
 import com.example.grabthisforme.R
-import com.example.grabthisforme.activity.MainActivity.view.MainActivity
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.fragment_misc.storeFragment.adapter.AlreadySelectGoodsRecyclerViewAdapter
 import com.example.grabthisforme.activity.fragment_misc.storeFragment.adapter.StoreGoodsRecyclerViewAdapter
 import com.example.grabthisforme.activity.fragment_misc.storeFragment.adpter.StoreCategoryRecyclerViewAdapter
@@ -39,6 +37,8 @@ class StoreFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentStoreBinding.inflate(inflater, container, false)
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = storeViewModel
         return binding.root
     }
 
@@ -68,10 +68,10 @@ class StoreFragment : Fragment() {
     }
     private fun initCLickListener(){
         binding.llStore.setOnClickListener {
-            showStore()
+            storeViewModel.setShowStorePage(true)
         }
         binding.llAllGoods.setOnClickListener {
-            showGoods()
+            storeViewModel.setShowStorePage(false)
         }
         binding.ivBack.setOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
@@ -91,26 +91,15 @@ class StoreFragment : Fragment() {
         binding.ivAddToLove.setOnClickListener {}
     }
     private fun initObserve(){
-        storeViewModel.priceTotal.observe(viewLifecycleOwner){
-            binding.tvPriceTotal.setText("￥$it")
-        }
         storeViewModel.isOpenMySelectGoosView.observe(viewLifecycleOwner){isOpen ->
             showGoodsMenu(isOpen)
         }
     }
     private fun showStore(){
-        binding.clStore.visibility = View.VISIBLE
-        binding.clGoods.visibility = View.GONE
-        binding.llSelectBackOrangeStore.visibility = View.VISIBLE
-        binding.llSelectBackOrangeGoods.visibility = View.GONE
-        binding.llBottom.visibility = View.GONE
+        storeViewModel.setShowStorePage(true)
     }
     private fun showGoods(){
-        binding.clStore.visibility = View.GONE
-        binding.clGoods.visibility = View.VISIBLE
-        binding.llSelectBackOrangeStore.visibility = View.GONE
-        binding.llSelectBackOrangeGoods.visibility = View.VISIBLE
-        binding.llBottom.visibility = View.VISIBLE
+        storeViewModel.setShowStorePage(false)
     }
     private fun initGoodsRecyclerView() {
         goodsAdapter = StoreGoodsRecyclerViewAdapter(
@@ -143,8 +132,6 @@ class StoreFragment : Fragment() {
     private fun showGoodsMenu(show: Boolean) {
         if (show) {
             binding.llAlreadySelectGoods.alpha = 0f
-            binding.llAlreadySelectGoods.visibility = View.VISIBLE
-            binding.flGrayBg.visibility = View.VISIBLE
 
             binding.rvAlreadySelect.setMaxVisibleItems(6)
 
@@ -167,8 +154,6 @@ class StoreFragment : Fragment() {
                 .translationY(binding.llAlreadySelectGoods.height.toFloat())
                 .setDuration(240)
                 .withEndAction {
-                    binding.llAlreadySelectGoods.visibility = View.GONE
-                    binding.flGrayBg.visibility = View.GONE
                     binding.llAlreadySelectGoods.translationY = 0f
                     binding.llAlreadySelectGoods.alpha = 0f
                 }

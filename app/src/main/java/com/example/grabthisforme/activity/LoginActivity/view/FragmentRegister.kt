@@ -58,10 +58,8 @@ class FragmentRegister : Fragment() {
         }
     }
     private fun getUserItem() {
-
         val context = context ?: return
         if (binding == null) return
-
         val userName = binding.etUserName.text?.toString()?.trim() ?: ""
         val password = binding.etPassword.text?.toString()?.trim() ?: ""
         val passwordMakeSure = binding.etPasswordMakeSure.text?.toString()?.trim() ?: ""

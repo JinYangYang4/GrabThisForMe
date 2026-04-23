@@ -8,10 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.grabthisforme.activity.MainActivity.view.MainActivity
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.fragment_misc.couponFragment.adapter.CouponRecyclerViewAdapter
+import com.example.grabthisforme.activity.fragment_misc.couponFragment.viewModel.CouponViewModel
 import com.example.grabthisforme.activity.fragment_misc.sign_inFragment.model.Coupon
 import com.example.grabthisforme.databinding.FragmentCouponBinding
 
@@ -20,16 +21,15 @@ class CouponFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var couponListAdapter :CouponRecyclerViewAdapter
-
-
-
-
+    private val viewModel: CouponViewModel by viewModels()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentCouponBinding.inflate(inflater, container, false)
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
         return binding.root
     }
 
@@ -105,13 +105,7 @@ class CouponFragment : Fragment() {
         handleEmptyData(couponTestList)
     }
     private fun handleEmptyData(couponList: List<Coupon>) {
-        if (couponList.isEmpty()) {
-            binding.rvCouponList.visibility = View.GONE
-            binding.llEmptyTip.visibility = View.VISIBLE
-        } else {
-            binding.rvCouponList.visibility = View.VISIBLE
-            binding.llEmptyTip.visibility = View.GONE
-        }
+        viewModel.updateEmptyState(couponList.isEmpty())
     }
 
     override fun onDestroyView() {

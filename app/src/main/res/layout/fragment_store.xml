@@ -2,6 +2,12 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="viewModel"
+            type="com.example.grabthisforme.activity.fragment_misc.storeFragment.viewModel.StoreViewModel" />
+    </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -90,6 +96,7 @@
                     android:layout_marginTop="5dp"
                     android:background="@drawable/bg_round_stripe"
                     android:id="@+id/ll_select_back_orange_goods"
+                    android:visibility="@{viewModel.showStorePage ? View.GONE : View.VISIBLE}"
                     android:backgroundTint="@color/orange_primary"
                     tools:ignore="Orientation">
                 </LinearLayout>
@@ -113,6 +120,7 @@
                     android:layout_width="25dp"
                     android:layout_height="4dp"
                     android:background="@drawable/bg_round_stripe"
+                    android:visibility="@{viewModel.showStorePage ? View.VISIBLE : View.GONE}"
                     android:backgroundTint="@color/orange_primary"
                     tools:ignore="Orientation">
                 </LinearLayout>
@@ -127,7 +135,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ll_select_function"
             app:layout_constraintBottom_toTopOf="@id/ll_bottom"
-            android:layout_marginTop="10sp">
+            android:layout_marginTop="10sp"
+            android:visibility="@{viewModel.showStorePage ? View.GONE : View.VISIBLE}">
             <LinearLayout
                 android:id="@+id/ll_select_goods"
                 android:layout_width="match_parent"
@@ -154,7 +163,7 @@
             android:id="@+id/cl_store"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:visibility="gone"
+            android:visibility="@{viewModel.showStorePage ? View.VISIBLE : View.GONE}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ll_select_function"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -553,7 +562,7 @@
             app:layout_constraintBottom_toTopOf="@+id/ll_bottom"
             android:clickable="true"
             android:focusable="true"
-            android:visibility="gone"/>
+            android:visibility="@{viewModel.isOpenMySelectGoosView ? View.VISIBLE : View.GONE}"/>
         <LinearLayout
             android:id="@+id/ll_already_select_goods"
             android:layout_width="match_parent"
@@ -565,7 +574,7 @@
             app:layout_constraintBottom_toTopOf="@+id/ll_bottom"
             android:clickable="true"
             android:focusable="true"
-            android:visibility="gone"
+            android:visibility="@{viewModel.isOpenMySelectGoosView ? View.VISIBLE : View.GONE}"
             android:orientation="vertical">
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -630,6 +639,7 @@
             android:background="@color/white_fff8"
             android:orientation="horizontal"
             android:gravity="center"
+            android:visibility="@{viewModel.showStorePage ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent">
             <LinearLayout
@@ -657,7 +667,7 @@
                         android:id="@+id/tv_price_total"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="¥0.00"
+                        android:text='@{"￥" + String.valueOf(viewModel.priceTotal)}'
                         android:layout_marginStart="10dp"
                         android:textColor="#FF3333"
                         android:textSize="14sp"

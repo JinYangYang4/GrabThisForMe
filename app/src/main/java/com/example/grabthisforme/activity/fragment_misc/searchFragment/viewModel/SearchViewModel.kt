@@ -1,5 +1,6 @@
 package com.example.grabthisforme.activity.fragment_misc.searchFragment.viewModel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,6 +22,12 @@ class SearchViewModel @Inject constructor(
     val _selectedSearchContent = MutableLiveData<SearchContent?>()
     val selectedSearchContent : LiveData<SearchContent?> get() = _selectedSearchContent
     var fullList : MutableList<SearchContent> = mutableListOf()
+    private val _deleteMode = MutableLiveData(false)
+    val deleteMode: LiveData<Boolean> get() = _deleteMode
+    private val _historyEmpty = MutableLiveData(true)
+    val historyEmpty: LiveData<Boolean> get() = _historyEmpty
+    private val _searchInput = MutableLiveData("")
+    val searchInput: LiveData<String> get() = _searchInput
 
     fun loadSearchHistory() {
         viewModelScope.launch {
@@ -31,6 +38,7 @@ class SearchViewModel @Inject constructor(
                 fullList.toMutableList()
             }
             _searchHistoryList.postValue(limitedList)
+            _historyEmpty.postValue(limitedList.isEmpty())
         }
     }
 
@@ -49,6 +57,7 @@ class SearchViewModel @Inject constructor(
                 fullList
             }
             _searchHistoryList.postValue(limitedList)
+            _historyEmpty.postValue(limitedList.isEmpty())
         }
     }
 
@@ -62,6 +71,7 @@ class SearchViewModel @Inject constructor(
                 fullList
             }
             _searchHistoryList.postValue(limitedList)
+            _historyEmpty.postValue(limitedList.isEmpty())
         }
     }
 
@@ -78,7 +88,22 @@ class SearchViewModel @Inject constructor(
     fun clearAllHistories() {
         viewModelScope.launch {
             searchDao. clearByType(SearchContent.SearchType.SHOPPING)
+            fullList.clear()
         }
         _searchHistoryList.postValue(mutableListOf())
+
+        _historyEmpty.postValue(true)
+    }
+
+    fun setDeleteMode(enabled: Boolean) {
+        _deleteMode.value = enabled
+    }
+
+    fun updateSearchInput(content: String) {
+        _searchInput.value = content
+    }
+
+    fun clearSearchInput() {
+        _searchInput.value = ""
     }
 }

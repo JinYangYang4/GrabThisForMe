@@ -1,4 +1,4 @@
-package com.example.grabthisforme.activity.fragment_misc.setFragment.view
+package com.example.grabthisforme.activity.fragment_misc.setfragment.view
 
 
 import android.os.Bundle
@@ -7,11 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import com.example.grabthisforme.activity.fragment_misc.setfragment.viewmodel.AccountSecurityViewModel
 import com.example.grabthisforme.databinding.FragmentAccountSecurityBinding
 
 class FragmentAccountSecurity : Fragment() {
     private var _binding: FragmentAccountSecurityBinding? = null
     private val binding get() = _binding!!
+    private val viewModel: AccountSecurityViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -19,6 +22,8 @@ class FragmentAccountSecurity : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAccountSecurityBinding.inflate(inflater, container, false)
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
         return binding.root
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -27,7 +32,6 @@ class FragmentAccountSecurity : Fragment() {
         initClickListener()
     }
     private fun initViewData() {
-        binding.tvAccount.text = "user12345678"
         binding.etOriginalPwd.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 binding.etOriginalPwd.clearFocus()

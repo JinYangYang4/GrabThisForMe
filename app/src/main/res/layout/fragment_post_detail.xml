@@ -3,6 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="viewModel"
+            type="com.example.grabthisforme.activity.fragment_misc.postDetailFragment.viewModel.PostDetailViewModel" />
+    </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -30,7 +36,7 @@
                 android:id="@+id/ll_head"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone">
+                android:visibility="@{viewModel.headerCovered ? View.VISIBLE : View.GONE}">
                 <ImageView
                     android:id="@+id/iv_top_avatar"
                     android:layout_width="28dp"
@@ -48,7 +54,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="发布者昵称"
+                    android:text="@{viewModel.postUserName}"
                     android:textSize="16sp"
                     android:textColor="#333333"
                     android:textStyle="bold"
@@ -62,6 +68,7 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginStart="16dp"
                 android:text="话题详情"
+                android:visibility="@{viewModel.headerCovered ? View.GONE : View.VISIBLE}"
                 android:textSize="18sp"
                 android:textColor="#333333"
                 android:textStyle="bold"/>
@@ -136,7 +143,7 @@
                                 android:id="@+id/tv_post_username"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="发布者昵称"
+                                android:text="@{viewModel.postUserName}"
                                 android:textSize="16sp"
                                 android:textColor="#333333"
                                 android:textStyle="bold"/>
@@ -145,7 +152,7 @@
                                 android:id="@+id/tv_post_time"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="2小时前 发布于 某某社区"
+                                android:text="@{viewModel.postTimeText}"
                                 android:textSize="12sp"
                                 android:textColor="#999999"
                                 android:layout_marginTop="4dp"/>
@@ -167,7 +174,7 @@
                             android:id="@+id/tv_post_content"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="这是一条社区说说的正文内容，可以是长文本，支持多行展示。这里是测试内容，后续你可以替换成真实的说说数据~"
+                            android:text="@{viewModel.postContentText}"
                             android:textSize="15sp"
                             android:textColor="#666666"
                             android:lineSpacingExtra="4dp"/>
@@ -217,7 +224,7 @@
                         android:textSize="12sp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="评论 100"/>
+                        android:text='@{"评论 " + String.valueOf(viewModel.commentList.size())}'/>
                     <TextView
                         android:id="@+id/tv_love_count_top"
                         android:layout_width="wrap_content"
@@ -225,7 +232,7 @@
                         android:textSize="12sp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="点赞 100"/>
+                        android:text='@{"点赞 " + String.valueOf(viewModel.likeCount)}'/>
                 </LinearLayout>
 
 
@@ -306,19 +313,19 @@
                     android:id="@+id/iv_love"
                     android:layout_width="22dp"
                     android:layout_height="22dp"
-                    android:src="@drawable/ic_unselect"/>
+                    android:src="@drawable/ic_unselected"/>
                 <TextView
                     android:id="@+id/tv_love_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:text="点赞"/>
+                    android:text='@{String.valueOf(viewModel.likeCount)}'/>
             </LinearLayout>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
+            android:visibility="@{viewModel.inputVisible ? View.VISIBLE : View.GONE}"
             android:id="@+id/ll_input"
             android:background = "@drawable/bg_round_rect_top_small_bottom_no"
             android:backgroundTint="@color/white_fff8"
@@ -336,6 +343,7 @@
                 android:minHeight="30dp"
                 android:padding="12dp"
                 android:background="@drawable/bg_chat_massage"
+                android:text="@{viewModel.inputText}"
                 android:textSize="16sp" />
             <TextView
                 android:id="@+id/tv_send"

@@ -4,13 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.grabthisforme.R
-import com.example.grabthisforme.activity.MainActivity.view.MainActivity
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.communityFragment.adpter.CommunityVP2_RVAdapter
-import com.example.grabthisforme.activity.homeFragment.view.FragmentHomeViewPager2
 import com.example.grabthisforme.databinding.FragmentCommunityViewpager2Binding
 import com.example.grabthisforme.model.Post.Post
 

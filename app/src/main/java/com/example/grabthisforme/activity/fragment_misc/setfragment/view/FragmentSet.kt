@@ -1,4 +1,4 @@
-package com.example.grabthisforme.activity.fragment_misc.setFragment.view
+package com.example.grabthisforme.activity.fragment_misc.setfragment.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.grabthisforme.R
-import com.example.grabthisforme.activity.MainActivity.view.MainActivity
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentSetBinding
 
 class FragmentSet : Fragment() {

@@ -3,7 +3,6 @@ package com.example.grabthisforme.activity.fragment_misc.chat_fragment.view
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.net.Uri
@@ -30,7 +29,8 @@ import com.example.grabthisforme.databinding.FragmentChatBinding
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.example.grabthisforme.activity.MainActivity.view.MainActivity
+import androidx.core.widget.doAfterTextChanged
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.fragment_misc.chat_fragment.adapter.ChatMessageRecyclerViewAdapter
 import com.example.grabthisforme.activity.fragment_misc.chat_fragment.viewModel.FragmentChatViewModel
 
@@ -66,6 +66,8 @@ class FragmentChat : Fragment(), BottomSheetDialogPhoto.OnPhotosSelectedListener
     ): View {
         _binding = FragmentChatBinding.inflate(inflater, container, false)
         chatViewModel = ViewModelProvider(this).get( FragmentChatViewModel::class.java)
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = chatViewModel
         return binding.root
     }
 
@@ -217,6 +219,9 @@ class FragmentChat : Fragment(), BottomSheetDialogPhoto.OnPhotosSelectedListener
         binding.ivTakePhoto.setOnClickListener {
             checkCameraPermissionAndTakePicture()
         }
+        binding.etMessageInput.doAfterTextChanged { editable ->
+            chatViewModel.onInputChanged(editable?.toString().orEmpty())
+        }
     }
     private fun checkPhotoPermissionAndShowBottomSheet() {
         val context = requireContext()
@@ -348,7 +353,7 @@ class FragmentChat : Fragment(), BottomSheetDialogPhoto.OnPhotosSelectedListener
                 )
                 messageList.add(newMessage)
                 chatAdapter.submitList(messageList)
-                binding.etMessageInput.setText("")
+                chatViewModel.clearInputState()
                 binding.rvChatMessages.scrollToPosition(messageList.size - 1)
             } else {
                 Toast.makeText(context, "请输入消息内容", Toast.LENGTH_SHORT).show()

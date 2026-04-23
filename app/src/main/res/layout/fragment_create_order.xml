@@ -2,6 +2,12 @@
 <layout
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="viewModel"
+            type="com.example.grabthisforme.activity.fragment_misc.create.viewModel.CreateOrderViewModel" />
+    </data>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -62,7 +68,7 @@
                     android:layout_height="wrap_content"
                     android:text="买商品"
                     android:textSize="15sp"
-                    android:checked="true"
+                    android:checked="@{viewModel.buyGoodsMode}"
                     android:textColor="@color/radio_text_selector"
                     app:buttonTint="@color/radio_button_tint"
                     android:layout_marginLeft="10dp"/>
@@ -73,6 +79,7 @@
                     android:layout_height="wrap_content"
                     android:text="取快递"
                     android:textSize="15sp"
+                    android:checked="@{!viewModel.buyGoodsMode}"
                     android:textColor="@color/radio_text_selector"
                     app:buttonTint="@color/radio_button_tint"
                     android:layout_marginLeft="20dp"/>
@@ -119,7 +126,8 @@
                     android:background="@drawable/bg_rounded_white"
                     android:padding="16dp"
                     android:layout_marginTop="10dp"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="@{viewModel.buyGoodsMode ? View.VISIBLE : View.GONE}">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -318,6 +326,7 @@
                                 android:textSize="15sp"
                                 android:paddingVertical="8dp"
                                 android:focusable="false"
+                                android:text="@{viewModel.startTime}"
                                 android:background="@null"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -346,6 +355,7 @@
                                 android:textSize="15sp"
                                 android:paddingVertical="8dp"
                                 android:focusable="false"
+                                android:text="@{viewModel.endTime}"
                                 android:background="@null"/>
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
@@ -359,7 +369,7 @@
                     android:padding="16dp"
                     android:layout_marginTop="10dp"
                     android:orientation="vertical"
-                    android:visibility="gone">
+                    android:visibility="@{viewModel.buyGoodsMode ? View.GONE : View.VISIBLE}">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -486,6 +496,7 @@
                                 android:textSize="15sp"
                                 android:paddingVertical="8dp"
                                 android:focusable="false"
+                                android:text="@{viewModel.expressStartTime}"
                                 android:background="@null"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -514,6 +525,7 @@
                                 android:textSize="15sp"
                                 android:paddingVertical="8dp"
                                 android:focusable="false"
+                                android:text="@{viewModel.expressEndTime}"
                                 android:background="@null"/>
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>

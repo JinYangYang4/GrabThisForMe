@@ -24,9 +24,17 @@ class StoreViewModel @Inject constructor(
     var fullList: MutableList<SearchContent> = mutableListOf()
     private var _priceTotal =  MutableLiveData<Double>(0.0)
     private var _openMySelectGoosView = MutableLiveData<Boolean>(false)
+    private val _showStorePage = MutableLiveData(false)
+    private val _deleteMode = MutableLiveData(false)
+    private val _historyEmpty = MutableLiveData(true)
+    private val _searchInput = MutableLiveData("")
 
     val priceTotal : LiveData<Double> get() = _priceTotal
     val isOpenMySelectGoosView : LiveData<Boolean> get() = _openMySelectGoosView
+    val showStorePage: LiveData<Boolean> get() = _showStorePage
+    val deleteMode: LiveData<Boolean> get() = _deleteMode
+    val historyEmpty: LiveData<Boolean> get() = _historyEmpty
+    val searchInput: LiveData<String> get() = _searchInput
     fun addGoods(price : Double){
         _priceTotal.value = _priceTotal.value + price
     }
@@ -38,6 +46,9 @@ class StoreViewModel @Inject constructor(
             _openMySelectGoosView.value = false
         }
     }
+    fun setShowStorePage(showStore: Boolean) {
+        _showStorePage.value = showStore
+    }
 
     fun loadSearchHistory() {
         viewModelScope.launch {
@@ -48,6 +59,7 @@ class StoreViewModel @Inject constructor(
                 fullList.toMutableList()
             }
             _searchHistoryList.postValue(limitedList)
+            _historyEmpty.postValue(limitedList.isEmpty())
         }
     }
 
@@ -70,6 +82,7 @@ class StoreViewModel @Inject constructor(
                 fullList
             }
             _searchHistoryList.postValue(limitedList)
+            _historyEmpty.postValue(limitedList.isEmpty())
         }
     }
 
@@ -83,6 +96,7 @@ class StoreViewModel @Inject constructor(
                 fullList
             }
             _searchHistoryList.postValue(limitedList)
+            _historyEmpty.postValue(limitedList.isEmpty())
         }
     }
 
@@ -98,7 +112,21 @@ class StoreViewModel @Inject constructor(
     fun clearAllHistories() {
         viewModelScope.launch {
             searchDao.clearByType(SearchContent.SearchType.STORE)
+            fullList.clear()
         }
         _searchHistoryList.postValue(mutableListOf())
+        _historyEmpty.postValue(true)
+    }
+
+    fun setDeleteMode(enabled: Boolean) {
+        _deleteMode.value = enabled
+    }
+
+    fun updateSearchInput(content: String) {
+        _searchInput.value = content
+    }
+
+    fun clearSearchInput() {
+        _searchInput.value = ""
     }
 }

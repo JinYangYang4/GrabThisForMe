@@ -1,17 +1,15 @@
-package com.example.grabthisforme.activity.MainActivity.adapter
+package com.example.grabthisforme.activity.mainactivity.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.grabthisforme.databinding.RvRecentlyUserItemBinding
-import com.example.grabthisforme.model.store.Store
+import com.example.grabthisforme.model.user.User
 
-
-class RVRecentStoreAdapter(val clickListener : (StoreId : Long) -> Unit) : ListAdapter<Store, RVRecentStoreAdapter.ViewHolder>(
-    DiffItemCallback()
-) {
+class RVRecentlyUserAdapter(val clickListener : (userid : Long) -> Unit) : ListAdapter<User, RVRecentlyUserAdapter.ViewHolder>(UserDiffItemCallback()){
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -23,35 +21,36 @@ class RVRecentStoreAdapter(val clickListener : (StoreId : Long) -> Unit) : ListA
         holder: ViewHolder,
         position: Int
     ) {
-        val store = getItem(position)
-        holder.bind(store,clickListener)
+        val user = getItem(position)
+        holder.bind(user,clickListener)
     }
 
     class ViewHolder(val binding: RvRecentlyUserItemBinding): RecyclerView.ViewHolder(binding.root){
         companion object{
-            fun inflate(parent : ViewGroup): ViewHolder {
+            fun inflate(parent: ViewGroup): ViewHolder{
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = RvRecentlyUserItemBinding.inflate(layoutInflater,parent,false)
                 return ViewHolder(binding)
             }
         }
-        fun bind(store : Store,clickListener: (Long) -> Unit){
-            binding.tvName.text = store.name
+        fun bind(user : User,clickListener: (Long) -> Unit){
+            binding.tvName.text = user.name
         }
     }
-    class DiffItemCallback : DiffUtil.ItemCallback<Store>() {
-        override fun areContentsTheSame(
-            oldItem: Store,
-            newItem: Store
+    class UserDiffItemCallback: DiffUtil.ItemCallback<User>(){
+        override fun areItemsTheSame(
+            oldItem: User,
+            newItem: User
         ): Boolean {
             return oldItem == newItem
         }
 
-        override fun areItemsTheSame(
-            oldItem: Store,
-            newItem: Store
+        override fun areContentsTheSame(
+            oldItem: User,
+            newItem: User
         ): Boolean {
             return oldItem.id == newItem.id
         }
+
     }
 }

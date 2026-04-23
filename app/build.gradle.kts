@@ -57,6 +57,7 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.51.1")
     kapt ("com.google.dagger:hilt-android-compiler:2.51.1")
 
+
     implementation("com.google.android.flexbox:flexbox:3.0.0")
 
     implementation("net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:3.0.0-RC2")

@@ -41,7 +41,7 @@
         </provider>
 
         <activity
-            android:name=".activity.MainActivity.view.MainActivity"
+            android:name=".activity.mainactivity.view.MainActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>

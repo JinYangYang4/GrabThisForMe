@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.grabthisforme.activity.MainActivity.view.MainActivity
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.fragment_misc.sign_inFragment.adapter.CouponMallRecyclerViewAdapter
 import com.example.grabthisforme.activity.fragment_misc.sign_inFragment.adapter.SignCalendarRecyclerViewAdapter
 import com.example.grabthisforme.activity.fragment_misc.sign_inFragment.model.CouponMallItem

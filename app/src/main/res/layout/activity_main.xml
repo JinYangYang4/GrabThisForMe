@@ -2,6 +2,12 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="viewModel"
+            type="com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel" />
+    </data>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,6 +29,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
+                        android:visibility="@{viewModel.openNewFragment ? View.GONE : View.VISIBLE}"
                         android:id="@+id/nav_host_fragment"
                         android:name="androidx.navigation.fragment.NavHostFragment"
                         app:defaultNavHost = "true">
@@ -30,7 +37,7 @@
                     <androidx.fragment.app.FragmentContainerView
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:visibility="gone"
+                        android:visibility="@{viewModel.openNewFragment ? View.VISIBLE : View.GONE}"
                         android:layout_weight="1"
                         android:id="@+id/nav_new_fragment"
                         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -44,12 +51,14 @@
                         android:id="@+id/bottom_bar"
                         android:layout_width="match_parent"
                         android:layout_height="60dp"
+                        android:visibility="@{viewModel.openNewFragment ? View.GONE : View.VISIBLE}"
                         android:gravity="center"
                         android:orientation="horizontal">
                         <LinearLayout
                             android:id="@+id/llHome"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:alpha="@{viewModel.selectedTab == 0 ? 1f : 0.5f}"
                             android:orientation="vertical"
                             android:layout_weight="1"
                             android:gravity="center_horizontal">
@@ -73,6 +82,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:id="@+id/llCommunity"
+                            android:alpha="@{viewModel.selectedTab == 1 ? 1f : 0.5f}"
                             android:orientation="vertical"
                             android:layout_weight="1"
                             android:gravity="center_horizontal">
@@ -96,6 +106,7 @@
                             android:id="@+id/llInformation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:alpha="@{viewModel.selectedTab == 2 ? 1f : 0.5f}"
                             android:orientation="vertical"
                             android:layout_weight="1"
                             android:gravity="center_horizontal">
@@ -119,6 +130,7 @@
                             android:id="@+id/llMy"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:alpha="@{viewModel.selectedTab == 3 ? 1f : 0.5f}"
                             android:orientation="vertical"
                             android:layout_weight="1"
                             android:gravity="center_horizontal">
@@ -248,14 +260,14 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="20dp"
-                                android:text="作者"
+                                android:text="@{viewModel.drawerUserName}"
                                 android:textSize="18sp">
                             </TextView>
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="20dp"
-                                android:text="账号：1233231"
+                                android:text="@{viewModel.drawerAccountText}"
                                 android:textSize="14sp"/>
 
                         </LinearLayout>
@@ -287,7 +299,7 @@
                                 android:layout_marginTop="5dp"
                                 android:padding="3dp"
                                 android:gravity="center_vertical"
-                                android:background="@drawable/bg_arc_gradient">
+                                android:background='@{viewModel.page == 0 ? @drawable/bg_arc_gradient : @drawable/bg_arc_gradient_green}'>
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -335,7 +347,7 @@
                                 android:layout_marginTop="5dp"
                                 android:padding="3dp"
                                 android:gravity="center_vertical"
-                                android:background="@drawable/bg_arc_gradient">
+                                android:background='@{viewModel.page == 0 ? @drawable/bg_arc_gradient : @drawable/bg_arc_gradient_green}'>
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -383,7 +395,7 @@
                                 android:layout_marginTop="5dp"
                                 android:padding="3dp"
                                 android:gravity="center_vertical"
-                                android:background="@drawable/bg_arc_gradient">
+                                android:background='@{viewModel.page == 0 ? @drawable/bg_arc_gradient : @drawable/bg_arc_gradient_green}'>
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -549,7 +561,7 @@
                             android:layout_height="2dp"
                             android:id="@+id/ll_menu_back_1"
                             android:layout_marginTop="10dp"
-                            android:background="@drawable/bg_arc_gradient"
+                            android:background='@{viewModel.page == 0 ? @drawable/bg_arc_gradient : @drawable/bg_arc_gradient_green}'
                             tools:ignore="Orientation" />
 
 

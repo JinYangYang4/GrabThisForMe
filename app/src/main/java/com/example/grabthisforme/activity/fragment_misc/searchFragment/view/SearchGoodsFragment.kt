@@ -9,18 +9,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import com.example.grabthisforme.activity.MainActivity.view.MainActivity
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.fragment_misc.searchFragment.adapter.SearchRecommendationViewPager2Adapter
 import com.example.grabthisforme.activity.fragment_misc.searchFragment.viewModel.SearchViewModel
-import com.example.grabthisforme.activity.fragment_misc.searchFragment.viewModel.SearchViewModelFactory
 import com.example.grabthisforme.activity.homeFragment.adapter.SearchHistoryRecyclerViewAdapter
 import com.example.grabthisforme.databinding.FragmentSearchGoodsBinding
-import com.example.grabthisforme.model.AppDataBase.AppDatabase
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -35,9 +32,7 @@ class SearchGoodsFragment : Fragment(){
     private var rightPadding : Int = 0
     private lateinit var searchAdapterHistory : SearchHistoryRecyclerViewAdapter
     private var _binding: FragmentSearchGoodsBinding? = null
-    private var searchInput : String = ""
     private val binding get() = _binding!!
-    private var isShow = false
     private  val sharedViewModel: SearchViewModel by viewModels()
 
     interface OnItemComponentShowListener {
@@ -54,6 +49,8 @@ class SearchGoodsFragment : Fragment(){
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSearchGoodsBinding.inflate(inflater, container, false)
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = sharedViewModel
         return binding.root
     }
 
@@ -71,20 +68,16 @@ class SearchGoodsFragment : Fragment(){
         sharedViewModel.searchHistoryList.observe(viewLifecycleOwner) { list ->
             searchAdapterHistory.submitList(ArrayList(list))
             Log.d("test11", "observeSearchHistory: ${list.size}")
-            if (list.size == 0){
-                binding.tvNotHistory.visibility = View.VISIBLE
-            }else{
-                binding.tvNotHistory.visibility = View.GONE
-            }
+            sharedViewModel.setDeleteMode(false)
         }
     }
 
     private fun observeSearchItemClick() {
         sharedViewModel.selectedSearchContent.observe(viewLifecycleOwner) { searchContent ->
             searchContent ?: return@observe
-            searchInput = searchContent.content
-            sharedViewModel.addSearchHistory(searchInput)
+            sharedViewModel.addSearchHistory(searchContent.content)
             sharedViewModel.deleteHistory(searchContent.content)
+            sharedViewModel.clearSearchInput()
         }
     }
 
@@ -165,12 +158,12 @@ class SearchGoodsFragment : Fragment(){
     }
     private fun initRecyclerViewHistory() {
         searchAdapterHistory = SearchHistoryRecyclerViewAdapter(){ searchContent ->
-            if (isShow){
+            if (sharedViewModel.deleteMode.value == true){
                 sharedViewModel.deleteByContent(searchContent.content)
             }else{
-                searchInput = searchContent.content
-                sharedViewModel.addSearchHistory(searchInput)
+                sharedViewModel.addSearchHistory(searchContent.content)
                 sharedViewModel.deleteHistory(searchContent.content)
+                sharedViewModel.clearSearchInput()
             }
         }
         setOnItemComponentShowListener(searchAdapterHistory)
@@ -186,25 +179,22 @@ class SearchGoodsFragment : Fragment(){
             requireActivity().supportFragmentManager.popBackStack()
         }
         binding.ivClear.setOnClickListener {
-            isShow = true
-            binding.llDelete.visibility = View.VISIBLE
-            onItemComponentShowListener?.onComponentShowChanged(isShow)
+            sharedViewModel.setDeleteMode(true)
+            onItemComponentShowListener?.onComponentShowChanged(true)
         }
         binding.tvDeleteAll.setOnClickListener {
             sharedViewModel.clearAllHistories()
-            isShow = false
-            onItemComponentShowListener?.onComponentShowChanged(isShow)
-            binding.llDelete.visibility = View.GONE
+            sharedViewModel.setDeleteMode(false)
+            onItemComponentShowListener?.onComponentShowChanged(false)
         }
         binding.tvComplete.setOnClickListener {
-            isShow = false
-            onItemComponentShowListener?.onComponentShowChanged(isShow)
-            binding.llDelete.visibility = View.GONE
+            sharedViewModel.setDeleteMode(false)
+            onItemComponentShowListener?.onComponentShowChanged(false)
         }
         binding.llSearch.setOnClickListener {
-            searchInput = binding.etSearch.text?.toString()?.trim() ?: ""
+            val searchInput = binding.etSearch.text?.toString()?.trim() ?: ""
             sharedViewModel.addSearchHistory(searchInput)
-            binding.etSearch.text = null
+            sharedViewModel.clearSearchInput()
         }
     }
 

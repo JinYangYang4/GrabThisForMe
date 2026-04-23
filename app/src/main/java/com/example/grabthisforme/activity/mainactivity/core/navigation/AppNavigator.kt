@@ -1,4 +1,4 @@
-package com.example.grabthisforme.activity.MainActivity.core.navigation
+package com.example.grabthisforme.activity.mainactivity.core.navigation
 
 import android.content.Context
 import android.os.Bundle

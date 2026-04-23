@@ -1,8 +1,7 @@
-package com.example.grabthisforme.activity.MainActivity.view
+package com.example.grabthisforme.activity.mainactivity.view
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.app.DirectAction
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
@@ -10,26 +9,21 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.ActionOnlyNavDirections
-import androidx.navigation.NavDirections
-import androidx.navigation.NavGraphNavigator
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.grabthisforme.R
-import com.example.grabthisforme.activity.MainActivity.adapter.RVRecentStoreAdapter
-import com.example.grabthisforme.activity.MainActivity.adapter.RVRecentlyUserAdapter
-import com.example.grabthisforme.activity.MainActivity.core.navigation.AppNavigator
-import com.example.grabthisforme.activity.MainActivity.viewModel.MainViewModel
-import com.example.grabthisforme.activity.fragment_misc.all_executor.view.OrderExecutorFragmentArgs
+import com.example.grabthisforme.activity.mainactivity.adapter.RVRecentStoreAdapter
+import com.example.grabthisforme.activity.mainactivity.adapter.RVRecentlyUserAdapter
+import com.example.grabthisforme.activity.mainactivity.core.navigation.AppNavigator
+import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
 import com.example.grabthisforme.activity.fragment_misc.default_entry.view.BlankFragment
 import com.example.grabthisforme.activity.fragment_misc.default_entry.view.BlankFragmentDirections
 import com.example.grabthisforme.databinding.ActivityMainBinding
@@ -39,12 +33,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-import kotlin.math.log
-
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by viewModels()
     private var isTouching = false
     private var originalImgHeight = 0
     private var isViewInit = false
@@ -72,13 +64,13 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        binding.lifecycleOwner = this
+        binding.viewModel = viewModel
 
         initNavigationBottom()
         drawerAnimation()
         viewModelObserve()
         waitViewDrawComplete()
-        bottomUiAlpha(binding.llHome)
         initRvUser()
         initRvStore()
         nestedScrollviewTouchListener()
@@ -89,35 +81,9 @@ class MainActivity : AppCompatActivity() {
                 binding.drawerLayout.openDrawer(GravityCompat.START)
             }
         }
-        viewModel.page.observe(this){value ->
-            if (value == 0){
-                binding.llMenuPeopleBack.background = ContextCompat.
-                getDrawable(this, R.drawable.bg_arc_gradient)
-                binding.llMenuShopBack.background = ContextCompat.
-                getDrawable(this,R.drawable.bg_arc_gradient)
-                binding.llMenuToolBack.background = ContextCompat.
-                getDrawable(this,R.drawable.bg_arc_gradient)
-                binding.llMenuBack1.background = ContextCompat.
-                getDrawable(this,R.drawable.bg_arc_gradient)
-            }else{
-                binding.llMenuPeopleBack.background = ContextCompat.
-                getDrawable(this, R.drawable.bg_arc_gradient_green)
-                binding.llMenuShopBack.background = ContextCompat.
-                getDrawable(this,R.drawable.bg_arc_gradient_green)
-                binding.llMenuToolBack.background = ContextCompat.
-                getDrawable(this,R.drawable.bg_arc_gradient_green)
-                binding.llMenuBack1.background = ContextCompat.
-                getDrawable(this,R.drawable.bg_arc_gradient_green)
-            }
-        }
         viewModel.openNewFragment.observe(this){value ->
-            if (value){
-                isOpenNewFragment = true
-            }else{
-                isOpenNewFragment = false
-            }
+            isOpenNewFragment = value
         }
-
     }
     fun initNavigationBottom(){
         navHostFragment = supportFragmentManager.findFragmentById(binding.navHostFragment.id) as NavHostFragment
@@ -131,19 +97,19 @@ class MainActivity : AppCompatActivity() {
         navHostFragment.navController.setGraph(R.navigation.nav_graph)
         binding.llCommunity.setOnClickListener {
             navHostFragment.navController.navigate(R.id.fragmentCommunity)
-            bottomUiAlpha(binding.llCommunity)
+            viewModel.selectTab(1)
         }
         binding.llHome.setOnClickListener {
             navHostFragment.navController.navigate(R.id.fragmentHomeContainer)
-            bottomUiAlpha(binding.llHome)
+            viewModel.selectTab(0)
         }
         binding.llInformation.setOnClickListener {
             navHostFragment.navController.navigate(R.id.fragmentInformation)
-            bottomUiAlpha(binding.llInformation)
+            viewModel.selectTab(2)
         }
         binding.llMy.setOnClickListener {
             navHostFragment.navController.navigate(R.id.fragmentMy)
-            bottomUiAlpha(binding.llMy)
+            viewModel.selectTab(3)
         }
 
         //零散片段
@@ -187,7 +153,7 @@ class MainActivity : AppCompatActivity() {
                             val now = System.currentTimeMillis()
                             if (currentId != null && currentId != startId) {
                                 navHostFragment.navController.navigate(startId)
-                                bottomUiAlpha(binding.llHome)
+                                viewModel.selectTab(0)
                             } else if (now - lastBackPressTime < 2000) {
                                 isEnabled = false
                                 onBackPressed()
@@ -220,24 +186,11 @@ class MainActivity : AppCompatActivity() {
         val action = BlankFragmentDirections.actionBlankFragmentToOrderExecutorFragment(ac)
         navController.navigate(action)
     }
-    fun bottomUiAlpha(targetView : View){
-        binding.llMy.alpha = 0.5f
-        binding.llHome.alpha = 0.5f
-        binding.llCommunity.alpha = 0.5f
-        binding.llInformation.alpha = 0.5f
-        targetView.alpha = 1f
-    }
     fun innerBottomBar(){
         viewModel.openNewFragment_ture()
-        binding.navNewFragment.visibility = View.VISIBLE
-        binding.bottomBar.visibility = View.GONE
-        binding.navHostFragment.visibility = View.GONE
     }
     fun showBottomBar(){
         viewModel.openNewFragment_false()
-        binding.navNewFragment.visibility = View.GONE
-        binding.bottomBar.visibility = View.VISIBLE
-        binding.navHostFragment.visibility = View.VISIBLE
     }
 
     fun initRvUser(){

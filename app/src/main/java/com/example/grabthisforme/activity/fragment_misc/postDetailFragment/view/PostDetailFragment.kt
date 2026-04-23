@@ -18,7 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.example.grabthisforme.R
-import com.example.grabthisforme.activity.MainActivity.view.MainActivity
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.adapter.CommentRecyclerViewAdapter
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.model.Comment
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.viewModel.PostDetailViewModel
@@ -59,6 +59,8 @@ class PostDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(requireActivity()).get(PostDetailViewModel::class.java)
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
 
         initView()
         initObserve()
@@ -69,8 +71,7 @@ class PostDetailFragment : Fragment() {
 
         ViewCompat.setOnApplyWindowInsetsListener(requireView()) { view, insets ->
             val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
-
-            binding.llInput.visibility = if (imeVisible) View.VISIBLE else View.GONE
+            viewModel.setInputVisible(imeVisible)
 
             insets
         }
@@ -100,7 +101,7 @@ class PostDetailFragment : Fragment() {
             the_commentPosition=position
             the_parentCommentId = commentId
             inputActionType = InputActionType.REPLY_COMMENT
-            binding.llInput.visibility = View.VISIBLE
+            viewModel.setInputVisible(true)
             showKeyboard(binding.etMessageInput)
         },
         scrollListener = object : CommentRecyclerViewAdapter.OnCommentScrollListener {
@@ -110,7 +111,7 @@ class PostDetailFragment : Fragment() {
         },
         onReplyItemClick = {reply, position, commentId ->
             inputActionType = InputActionType.REPLY_COMMENT
-            binding.llInput.visibility = View.VISIBLE
+            viewModel.setInputVisible(true)
             showKeyboard(binding.etMessageInput)
         }
         )
@@ -128,13 +129,10 @@ class PostDetailFragment : Fragment() {
             val avatarAreaHeight = dp2px(60)
             val isAvatarCovered = offsetAbs >= avatarAreaHeight
             val alpha = kotlin.math.min(Math.abs(offsetAbs.toFloat() - dp2px(60).toFloat()) / dp2px(60), 1f)
+            viewModel.setHeaderCovered(isAvatarCovered)
             if (isAvatarCovered) {
-                binding.llHead.visibility = View.VISIBLE
-                binding.tvPageTitle.visibility = View.GONE
                 binding.llHead.alpha = alpha
             } else {
-                binding.llHead.visibility = View.GONE
-                binding.tvPageTitle.visibility = View.VISIBLE
                 binding.tvPageTitle.alpha = alpha
             }
         })
@@ -146,9 +144,6 @@ class PostDetailFragment : Fragment() {
     }
 
     private fun initView() {
-        binding.tvPostUsername.text = "数码达人_小李"
-        binding.tvPostTime.text = "2小时前 发布于 二手数码社区"
-        binding.tvPostContent.text = "新买的二手平板到了，成色99新，续航超给力，追剧一整天无压力，分享给有需要的小伙伴~"
     }
 
     private fun initClickListeners() {
@@ -156,11 +151,11 @@ class PostDetailFragment : Fragment() {
             parentFragmentManager.popBackStack()
         }
         binding.llComment.setOnClickListener {
-            binding.llInput.visibility = View.VISIBLE
+            viewModel.setInputVisible(true)
             inputActionType = InputActionType.POST_COMMENT
             showKeyboard(binding.etMessageInput)
         }
-        binding.llInput.setOnClickListener {
+        binding.tvSend.setOnClickListener {
             if (inputActionType == InputActionType.POST_COMMENT){
                 Log.d("test11", "initClickListeners: ${inputActionType}")
                 sendCommentToPostMan()
@@ -189,7 +184,7 @@ class PostDetailFragment : Fragment() {
         val newComment = Comment(
             id = System.currentTimeMillis(),
             time = System.currentTimeMillis(),
-            message = binding.etMessageInput.text.toString().trim(),
+            message = (viewModel.inputText.value ?: "").trim(),
             imageUrls = mutableListOf(),
             commenter = User(id = 1, name = "用户1", headPic = ""),
             replies = mutableListOf(),
@@ -197,7 +192,7 @@ class PostDetailFragment : Fragment() {
         )
         viewModel.addComment(newComment)
         binding.etMessageInput.clearFocus()
-        binding.etMessageInput.text = null
+        viewModel.clearInputText()
         hideKeyboard()
         lifecycleScope.launch {
             delay(100)
@@ -214,7 +209,7 @@ class PostDetailFragment : Fragment() {
     }
     fun sendReplyToComment(commentPosition: Int, parentCommentId: Long, beCommenter: User? = null) {
         // 1. 获取输入的回复内容
-        val replyContent = binding.etMessageInput.text.toString().trim()
+        val replyContent = (viewModel.inputText.value ?: "").trim()
         if (replyContent.isEmpty()) {
             Toast.makeText(requireContext(), "回复内容不能为空", Toast.LENGTH_SHORT).show()
             return
@@ -228,7 +223,7 @@ class PostDetailFragment : Fragment() {
         viewModel.addReplyToComment(commentPosition, newReply)
 
         binding.etMessageInput.clearFocus()
-        binding.etMessageInput.text = null
+        viewModel.clearInputText()
         hideKeyboard()
 
 
@@ -238,15 +233,12 @@ class PostDetailFragment : Fragment() {
             val newList = list.toMutableList()
             adapter.submitList(newList)
             Log.d("test11", "initObserve: ")
-            binding.tvCommentCount.setText("评论 ${list.size}")
         }
         viewModel.likeCount.observe(viewLifecycleOwner){count ->
             Log.d("test11", "initObserve: $count")
-            binding.tvLoveCount.setText(count.toString())
-            binding.tvLoveCountTop.setText("点赞 $count")
         }
-        viewModel.addLike.observe(viewLifecycleOwner){love ->
-            if (love){
+        viewModel.loveIconRes.observe(viewLifecycleOwner){ isLove ->
+            if (isLove){
                 binding.ivLove.setImageResource(R.drawable.ic_love_selected)
             }else{
                 binding.ivLove.setImageResource(R.drawable.ic_unselected)
@@ -273,7 +265,7 @@ class PostDetailFragment : Fragment() {
 
         }
         hideKeyboard()
-        binding.llInput.visibility = View.GONE
+        viewModel.setInputVisible(false)
     }
 
     override fun onResume() {

@@ -3,6 +3,7 @@ package com.example.grabthisforme.activity.homeFragment.viewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.grabthisforme.R
 
 class FragmentHomeViewModel : ViewModel() {
     private var isAnimating = false
@@ -10,8 +11,12 @@ class FragmentHomeViewModel : ViewModel() {
     private var rvTaskHeight = 0
     private var _rvTaskIsOpen = MutableLiveData<Boolean>(false)
     val rvTaskIsOpen : LiveData<Boolean> get() = _rvTaskIsOpen
+    private val _giveMode = MutableLiveData(false)
+    val giveMode: LiveData<Boolean> get() = _giveMode
+    private val _dropdownVisible = MutableLiveData(false)
+    val dropdownVisible: LiveData<Boolean> get() = _dropdownVisible
 
-    //home1的RV部分
+
     private val _outerRvAtBottom = MutableLiveData(false)
     val  outerRvAtBottom : LiveData<Boolean> get() = _outerRvAtBottom
     fun setOuterRvAtBottom(atBottom : Boolean){
@@ -37,6 +42,7 @@ class FragmentHomeViewModel : ViewModel() {
 
     fun MakeAlreadyShowTure(){
         alreadyShow = true
+        _dropdownVisible.value = true
     }
     fun MakeAlreadyShowFalse(){
         alreadyShow = false
@@ -48,11 +54,16 @@ class FragmentHomeViewModel : ViewModel() {
 
     fun MakeRvTaskIsOpenTure(){
         _rvTaskIsOpen.value = true
+
     }
     fun MakeRvTaskIsOpenFalse(){
         _rvTaskIsOpen.value = false
     }
     fun GetRvTaskIsOpen(): Boolean {
         return _rvTaskIsOpen.value == true
+    }
+
+    fun setGiveMode(enabled: Boolean) {
+        _giveMode.value = enabled
     }
 }

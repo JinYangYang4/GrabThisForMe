@@ -1,15 +1,17 @@
-package com.example.grabthisforme.activity.MainActivity.view
+package com.example.grabthisforme.activity.mainactivity.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.fragment.app.viewModels
 import com.example.grabthisforme.databinding.FragmentOrderMessageBottomMessageBinding
 
 import com.example.grabthisforme.model.Order.Order
 import com.example.grabthisforme.model.goods.Goods
 import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.activity.mainactivity.viewmodel.OrderMessageViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -17,6 +19,7 @@ class OrderMessageBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: FragmentOrderMessageBottomMessageBinding? = null
     private  var order : Order? = null
     private val binding get() = _binding!!
+    private val viewModel: OrderMessageViewModel by viewModels()
     companion object {
         private const val ARG_ORDER_DATA = "order_data"
         fun newInstance(orderId: String): OrderMessageBottomSheetFragment {
@@ -34,6 +37,8 @@ class OrderMessageBottomSheetFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding =  FragmentOrderMessageBottomMessageBinding.inflate(inflater, container, false)
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
         return binding.root
     }
 
@@ -48,7 +53,7 @@ class OrderMessageBottomSheetFragment : BottomSheetDialogFragment() {
     }
     fun initView(){
         order?.let{
-            binding.buyerName.text = order!!.buyer.name
+            viewModel.updateBuyerName(order!!.buyer.name)
         }
     }
 

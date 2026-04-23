@@ -1,14 +1,13 @@
 package com.example.grabthisforme.activity.fragment_misc.searchCommunityFragment.view
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.grabthisforme.activity.MainActivity.view.MainActivity
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.fragment_misc.searchCommunityFragment.viewModle.SearchCommunityViewModel
 import com.example.grabthisforme.activity.fragment_misc.searchCommunityFragment.viewModle.SearchCommunityViewModelFactory
 import com.example.grabthisforme.activity.fragment_misc.searchFragment.adapter.SearchRecyclerViewAdapter
@@ -28,8 +27,6 @@ class SearchCommunityFragment : Fragment() {
     private lateinit var searchAdapterHistory : SearchHistoryRecyclerViewAdapter
     private lateinit var adapter_recomment:SearchRecyclerViewAdapter
     private lateinit var ViewModel: SearchCommunityViewModel
-    private var searchInput : String = ""
-    private var isShow = false
     interface OnItemComponentShowListener {
         fun onComponentShowChanged(isShow: Boolean)
     }
@@ -52,6 +49,8 @@ class SearchCommunityFragment : Fragment() {
         val searchHistoryDao = AppDatabase.getInstance(requireContext()).searchDao()
         val factory = SearchCommunityViewModelFactory(searchHistoryDao)
         ViewModel = ViewModelProvider(this,factory)[SearchCommunityViewModel::class.java]
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = ViewModel
 
         initViews()
         initClickEvents()
@@ -69,18 +68,12 @@ class SearchCommunityFragment : Fragment() {
         }
         ViewModel.searchHistoryList.observe(viewLifecycleOwner){list ->
             searchAdapterHistory.submitList(ArrayList(list))
-            if (list.size == 0){
-                binding.tvNotHistory.visibility = View.VISIBLE
-            }else{
-                binding.tvNotHistory.visibility = View.GONE
-            }
         }
 
     }
 
     private fun initViews() {
-        binding.llDelete.visibility = View.GONE
-        binding.tvNotHistory.visibility = View.VISIBLE
+        ViewModel.setDeleteMode(false)
     }
 
     private fun initClickEvents() {
@@ -89,17 +82,14 @@ class SearchCommunityFragment : Fragment() {
         }
 
         binding.llSearch.setOnClickListener {
-            binding.llSearch.setOnClickListener {
-                searchInput = binding.etSearch.text?.toString()?.trim() ?: ""
-                ViewModel.addSearchHistory(searchInput)
-                binding.etSearch.text = null
-            }
+            val searchInput = binding.etSearch.text?.toString()?.trim() ?: ""
+            ViewModel.addSearchHistory(searchInput)
+            ViewModel.clearSearchInput()
         }
 
         binding.ivClear.setOnClickListener {
-            isShow = true
-            searchAdapterHistory.onComponentShowChanged(isShow)
-            binding.llDelete.visibility = View.VISIBLE
+            ViewModel.setDeleteMode(true)
+            searchAdapterHistory.onComponentShowChanged(true)
         }
 
         binding.tvDeleteAll.setOnClickListener {
@@ -107,9 +97,8 @@ class SearchCommunityFragment : Fragment() {
         }
 
         binding.tvComplete.setOnClickListener {
-            binding.llDelete.visibility = View.GONE
-            isShow = false
-            searchAdapterHistory.onComponentShowChanged(isShow)
+            ViewModel.setDeleteMode(false)
+            searchAdapterHistory.onComponentShowChanged(false)
         }
 
         binding.ivRefresh.setOnClickListener {
@@ -117,8 +106,7 @@ class SearchCommunityFragment : Fragment() {
         }
 
         binding.ivInner.setOnClickListener {
-            val isVisible = binding.rvRecomment.visibility == View.VISIBLE
-            binding.rvRecomment.visibility = if (isVisible) View.GONE else View.VISIBLE
+            ViewModel.toggleRecommendVisible()
         }
 
 
@@ -135,12 +123,12 @@ class SearchCommunityFragment : Fragment() {
     private fun initRecyclerView() {
         binding.rvHistory.layoutManager = GridLayoutManager(context, 2)
         searchAdapterHistory = SearchHistoryRecyclerViewAdapter() { searchContent ->
-            if (isShow) {
+            if (ViewModel.deleteMode.value == true) {
                 ViewModel.deleteByContent(searchContent.content)
             }else{
-                searchInput = searchContent.content
-                ViewModel.addSearchHistory(searchInput)
+                ViewModel.addSearchHistory(searchContent.content)
                 ViewModel.deleteHistory(searchContent.content)
+                ViewModel.clearSearchInput()
             }
         }
         setOnItemComponentShowListener(searchAdapterHistory)
@@ -150,9 +138,9 @@ class SearchCommunityFragment : Fragment() {
 
         binding.rvRecomment.layoutManager = GridLayoutManager(context, 2)
         adapter_recomment = SearchRecyclerViewAdapter(){searchContent ->
-            searchInput = searchContent.content
-            ViewModel.addSearchHistory(searchInput)
+            ViewModel.addSearchHistory(searchContent.content)
             ViewModel.deleteHistory(searchContent.content)
+            ViewModel.clearSearchInput()
         }
         binding.rvRecomment.adapter = adapter_recomment
         searchRecomment = ViewModel.searchRecomment.value!!
@@ -163,10 +151,9 @@ class SearchCommunityFragment : Fragment() {
     private fun saveSearchHistory(keyword: String) {
     }
     private fun deleteAllHistory() {
-        isShow = false
         ViewModel.clearAllHistories()
-        searchAdapterHistory.onComponentShowChanged(isShow)
-        binding.llDelete.visibility = View.GONE
+        ViewModel.setDeleteMode(false)
+        searchAdapterHistory.onComponentShowChanged(false)
     }
     private fun refreshRecommendList() {
     }
@@ -178,8 +165,7 @@ class SearchCommunityFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        isShow = false
-        searchAdapterHistory.onComponentShowChanged(isShow)
+        searchAdapterHistory.onComponentShowChanged(false)
         onItemComponentShowListener = null
         _binding = null
     }

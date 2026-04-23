@@ -5,13 +5,11 @@ import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.example.grabthisforme.R
-import com.example.grabthisforme.activity.MainActivity.view.MainActivity
-import com.example.grabthisforme.activity.MainActivity.viewModel.MainViewModel
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
+import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
 import com.example.grabthisforme.activity.homeFragment.adapter.OrderDetailViewPager2Adapter
 import com.example.grabthisforme.databinding.FragmentOrderBottomSheetBinding
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlin.math.log
 
 class OrderExecutorFragment : Fragment() {
 
