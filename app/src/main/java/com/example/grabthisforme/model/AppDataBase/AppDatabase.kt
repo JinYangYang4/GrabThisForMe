@@ -6,10 +6,15 @@ import androidx.room.RoomDatabase
 import android.content.Context
 import com.example.grabthisforme.activity.fragment_misc.searchFragment.model.SearchContent
 import com.example.grabthisforme.activity.fragment_misc.searchFragment.model.SearchDao
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.user.UserAccountEntity
+import com.example.grabthisforme.model.user.UserProfileEntity
 import com.example.grabthisforme.model.user.UserDao
 
-@Database(entities = [SearchContent::class, User::class], version = 5, exportSchema = false)
+@Database(
+    entities = [SearchContent::class, UserAccountEntity::class, UserProfileEntity::class],
+    version = 6,
+    exportSchema = false
+)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun searchDao(): SearchDao
     abstract fun userDao(): UserDao

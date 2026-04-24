@@ -46,7 +46,7 @@ class ConversationRecyclerViewAdapter(
             when (val peer = conversation.conversationPeer) {
                 is Conversation.ConversationPeer.Single -> {
                     binding.tvName.text = peer.user?.name
-                    binding.ivAvatar.setImageResource(R.drawable.ic_back_charactor2) // 假设你有一个扩展方法 `setImageUrl`
+                    binding.ivAvatar.setImageResource(R.drawable.ic_back_charactor2)
                 }
                 is Conversation.ConversationPeer.Group -> {
                     binding.tvName.text = "Group Chat"
@@ -54,10 +54,8 @@ class ConversationRecyclerViewAdapter(
                 }
             }
 
-            // 显示最新的消息
-            binding.tvLastMsg.text = conversation.lastMessage.content
 
-            // 格式化时间戳并显示
+            binding.tvLastMsg.text = conversation.lastMessage.content
             binding.tvTime.text = formatTimestampToDateTime(conversation.lastTime)
 
             // 点击事件：点击跳转到聊天界面

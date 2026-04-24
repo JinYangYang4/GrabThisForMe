@@ -1,6 +1,7 @@
 package com.example.grabthisforme.activity.fragment_misc.storeFragment.view
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -132,11 +133,9 @@ class StoreFragment : Fragment() {
     private fun showGoodsMenu(show: Boolean) {
         if (show) {
             binding.llAlreadySelectGoods.alpha = 0f
-
-            binding.rvAlreadySelect.setMaxVisibleItems(6)
-
+            binding.llAlreadySelectGoods.visibility = View.VISIBLE
             binding.rvAlreadySelect.post {
-
+                binding.rvAlreadySelect.setMaxVisibleItems(6)
                 binding.llAlreadySelectGoods.translationY = binding.llAlreadySelectGoods.height.toFloat()
 
                 binding.llAlreadySelectGoods.animate()

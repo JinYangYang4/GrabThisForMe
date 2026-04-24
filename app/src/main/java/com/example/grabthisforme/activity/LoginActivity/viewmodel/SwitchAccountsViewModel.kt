@@ -41,10 +41,10 @@ class SwitchAccountsViewModel @Inject constructor(
 
     fun insertUser(user: User) {
         val updatedList = allUser.map {
-            it.copy(isCurrent = false)
+            it.withCurrent(false)
         }.toMutableList()
 
-        val newUser = user.copy(isCurrent = true)
+        val newUser = user.withCurrent(true)
         updatedList.removeAll { it.id == newUser.id }
         updatedList.add(0, newUser)
         allUser = updatedList

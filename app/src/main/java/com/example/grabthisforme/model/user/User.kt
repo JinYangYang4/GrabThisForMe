@@ -1,25 +1,59 @@
 package com.example.grabthisforme.model.user
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.example.grabthisforme.activity.fragment_misc.sign_inFragment.model.Coupon
-import java.util.UUID
-
-@Entity(tableName = "user")
 data class User(
-    @PrimaryKey val id: Long,
-    val isCurrent: Boolean = false,
-    val name: String,
-    val headPic: String,
-    val phone: String? = null,
-    val email: String? = null,
-    val gender: Int = 0,
-    val createTime: Long = System.currentTimeMillis(),
-    val isVip: Boolean = false,
-    val signature: String? = null,
-//    val coupon: List<Coupon>? = null,
-//    val loveStoreId : List<Long>? = null
+    val account: UserAccount,
+    val profile: UserProfile,
+    val setting: UserSetting? = null
 ) {
+    val id: Long get() = account.userId
+    val accountName: String get() = account.accountName
+    val isCurrent: Boolean get() = account.isCurrent
+    val name: String get() = profile.displayName
+    val headPic: String get() = profile.avatarUrl
+    val phone: String? get() = profile.phone
+    val email: String? get() = profile.email
+    val gender: Int get() = profile.gender
+    val createTime: Long get() = account.createTime
+    val isVip: Boolean get() = profile.isVip
+    val signature: String? get() = profile.signature
+
+    constructor(
+        id: Long,
+        name: String,
+        headPic: String,
+        phone: String? = null,
+        email: String? = null,
+        gender: Int = UserProfile.GENDER_UNKNOWN,
+        createTime: Long = System.currentTimeMillis(),
+        isVip: Boolean = false,
+        signature: String? = null,
+        isCurrent: Boolean = false,
+        accountName: String = name,
+        passwordHash: String = "",
+        lastLoginTime: Long? = null,
+        setting: UserSetting? = null
+    ) : this(
+        account = UserAccount(
+            userId = id,
+            accountName = accountName,
+            passwordHash = passwordHash,
+            isCurrent = isCurrent,
+            createTime = createTime,
+            lastLoginTime = lastLoginTime
+        ),
+        profile = UserProfile(
+            userId = id,
+            displayName = name,
+            avatarUrl = headPic,
+            phone = phone,
+            email = email,
+            gender = gender,
+            isVip = isVip,
+            signature = signature
+        ),
+        setting = setting
+    )
+
     fun getInfoSummary(): String {
         return "用户ID：$id，昵称：$name，VIP状态：${if (isVip) "是" else "否"}"
     }
@@ -27,62 +61,27 @@ data class User(
     fun isBasicInfoComplete(): Boolean {
         return name.isNotBlank() && headPic.isNotBlank()
     }
+
+    fun withCurrent(isCurrent: Boolean): User {
+        return copy(
+            account = account.copy(isCurrent = isCurrent)
+        )
+    }
+
     companion object {
         fun createVirtualUsers(
             templateUser: User,
             count: Int,
             randomName: Boolean = true,
             randomVip: Boolean = false
-        ): List<User> {
-            if (count <= 0) return emptyList()
+        ): List<User> = UserSampleData.createVirtualUsers(
+            templateUser = templateUser,
+            count = count,
+            randomName = randomName,
+            randomVip = randomVip
+        )
 
-            val virtualUsers = mutableListOf<User>()
-            var baseId = templateUser.id + 1
-
-            repeat(count) { index ->
-                val userName = if (randomName) {
-                    val randomStr = UUID.randomUUID().toString().substring(0, 6)
-                    "${templateUser.name}_$randomStr"
-                } else {
-                    "${templateUser.name}_虚拟${index + 1}"
-                }
-                val vipStatus = if (randomVip) (Math.random() > 0.7) else templateUser.isVip
-                val virtualUser = templateUser.copy(
-                    id = baseId++,
-                    name = userName,
-                    isVip = vipStatus,
-                    phone = if (randomName) "138${(10000000..99999999).random()}" else templateUser.phone,
-                    createTime = System.currentTimeMillis() // 重新生成创建时间
-                )
-                virtualUsers.add(virtualUser)
-            }
-            return virtualUsers
-        }
-
-        @Volatile
-        private var mockUser: User? = null
-
-        fun getVirtualUser(): User {
-            if (mockUser == null) {
-                synchronized(this) {
-                    if (mockUser == null) {
-                        // 构建默认的虚拟用户数据（可根据需求调整）
-                        mockUser = User(
-                            name = "测试用户_${UUID.randomUUID().toString().substring(0, 4)}",
-                            id = 10000 + (1000..9999).random().toLong(), // 随机ID（10000-19999）
-                            headPic = "https://example.com/avatar/${(1..10).random()}.png", // 占位头像URL
-                            phone = "138${(10000000..99999999).random()}", // 随机手机号
-                            email = "test_${
-                                UUID.randomUUID().toString().substring(0, 6)
-                            }@example.com", // 随机邮箱
-                            gender = (0..1).random(), // 0=未知，1=男，2=女（这里随机0/1）
-                            isVip = Math.random() > 0.5, // 50%概率为VIP
-                            signature = "这是一个虚拟用户的个性签名~"
-                        )
-                    }
-                }
-            }
-            return mockUser!!
-        }
+        fun getVirtualUser(): User = UserSampleData.getVirtualUser()
     }
 }
+
