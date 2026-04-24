@@ -2,7 +2,7 @@
 
 一个基于 Android（Kotlin）的代取/跑腿 + 社区 + 消息 + 商城 + 二手综合应用原型。
 
-## ✨ 功能概览
+##  功能概览
 
 - 首页双模式：`我来取` / `找人取`
 - 订单能力：任务列表、订单详情、创建订单、历史订单
@@ -15,7 +15,7 @@
 - 搜索能力：商品/社区/好友群聊/店铺 多场景搜索历史（本地持久化）
 - 活动能力：签到日历、优惠券列表、券商城
 
-## 🧱 技术栈
+##  技术栈
 
 - 语言：Kotlin（JVM 11）
 - UI：XML + DataBinding（已开启 Compose 支持）
@@ -26,7 +26,7 @@
 - 组件：RecyclerView / ViewPager2 / Material Components
 - 图片与图表：Glide、MPAndroidChart
 
-## 📁 项目结构
+##  项目结构
 
 ```text
 app/
@@ -42,7 +42,7 @@ app/
       drawable/                # 图标与背景资源
 ```
 
-## 🚀 快速开始
+##  快速开始
 
 ### 1) 环境要求
 
@@ -75,13 +75,13 @@ macOS / Linux:
 
 然后在 Android Studio 中运行 `app` 模块到模拟器或真机。
 
-## 🔐 权限说明
+##  权限说明
 
 - 相册读取：用于聊天选图
 - 相机：用于聊天拍照发送
 - 文件提供器（FileProvider）：用于拍照后安全分享图片 URI
 
-## 🗃️ 数据现状
+##  数据现状
 
 当前项目以原型验证为主：
 
@@ -90,7 +90,7 @@ macOS / Linux:
   - `search` 表：多场景搜索历史
   - `user` 表：本地账号与当前账号状态
 
-## 🛣️ Roadmap（建议）
+##  Roadmap（建议）
 
 - 接入真实后端 API（登录、订单、帖子、聊天）
 - WebSocket/IM 实时消息与未读同步
@@ -98,11 +98,11 @@ macOS / Linux:
 - 图片上传与媒体服务
 - 完善埋点、监控、崩溃与性能优化
 
-## 🤝 Contributing
+##  Contributing
 
 欢迎提 Issue 和 PR。建议先开 Issue 讨论改动方向，再提交实现。
 
 ## 📄 License
 
-当前仓库暂未声明 License。如需开源发布，建议补充 `MIT` 或 `Apache-2.0` 许可证。
+当前仓库暂未声明 License。
 
