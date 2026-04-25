@@ -16,7 +16,7 @@ import com.example.grabthisforme.activity.fragment_misc.storeFragment.adpter.Sto
 import com.example.grabthisforme.activity.fragment_misc.storeFragment.viewModel.StoreViewModel
 import com.example.grabthisforme.databinding.FragmentStoreBinding
 import com.example.grabthisforme.extension.setMaxVisibleItems
-import com.example.grabthisforme.model.goods.Goods
+import com.example.grabthisforme.model.goods.domain.Goods
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

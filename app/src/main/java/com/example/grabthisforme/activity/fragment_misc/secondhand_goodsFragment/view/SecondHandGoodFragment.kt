@@ -9,7 +9,7 @@ import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.fragment_misc.secondhand_goodsFragment.adapter.GoodsViewPager2Adapter
 import com.example.grabthisforme.databinding.FragmentSecondhandGoodsBinding
-import com.example.grabthisforme.model.goods.Goods
+import com.example.grabthisforme.model.goods.domain.Goods
 import com.google.android.material.tabs.TabLayoutMediator
 
 

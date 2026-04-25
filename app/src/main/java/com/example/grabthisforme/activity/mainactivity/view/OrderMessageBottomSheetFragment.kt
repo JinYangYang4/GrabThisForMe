@@ -9,7 +9,7 @@ import androidx.fragment.app.viewModels
 import com.example.grabthisforme.databinding.FragmentOrderMessageBottomMessageBinding
 
 import com.example.grabthisforme.model.Order.Order
-import com.example.grabthisforme.model.goods.Goods
+import com.example.grabthisforme.model.goods.domain.Goods
 import com.example.grabthisforme.model.user.User
 import com.example.grabthisforme.activity.mainactivity.viewmodel.OrderMessageViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog

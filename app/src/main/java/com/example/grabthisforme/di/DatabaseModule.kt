@@ -3,6 +3,7 @@ package com.example.grabthisforme.di
 import android.content.Context
 import com.example.grabthisforme.model.AppDataBase.AppDatabase
 import com.example.grabthisforme.activity.fragment_misc.searchFragment.model.SearchDao
+import com.example.grabthisforme.model.goods.data.dao.GoodsDao
 import com.example.grabthisforme.model.user.UserDao
 import dagger.Module
 import dagger.Provides
@@ -28,5 +29,10 @@ object DatabaseModule {
     @Provides
     fun provideUserDao(database: AppDatabase): UserDao{
         return database.userDao()
+    }
+
+    @Provides
+    fun provideGoodsDao(database: AppDatabase): GoodsDao {
+        return database.goodsDao()
     }
 }

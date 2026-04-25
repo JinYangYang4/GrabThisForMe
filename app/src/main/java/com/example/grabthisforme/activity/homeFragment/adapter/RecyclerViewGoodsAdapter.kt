@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.grabthisforme.databinding.RvGoodsItemBinding
-import com.example.grabthisforme.model.goods.Goods
+import com.example.grabthisforme.model.goods.domain.Goods
 
 class RecyclerViewGoodsAdapter(
     private val clickListener: (goodsId: Long) -> Unit) : ListAdapter<Goods, RecyclerViewGoodsAdapter.ViewHolder>(

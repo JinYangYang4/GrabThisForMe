@@ -19,7 +19,7 @@ import com.example.grabthisforme.activity.fragment_misc.secondhand_goodsFragment
 import com.example.grabthisforme.activity.fragment_misc.secondhand_goodsFragment.model.ConditionModel
 import com.example.grabthisforme.activity.fragment_misc.secondhand_goodsFragment.viewModel.CategoryViewModel
 import com.example.grabthisforme.databinding.FragmentGoodsRvBinding
-import com.example.grabthisforme.model.secondhandGoods.SecondhandGoods
+import com.example.grabthisforme.model.secondhandGoods.domain.SecondhandGoods
 import kotlin.collections.forEach
 
 //禁止父控件拦截触摸事件

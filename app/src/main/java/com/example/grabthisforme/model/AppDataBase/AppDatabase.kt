@@ -6,18 +6,34 @@ import androidx.room.RoomDatabase
 import android.content.Context
 import com.example.grabthisforme.activity.fragment_misc.searchFragment.model.SearchContent
 import com.example.grabthisforme.activity.fragment_misc.searchFragment.model.SearchDao
+import com.example.grabthisforme.model.goods.data.dao.GoodsDao
+import com.example.grabthisforme.model.goods.data.entity.GoodsBaseEntity
+import com.example.grabthisforme.model.goods.data.entity.GoodsPriceEntity
+import com.example.grabthisforme.model.goods.data.entity.GoodsStateEntity
+import com.example.grabthisforme.model.goods.data.entity.GoodsUiEntity
+import com.example.grabthisforme.model.secondhandGoods.data.entity.SecondhandTradeEntity
 import com.example.grabthisforme.model.user.UserAccountEntity
 import com.example.grabthisforme.model.user.UserProfileEntity
 import com.example.grabthisforme.model.user.UserDao
 
 @Database(
-    entities = [SearchContent::class, UserAccountEntity::class, UserProfileEntity::class],
-    version = 6,
+    entities = [
+        SearchContent::class,
+        UserAccountEntity::class,
+        UserProfileEntity::class,
+        GoodsBaseEntity::class,
+        GoodsPriceEntity::class,
+        GoodsUiEntity::class,
+        GoodsStateEntity::class,
+        SecondhandTradeEntity::class
+    ],
+    version = 7,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun searchDao(): SearchDao
     abstract fun userDao(): UserDao
+    abstract fun goodsDao(): GoodsDao
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null

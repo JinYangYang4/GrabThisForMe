@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.grabthisforme.databinding.RvAlreadySelectItemBinding
 
 
-import com.example.grabthisforme.model.goods.Goods
+import com.example.grabthisforme.model.goods.domain.Goods
 
 class AlreadySelectGoodsRecyclerViewAdapter(
     private val onItemClick: (Goods) -> Unit,

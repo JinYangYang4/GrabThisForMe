@@ -1,6 +1,6 @@
 package com.example.grabthisforme.model.store
 
-import com.example.grabthisforme.model.goods.Goods
+import com.example.grabthisforme.model.goods.domain.Goods
 import java.math.BigDecimal
 import java.util.UUID
 

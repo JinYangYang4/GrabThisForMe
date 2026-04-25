@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
 import com.example.grabthisforme.databinding.RvSecondGoodsItemBinding
-import com.example.grabthisforme.model.secondhandGoods.SecondhandGoods
+import com.example.grabthisforme.model.secondhandGoods.domain.SecondhandGoods
 
 class SecondhandGoodsRecyclerViewAdapter(
     private val clickListener: (goodsId: Long) -> Unit

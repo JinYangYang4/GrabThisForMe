@@ -1,6 +1,6 @@
 package com.example.grabthisforme.model.Order
 
-import com.example.grabthisforme.model.goods.Goods
+import com.example.grabthisforme.model.goods.domain.Goods
 import com.example.grabthisforme.model.user.User
 
 class Order(
