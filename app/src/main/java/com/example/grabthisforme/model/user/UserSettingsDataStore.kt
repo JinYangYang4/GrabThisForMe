@@ -25,7 +25,6 @@ class UserSettingsRepository @Inject constructor(
         val homePageMode = intPreferencesKey("home_page_mode")
         val chatBackground = stringPreferencesKey("chat_background")
         val receiveNotification = booleanPreferencesKey("receive_notification")
-        val lastBottomTab = intPreferencesKey("last_bottom_tab")
     }
 
     val settings: Flow<UserSetting> = dataStore.data.map { preferences ->
@@ -34,7 +33,6 @@ class UserSettingsRepository @Inject constructor(
             homePageMode = preferences[Keys.homePageMode] ?: 0,
             chatBackground = preferences[Keys.chatBackground] ?: "",
             receiveNotification = preferences[Keys.receiveNotification] ?: true,
-            lastBottomTab = preferences[Keys.lastBottomTab] ?: 0
         )
     }
 
@@ -44,7 +42,6 @@ class UserSettingsRepository @Inject constructor(
             preferences[Keys.homePageMode] = settings.homePageMode
             preferences[Keys.chatBackground] = settings.chatBackground
             preferences[Keys.receiveNotification] = settings.receiveNotification
-            preferences[Keys.lastBottomTab] = settings.lastBottomTab
         }
     }
 
@@ -69,12 +66,6 @@ class UserSettingsRepository @Inject constructor(
     suspend fun updateReceiveNotification(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[Keys.receiveNotification] = enabled
-        }
-    }
-
-    suspend fun updateLastBottomTab(tabIndex: Int) {
-        dataStore.edit { preferences ->
-            preferences[Keys.lastBottomTab] = tabIndex
         }
     }
 }
