@@ -102,7 +102,7 @@ macOS / Linux:
 
 欢迎提 Issue 和 PR。建议先开 Issue 讨论改动方向，再提交实现。
 
-## 📄 License
+##  License
 
 当前仓库暂未声明 License。
 
