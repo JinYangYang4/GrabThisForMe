@@ -53,7 +53,7 @@ app/
 ### 2) 拉取项目
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/JinYangYang4/GrabThisForMe.git
 cd GrabThisForMe
 ```
 
