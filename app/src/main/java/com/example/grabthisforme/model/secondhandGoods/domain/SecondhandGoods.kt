@@ -6,7 +6,7 @@ import com.example.grabthisforme.model.goods.domain.GoodsPriceInfo
 import com.example.grabthisforme.model.goods.domain.GoodsStateInfo
 import com.example.grabthisforme.model.goods.domain.GoodsUiInfo
 import com.example.grabthisforme.model.secondhandGoods.data.mock.SecondhandGoodsSampleData
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.user.domain.User
 
 open class SecondhandGoods(
     saleUser: User? = null,
@@ -55,4 +55,3 @@ open class SecondhandGoods(
         fun generateDefaultMockData(): List<SecondhandGoods> = SecondhandGoodsSampleData.generateDefaultMockData()
     }
 }
-

@@ -27,8 +27,8 @@ import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
 import com.example.grabthisforme.activity.fragment_misc.default_entry.view.BlankFragment
 import com.example.grabthisforme.activity.fragment_misc.default_entry.view.BlankFragmentDirections
 import com.example.grabthisforme.databinding.ActivityMainBinding
-import com.example.grabthisforme.model.store.Store
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.store.domain.Store
+import com.example.grabthisforme.model.user.domain.User
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

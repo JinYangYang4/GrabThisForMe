@@ -1,6 +1,6 @@
 package com.example.grabthisforme.activity.fragment_misc.postDetailFragment.model
 
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.user.domain.User
 
 data class Comment(
     val id : Long,

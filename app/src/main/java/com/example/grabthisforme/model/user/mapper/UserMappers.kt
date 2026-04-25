@@ -1,7 +1,12 @@
-package com.example.grabthisforme.model.user
+package com.example.grabthisforme.model.user.mapper
 
+import com.example.grabthisforme.model.user.data.entity.UserAccountEntity
+import com.example.grabthisforme.model.user.data.entity.UserBundleEntity
+import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
+import com.example.grabthisforme.model.user.domain.User
+import com.example.grabthisforme.model.user.domain.UserAccount
+import com.example.grabthisforme.model.user.domain.UserProfile
 
-//数据转换
 fun User.toAccountEntity(): UserAccountEntity {
     return UserAccountEntity(
         userId = id,
@@ -42,6 +47,24 @@ fun UserBundleEntity.toDomain(): User {
         accountName = account.accountName,
         passwordHash = account.passwordHash,
         lastLoginTime = account.lastLoginTime
+    )
+}
+
+fun UserAccountEntity.toDomain(profile: UserProfileEntity? = null): User {
+    return User(
+        id = userId,
+        name = profile?.displayName ?: accountName,
+        headPic = profile?.avatarUrl.orEmpty(),
+        phone = profile?.phone,
+        email = profile?.email,
+        gender = profile?.gender ?: UserProfile.GENDER_UNKNOWN,
+        createTime = createTime,
+        isVip = profile?.isVip ?: false,
+        signature = profile?.signature,
+        isCurrent = isCurrent,
+        accountName = accountName,
+        passwordHash = passwordHash,
+        lastLoginTime = lastLoginTime
     )
 }
 

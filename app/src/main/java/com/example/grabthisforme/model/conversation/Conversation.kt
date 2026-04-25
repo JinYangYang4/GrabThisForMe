@@ -1,7 +1,7 @@
 package com.example.grabthisforme.model.conversation
 
 import com.example.grabthisforme.model.messageContent.MessageContent
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.user.domain.User
 import java.util.*
 
 data class Conversation(

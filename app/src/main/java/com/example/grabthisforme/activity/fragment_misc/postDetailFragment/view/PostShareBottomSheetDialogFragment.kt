@@ -12,7 +12,7 @@ import com.example.grabthisforme.databinding.PostShareBottomSheetDialogFragmentB
 import com.example.grabthisforme.model.friendAndGroup.Friend
 import com.example.grabthisforme.model.friendAndGroup.Group
 import com.example.grabthisforme.model.friendAndGroup.SelectableItem
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.user.domain.User
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 

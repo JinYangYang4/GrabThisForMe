@@ -12,9 +12,9 @@ import com.example.grabthisforme.model.goods.data.entity.GoodsPriceEntity
 import com.example.grabthisforme.model.goods.data.entity.GoodsStateEntity
 import com.example.grabthisforme.model.goods.data.entity.GoodsUiEntity
 import com.example.grabthisforme.model.secondhandGoods.data.entity.SecondhandTradeEntity
-import com.example.grabthisforme.model.user.UserAccountEntity
-import com.example.grabthisforme.model.user.UserProfileEntity
-import com.example.grabthisforme.model.user.UserDao
+import com.example.grabthisforme.model.user.data.dao.UserDao
+import com.example.grabthisforme.model.user.data.entity.UserAccountEntity
+import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
 
 @Database(
     entities = [

@@ -1,6 +1,6 @@
 package com.example.grabthisforme.model.Post
 
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.user.domain.User
 
 // 说说
 data class Post(

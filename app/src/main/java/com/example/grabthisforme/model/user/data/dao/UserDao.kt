@@ -1,15 +1,22 @@
-package com.example.grabthisforme.model.user
+package com.example.grabthisforme.model.user.data.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import com.example.grabthisforme.model.user.data.entity.UserAccountEntity
+import com.example.grabthisforme.model.user.data.entity.UserBundleEntity
+import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
+import com.example.grabthisforme.model.user.domain.User
+import com.example.grabthisforme.model.user.mapper.toAccountEntity
+import com.example.grabthisforme.model.user.mapper.toDomain
+import com.example.grabthisforme.model.user.mapper.toProfileEntity
 
 @Dao
 interface UserDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)  //怎么判断
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertAccount(account: UserAccountEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -52,4 +59,3 @@ interface UserDao {
     @Query("DELETE FROM user_account WHERE userId = :userId")
     suspend fun deleteUserById(userId: Long)
 }
-

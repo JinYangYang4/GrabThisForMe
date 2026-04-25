@@ -23,7 +23,7 @@ import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.adapt
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.model.Comment
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.viewModel.PostDetailViewModel
 import com.example.grabthisforme.databinding.FragmentPostDetailBinding
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.user.domain.User
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

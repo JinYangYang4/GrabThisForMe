@@ -1,4 +1,4 @@
-package com.example.grabthisforme.model.user
+package com.example.grabthisforme.model.user.domain
 
 data class UserAccount(
     val userId: Long,
@@ -33,4 +33,3 @@ data class UserSetting(
     val receiveNotification: Boolean = true,
     val lastBottomTab: Int = 0
 )
-

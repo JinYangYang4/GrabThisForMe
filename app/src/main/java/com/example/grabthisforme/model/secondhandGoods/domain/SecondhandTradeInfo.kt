@@ -1,6 +1,6 @@
 package com.example.grabthisforme.model.secondhandGoods.domain
 
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.user.domain.User
 
 data class SecondhandTradeInfo(
     val saleUser: User? = null,
@@ -17,4 +17,3 @@ data class SecondhandTradeInfo(
         const val STATUS_OFF_SHELF = 3
     }
 }
-

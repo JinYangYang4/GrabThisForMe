@@ -9,7 +9,7 @@ import com.example.grabthisforme.model.secondhandGoods.data.dto.SecondhandTradeD
 import com.example.grabthisforme.model.secondhandGoods.data.entity.SecondhandTradeEntity
 import com.example.grabthisforme.model.secondhandGoods.domain.SecondhandGoods
 import com.example.grabthisforme.model.secondhandGoods.domain.SecondhandTradeInfo
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.user.domain.User
 
 fun SecondhandTradeDto.toDomainInfo(): SecondhandTradeInfo {
     val seller = if (saleUserId != null || saleUserName.isNotBlank() || saleUserAvatar.isNotBlank()) {
@@ -109,4 +109,3 @@ fun SecondhandGoods.toDto(): SecondhandGoodsDto {
 fun SecondhandGoods.toTradeEntity(): SecondhandTradeEntity {
     return tradeInfo.toEntity(id)
 }
-

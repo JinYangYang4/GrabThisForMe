@@ -1,4 +1,4 @@
-package com.example.grabthisforme.model.user
+package com.example.grabthisforme.model.user.data.datastore
 
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.grabthisforme.model.user.domain.UserSetting
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -32,7 +33,7 @@ class UserSettingsRepository @Inject constructor(
             themeMode = preferences[Keys.themeMode] ?: 0,
             homePageMode = preferences[Keys.homePageMode] ?: 0,
             chatBackground = preferences[Keys.chatBackground] ?: "",
-            receiveNotification = preferences[Keys.receiveNotification] ?: true,
+            receiveNotification = preferences[Keys.receiveNotification] ?: true
         )
     }
 
@@ -69,4 +70,3 @@ class UserSettingsRepository @Inject constructor(
         }
     }
 }
-

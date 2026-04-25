@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.grabthisforme.databinding.RvRecentlyUserItemBinding
-import com.example.grabthisforme.model.store.Store
+import com.example.grabthisforme.model.store.domain.Store
 
 
 class RVRecentStoreAdapter(val clickListener : (StoreId : Long) -> Unit) : ListAdapter<Store, RVRecentStoreAdapter.ViewHolder>(

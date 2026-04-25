@@ -1,4 +1,6 @@
-package com.example.grabthisforme.model.user
+package com.example.grabthisforme.model.user.domain
+
+import com.example.grabthisforme.model.user.data.mock.UserSampleData
 
 data class User(
     val account: UserAccount,
@@ -55,7 +57,7 @@ data class User(
     )
 
     fun getInfoSummary(): String {
-        return "用户ID：$id，昵称：$name，VIP状态：${if (isVip) "是" else "否"}"
+        return "User ID: $id, name: $name, vip: ${if (isVip) "true" else "false"}"
     }
 
     fun isBasicInfoComplete(): Boolean {
@@ -84,4 +86,3 @@ data class User(
         fun getVirtualUser(): User = UserSampleData.getVirtualUser()
     }
 }
-

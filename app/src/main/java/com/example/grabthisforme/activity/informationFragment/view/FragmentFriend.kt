@@ -10,7 +10,7 @@ import com.example.grabthisforme.databinding.FragmentFriendBinding
 import com.example.grabthisforme.activity.informationFragment.adapter.AllFriendOrGroupRecyclerViewAdapter
 import com.example.grabthisforme.model.friendAndGroup.ContactItem
 import com.example.grabthisforme.model.friendAndGroup.Friend
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.user.domain.User
 import com.example.grabthisforme.model.friendAndGroup.Group
 
 class FragmentFriend : Fragment() {

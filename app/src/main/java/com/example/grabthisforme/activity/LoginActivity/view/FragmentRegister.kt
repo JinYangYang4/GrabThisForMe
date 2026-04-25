@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.grabthisforme.activity.LoginActivity.viewmodel.SwitchAccountsViewModel
 import com.example.grabthisforme.databinding.FragmentRegisterBinding
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.user.domain.User
 import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.UUID

@@ -1,4 +1,4 @@
-package com.example.grabthisforme.model.user
+package com.example.grabthisforme.model.user.data.entity
 
 import androidx.room.Embedded
 import androidx.room.Entity
@@ -6,6 +6,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import com.example.grabthisforme.model.user.domain.UserProfile
 
 @Entity(tableName = "user_account")
 data class UserAccountEntity(
@@ -48,4 +49,3 @@ data class UserBundleEntity(
     )
     val profile: UserProfileEntity?
 )
-

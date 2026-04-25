@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.model.Comment
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.model.Reply
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.user.domain.User
 
 class PostDetailViewModel : ViewModel() {
     private val _commentList = MutableLiveData<MutableList<Comment>>(mutableListOf())

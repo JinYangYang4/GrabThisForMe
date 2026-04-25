@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.LoginActivity.adapter.SwitchAccountsRecyclerViewAdapter
 import com.example.grabthisforme.databinding.SwitchAccountBottomSheetDialogFragmentBinding
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.user.domain.User
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider

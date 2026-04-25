@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.grabthisforme.databinding.RvRecentlyUserItemBinding
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.user.domain.User
 
 class RVRecentlyUserAdapter(val clickListener : (userid : Long) -> Unit) : ListAdapter<User, RVRecentlyUserAdapter.ViewHolder>(UserDiffItemCallback()){
     override fun onCreateViewHolder(

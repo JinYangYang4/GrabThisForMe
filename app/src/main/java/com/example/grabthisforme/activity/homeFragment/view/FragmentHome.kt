@@ -26,7 +26,7 @@ import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewTaskA
 import com.example.grabthisforme.activity.homeFragment.viewModel.FragmentHomeViewModel
 import com.example.grabthisforme.databinding.FragmentHomeBinding
 import com.example.grabthisforme.model.Order.Order
-import com.example.grabthisforme.model.store.Store
+import com.example.grabthisforme.model.store.domain.Store
 
 class FragmentHome : Fragment() {
     private var _binding : FragmentHomeBinding ?= null

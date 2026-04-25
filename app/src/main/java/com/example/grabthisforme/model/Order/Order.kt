@@ -1,7 +1,7 @@
 package com.example.grabthisforme.model.Order
 
 import com.example.grabthisforme.model.goods.domain.Goods
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.user.domain.User
 
 class Order(
     var sender : User? = null,

@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.databinding.RvSwitchAccountItemBinding
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.user.domain.User
 
 class SwitchAccountsRecyclerViewAdapter(
     private val onItemClick: (User) -> Unit,

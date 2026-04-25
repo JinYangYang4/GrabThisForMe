@@ -1,6 +1,6 @@
 package com.example.grabthisforme.model.friendAndGroup
 
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.user.domain.User
 
 data class Friend(
     val friendId: Long,

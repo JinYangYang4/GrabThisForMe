@@ -18,7 +18,7 @@ import com.example.grabthisforme.model.goods.domain.GoodsUiInfo
 import com.example.grabthisforme.model.secondhandGoods.data.entity.SecondhandTradeEntity
 import com.example.grabthisforme.model.secondhandGoods.domain.SecondhandGoods
 import com.example.grabthisforme.model.secondhandGoods.domain.SecondhandTradeInfo
-import com.example.grabthisforme.model.user.User
+import com.example.grabthisforme.model.user.domain.User
 
 fun Goods.toBaseEntity(): GoodsBaseEntity {
     return GoodsBaseEntity(
@@ -203,4 +203,3 @@ fun Goods.toSecondhandTradeEntity(
         negotiable = negotiable
     )
 }
-

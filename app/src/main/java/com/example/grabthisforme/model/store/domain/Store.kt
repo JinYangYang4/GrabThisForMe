@@ -1,15 +1,16 @@
-package com.example.grabthisforme.model.store
+package com.example.grabthisforme.model.store.domain
 
 import com.example.grabthisforme.model.goods.domain.Goods
+import com.example.grabthisforme.model.store.data.mock.StoreSampleData
 import java.math.BigDecimal
 import java.util.UUID
 
 data class Store(
-    val identity: StoreIdentity,      // 商店核心身份信息（ID、名称、类型）
-    val location: StoreLocation,       // 商店位置信息（地址、经纬度）
-    val commercialInfo: StoreCommercialInfo, // 商店营业信息（电话、评分、配送费等）
-    val statistics: StoreStatistics,   // 商店统计数据（销量）
-    val goodsAll: List<Goods>? = null // 该商店的所有商品列表
+    val identity: StoreIdentity,
+    val location: StoreLocation,
+    val commercialInfo: StoreCommercialInfo,
+    val statistics: StoreStatistics,
+    val goodsAll: List<Goods>? = null
 ) {
     val id: Long get() = identity.id
     val name: String get() = identity.name
@@ -27,25 +28,24 @@ data class Store(
     val tags: List<String> get() = commercialInfo.tags
     val salesVolume: Long get() = statistics.salesVolume
 
-    // 简化构造方法（方便外部直接创建店铺对象，不用手动组装子模型）
     constructor(
-        name: String,                          // 店铺名称
-        type: String,                          // 店铺类型（快餐/超市/奶茶等）
-        address: String,                       // 店铺详细地址
-        id: Long = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE,  // 店铺唯一ID（自动生成）
-        phone: String? = null,                  // 联系电话
-        businessHours: String? = null,          // 营业时间
-        latitude: Double? = null,               // 纬度
-        longitude: Double? = null,              // 经度
-        minOrderAmount: BigDecimal = BigDecimal.ZERO,  // 起送价（默认0）
-        deliveryFee: BigDecimal = BigDecimal.ZERO,     // 配送费（默认0）
-        isOpen: Boolean = true,                 // 是否营业中（默认营业）
-        pic: String? = null,                    // 店铺封面/头像图片
-        rating: Float = 0.0f,                   // 店铺评分（默认0分）
-        tags: List<String> = emptyList(),        // 店铺标签（默认空列表）
-        goodsAll: List<Goods>? = null,          // 商品列表（默认null）
-        salesVolume: Long = 0                   // 销量（默认0）
-    ): this(
+        name: String,
+        type: String,
+        address: String,
+        id: Long = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE,
+        phone: String? = null,
+        businessHours: String? = null,
+        latitude: Double? = null,
+        longitude: Double? = null,
+        minOrderAmount: BigDecimal = BigDecimal.ZERO,
+        deliveryFee: BigDecimal = BigDecimal.ZERO,
+        isOpen: Boolean = true,
+        pic: String? = null,
+        rating: Float = 0.0f,
+        tags: List<String> = emptyList(),
+        goodsAll: List<Goods>? = null,
+        salesVolume: Long = 0
+    ) : this(
         identity = StoreIdentity(
             id = id,
             name = name,
@@ -89,4 +89,3 @@ data class Store(
             StoreSampleData.createVirtualStores(templateStore)
     }
 }
-

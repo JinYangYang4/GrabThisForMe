@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.grabthisforme.databinding.RvStoreItemBinding
 import com.example.grabthisforme.model.goods.domain.Goods
-import com.example.grabthisforme.model.store.Store
+import com.example.grabthisforme.model.store.domain.Store
 
 
 class RecyclerViewStoreAdapter(private var onStoreClickListener: ((Store) -> Unit)? = null) : ListAdapter<Store, RecyclerViewStoreAdapter.StoreViewHolder>(StoreDiffCallback()) {

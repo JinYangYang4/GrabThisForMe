@@ -1,11 +1,13 @@
-package com.example.grabthisforme.model.store
+package com.example.grabthisforme.model.store.data.mock
+
+import com.example.grabthisforme.model.store.domain.Store
 
 internal object StoreSampleData {
     fun createVirtualStores(templateStore: Store? = null): List<Store> {
         val baseStore = templateStore ?: Store(
-            name = "默认虚拟商店",
-            type = "便利店",
-            address = "XX市虚拟路100号"
+            name = "Default Store",
+            type = "Convenience",
+            address = "Virtual Road 100"
         )
 
         return List(15) { index ->
