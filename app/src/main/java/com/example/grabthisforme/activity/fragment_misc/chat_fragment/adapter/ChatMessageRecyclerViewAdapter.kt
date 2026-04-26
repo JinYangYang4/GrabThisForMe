@@ -12,7 +12,7 @@ import com.bigkoo.pickerview.view.WheelTime.dateFormat
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.databinding.RvChatMessageItemBinding
-import com.example.grabthisforme.model.messageContent.MessageContent
+import com.example.grabthisforme.model.messageContent.domain.MessageContent
 import java.util.Date
 
 typealias OnImageClick = (String) -> Unit

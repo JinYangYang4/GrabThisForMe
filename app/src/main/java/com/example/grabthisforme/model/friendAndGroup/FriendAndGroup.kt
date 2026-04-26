@@ -27,7 +27,7 @@ sealed class ContactItem {
     data class GroupHeader(val title: String) : ContactItem() // 分组头部，如 “聊天群”
     data class GroupItem(val group: Group) : ContactItem() // 群聊项
 }
-// 新增：通用的好友/群聊选择项（无分组，可直接展示）
+// 通用的好友/群聊选择项
 sealed class SelectableItem : ContactItem() {
     data class SelectableFriend(
         val friend: Friend,

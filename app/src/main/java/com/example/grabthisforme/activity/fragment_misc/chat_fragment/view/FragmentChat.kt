@@ -34,7 +34,7 @@ import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.fragment_misc.chat_fragment.adapter.ChatMessageRecyclerViewAdapter
 import com.example.grabthisforme.activity.fragment_misc.chat_fragment.viewModel.FragmentChatViewModel
 
-import com.example.grabthisforme.model.messageContent.MessageContent
+import com.example.grabthisforme.model.messageContent.domain.MessageContent
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -409,4 +409,3 @@ class FragmentChat : Fragment(), BottomSheetDialogPhoto.OnPhotosSelectedListener
         }
     }
 }
-

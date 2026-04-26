@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 
 import androidx.recyclerview.widget.RecyclerView
-import com.example.grabthisforme.model.conversation.Conversation
+import com.example.grabthisforme.model.conversation.domain.Conversation
 
 import java.text.SimpleDateFormat
 import java.util.*

@@ -1,25 +1,27 @@
-package com.example.grabthisforme.model.messageContent
+package com.example.grabthisforme.model.messageContent.domain
+
 data class MessageContent(
     val messageId: String,
+    val senderId: Long = 0L,
     val type: MessageType,
     val content: String? = null,
     val mediaUrl: String? = null,
     val timestamp: Long,
-    val need_show_time :  Boolean = false,
+    val need_show_time: Boolean = false,
     val isMine: Boolean,
     val status: MessageStatus
-){
+) {
     enum class MessageType {
         TEXT,
         IMAGE,
         VOICE,
         SYSTEM
     }
+
     enum class MessageStatus {
         SENDING,
         SENT,
         FAILED,
         READ
     }
-
 }

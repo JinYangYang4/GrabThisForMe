@@ -12,7 +12,7 @@ import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentMessageBinding
 import com.example.grabthisforme.activity.informationFragment.adapter.ConversationRecyclerViewAdapter
-import com.example.grabthisforme.model.conversation.Conversation
+import com.example.grabthisforme.model.conversation.domain.Conversation
 
 class FragmentConversation : Fragment() {
 

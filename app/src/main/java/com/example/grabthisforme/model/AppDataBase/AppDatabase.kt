@@ -6,11 +6,15 @@ import androidx.room.RoomDatabase
 import android.content.Context
 import com.example.grabthisforme.activity.fragment_misc.searchFragment.model.SearchContent
 import com.example.grabthisforme.activity.fragment_misc.searchFragment.model.SearchDao
+import com.example.grabthisforme.model.conversation.data.dao.ConversationDao
 import com.example.grabthisforme.model.goods.data.dao.GoodsDao
 import com.example.grabthisforme.model.goods.data.entity.GoodsBaseEntity
 import com.example.grabthisforme.model.goods.data.entity.GoodsPriceEntity
 import com.example.grabthisforme.model.goods.data.entity.GoodsStateEntity
 import com.example.grabthisforme.model.goods.data.entity.GoodsUiEntity
+import com.example.grabthisforme.model.messageContent.data.dao.MessageDao
+import com.example.grabthisforme.model.conversation.data.entity.ConversationEntity
+import com.example.grabthisforme.model.messageContent.data.entity.MessageEntity
 import com.example.grabthisforme.model.secondhandGoods.data.entity.SecondhandTradeEntity
 import com.example.grabthisforme.model.user.data.dao.UserDao
 import com.example.grabthisforme.model.user.data.entity.UserAccountEntity
@@ -25,15 +29,19 @@ import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
         GoodsPriceEntity::class,
         GoodsUiEntity::class,
         GoodsStateEntity::class,
+        MessageEntity::class,
+        ConversationEntity::class,
         SecondhandTradeEntity::class
     ],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun searchDao(): SearchDao
     abstract fun userDao(): UserDao
     abstract fun goodsDao(): GoodsDao
+    abstract fun messageDao(): MessageDao
+    abstract fun conversationDao(): ConversationDao
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
