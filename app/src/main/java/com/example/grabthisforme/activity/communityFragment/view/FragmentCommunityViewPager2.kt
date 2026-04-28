@@ -10,7 +10,7 @@ import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.communityFragment.adpter.CommunityVP2_RVAdapter
 import com.example.grabthisforme.databinding.FragmentCommunityViewpager2Binding
-import com.example.grabthisforme.model.Post.Post
+import com.example.grabthisforme.model.post.data.mock.PostMockData
 
 class FragmentCommunityViewPager2 : Fragment(){
     private var _binding: FragmentCommunityViewpager2Binding? = null
@@ -55,7 +55,7 @@ class FragmentCommunityViewPager2 : Fragment(){
         }
         binding.rvTask.adapter = adapter
         binding.rvTask.layoutManager = LinearLayoutManager(requireContext())
-        adapter.submitList(Post.getPostList())
+        adapter.submitList(PostMockData.getPostList())
     }
 
 

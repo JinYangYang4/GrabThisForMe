@@ -11,8 +11,7 @@ import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.communityFragment.adpter.CommunityVP2_RVAdapter
 import com.example.grabthisforme.databinding.FragmentMyTopicBinding
-
-import com.example.grabthisforme.model.Post.Post
+import com.example.grabthisforme.model.post.data.mock.PostMockData
 
 class MyTopicFragment : Fragment() {
     private var _binding: FragmentMyTopicBinding? = null
@@ -54,7 +53,7 @@ class MyTopicFragment : Fragment() {
         }
         binding.rvTopic.adapter = topicAdapter
         binding.rvTopic.setHasFixedSize(true)
-        topicAdapter.submitList(Post.getPostList())
+        topicAdapter.submitList(PostMockData.getPostList())
     }
 
 

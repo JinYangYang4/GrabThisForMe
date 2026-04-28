@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.grabthisforme.databinding.PostRvItemBinding
-import com.example.grabthisforme.model.Post.Post
+import com.example.grabthisforme.model.post.domain.Post
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -51,7 +51,7 @@ class CommunityVP2_RVAdapter(val clickListener:(taskId : String) -> Unit) : List
                 oldItem: Post,
                 newItem: Post
             ): Boolean {
-                return oldItem == newItem
+                return oldItem.postId == newItem.postId
             }
 
             @SuppressLint("DiffUtilEquals")
