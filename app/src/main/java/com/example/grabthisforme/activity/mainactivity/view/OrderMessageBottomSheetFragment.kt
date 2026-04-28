@@ -8,8 +8,9 @@ import android.view.WindowManager
 import androidx.fragment.app.viewModels
 import com.example.grabthisforme.databinding.FragmentOrderMessageBottomMessageBinding
 
-import com.example.grabthisforme.model.Order.Order
 import com.example.grabthisforme.model.goods.domain.Goods
+import com.example.grabthisforme.model.order.data.mock.OrderMockData
+import com.example.grabthisforme.model.order.domain.Order
 import com.example.grabthisforme.model.user.domain.User
 import com.example.grabthisforme.activity.mainactivity.viewmodel.OrderMessageViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -44,12 +45,16 @@ class OrderMessageBottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        order = getOrderById("1213213")
+        order = getOrderById(arguments?.getString(ARG_ORDER_DATA).orEmpty()) // 需要被弹出订单的id
         initView()
     }
     fun getOrderById(orderId: String) : Order{
-        val order = Order(User.getVirtualUser(),orderId, User.getVirtualUser(), Goods.getSingleVirtualGoods())
-        return order
+        return OrderMockData.getOrderById(orderId) ?: Order(
+            sender = User.getVirtualUser(),
+            orderId = orderId,
+            buyer = User.getVirtualUser(),
+            goods = Goods.getSingleVirtualGoods()
+        )
     }
     fun initView(){
         order?.let{

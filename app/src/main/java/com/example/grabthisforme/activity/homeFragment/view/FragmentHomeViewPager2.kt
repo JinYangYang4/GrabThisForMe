@@ -12,7 +12,8 @@ import com.example.grabthisforme.activity.mainactivity.view.OrderMessageBottomSh
 import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewOrderAdapter
 import com.example.grabthisforme.activity.homeFragment.viewModel.FragmentHomeViewModel
 import com.example.grabthisforme.databinding.FragmentTaskBinding
-import com.example.grabthisforme.model.Order.Order
+import com.example.grabthisforme.model.order.data.mock.OrderMockData
+import com.example.grabthisforme.model.order.domain.Order
 
 
 class FragmentHomeViewPager2 : Fragment() {
@@ -41,7 +42,7 @@ class FragmentHomeViewPager2 : Fragment() {
     }
 
     fun loadAllTask(){
-        mockList = Order.getOrderList()
+        mockList = OrderMockData.getOrderList()
     }
 
 
@@ -73,7 +74,7 @@ class FragmentHomeViewPager2 : Fragment() {
             adapter = taskAdapter
 
         }
-        taskAdapter.submitList(Order.getOrderList())
+        taskAdapter.submitList(OrderMockData.getOrderList())
     }
     private fun loadData() {
         when (taskType) {

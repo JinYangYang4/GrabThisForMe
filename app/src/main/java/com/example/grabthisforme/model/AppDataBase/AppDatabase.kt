@@ -15,6 +15,8 @@ import com.example.grabthisforme.model.goods.data.entity.GoodsUiEntity
 import com.example.grabthisforme.model.messageContent.data.dao.MessageDao
 import com.example.grabthisforme.model.conversation.data.entity.ConversationEntity
 import com.example.grabthisforme.model.messageContent.data.entity.MessageEntity
+import com.example.grabthisforme.model.order.data.dao.OrderDao
+import com.example.grabthisforme.model.order.data.entity.OrderEntity
 import com.example.grabthisforme.model.secondhandGoods.data.entity.SecondhandTradeEntity
 import com.example.grabthisforme.model.user.data.dao.UserDao
 import com.example.grabthisforme.model.user.data.entity.UserAccountEntity
@@ -31,9 +33,10 @@ import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
         GoodsStateEntity::class,
         MessageEntity::class,
         ConversationEntity::class,
-        SecondhandTradeEntity::class
+        SecondhandTradeEntity::class,
+        OrderEntity::class
     ],
-    version = 8,
+    version = 9,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -42,6 +45,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun goodsDao(): GoodsDao
     abstract fun messageDao(): MessageDao
     abstract fun conversationDao(): ConversationDao
+    abstract fun orderDao(): OrderDao
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null

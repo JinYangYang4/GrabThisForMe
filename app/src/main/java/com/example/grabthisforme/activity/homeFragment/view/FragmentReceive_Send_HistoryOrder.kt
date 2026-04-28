@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.grabthisforme.activity.mainactivity.view.OrderMessageBottomSheetFragment
 import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewOrderAdapter
 import com.example.grabthisforme.databinding.FragmentReceiveOrderBinding
-import com.example.grabthisforme.model.Order.Order
+import com.example.grabthisforme.model.order.data.mock.OrderMockData
 
 class FragmentReceive_Send_HistoryOrder : Fragment() {
     private var _binding: FragmentReceiveOrderBinding? = null
@@ -45,7 +45,7 @@ class FragmentReceive_Send_HistoryOrder : Fragment() {
             setHasFixedSize(true)
         }
 
-        val orderList = Order.getOrderList()
+        val orderList = OrderMockData.getOrderList()
         orderAdapter.submitList(orderList)
     }
     override fun onDestroyView() {

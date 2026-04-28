@@ -6,6 +6,7 @@ import com.example.grabthisforme.model.conversation.data.dao.ConversationDao
 import com.example.grabthisforme.activity.fragment_misc.searchFragment.model.SearchDao
 import com.example.grabthisforme.model.goods.data.dao.GoodsDao
 import com.example.grabthisforme.model.messageContent.data.dao.MessageDao
+import com.example.grabthisforme.model.order.data.dao.OrderDao
 import com.example.grabthisforme.model.user.data.dao.UserDao
 import dagger.Module
 import dagger.Provides
@@ -46,5 +47,9 @@ object DatabaseModule {
     @Provides
     fun provideConversationDao(database: AppDatabase): ConversationDao {
         return database.conversationDao()
+    }
+    @Provides
+    fun provideOrderDao(database : AppDatabase) : OrderDao{
+        return database.orderDao()
     }
 }

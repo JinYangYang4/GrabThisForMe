@@ -25,7 +25,7 @@ import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewStore
 import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewTaskAdapter
 import com.example.grabthisforme.activity.homeFragment.viewModel.FragmentHomeViewModel
 import com.example.grabthisforme.databinding.FragmentHomeBinding
-import com.example.grabthisforme.model.Order.Order
+import com.example.grabthisforme.model.order.data.mock.OrderMockData
 import com.example.grabthisforme.model.store.domain.Store
 
 class FragmentHome : Fragment() {
@@ -97,16 +97,14 @@ class FragmentHome : Fragment() {
     @SuppressLint("ClickableViewAccessibility")
     fun initRecyclerViewTask(){
 
-        val taskList = Order.getOrderList()
+        val taskList = OrderMockData.getOrderList()
         adapter1 = RecyclerViewTaskAdapter() { taskId ->
             val orderBottomSheet = OrderMessageBottomSheetFragment.newInstance(taskId.toString())
             orderBottomSheet.show(childFragmentManager, "OrderMessageBottomSheet")
         }
         binding.rvTask.adapter = adapter1
         binding.rvTask.layoutManager = LinearLayoutManager(requireContext())
-        taskList.let {
-            adapter1.submitList(it)
-        }
+        adapter1.submitList(taskList)
         binding.rvTask.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 val layoutManager = recyclerView.layoutManager as LinearLayoutManager
