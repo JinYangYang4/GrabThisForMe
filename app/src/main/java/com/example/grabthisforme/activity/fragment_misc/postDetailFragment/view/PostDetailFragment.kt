@@ -2,7 +2,6 @@ package com.example.grabthisforme.activity.fragment_misc.postDetailFragment.view
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,34 +17,33 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import com.example.grabthisforme.R
-import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.adapter.CommentRecyclerViewAdapter
-import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.model.Comment
+import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Comment
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.viewModel.PostDetailViewModel
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentPostDetailBinding
 import com.example.grabthisforme.model.user.domain.User
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
 class PostDetailFragment : Fragment() {
     private var _binding: FragmentPostDetailBinding? = null
-    private lateinit var viewModel : PostDetailViewModel
+    private lateinit var viewModel: PostDetailViewModel
     private val binding get() = _binding!!
     private var isListenerActive = true
     private var the_commentPosition: Int = -1
-    private var the_parentCommentId: Long = -1;
+    private var the_parentCommentId: Long = -1
+
     enum class InputActionType {
-        // 发布顶层评论
         POST_COMMENT,
-        // 回复评论
         REPLY_COMMENT,
     }
+
     private var inputActionType: InputActionType = InputActionType.POST_COMMENT
     private var adapter = CommentRecyclerViewAdapter()
 
-    private lateinit var globalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,11 +66,9 @@ class PostDetailFragment : Fragment() {
         initRecyclerViewComment()
         initAppBarOffsetListener()
 
-
-        ViewCompat.setOnApplyWindowInsetsListener(requireView()) { view, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(requireView()) { _, insets ->
             val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
             viewModel.setInputVisible(imeVisible)
-
             insets
         }
         ViewCompat.setWindowInsetsAnimationCallback(
@@ -84,48 +80,44 @@ class PostDetailFragment : Fragment() {
                     insets: WindowInsetsCompat,
                     runningAnimations: MutableList<WindowInsetsAnimationCompat>
                 ): WindowInsetsCompat {
-
                     val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
                     binding.llInput.translationY = -imeInsets.bottom.toFloat()
-
                     return insets
                 }
             }
         )
-
     }
 
-
     fun initRecyclerViewComment() {
-        adapter = CommentRecyclerViewAdapter({reply, position, commentId ->
-            the_commentPosition=position
-            the_parentCommentId = commentId
-            inputActionType = InputActionType.REPLY_COMMENT
-            viewModel.setInputVisible(true)
-            showKeyboard(binding.etMessageInput)
-        },
-        scrollListener = object : CommentRecyclerViewAdapter.OnCommentScrollListener {
-            override fun onCommentCollapse(position: Int) {
-                binding.rvComments.smoothScrollToPosition(position)
+        adapter = CommentRecyclerViewAdapter(
+            onItemClick = { _, position, commentId ->
+                the_commentPosition = position
+                the_parentCommentId = commentId
+                inputActionType = InputActionType.REPLY_COMMENT
+                viewModel.setInputVisible(true)
+                showKeyboard(binding.etMessageInput)
+            },
+            scrollListener = object : CommentRecyclerViewAdapter.OnCommentScrollListener {
+                override fun onCommentCollapse(position: Int) {
+                    binding.rvComments.smoothScrollToPosition(position)
+                }
+            },
+            onReplyItemClick = { _, position, commentId ->
+                the_commentPosition = position
+                the_parentCommentId = commentId
+                inputActionType = InputActionType.REPLY_COMMENT
+                viewModel.setInputVisible(true)
+                showKeyboard(binding.etMessageInput)
             }
-        },
-        onReplyItemClick = {reply, position, commentId ->
-            inputActionType = InputActionType.REPLY_COMMENT
-            viewModel.setInputVisible(true)
-            showKeyboard(binding.etMessageInput)
-        }
         )
         binding.rvComments.adapter = adapter
         binding.rvComments.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         adapter.submitList(viewModel.commentList.value)
     }
 
-
     private fun initAppBarOffsetListener() {
-        binding.appBar.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-            val totalScrollRange = appBarLayout.totalScrollRange
+        binding.appBar.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { _, verticalOffset ->
             val offsetAbs = Math.abs(verticalOffset)
-
             val avatarAreaHeight = dp2px(60)
             val isAvatarCovered = offsetAbs >= avatarAreaHeight
             val alpha = kotlin.math.min(Math.abs(offsetAbs.toFloat() - dp2px(60).toFloat()) / dp2px(60), 1f)
@@ -143,8 +135,7 @@ class PostDetailFragment : Fragment() {
         return (dp * density + 0.5).toInt()
     }
 
-    private fun initView() {
-    }
+    private fun initView() {}
 
     private fun initClickListeners() {
         binding.ivBack.setOnClickListener {
@@ -156,39 +147,36 @@ class PostDetailFragment : Fragment() {
             showKeyboard(binding.etMessageInput)
         }
         binding.tvSend.setOnClickListener {
-            if (inputActionType == InputActionType.POST_COMMENT){
-                Log.d("test11", "initClickListeners: ${inputActionType}")
+            if (inputActionType == InputActionType.POST_COMMENT) {
                 sendCommentToPostMan()
-            }else{
-                Log.d("test11", "initClickListeners: ${the_commentPosition}")
-                sendReplyToComment(the_commentPosition,the_parentCommentId)
+            } else {
+                sendReplyToComment(the_commentPosition, the_parentCommentId)
             }
-
         }
-        var already_like = false
+        var alreadyLike = false
         binding.llLove.setOnClickListener {
-             if (already_like){
-                 viewModel.removeLike()
-                 already_like = false
-             }else{
-                 viewModel.addLike()
-                 already_like = true
-             }
+            if (alreadyLike) {
+                viewModel.removeLike()
+                alreadyLike = false
+            } else {
+                viewModel.addLike()
+                alreadyLike = true
+            }
         }
         binding.llShare.setOnClickListener {
             val shareBottomSheet = PostShareBottomSheetDialogFragment.newInstance()
             shareBottomSheet.show(childFragmentManager, "PostShareBottomSheet")
         }
     }
-    fun sendCommentToPostMan(){
+
+    fun sendCommentToPostMan() {
         val newComment = Comment(
             id = System.currentTimeMillis(),
             time = System.currentTimeMillis(),
-            message = (viewModel.inputText.value ?: "").trim(),
-            imageUrls = mutableListOf(),
-            commenter = User(id = 1, name = "用户1", headPic = ""),
-            replies = mutableListOf(),
-            isExpanded = false
+            message = (binding.etMessageInput.text.toString() ?: "").trim(),
+            imageUrls = emptyList(),
+            commenter = User(id = 1, name = "User1", headPic = ""),
+            replies = emptyList()
         )
         viewModel.addComment(newComment)
         binding.etMessageInput.clearFocus()
@@ -197,7 +185,6 @@ class PostDetailFragment : Fragment() {
         lifecycleScope.launch {
             delay(100)
             val layoutManager = binding.rvComments.layoutManager as LinearLayoutManager
-
             val smoothScroller = object : LinearSmoothScroller(requireContext()) {
                 override fun getVerticalSnapPreference(): Int {
                     return SNAP_TO_START
@@ -207,11 +194,11 @@ class PostDetailFragment : Fragment() {
             layoutManager.startSmoothScroll(smoothScroller)
         }
     }
+
     fun sendReplyToComment(commentPosition: Int, parentCommentId: Long, beCommenter: User? = null) {
-        // 1. 获取输入的回复内容
-        val replyContent = (viewModel.inputText.value ?: "").trim()
+        val replyContent = (binding.etMessageInput.text.toString() ?: "").trim()
         if (replyContent.isEmpty()) {
-            Toast.makeText(requireContext(), "回复内容不能为空", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Reply content cannot be empty", Toast.LENGTH_SHORT).show()
             return
         }
         val newReply = viewModel.createReply(
@@ -221,26 +208,23 @@ class PostDetailFragment : Fragment() {
         )
 
         viewModel.addReplyToComment(commentPosition, newReply)
+        adapter.expandComment(parentCommentId)
 
         binding.etMessageInput.clearFocus()
         viewModel.clearInputText()
         hideKeyboard()
-
-
     }
-    fun initObserve(){
-        viewModel.commentList.observe(viewLifecycleOwner){list ->
-            val newList = list.toMutableList()
-            adapter.submitList(newList)
-            Log.d("test11", "initObserve: ")
+
+    fun initObserve() {
+        viewModel.commentList.observe(viewLifecycleOwner) { list ->
+            adapter.submitList(list)
         }
-        viewModel.likeCount.observe(viewLifecycleOwner){count ->
-            Log.d("test11", "initObserve: $count")
+        viewModel.likeCount.observe(viewLifecycleOwner) { _ ->
         }
-        viewModel.loveIconRes.observe(viewLifecycleOwner){ isLove ->
-            if (isLove){
+        viewModel.loveIconRes.observe(viewLifecycleOwner) { isLove ->
+            if (isLove) {
                 binding.ivLove.setImageResource(R.drawable.ic_love_selected)
-            }else{
+            } else {
                 binding.ivLove.setImageResource(R.drawable.ic_unselected)
             }
         }
@@ -260,10 +244,6 @@ class PostDetailFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        if (::globalLayoutListener.isInitialized) {
-            binding.root.viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
-
-        }
         hideKeyboard()
         viewModel.setInputVisible(false)
     }
@@ -276,10 +256,6 @@ class PostDetailFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (::globalLayoutListener.isInitialized) {
-            binding.root.viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
-            isListenerActive = false
-        }
         _binding = null
     }
 }

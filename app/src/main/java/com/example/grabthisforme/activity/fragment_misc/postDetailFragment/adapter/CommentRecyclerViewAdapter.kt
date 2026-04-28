@@ -8,23 +8,30 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.model.Comment
-import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.model.Reply
+import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Comment
+import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Reply
+import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.ui.state.CommentUiState
 import com.example.grabthisforme.databinding.RvCommentItemBinding
 
-// 常量抽离，便于统一修改
 private const val REPLY_PAGE_SIZE = 3
-private var increasing = 0
-private const val DEFAULT_USER_NAME = "匿名用户"
-private const val DEFAULT_COMMENT_CONTENT = "无评论内容"
-private const val DEFAULT_TIME_TEXT = "10分钟前"
+private const val DEFAULT_USER_NAME = "Anonymous"
+private const val DEFAULT_COMMENT_CONTENT = "No comment content"
+private const val DEFAULT_TIME_TEXT = "10 min ago"
 
 class CommentRecyclerViewAdapter(
-    private val onItemClick: ((Comment,position: Int, commentId: Long) -> Unit)? = null,
+    private val onItemClick: ((Comment, Int, Long) -> Unit)? = null,
     private val scrollListener: OnCommentScrollListener? = null,
-    private val onReplyItemClick: ((Reply,position: Int, commentId: Long) -> Unit)? = null
-
+    private val onReplyItemClick: ((Reply, Int, Long) -> Unit)? = null
 ) : ListAdapter<Comment, CommentRecyclerViewAdapter.CommentListViewHolder>(DiffCallback) {
+
+    private val commentUiStateMap = mutableMapOf<Long, CommentUiState>()
+
+    fun expandComment(commentId: Long) {
+        commentUiStateMap.getOrPut(commentId) {
+            CommentUiState(commentId = commentId)
+        }.expandAddReply()
+    }
+
     interface OnCommentScrollListener {
         fun onCommentCollapse(position: Int)
     }
@@ -41,47 +48,44 @@ class CommentRecyclerViewAdapter(
             binding.rvCommentReplies.run {
                 layoutManager = LinearLayoutManager(binding.root.context)
                 isNestedScrollingEnabled = false
-                overScrollMode = View.OVER_SCROLL_NEVER
+                overScrollMode = View.OVER_SCROLL_NEVER  //完全禁用过度滑动特效，界面更干净
             }
 
             initAllClickEvents()
         }
 
         private fun initAllClickEvents() {
-            binding.tvToggleReply.setOnClickListener {
+            binding.tvToggleReply.setOnClickListener {   //展开回复
                 currentComment?.let { comment ->
                     toggleReplyExpansion(comment)
-                    refreshReplyUI(comment)
                 }
             }
             binding.tvLoadMoreReply.setOnClickListener {
                 currentComment?.let { comment ->
                     loadMoreReplies(comment)
-                    refreshReplyUI(comment)
                 }
             }
 
             binding.tvCollapseExtraReply.setOnClickListener {
                 currentComment?.let { comment ->
                     collapseAllReplies(comment)
-                    refreshReplyUI(comment)
                 }
             }
             binding.llMainComment.setOnClickListener {
                 currentComment?.let { comment ->
-                    onItemClick?.invoke(comment,currentPosition,comment.id)
+                    onItemClick?.invoke(comment, currentPosition, comment.id)
                 }
             }
-
         }
 
-        fun bind(comment: Comment,position: Int) {
-            this.currentComment = comment
-            this.currentReplies = comment.replies ?: emptyList()
+        fun bind(comment: Comment, position: Int) {
+            currentComment = comment
+            currentReplies = comment.replies
             currentPosition = position
+            val state = getOrCreateCommentUiState(comment)
+
             replyAdapter = ReplyRecyclerViewAdapter(
-                comment_page = 0,
-                onReplyClick = { reply->
+                onReplyClick = { reply ->
                     onReplyItemClick?.invoke(reply, currentPosition, comment.id)
                 }
             )
@@ -90,78 +94,65 @@ class CommentRecyclerViewAdapter(
             binding.tvCommentContent.text = comment.message ?: DEFAULT_COMMENT_CONTENT
             binding.tvCommentTime.text = DEFAULT_TIME_TEXT
 
-            initReplyArea(comment)
-            refreshReplyUI(comment)
+            refreshReplyUI(state)
         }
 
-        private fun initReplyArea(comment: Comment) {
+        private fun getOrCreateCommentUiState(comment: Comment): CommentUiState {
+            return commentUiStateMap.getOrPut(comment.id) {
+                CommentUiState(commentId = comment.id)
+            }
+        }
+
+        private fun refreshReplyUI(state: CommentUiState) {
             val totalReplyCount = currentReplies.size
             if (totalReplyCount == 0) {
                 hideAllReplyViews()
                 return
             }
-            binding.tvToggleReply.visibility = View.VISIBLE
-            updateToggleButtonText(comment, totalReplyCount)
-        }
 
-        private fun refreshReplyUI(comment: Comment) {
-            val totalReplyCount = currentReplies.size
-            if (totalReplyCount == 0) {
-                hideAllReplyViews()
-                return
-            }
-
-            if (comment.isExpanded) {
-                val showCount = comment.page.coerceAtLeast(1).coerceAtMost(totalReplyCount)
-                val showReplies = currentReplies.take(showCount).toList()
-                replyAdapter.submitList(showReplies)
+            if (state.isExpanded) {
+                val showCount = state.visibleReplyCount.coerceAtLeast(1)
+                    .coerceAtMost(totalReplyCount)
+                replyAdapter.submitList(currentReplies.take(showCount))
                 binding.rvCommentReplies.visibility = View.VISIBLE
                 binding.tvCollapseExtraReply.visibility = View.VISIBLE
                 binding.tvLoadMoreReply.visibility = if (showCount >= totalReplyCount) View.GONE else View.VISIBLE
+                binding.tvToggleReply.visibility = View.GONE
             } else {
-                replyAdapter.submitList(emptyList<Reply>().toList())
+                replyAdapter.submitList(emptyList())
                 binding.rvCommentReplies.visibility = View.GONE
                 binding.tvCollapseExtraReply.visibility = View.GONE
                 binding.tvLoadMoreReply.visibility = View.GONE
+                binding.tvToggleReply.visibility = View.VISIBLE
+                binding.tvToggleReply.text = "Expand replies($totalReplyCount)"
             }
         }
 
-        private fun toggleReplyExpansion(comment: Comment) {
-            comment.isExpanded = !comment.isExpanded
-            increasing = 0
-            if (comment.isExpanded) {
-                comment.page = REPLY_PAGE_SIZE.coerceAtMost(currentReplies.size)
-            } else {
-                comment.page = 0
+        private fun toggleReplyExpansion(comment: Comment) {     //切换展开/关闭回复
+            val state = getOrCreateCommentUiState(comment)
+            if (state.isExpanded) {
+                state.collapse()
                 binding.root.post {
                     scrollListener?.onCommentCollapse(currentPosition)
                 }
+            } else {
+                state.expand(currentReplies.size, REPLY_PAGE_SIZE)
             }
-            updateToggleButtonText(comment, currentReplies.size)
+            refreshReplyUI(state)
         }
 
         private fun loadMoreReplies(comment: Comment) {
-            increasing += 2
-            increasing.coerceAtMost(10)
-            val newPage = comment.page + REPLY_PAGE_SIZE + increasing
-            comment.page = newPage.coerceAtMost(currentReplies.size)
+            val state = getOrCreateCommentUiState(comment)
+            state.loadMore(currentReplies.size, REPLY_PAGE_SIZE)
+            refreshReplyUI(state)
         }
 
         private fun collapseAllReplies(comment: Comment) {
-            comment.isExpanded = false
-            comment.page = 0
-            updateToggleButtonText(comment, currentReplies.size)
+            val state = getOrCreateCommentUiState(comment)
+            state.collapse()
+            refreshReplyUI(state)
             binding.root.post {
                 scrollListener?.onCommentCollapse(currentPosition)
-            }
-        }
-
-        private fun updateToggleButtonText(comment: Comment, totalReplyCount: Int) {
-            if (comment.isExpanded) {
-                binding.tvToggleReply.visibility = View.GONE
-            } else {
-                binding.tvToggleReply.visibility = View.VISIBLE
-                binding.tvToggleReply.text =  "展开回复($totalReplyCount)"
             }
         }
 
@@ -170,7 +161,7 @@ class CommentRecyclerViewAdapter(
             binding.rvCommentReplies.visibility = View.GONE
             binding.tvCollapseExtraReply.visibility = View.GONE
             binding.tvLoadMoreReply.visibility = View.GONE
-            replyAdapter.submitList(emptyList<Reply>().toList())
+            replyAdapter.submitList(emptyList())
         }
     }
 
@@ -180,9 +171,7 @@ class CommentRecyclerViewAdapter(
         }
 
         override fun areContentsTheSame(oldItem: Comment, newItem: Comment): Boolean {
-            return oldItem.commenter?.name == newItem.commenter?.name &&
-                    oldItem.message == newItem.message &&
-                    oldItem.replies?.size == newItem.replies?.size
+            return oldItem == newItem
         }
     }
 
@@ -196,8 +185,6 @@ class CommentRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: CommentListViewHolder, position: Int) {
-        val comment = getItem(position)
-        holder.bind(comment,position)
+        holder.bind(getItem(position), position)
     }
-
 }
