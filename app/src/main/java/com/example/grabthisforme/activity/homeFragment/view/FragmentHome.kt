@@ -32,8 +32,7 @@ class FragmentHome : Fragment() {
     private var _binding : FragmentHomeBinding ?= null
     private val binding get() = _binding!!
 
-    private var lastTouchY = 0f
-    private lateinit var viewModel: FragmentHomeViewModel
+    private lateinit var homeViewModel: FragmentHomeViewModel
     private lateinit var sharedViewModel: MainViewModel
     private lateinit var adapter1: RecyclerViewTaskAdapter
     private lateinit var adapter2: RecyclerViewStoreAdapter
@@ -45,15 +44,17 @@ class FragmentHome : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentHomeBinding.inflate(inflater,container,false)
-        viewModel = ViewModelProvider(this).get(FragmentHomeViewModel::class.java)
+        homeViewModel = ViewModelProvider(requireActivity()).get(FragmentHomeViewModel::class.java)
         sharedViewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
+        binding.viewModel = homeViewModel
 
         initRecyclerViewTask()
         initRecyclerViewStore()
+
+        initObserve()
         binding.llDropdown.setOnClickListener {
-            if (viewModel.GetRvTaskIsOpen()){
+            if (homeViewModel.GetRvTaskIsOpen()){
                 closeRvTaskAnimation()
             }else{
                 openRvTaskAnimation()
@@ -64,17 +65,15 @@ class FragmentHome : Fragment() {
             sharedViewModel.drawerOpenStateToOpen()
         }
         binding.IGet.setOnClickListener {
-            Log.d("test1", "onCreateView: ")
             sharedViewModel.toPage(1)
-            viewModel.setGiveMode(true)
         }
         binding.iHelpMeGet.setOnClickListener {
-            viewModel.setGiveMode(false)
         }
         initOperationBar()
         return binding.root
     }
-
+    fun initObserve(){
+    }
     fun initOperationBar(){
         binding.llItemOrder.setOnClickListener {
             (requireActivity() as MainActivity).intentToMiscFragment_ac(0)
@@ -110,7 +109,7 @@ class FragmentHome : Fragment() {
                 val layoutManager = recyclerView.layoutManager as LinearLayoutManager
                 val isAtTop = layoutManager.findFirstCompletelyVisibleItemPosition() == 0  // 是否滑到顶部
                 super.onScrolled(recyclerView, dx, dy)
-                if (viewModel.GetIsAnimating()) return
+                if (homeViewModel.GetIsAnimating()) return
                 when {
                     dy > 0 -> {
                         showDropdownWithSlideAnimation()
@@ -122,7 +121,7 @@ class FragmentHome : Fragment() {
             }
         })
 
-        viewModel.rvTaskIsOpen.observe(viewLifecycleOwner){is_open ->
+        homeViewModel.rvTaskIsOpen.observe(viewLifecycleOwner){ is_open ->
             if (is_open){
                 binding.rvTask.isNestedScrollingEnabled = false
                 binding.ivDropdown.setImageResource(R.drawable.ic_pull_up)
@@ -132,12 +131,10 @@ class FragmentHome : Fragment() {
             }
         }
         binding.rvTask.post {
-            viewModel.setRvTaskHeight(binding.rvTask.height)
+            homeViewModel.setRvTaskHeight(binding.rvTask.height)
         }
 
         binding.rvTask.setOnTouchListener { v, event ->
-
-            Log.d("test11", "initRecyclerViewTask: ")
             v.parent.requestDisallowInterceptTouchEvent(true)
             false
         }
@@ -161,8 +158,8 @@ class FragmentHome : Fragment() {
         adapter2.submitList(storeList)
     }
     private fun showDropdownWithSlideAnimation() {
-        if (!viewModel.GetAlreadyShow()){
-            viewModel.MakeIsAnimatingTrue()
+        if (!homeViewModel.GetAlreadyShow()){
+            homeViewModel.MakeIsAnimatingTrue()
 
             // 动画参数：从上方（-自身高度）滑到当前位置（0），透明度从 0→1
             val slideAnimation = TranslateAnimation(
@@ -194,19 +191,19 @@ class FragmentHome : Fragment() {
                 setAnimationListener(object : Animation.AnimationListener {
                     override fun onAnimationStart(animation: Animation?) {}
                     override fun onAnimationEnd(animation: Animation?) {
-                        viewModel.MakeIsAnimatingFalse()  // 动画结束，解除标记
+                        homeViewModel.MakeIsAnimatingFalse()  // 动画结束，解除标记
                     }
                     override fun onAnimationRepeat(animation: Animation?) {}
                 })
             }
             binding.ivDropdown.startAnimation(set)
-            viewModel.MakeAlreadyShowTure()
+            homeViewModel.MakeAlreadyShowTure()
         }
 
     }
     private fun hideDropdownWithSlideAnimation() {
-        if (viewModel.GetAlreadyShow()&&!viewModel.GetRvTaskIsOpen()){
-            viewModel.MakeIsAnimatingTrue()
+        if (homeViewModel.GetAlreadyShow()&&!homeViewModel.GetRvTaskIsOpen()){
+            homeViewModel.MakeIsAnimatingTrue()
             val slideAnimation = TranslateAnimation(
                 Animation.RELATIVE_TO_SELF, 0f,
                 Animation.RELATIVE_TO_SELF, 0f,
@@ -238,20 +235,19 @@ class FragmentHome : Fragment() {
                     override fun onAnimationStart(animation: Animation?) {}
                     override fun onAnimationEnd(animation: Animation?) {
                         binding.ivDropdown.clearAnimation()  // 清除动画，避免影响下次显示
-                        viewModel.MakeIsAnimatingFalse()
+                        homeViewModel.MakeIsAnimatingFalse()
                     }
                     override fun onAnimationRepeat(animation: Animation?) {}
                 })
             }
             binding.ivDropdown.startAnimation(set)
-            viewModel.MakeAlreadyShowFalse()
+            homeViewModel.MakeAlreadyShowFalse()
         }
 
     }
     private fun openRvTaskAnimation() {
         val totalItemHeight = calculateRecyclerViewTotalHeight(binding.rvTask)
-        val targetHeight = if (totalItemHeight > 0) totalItemHeight else 1500
-        val heightAnimator = ValueAnimator.ofInt(viewModel.getRvTaskHeight(), targetHeight).apply {
+        val heightAnimator = ValueAnimator.ofInt(homeViewModel.getRvTaskHeight(),totalItemHeight).apply {
             duration = 300
             addUpdateListener { anim ->
                 val height = anim.animatedValue as Int
@@ -261,26 +257,47 @@ class FragmentHome : Fragment() {
             }
         }
         heightAnimator.start()
-        viewModel.MakeRvTaskIsOpenTure()
+        homeViewModel.MakeRvTaskIsOpenTure()
     }
+    /**
+     * 完整计算：item高度 + item上下margin + 分割线 + rvpadding
+     */
     private fun calculateRecyclerViewTotalHeight(recyclerView: RecyclerView): Int {
-        val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return 0
         val adapter = recyclerView.adapter ?: return 0
-        var totalHeight = 0
-        for (i in 0 until adapter.itemCount) {
-            val viewHolder = adapter.createViewHolder(recyclerView, adapter.getItemViewType(i))
-            adapter.onBindViewHolder(viewHolder, i)
-            viewHolder.itemView.measure(
-                View.MeasureSpec.makeMeasureSpec(recyclerView.width, View.MeasureSpec.EXACTLY),
+        val lm = recyclerView.layoutManager as? LinearLayoutManager ?: return 0
+        val itemCount = adapter.itemCount
+        if (itemCount == 0) return 0
+
+        val widthSpec = View.MeasureSpec.makeMeasureSpec(recyclerView.width, View.MeasureSpec.EXACTLY)
+        var totalContentHeight = 0
+
+        // 1. 遍历所有Item，测量高度 + 拿到layout_margin
+        for (i in 0 until itemCount) {
+            val holder = adapter.createViewHolder(recyclerView, adapter.getItemViewType(i))
+            adapter.onBindViewHolder(holder, i)
+            val itemView = holder.itemView
+
+            // 测量item真实高度
+            itemView.measure(
+                widthSpec,
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
             )
-            totalHeight += viewHolder.itemView.measuredHeight
+            val itemH = itemView.measuredHeight
+
+            // 重点：获取 item 根布局的 Margin
+            val itemLp = itemView.layoutParams as ViewGroup.MarginLayoutParams
+            val itemMarginVertical = itemLp.topMargin + itemLp.bottomMargin
+
+            totalContentHeight += itemH + itemMarginVertical
         }
-        totalHeight += recyclerView.paddingTop + recyclerView.paddingBottom
-        return totalHeight
+
+
+        val rvPaddingVertical = recyclerView.paddingTop + recyclerView.paddingBottom
+
+        return totalContentHeight +  rvPaddingVertical
     }
     private fun closeRvTaskAnimation(){
-        val heightAnimator = ValueAnimator.ofInt(1500,viewModel.getRvTaskHeight()).apply {
+        val heightAnimator = ValueAnimator.ofInt(1500,homeViewModel.getRvTaskHeight()).apply {
             duration = 300
             addUpdateListener { anim ->
                 val height = anim.animatedValue as Int
@@ -293,7 +310,7 @@ class FragmentHome : Fragment() {
             heightAnimator.start()
         }
         binding.rvTask.startAnimation(set)
-        viewModel.MakeRvTaskIsOpenFalse()
+        homeViewModel.MakeRvTaskIsOpenFalse()
     }
     override fun onDestroy() {
         super.onDestroy()

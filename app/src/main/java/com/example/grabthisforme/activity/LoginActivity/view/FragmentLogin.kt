@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.grabthisforme.R
@@ -18,13 +20,10 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class FragmentLogin : Fragment() {
     private var _binding: FragmentLoginBinding? = null
-    private var lastTriggerTime = 0L
-    private val debounceThreshold = 100L
     private val binding get() = _binding!!
 
     private val viewModel: SwitchAccountsViewModel by activityViewModels()
     val bottomSheet = SwitchAccountsBottomSheetDialogFragment.newInstance()
-    private var globalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,28 +38,13 @@ class FragmentLogin : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initView()
         initClickListener()
-        globalLayoutListener = object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                val currentTime = System.currentTimeMillis()
-                if (currentTime - lastTriggerTime < debounceThreshold) {
-                    return
-                }
-                lastTriggerTime = currentTime
-
-                val r = Rect()
-                view.getWindowVisibleDisplayFrame(r)
-                val screenHeight = view.rootView.height
-                val keypadHeight = screenHeight - r.bottom
-                val isKeyboardClosed = keypadHeight < screenHeight * 0.15
-
-
-                if (isKeyboardClosed && _binding != null) {
-                    clearInputFocus()
-                }
+        ViewCompat.setOnApplyWindowInsetsListener(requireView()) { _, insets ->
+            val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+            if (!imeVisible && _binding != null) {
+                clearInputFocus()
             }
+            insets
         }
-        view.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
-
     }
 
 
@@ -69,7 +53,6 @@ class FragmentLogin : Fragment() {
         val currentFocus = requireActivity().currentFocus ?: return
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(currentFocus.windowToken, 0)
-
         _binding?.etUserId?.clearFocus()
         _binding?.etPassword?.clearFocus()
     }
@@ -89,21 +72,15 @@ class FragmentLogin : Fragment() {
         binding.tvSwitchAccounts.setOnClickListener {
             bottomSheet.show(childFragmentManager, "SwitchAccountsBottomSheet")
         }
+
     }
 
     override fun onStop() {
         super.onStop()
-        val rootView = view ?: return
-        globalLayoutListener?.let { listener ->
-            if (rootView.viewTreeObserver.isAlive) {
-                rootView.viewTreeObserver.removeOnGlobalLayoutListener(listener)
-            }
-        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        globalLayoutListener = null
         _binding = null
     }
 }

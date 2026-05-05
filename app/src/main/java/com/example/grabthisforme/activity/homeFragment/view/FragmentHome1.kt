@@ -1,6 +1,7 @@
 package com.example.grabthisforme.activity.homeFragment.view
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -40,11 +41,10 @@ class FragmentHome1 : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentHome1Binding.inflate(inflater,container,false)
-
         sharedViewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
         homeViewModel = ViewModelProvider(requireActivity()).get(FragmentHomeViewModel::class.java)
 
-        binding.YGet.setOnClickListener {
+        binding.IGet.setOnClickListener {
             sharedViewModel.toPage(0)
         }
         binding.ivHeadPic.setOnClickListener {
@@ -72,6 +72,7 @@ class FragmentHome1 : Fragment() {
         binding.llSearch.setOnClickListener {
             (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_searchGoodsFragment)
         }
+
     }
 
     fun initVp2(){

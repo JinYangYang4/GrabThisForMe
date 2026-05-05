@@ -5,6 +5,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
+        android:elevation="2dp"
         android:background="@drawable/bg_rounded_white"
         android:backgroundTint="#FFFFFF">
         <ImageView
@@ -48,6 +49,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_goods"
+            android:layout_marginHorizontal="4dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@+id/iv_store"

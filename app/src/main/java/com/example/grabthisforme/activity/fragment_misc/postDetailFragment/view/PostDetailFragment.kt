@@ -74,7 +74,7 @@ class PostDetailFragment : Fragment() {
         ViewCompat.setWindowInsetsAnimationCallback(
             binding.llInput,
             object : WindowInsetsAnimationCompat.Callback(
-                WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_CONTINUE_ON_SUBTREE
+                DISPATCH_MODE_CONTINUE_ON_SUBTREE
             ) {
                 override fun onProgress(
                     insets: WindowInsetsCompat,

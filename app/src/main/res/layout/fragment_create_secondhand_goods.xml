@@ -13,7 +13,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/green_primary"
+            android:background="@drawable/bg_arc_gradient_green_just_two_color"
             android:gravity="center_vertical"
             android:paddingTop="30dp"
             android:paddingBottom="10dp"
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="18dp"
                 android:text="发布二手商品"
-                android:textColor="#FFFFFF"
+
                 android:textSize="17sp"
                 android:textStyle="bold"/>
 
@@ -41,313 +41,379 @@
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:padding="16dp">
-
+            android:layout_weight="1">
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <!-- 第一部分：商品基础信息（对应 Goods 父类字段） -->
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:id="@+id/ll_nested">
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_rounded_white"
-                    android:padding="16dp"
+                    android:layout_height="match_parent"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="商品基础信息"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#333333"/>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="8dp"
-                        android:background="#E8E8E8"/>
-
-                    <!-- 商品名称（必填） -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="* 商品名称"
-                        app:hintTextColor="#999999"
-                        app:boxStrokeColor="#E8E8E8"
-                        app:boxStrokeWidth="0dp"
-                        app:hintEnabled="true">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_secondhand_name"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="15sp"
-                            android:paddingVertical="8dp"
-                            android:background="@null"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- 商品类别（必填，沿用原风格，替换为 Spinner） -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="* 商品类别"
-                        app:hintTextColor="#999999"
-                        app:boxStrokeColor="#E8E8E8"
-                        app:boxStrokeWidth="0dp"
-                        app:hintEnabled="true">
-
-                        <Spinner
-                            android:id="@+id/sp_secondhand_category"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:entries="@array/secondhand_category"
-                            android:spinnerMode="dropdown"
-                            android:background="@null"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- 商品价格（二手价 + 原价，横向排列） -->
+                    <!-- 第一部分：商品基础信息（对应 Goods 父类字段） -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="8dp">
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_round_stripe"
+                        android:elevation="2dp"
+                        android:backgroundTint="@color/white"
+                        android:padding="16dp"
+                        android:orientation="vertical">
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:hint="* 二手价（元）"
-                            app:hintTextColor="#999999"
-                            app:boxStrokeColor="#E8E8E8"
-                            app:boxStrokeWidth="0dp"
-                            app:hintEnabled="true">
-
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/et_secondhand_price"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textSize="15sp"
-                                android:paddingVertical="8dp"
-                                android:inputType="numberDecimal"
-                                android:background="@null"/>
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:hint="原价（元）"
-                            app:hintTextColor="#999999"
-                            app:boxStrokeColor="#E8E8E8"
-                            app:boxStrokeWidth="0dp"
-                            app:hintEnabled="true">
-
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/et_secondhand_original_price"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textSize="15sp"
-                                android:paddingVertical="8dp"
-                                android:inputType="numberDecimal"
-                                android:background="@null"/>
-                        </com.google.android.material.textfield.TextInputLayout>
-                    </LinearLayout>
-
-                    <!-- 商品描述（必填，对应 message 字段） -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="* 商品描述（新旧程度、瑕疵等）"
-                        app:hintTextColor="#999999"
-                        app:boxStrokeColor="#E8E8E8"
-                        app:boxStrokeWidth="0dp"
-                        app:hintEnabled="true"
-                        android:layout_marginTop="8dp">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_secondhand_message"
-                            android:layout_width="match_parent"
-                            android:layout_height="120dp"
-                            android:textSize="15sp"
-                            android:paddingVertical="8dp"
-                            android:gravity="top"
-                            android:inputType="textMultiLine"
-                            android:maxLines="5"
-                            android:background="@null"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- 商品数量（对应 sale_number 字段） -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="8dp">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="商品数量"
-                            android:textSize="15sp"
-                            android:textColor="@color/black"
-                            android:layout_marginBottom="4dp"/>
+                            android:text="商品基础信息"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#333333"/>
+
                         <View
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"/>
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="8dp"
+                            android:background="#E8E8E8"/>
+
+                        <!-- 商品名称（必填） -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="* 商品名称"
+                            app:hintTextColor="#999999"
+                            app:boxStrokeColor="#E8E8E8"
+                            app:boxStrokeWidth="0dp"
+                            app:hintEnabled="true">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/it_secondhand_name"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="15sp"
+                                android:paddingVertical="8dp"
+                                android:background="@null"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- 商品类别（必填，沿用原风格，替换为 Spinner） -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="* 商品类别"
+                            app:hintTextColor="#999999"
+                            app:boxStrokeColor="#E8E8E8"
+                            app:boxStrokeWidth="0dp"
+                            app:hintEnabled="true">
+
+                            <Spinner
+                                android:id="@+id/sp_secondhand_category"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:popupBackground="@drawable/bg_round_stripe"
+                                android:entries="@array/secondhand_category"
+                                android:spinnerMode="dropdown"
+                                android:background="@null"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- 商品价格（二手价 + 原价，横向排列） -->
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:background="#F5F5F5"
-                            android:gravity="center">
-                            <ImageView
-                                android:id="@+id/btn_minus"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:src="@drawable/ic_decrease"
-                                android:padding="0dp"/>
+                            android:layout_marginTop="8dp">
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:hint="* 二手价（元）"
+                                app:hintTextColor="#999999"
+                                app:boxStrokeColor="#E8E8E8"
+                                app:boxStrokeWidth="0dp"
+                                app:hintEnabled="true">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/it_secondhand_price"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="15sp"
+                                    android:paddingVertical="8dp"
+                                    android:inputType="numberDecimal"
+                                    android:background="@null"/>
+                            </com.google.android.material.textfield.TextInputLayout>
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:hint="原价（元）"
+                                app:hintTextColor="#999999"
+                                app:boxStrokeColor="#E8E8E8"
+                                app:boxStrokeWidth="0dp"
+                                app:hintEnabled="true">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/it_secondhand_original_price"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="15sp"
+                                    android:paddingVertical="8dp"
+                                    android:inputType="numberDecimal"
+                                    android:background="@null"/>
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+                        <!-- 商品描述（必填，对应 message 字段） -->
+                        <com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.NestedScrollableHost
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:clipToOutline="true"
+                                android:background="@drawable/bg_round_stripe">
+                                <com.google.android.material.textfield.TextInputLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_margin="1dp"
+                                    android:hint="* 商品描述（新旧程度、瑕疵等）"
+                                    app:hintTextColor="#999999"
+                                    app:boxStrokeColor="#E8E8E8"
+                                    android:background="@drawable/bg_round_stripe"                                    android:backgroundTint="@color/white"
+                                    android:elevation="4dp"
+                                    app:boxStrokeWidth="0dp"
+                                    app:hintEnabled="true">
+
+                                    <com.google.android.material.textfield.TextInputEditText
+                                        android:id="@+id/it_secondhand_message"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="120dp"
+                                        android:textSize="15sp"
+                                        android:paddingVertical="8dp"
+                                        android:gravity="top"
+                                        android:inputType="textMultiLine"
+                                        android:maxLines="5"
+                                        android:background="@null"/>
+                                </com.google.android.material.textfield.TextInputLayout>
+                            </LinearLayout>
+
+
+                        </com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.NestedScrollableHost>
+
+
+                        <!-- 商品数量（对应 sale_number 字段） -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp">
                             <TextView
-                                android:id="@+id/tv_sale_number"
-                                android:layout_width="45dp"
-                                android:layout_height="match_parent"
-                                android:background="@null"
-                                android:gravity="center"
-                                android:paddingHorizontal="8dp"
-                                android:text="1"
-                                android:textColor="#333333"
-                                android:textSize="15sp" />
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="商品数量"
+                                android:textSize="15sp"
+                                android:textColor="@color/black"
+                                android:layout_marginBottom="4dp"/>
+                            <View
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"/>
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:background="#F5F5F5"
+                                android:gravity="center">
+                                <ImageView
+                                    android:id="@+id/btn_minus"
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ic_decrease"
+                                    android:padding="0dp"/>
+                                <TextView
+                                    android:id="@+id/tv_sale_number"
+                                    android:layout_width="45dp"
+                                    android:layout_height="match_parent"
+                                    android:background="@null"
+                                    android:gravity="center"
+                                    android:paddingHorizontal="8dp"
+                                    android:text="1"
+                                    android:textColor="#333333"
+                                    android:textSize="15sp" />
+                                <ImageView
+                                    android:id="@+id/btn_plus"
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ic_increase"
+                                    android:padding="0dp"/>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- 商品图片（对应 pic 字段，可选） -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginTop="8dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="商品图片(可不填)"
+                                android:textSize="15sp"
+                                android:textColor="#999999"/>
                             <ImageView
-                                android:id="@+id/btn_plus"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:src="@drawable/ic_increase"
-                                android:padding="0dp"/>
+                                android:id="@+id/iv_secondhand_pic"
+                                android:layout_width="70dp"
+                                android:layout_height="70dp"
+                                android:layout_marginTop="8dp"
+                                android:src="@drawable/ic_add"
+                                android:scaleType="centerCrop"/>
                         </LinearLayout>
                     </LinearLayout>
 
-                    <!-- 商品图片（对应 pic 字段，可选） -->
+
+
+                    <!-- 第二部分：二手商品专属信息（对应 SecondhandGoods 扩展字段） -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="8dp">
+                        android:background="@drawable/bg_round_stripe"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginTop="10dp"
+                        android:elevation="4dp"
+                        android:padding="16dp"
+
+                        android:backgroundTint="@color/white"
+                        android:orientation="vertical">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="商品图片(可不填)"
-                            android:textSize="15sp"
-                            android:textColor="#999999"/>
-                        <ImageView
-                            android:id="@+id/iv_secondhand_pic"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
-                            android:layout_marginTop="8dp"
-                            android:src="@drawable/ic_add"
-                            android:scaleType="centerCrop"/>
+                            android:text="二手商品专属信息"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#333333"/>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="8dp"
+                            android:background="#E8E8E8"/>
+
+                        <!-- 物品成色（必填，对应 quality 字段） -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="* 物品成色（如 99新、95新、8新）"
+                            app:hintTextColor="#999999"
+                            app:boxStrokeColor="#E8E8E8"
+                            app:boxStrokeWidth="0dp"
+                            app:hintEnabled="true">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/it_secondhand_quality"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="15sp"
+                                android:paddingVertical="8dp"
+                                android:background="@null"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- 使用时长（可选，对应 usedTime 字段） -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="使用时长（如 6 个月、1 年，可不填）"
+                            app:hintTextColor="#999999"
+                            app:boxStrokeColor="#E8E8E8"
+                            app:boxStrokeWidth="0dp"
+                            app:hintEnabled="true"
+                            android:layout_marginTop="8dp">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/it_secondhand_used_time"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="15sp"
+                                android:paddingVertical="8dp"
+                                android:background="@null"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- 交易备注（可选，扩展字段） -->
+                        <com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.NestedScrollableHost
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:clipToOutline="true"
+                                android:background="@drawable/bg_round_stripe">
+                                <com.google.android.material.textfield.TextInputLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:hint="交易备注（如是否支持砍价、自提地点，可不填）"
+                                    app:hintTextColor="#999999"
+                                    app:boxStrokeColor="#E8E8E8"
+                                    android:background="@drawable/bg_round_stripe"
+                                    android:elevation="4dp"
+                                    android:layout_margin="1dp"
+                                    app:boxStrokeWidth="0dp"
+                                    app:hintEnabled="true"
+                                    android:layout_marginTop="8dp">
+
+                                    <com.google.android.material.textfield.TextInputEditText
+                                        android:id="@+id/it_secondhand_remark"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="120dp"
+                                        android:textSize="15sp"
+                                        android:paddingVertical="8dp"
+                                        android:gravity="top"
+                                        android:inputType="textMultiLine"
+                                        android:maxLines="5"
+                                        android:background="@null"/>
+                                </com.google.android.material.textfield.TextInputLayout>
+                            </LinearLayout>
+                        </com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.NestedScrollableHost>
+
+
                     </LinearLayout>
+
+
+
+                    <!-- 底部发布按钮（与原风格一致） -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:elevation="2dp"
+                        android:background="@drawable/bg_round_stripe"
+                        android:layout_margin="16dp"
+                        android:clipToOutline="true">
+                        <Button
+                            android:id="@+id/btn_publish_secondhand"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:elevation="4dp"
+                            android:layout_margin="1dp"
+                            android:background="@drawable/bg_round_stripe_green"
+                            app:backgroundTint="@color/green_light"
+                            android:text="发布二手商品"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp"
+                            android:enabled="false"/>
+                    </LinearLayout>
+
+
                 </LinearLayout>
-
-                <!-- 第二部分：二手商品专属信息（对应 SecondhandGoods 扩展字段） -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_rounded_white"
-                    android:padding="16dp"
-                    android:layout_marginTop="10dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="二手商品专属信息"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#333333"/>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="8dp"
-                        android:background="#E8E8E8"/>
-
-                    <!-- 物品成色（必填，对应 quality 字段） -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="* 物品成色（如 99新、95新、8新）"
-                        app:hintTextColor="#999999"
-                        app:boxStrokeColor="#E8E8E8"
-                        app:boxStrokeWidth="0dp"
-                        app:hintEnabled="true">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_secondhand_quality"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="15sp"
-                            android:paddingVertical="8dp"
-                            android:background="@null"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- 使用时长（可选，对应 usedTime 字段） -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="使用时长（如 6 个月、1 年，可不填）"
-                        app:hintTextColor="#999999"
-                        app:boxStrokeColor="#E8E8E8"
-                        app:boxStrokeWidth="0dp"
-                        app:hintEnabled="true"
-                        android:layout_marginTop="8dp">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_secondhand_used_time"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="15sp"
-                            android:paddingVertical="8dp"
-                            android:background="@null"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- 交易备注（可选，扩展字段） -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="交易备注（如是否支持砍价、自提地点，可不填）"
-                        app:hintTextColor="#999999"
-                        app:boxStrokeColor="#E8E8E8"
-                        app:boxStrokeWidth="0dp"
-                        app:hintEnabled="true"
-                        android:layout_marginTop="8dp">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_secondhand_remark"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="15sp"
-                            android:paddingVertical="8dp"
-                            android:background="@null"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-                </LinearLayout>
-
-                <!-- 底部发布按钮（与原风格一致） -->
-                <Button
-                    android:id="@+id/btn_publish_secondhand"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    android:background="@drawable/bg_round_stripe_green"
-                    app:backgroundTint="@color/green_light"
-                    android:text="发布二手商品"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:enabled="false"/>
-
             </LinearLayout>
+
+
         </androidx.core.widget.NestedScrollView>
 
     </LinearLayout>

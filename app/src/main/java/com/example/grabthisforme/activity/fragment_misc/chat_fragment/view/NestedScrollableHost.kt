@@ -16,10 +16,7 @@ class NestedScrollableHost @JvmOverloads constructor(
         handleInterceptTouchEvent(e)
         return super.onInterceptTouchEvent(e)
     }
-
     private fun handleInterceptTouchEvent(e: MotionEvent) {
-
-
         when (e.action) {
 
             MotionEvent.ACTION_DOWN -> {

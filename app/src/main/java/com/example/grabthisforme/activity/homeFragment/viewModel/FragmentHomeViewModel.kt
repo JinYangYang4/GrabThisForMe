@@ -11,8 +11,8 @@ class FragmentHomeViewModel : ViewModel() {
     private var rvTaskHeight = 0
     private var _rvTaskIsOpen = MutableLiveData<Boolean>(false)
     val rvTaskIsOpen : LiveData<Boolean> get() = _rvTaskIsOpen
-    private val _giveMode = MutableLiveData(false)
-    val giveMode: LiveData<Boolean> get() = _giveMode
+
+
     private val _dropdownVisible = MutableLiveData(false)
     val dropdownVisible: LiveData<Boolean> get() = _dropdownVisible
 
@@ -61,9 +61,5 @@ class FragmentHomeViewModel : ViewModel() {
     }
     fun GetRvTaskIsOpen(): Boolean {
         return _rvTaskIsOpen.value == true
-    }
-
-    fun setGiveMode(enabled: Boolean) {
-        _giveMode.value = enabled
     }
 }

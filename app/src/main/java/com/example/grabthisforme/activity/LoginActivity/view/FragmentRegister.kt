@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.grabthisforme.activity.LoginActivity.viewmodel.SwitchAccountsViewModel
@@ -23,9 +25,6 @@ import java.util.UUID
 class FragmentRegister : Fragment() {
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
-    private var lastTriggerTime = 0L
-    private val debounceThreshold = 100L
-    private var globalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
     private val viewModel: SwitchAccountsViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -39,22 +38,25 @@ class FragmentRegister : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initKeyboardListener()
         initClick()
+        ViewCompat.setOnApplyWindowInsetsListener(requireView()) { _, insets ->
+            val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+            if (!imeVisible && _binding != null) {
+                clearInputFocus()
+            }
+            insets
+        }
     }
     override fun onStop() {
         super.onStop()
-        val rootView = view ?: return
-        globalLayoutListener?.let { listener ->
-            if (rootView.viewTreeObserver.isAlive) {
-                rootView.viewTreeObserver.removeOnGlobalLayoutListener(listener)
-            }
-        }
 
     }
     fun initClick(){
         binding.layoutRegister.setOnClickListener {
             getUserItem()
+        }
+        binding.root.setOnClickListener {
+            clearInputFocus()
         }
     }
     private fun getUserItem() {
@@ -110,42 +112,16 @@ class FragmentRegister : Fragment() {
         }, 3000)
         textInputLayout.editText?.requestFocus()
     }
-    private fun initKeyboardListener() {
-        val rootView = binding.root
-        globalLayoutListener = object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                val currentTime = System.currentTimeMillis()
-                if (currentTime - lastTriggerTime < debounceThreshold) {
-                    return
-                }
-                lastTriggerTime = currentTime
 
-                val r = Rect()
-                rootView.getWindowVisibleDisplayFrame(r)
-                val screenHeight = rootView.rootView.height
-                val keypadHeight = screenHeight - r.bottom
-                val isKeyboardClosed = keypadHeight < screenHeight * 0.15
-
-                if (isKeyboardClosed && _binding != null) {
-                    clearInputFocus()
-                }
-            }
-        }
-
-        rootView.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
-    }
 
     private fun clearInputFocus() {
-        binding.etUserName.clearFocus()
-        binding.etPassword.clearFocus()
-        binding.etPasswordMakeSure.clearFocus()
         val currentFocus = requireActivity().currentFocus ?: return
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(currentFocus.windowToken, 0)
+        currentFocus.clearFocus()
     }
     override fun onDestroyView() {
         super.onDestroyView()
-
         _binding = null
     }
 }
