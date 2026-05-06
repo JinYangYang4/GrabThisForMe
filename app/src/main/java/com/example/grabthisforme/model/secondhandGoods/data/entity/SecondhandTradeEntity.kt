@@ -30,4 +30,3 @@ data class SecondhandTradeEntity(
     val tradeStatus: Int = SecondhandTradeInfo.STATUS_ON_SALE,
     val negotiable: Boolean = true
 )
-

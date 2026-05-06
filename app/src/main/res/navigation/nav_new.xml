@@ -68,6 +68,9 @@
         <action
             android:id="@+id/action_blankFragment_to_storeFragment"
             app:destination="@id/storeFragment" />
+        <action
+            android:id="@+id/action_blankFragment_to_postTopicFragemnt"
+            app:destination="@id/postTopicFragemnt" />
     </fragment>
     <fragment
         android:id="@+id/fragmentSignIn"
@@ -168,4 +171,8 @@
         android:id="@+id/storeSearchFragment"
         android:name="com.example.grabthisforme.activity.fragment_misc.storeFragment.view.StoreSearchFragment"
         android:label="StoreSearchFragment" />
+    <fragment
+        android:id="@+id/postTopicFragemnt"
+        android:name="com.example.grabthisforme.activity.fragment_misc.post_topic.view.PostTopicFragemnt"
+        android:label="PostTopicFragemnt" />
 </navigation>

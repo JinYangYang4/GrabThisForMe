@@ -54,7 +54,9 @@ fun Goods.toStateEntity(): GoodsStateEntity {
         saleNumber = sale_number,
         stock = stock,
         isSoldOut = isSoldOut,
-        isHot = isHot
+        isHot = isHot,
+        purchaseStatus = purchaseStatus,
+        soldCount = soldCount
     )
 }
 
@@ -76,6 +78,8 @@ fun GoodsBundleEntity.toDomain(): Goods {
         stock = state?.stock ?: 0,
         isSoldOut = state?.isSoldOut ?: false,
         isHot = state?.isHot ?: false,
+        purchaseStatus = state?.purchaseStatus ?: GoodsStateInfo.PURCHASE_STATUS_NO_PURCHASE,
+        soldCount = state?.soldCount ?: 0L,
         unit = ui?.unit.orEmpty(),
         selectedCount = ui?.selectedCount ?: 0
     )
@@ -83,6 +87,10 @@ fun GoodsBundleEntity.toDomain(): Goods {
 
 fun GoodsBundleEntity.toDomainSecondhandOrNull(): SecondhandGoods? {
     val tradeEntity = trade ?: return null
+    val category = base.categoryKey?.let { key ->
+        Goods.GoodsCategory.entries.firstOrNull { it.name == key }
+    } ?: Goods.GoodsCategory.CLOTHING
+
     val seller = if (tradeEntity.saleUserId != null || tradeEntity.saleUserName.isNotBlank() || tradeEntity.saleUserAvatar.isNotBlank()) {
         User(
             id = tradeEntity.saleUserId ?: 0L,
@@ -98,6 +106,7 @@ fun GoodsBundleEntity.toDomainSecondhandOrNull(): SecondhandGoods? {
         id = base.goodsId,
         name = base.name,
         message = base.message,
+        category = category,
         secondhandPrice = price?.price ?: 0.0,
         sale_number = state?.saleNumber ?: 0,
         pic = ui?.pic.orEmpty(),
@@ -105,7 +114,9 @@ fun GoodsBundleEntity.toDomainSecondhandOrNull(): SecondhandGoods? {
         quality = tradeEntity.quality,
         usedTime = tradeEntity.usedTime,
         tradeStatus = tradeEntity.tradeStatus,
-        negotiable = tradeEntity.negotiable
+        negotiable = tradeEntity.negotiable,
+        purchaseStatus = state?.purchaseStatus ?: GoodsStateInfo.PURCHASE_STATUS_NO_PURCHASE,
+        soldCount = state?.soldCount ?: 0L
     )
 }
 
@@ -142,7 +153,9 @@ fun GoodsStateDto.toDomainInfo(): GoodsStateInfo {
         saleNumber = saleNumber,
         stock = stock,
         isSoldOut = isSoldOut,
-        isHot = isHot
+        isHot = isHot,
+        purchaseStatus = purchaseStatus,
+        soldCount = soldCount
     )
 }
 
@@ -178,7 +191,9 @@ fun Goods.toDto(): GoodsDto {
             saleNumber = sale_number,
             stock = stock,
             isSoldOut = isSoldOut,
-            isHot = isHot
+            isHot = isHot,
+            purchaseStatus = purchaseStatus,
+            soldCount = soldCount
         )
     )
 }

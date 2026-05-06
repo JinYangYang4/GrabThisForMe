@@ -88,6 +88,7 @@ fun SecondhandGoodsDto.toDomain(): SecondhandGoods {
         id = goodsDomain.id,
         name = goodsDomain.name,
         message = goodsDomain.message,
+        category = goodsDomain.category ?: com.example.grabthisforme.model.goods.domain.Goods.GoodsCategory.CLOTHING,
         secondhandPrice = goodsDomain.price,
         sale_number = goodsDomain.sale_number,
         pic = goodsDomain.pic,
@@ -95,7 +96,9 @@ fun SecondhandGoodsDto.toDomain(): SecondhandGoods {
         quality = tradeDomain.quality,
         usedTime = tradeDomain.usedTime,
         tradeStatus = tradeDomain.tradeStatus,
-        negotiable = tradeDomain.negotiable
+        negotiable = tradeDomain.negotiable,
+        purchaseStatus = goodsDomain.purchaseStatus,
+        soldCount = goodsDomain.soldCount
     )
 }
 

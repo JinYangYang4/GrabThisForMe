@@ -11,10 +11,10 @@ class OrderDetailViewPager2Adapter(fragment : Fragment) :
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> FragmentReceive_Send_HistoryOrder()
-            1 -> FragmentReceive_Send_HistoryOrder()
-            2 -> FragmentReceive_Send_HistoryOrder()
-            else ->  FragmentReceive_Send_HistoryOrder()
+            0 -> FragmentReceive_Send_HistoryOrder.newInstance(0)
+            1 -> FragmentReceive_Send_HistoryOrder.newInstance(1)
+            2 -> FragmentReceive_Send_HistoryOrder.newInstance(2)
+            else ->  FragmentReceive_Send_HistoryOrder.newInstance(2)
         }
     }
 }

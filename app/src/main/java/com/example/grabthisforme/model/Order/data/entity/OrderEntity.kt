@@ -31,5 +31,7 @@ data class OrderEntity(
     val aimPosition: String = "",
     val atPosition: String = "",
     val startTime: Long = 0L,
-    val endTime: Long = 0L
+    val endTime: Long = 0L,
+    val orderStatus: Int = 0,
+    val isAccepted: Boolean = false
 )

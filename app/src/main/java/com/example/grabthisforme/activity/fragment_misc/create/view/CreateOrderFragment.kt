@@ -1,27 +1,26 @@
 package com.example.grabthisforme.activity.fragment_misc.create.view
 
-import android.app.ActionBar
 import android.content.Context
 import android.graphics.Color
-import androidx.fragment.app.Fragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.R
-import androidx.cardview.widget.CardView
+import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.bigkoo.pickerview.builder.TimePickerBuilder
 import com.example.grabthisforme.activity.fragment_misc.create.viewModel.CreateOrderViewModel
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentCreateOrderBinding
+import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-
+@AndroidEntryPoint
 class CreateOrderFragment : Fragment() {
     private var _binding: FragmentCreateOrderBinding? = null
     private val binding get() = _binding!!
@@ -43,6 +42,7 @@ class CreateOrderFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+        observeCreateResult()
         ViewCompat.setOnApplyWindowInsetsListener(requireView()) { _, insets ->
             val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
             if (!imeVisible && _binding != null) {
@@ -57,10 +57,21 @@ class CreateOrderFragment : Fragment() {
         imm.hideSoftInputFromWindow(currentFocus.windowToken, 0)
         currentFocus.clearFocus()
     }
-    fun initView(){
+
+    private fun observeCreateResult() {
+        viewModel.createResult.observe(viewLifecycleOwner) { result ->
+            Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+            if (result.success) {
+                parentFragmentManager.popBackStack()
+            }
+        }
+    }
+
+    private fun initView() {
         binding.ivBack.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
+
         binding.rbBuyGoods.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 viewModel.setBuyGoodsMode(true)
@@ -73,8 +84,47 @@ class CreateOrderFragment : Fragment() {
             }
         }
 
+        binding.btnCreateOrder.isEnabled = true
+
+        binding.btnMinus.setOnClickListener {
+            val current = binding.tvSaleNumber.text.toString().toLongOrNull() ?: 1L
+            binding.tvSaleNumber.text = current.minus(1).coerceAtLeast(1L).toString()
+        }
+
+        binding.btnPlus.setOnClickListener {
+            val current = binding.tvSaleNumber.text.toString().toLongOrNull() ?: 1L
+            binding.tvSaleNumber.text = current.plus(1).coerceAtMost(999L).toString()
+        }
+
+        binding.btnCreateOrder.setOnClickListener {
+            clearInputFocus()
+            if (viewModel.buyGoodsMode.value == true) {
+                viewModel.submitBuyGoodsOrder(
+                    goodsName = binding.tiGoodsName.text?.toString()?.trim().orEmpty(),
+                    goodsPriceText = binding.tiGoodsPrice.text?.toString()?.trim().orEmpty(),
+                    goodsMessage = binding.tiGoodsMessage.text?.toString()?.trim().orEmpty(),
+                    goodsPic = binding.ivGoodsPic.tag?.toString().orEmpty(),
+                    saleNumber = binding.tvSaleNumber.text.toString().toLongOrNull() ?: 1L,
+                    aimPosition = binding.tiAimPosition.text?.toString()?.trim().orEmpty(),
+                    shelfNumber = binding.tiShelfNumber.text?.toString()?.trim().orEmpty(),
+                    startTimeText = binding.etStartTime.text?.toString()?.trim().orEmpty(),
+                    endTimeText = binding.etEndTime.text?.toString()?.trim().orEmpty()
+                )
+            } else {
+                viewModel.submitExpressOrder(
+                    expressNo = binding.etExpressNo.text?.toString()?.trim().orEmpty(),
+                    expressCompany = binding.tiExpressCompany.text?.toString()?.trim().orEmpty(),
+                    expressPosition = binding.tiExpressPosition.text?.toString()?.trim().orEmpty(),
+                    pickupCode = binding.etPickupCode.text?.toString()?.trim().orEmpty(),
+                    remark = binding.tiExpressRemark.text?.toString()?.trim().orEmpty(),
+                    startTimeText = binding.etExpressStartTime.text?.toString()?.trim().orEmpty(),
+                    endTimeText = binding.etExpressEndTime.text?.toString()?.trim().orEmpty()
+                )
+            }
+        }
+
         binding.etStartTime.setOnClickListener {
-            val timePicker = TimePickerBuilder(requireContext()) { date, v ->
+            val timePicker = TimePickerBuilder(requireActivity()) { date, _ ->
                 val format = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA)
                 val selectTime = format.format(date)
                 viewModel.setStartTime(selectTime)
@@ -90,7 +140,7 @@ class CreateOrderFragment : Fragment() {
             timePicker.show()
         }
         binding.etEndTime.setOnClickListener {
-            val timePicker = TimePickerBuilder(requireContext()) { date, v ->
+            val timePicker = TimePickerBuilder(requireActivity()) { date, _ ->
                 val format = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA)
                 val selectTime = format.format(date)
                 viewModel.setEndTime(selectTime)
@@ -100,7 +150,6 @@ class CreateOrderFragment : Fragment() {
                 .setSubmitText("确认")
                 .setTitleText("选择服务时间")
                 .setTitleColor(Color.BLACK)
-
                 .setSubmitColor(Color.parseColor("#FF5722")) // 主题色
                 .build()
 
@@ -108,7 +157,7 @@ class CreateOrderFragment : Fragment() {
             timePicker.show()
         }
         binding.etExpressStartTime.setOnClickListener {
-            val timePicker = TimePickerBuilder(requireContext()) { date, v ->
+            val timePicker = TimePickerBuilder(requireActivity()) { date, _ ->
                 val format = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA)
                 val selectTime = format.format(date)
                 viewModel.setExpressStartTime(selectTime)
@@ -127,7 +176,7 @@ class CreateOrderFragment : Fragment() {
             timePicker.show()
         }
         binding.etExpressEndTime.setOnClickListener {
-            val timePicker = TimePickerBuilder(requireContext()) { date, v ->
+            val timePicker = TimePickerBuilder(requireActivity()) { date, _ ->
                 val format = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA)
                 val selectTime = format.format(date)
                 viewModel.setExpressEndTime(selectTime)
@@ -139,7 +188,6 @@ class CreateOrderFragment : Fragment() {
                 .setTitleColor(Color.BLACK)
                 .setSubmitColor(Color.parseColor("#FF5722")) // 主题色
                 .build()
-
 
             timePicker.show()
         }
@@ -155,10 +203,6 @@ class CreateOrderFragment : Fragment() {
         super.onResume()
         (requireActivity() as MainActivity).innerBottomBar()
     }
-
-
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()

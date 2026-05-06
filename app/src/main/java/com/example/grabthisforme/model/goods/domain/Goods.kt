@@ -1,7 +1,6 @@
 package com.example.grabthisforme.model.goods.domain
 
 import com.example.grabthisforme.model.goods.data.mock.GoodsSampleData
-import java.util.UUID
 
 open class Goods(
     val baseInfo: GoodsBaseInfo,
@@ -25,6 +24,8 @@ open class Goods(
     val stock: Int get() = stateInfo.stock
     val isSoldOut: Boolean get() = stateInfo.isSoldOut
     val isHot: Boolean get() = stateInfo.isHot
+    val purchaseStatus: Int get() = stateInfo.purchaseStatus
+    val soldCount: Long get() = stateInfo.soldCount
     var selectedCount: Int
         get() = uiInfo.selectedCount
         set(value) {
@@ -45,6 +46,8 @@ open class Goods(
         stock: Int = 0,
         isSoldOut: Boolean = false,
         isHot: Boolean = false,
+        purchaseStatus: Int = GoodsStateInfo.PURCHASE_STATUS_NO_PURCHASE,
+        soldCount: Long = 0L,
         unit: String = "",
         selectedCount: Int = 0
     ) : this(
@@ -69,7 +72,9 @@ open class Goods(
             saleNumber = sale_number,
             stock = stock,
             isSoldOut = isSoldOut,
-            isHot = isHot
+            isHot = isHot,
+            purchaseStatus = purchaseStatus,
+            soldCount = soldCount
         )
     )
 
@@ -92,6 +97,8 @@ open class Goods(
             stock = stock,
             isSoldOut = isSoldOut,
             isHot = isHot,
+            purchaseStatus = purchaseStatus,
+            soldCount = soldCount,
             unit = unit,
             selectedCount = selectedCount
         )
@@ -114,4 +121,3 @@ open class Goods(
         OTHER("其他物品")
     }
 }
-

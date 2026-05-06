@@ -13,6 +13,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationSet
 import android.view.animation.TranslateAnimation
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -25,9 +26,16 @@ import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewStore
 import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewTaskAdapter
 import com.example.grabthisforme.activity.homeFragment.viewModel.FragmentHomeViewModel
 import com.example.grabthisforme.databinding.FragmentHomeBinding
+import com.example.grabthisforme.model.order.data.dao.OrderDao
 import com.example.grabthisforme.model.order.data.mock.OrderMockData
+import com.example.grabthisforme.model.order.domain.OrderStatusInfo
 import com.example.grabthisforme.model.store.domain.Store
+import com.example.grabthisforme.model.user.data.dao.UserDao
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FragmentHome : Fragment() {
     private var _binding : FragmentHomeBinding ?= null
     private val binding get() = _binding!!
@@ -37,7 +45,10 @@ class FragmentHome : Fragment() {
     private lateinit var adapter1: RecyclerViewTaskAdapter
     private lateinit var adapter2: RecyclerViewStoreAdapter
 
-
+    @Inject
+    lateinit var orderDao: OrderDao
+    @Inject
+    lateinit var userDao: UserDao
     
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -96,14 +107,30 @@ class FragmentHome : Fragment() {
     @SuppressLint("ClickableViewAccessibility")
     fun initRecyclerViewTask(){
 
-        val taskList = OrderMockData.getOrderList()
         adapter1 = RecyclerViewTaskAdapter() { taskId ->
             val orderBottomSheet = OrderMessageBottomSheetFragment.newInstance(taskId.toString())
             orderBottomSheet.show(childFragmentManager, "OrderMessageBottomSheet")
         }
         binding.rvTask.adapter = adapter1
         binding.rvTask.layoutManager = LinearLayoutManager(requireContext())
-        adapter1.submitList(taskList)
+
+        lifecycleScope.launch {
+            val dbOrders = orderDao.getAllOrders()
+            val currentUser = userDao.getCurrentUser()
+            val activeDbOrders = dbOrders.filter {
+                it.orderStatus == OrderStatusInfo.STATUS_PENDING_RECEIPT || it.orderStatus == OrderStatusInfo.STATUS_PENDING_DELIVERY && (it.sender?.id == currentUser?.id || it.buyer.id == currentUser?.id)
+            }
+            val displayOrders = if (activeDbOrders.isEmpty()) {
+                OrderMockData.getOrderList().filter {
+                    it.orderStatus == OrderStatusInfo.STATUS_PENDING_RECEIPT ||
+                        it.orderStatus == OrderStatusInfo.STATUS_PENDING_DELIVERY
+                }
+            } else {
+                activeDbOrders
+            }
+            adapter1.submitList(displayOrders)
+        }
+
         binding.rvTask.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 val layoutManager = recyclerView.layoutManager as LinearLayoutManager

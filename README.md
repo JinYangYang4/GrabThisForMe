@@ -1,108 +1,109 @@
 # GrabThisForMe
 
-一个基于 Android（Kotlin）的代取/跑腿 + 社区 + 消息 + 商城 + 二手综合应用原型。
+一个基于 Android Kotlin 的校园代取/跑腿 + 社区 + 商城 + 二手 + 消息应用原型。
 
-##  功能概览
+## 快速上下文（给新同事/新对话AI）
+- 技术形态：以 `XML + DataBinding + MVVM` 为主，`Compose` 已开启但不是主要 UI 实现。
+- 入口 Activity：`MainActivity`（主流程）+ `LoginActivity`（登录流程）。
+- 导航策略：主底栏与零散业务页面分成两个 `NavHostFragment`（同屏切换）。
+- 数据层现状：核心业务大量使用 mock，部分模块已做 Room 持久化与分层改造。
+- 最近新增规范：`docs/skills/` 下维护可复用 UI skill 文档（表单生成统一风格）。
 
+## 功能概览
 - 首页双模式：`我来取` / `找人取`
-- 订单能力：任务列表、订单详情、创建订单、历史订单
-- 社区能力：帖子流、帖子详情、评论/回复、点赞、分享
-- 消息能力：会话列表、好友/群组、聊天（文本/相册发图/拍照发图/图片预览）
-- 商城能力：店铺页、分类商品、加购与已选商品面板、店铺搜索
-- 二手能力：二手商品列表、分类浏览、发布入口
-- 账户能力：登录、注册、找回密码、切换账号
-- 个人中心：我的喜欢、我的话题、设置、个人信息与账户安全页面
-- 搜索能力：商品/社区/好友群聊/店铺 多场景搜索历史（本地持久化）
-- 活动能力：签到日历、优惠券列表、券商城
+- 订单：创建订单、任务列表、订单详情、历史
+- 社区：帖子流、帖子详情、评论/回复、点赞、分享
+- 消息：会话列表、好友/群组、聊天（文本/相册/拍照/图片预览）
+- 商城：店铺页、商品列表、加购面板、店铺搜索
+- 二手：二手商品列表、分类浏览、发布二手商品
+- 账户：登录、注册、找回密码、切换账号
+- 个人中心：我的喜欢、我的话题、设置、个人信息、账户安全
+- 搜索：商品/社区/好友群聊/店铺 多场景搜索历史
 
-##  技术栈
+## 环境与构建
+### 基础要求
+- Android Studio（建议稳定版）
+- JDK 11（项目编译目标）
+- Android SDK：`compileSdk=36`，`targetSdk=36`，`minSdk=24`
 
-- 语言：Kotlin（JVM 11）
-- UI：XML + DataBinding（已开启 Compose 支持）
-- 架构：MVVM（ViewModel + LiveData）
-- 导航：Navigation Component + Safe Args + 自定义 `keep_state_fragment` Navigator
-- 依赖注入：Hilt
-- 本地存储：Room（搜索历史、用户）
-- 组件：RecyclerView / ViewPager2 / Material Components
-- 图片与图表：Glide、MPAndroidChart
-
-##  项目结构
-
-```text
-app/
-  src/main/
-    java/com/example/grabthisforme/
-      activity/                # 各业务页面（home/community/information/my/login/misc）
-      model/                   # 数据模型与 mock 数据
-      di/                      # Hilt + Room 注入模块
-      extension/               # 扩展函数
-    res/
-      layout/                  # XML 布局
-      navigation/              # nav_graph / nav_new / nav_graph_login / nav_graph_home
-      drawable/                # 图标与背景资源
-```
-
-##  快速开始
-
-### 1) 环境要求
-
-- Android Studio（建议最新稳定版）
-- JDK 11
-- Android SDK（`compileSdk = 36`）
-
-### 2) 拉取项目
-
-```bash
-git clone https://github.com/JinYangYang4/GrabThisForMe.git
-cd GrabThisForMe
-```
-
-### 3) 构建与运行
-
-Windows:
-
+### 本地运行
 ```powershell
 .\gradlew.bat assembleDebug
 .\gradlew.bat test
 ```
 
-macOS / Linux:
-
-```bash
-./gradlew assembleDebug
-./gradlew test
+如果出现 SDK 路径错误，在项目根目录 `local.properties` 配置：
+```properties
+sdk.dir=你的AndroidSdk绝对路径
 ```
 
-然后在 Android Studio 中运行 `app` 模块到模拟器或真机。
+## 核心架构
+### UI 层
+- 组织方式：`activity/.../view` + `viewModel`
+- 状态驱动：`ViewModel + LiveData + DataBinding`
+- 主要布局目录：`app/src/main/res/layout`
 
-##  权限说明
+### 导航层
+- 主导航（底栏四大页）：`app/src/main/res/navigation/nav_graph.xml`
+- 登录导航：`app/src/main/res/navigation/nav_graph_login.xml`
+- 杂项业务导航（创建订单/帖子详情/聊天等）：`app/src/main/res/navigation/nav_new.xml`
+- 关键实现：`MainActivity` 中维护两个 `NavHostFragment`，通过 `openNewFragment` 状态控制显示。
 
-- 相册读取：用于聊天选图
-- 相机：用于聊天拍照发送
-- 文件提供器（FileProvider）：用于拍照后安全分享图片 URI
+### 数据层
+- DI：Hilt（`@HiltAndroidApp` + `di/DatabaseModule.kt`）
+- Room 数据库：`model/AppDataBase/AppDatabase.kt`
+  - DB 名称：`grab_this_for_me_core_db`
+  - 迁移策略：`fallbackToDestructiveMigration()`
+  - 当前版本：`version = 9`
+- 已接入 DAO：`SearchDao`、`UserDao`、`GoodsDao`、`MessageDao`、`ConversationDao`、`OrderDao`
+- DataStore：`model/user/data/datastore/UserSettingsDataStore.kt`
 
-##  数据现状
+## 模型分层与目录约定
+模型目录位于 `app/src/main/java/com/example/grabthisforme/model/`，当前采用“模块内分层”：
+- `data/dto`：网络/传输模型
+- `data/entity`：Room 实体
+- `data/dao`：数据库访问
+- `domain`：业务模型
+- `mapper`：模型转换（常见链路：`dto -> domain <-> entity`）
 
-当前项目以原型验证为主：
+当前已较完整分层的模块（示例）：
+- `goods`
+- `secondhandGoods`
+- `user`
+- `store`（DTO + Domain，不含 Entity）
+- `conversation`
+- `messageContent`
+- `Order`
+- `Post`
 
-- 主要业务数据（订单、帖子、商品、会话等）大多为本地 mock 数据
-- 已接入 Room 本地持久化：
-  - `search` 表：多场景搜索历史
-  - `user` 表：本地账号与当前账号状态
+注意：目录名存在历史大小写混用（例如 `model/Post`、`model/Order`），但 Kotlin 包名使用小写 `model.post`、`model.order`。新增代码请保持包名小写并遵循现有模块结构。
 
-##  Roadmap（建议）
+## 关键入口文件索引
+- Application：`app/src/main/java/com/example/grabthisforme/activity/myApp/MyApp.kt`
+- 主 Activity：`app/src/main/java/com/example/grabthisforme/activity/mainactivity/view/MainActivity.kt`
+- 登录 Activity：`app/src/main/java/com/example/grabthisforme/activity/LoginActivity/view/LoginActivity.kt`
+- DB 定义：`app/src/main/java/com/example/grabthisforme/model/AppDataBase/AppDatabase.kt`
+- Hilt DB 注入：`app/src/main/java/com/example/grabthisforme/di/DatabaseModule.kt`
 
-- 接入真实后端 API（登录、订单、帖子、聊天）
-- WebSocket/IM 实时消息与未读同步
-- 订单流转状态机与支付/结算
-- 图片上传与媒体服务
-- 完善埋点、监控、崩溃与性能优化
+## UI Skill 文档（批量生成同风格页面）
+位于 `docs/skills/`：
+- 总索引：`docs/skills/README.md`
+- UI 分类：`docs/skills/ui/README.md`
+- 表单分类：`docs/skills/ui/forms/README.md`
+- 创建类表单规范：`docs/skills/ui/forms/create-data-entry/SKILL.md`
+- 认证页规范（登录/注册/找回）：`docs/skills/ui/forms/auth-login-register-recover/SKILL.md`
 
-##  Contributing
+后续新增 skill 建议结构：
+- `docs/skills/ui/<子域>/<skill-id>/SKILL.md`
 
-欢迎提 Issue 和 PR。建议先开 Issue 讨论改动方向，再提交实现。
+## 权限说明
+- 相册读取：聊天选图
+- 相机：拍照发送
+- FileProvider：拍照 URI 安全共享
 
-##  License
+## 当前阶段说明
+- 项目偏原型验证，部分数据与流程仍为 mock。
+- 存在一定历史代码风格差异（命名、目录层级、大小写），重构按模块渐进进行。
 
-当前仓库暂未声明 License。
-
+## License
+仓库当前未声明开源 License。

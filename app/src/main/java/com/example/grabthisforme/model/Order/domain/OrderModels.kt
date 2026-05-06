@@ -26,3 +26,14 @@ data class OrderTimeInfo(
     val startTime: Long = 0L,
     val endTime: Long = 0L
 )
+
+data class OrderStatusInfo(
+    val status: Int = STATUS_PENDING_RECEIPT,
+    val isAccepted: Boolean = false
+) {
+    companion object {
+        const val STATUS_PENDING_RECEIPT = 0
+        const val STATUS_PENDING_DELIVERY = 1
+        const val STATUS_COMPLETED = 2
+    }
+}

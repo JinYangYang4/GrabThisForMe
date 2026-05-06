@@ -11,7 +11,12 @@ import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
 
 import com.example.grabthisforme.R
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
+import com.example.grabthisforme.databinding.CommunityDialogLeftBottomMenuBinding
+
 class CommunityLeftBottomMenuDialog : DialogFragment() {
+    private var _binding : CommunityDialogLeftBottomMenuBinding ?= null
+    private val binding get() = _binding!!
 
     companion object {
         // 创建一个静态方法来传递目标视图的 ID
@@ -27,8 +32,20 @@ class CommunityLeftBottomMenuDialog : DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.community_dialog_left_bottom_menu, container, false)
+    ): View{
+        _binding = CommunityDialogLeftBottomMenuBinding.inflate(layoutInflater,container,false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initClicked()
+    }
+    private fun initClicked(){
+        binding.llCreateTopic.setOnClickListener {
+            dismiss()
+            (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_postTopicFragemnt)
+        }
     }
     override fun onStart() {
         super.onStart()

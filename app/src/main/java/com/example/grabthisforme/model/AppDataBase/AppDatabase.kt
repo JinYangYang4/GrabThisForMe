@@ -36,7 +36,7 @@ import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
         SecondhandTradeEntity::class,
         OrderEntity::class
     ],
-    version = 9,
+    version = 11,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

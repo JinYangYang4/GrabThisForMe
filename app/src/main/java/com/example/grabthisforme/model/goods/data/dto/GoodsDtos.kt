@@ -24,7 +24,9 @@ data class GoodsStateDto(
     val saleNumber: Long = 0,
     val stock: Int = 0,
     val isSoldOut: Boolean = false,
-    val isHot: Boolean = false
+    val isHot: Boolean = false,
+    val purchaseStatus: Int = 0,
+    val soldCount: Long = 0L
 )
 
 data class GoodsDto(
@@ -33,4 +35,3 @@ data class GoodsDto(
     val ui: GoodsUiDto = GoodsUiDto(),
     val state: GoodsStateDto = GoodsStateDto()
 )
-

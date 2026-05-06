@@ -18,4 +18,3 @@ data class SecondhandGoodsDto(
     val goods: GoodsDto,
     val trade: SecondhandTradeDto = SecondhandTradeDto()
 )
-

@@ -24,6 +24,13 @@ data class GoodsStateInfo(
     val saleNumber: Long = 0,      // 销量
     val stock: Int = 0,            // 库存数量
     val isSoldOut: Boolean = false,// 是否售罄
-    val isHot: Boolean = false     // 是否热销商品
-)
-
+    val isHot: Boolean = false,     // 是否热销商品
+    val purchaseStatus: Int = PURCHASE_STATUS_NO_PURCHASE,
+    val soldCount: Long = 0L
+) {
+    companion object {
+        const val PURCHASE_STATUS_NO_PURCHASE = 0
+        const val PURCHASE_STATUS_SOLD_PARTIAL = 1
+        const val PURCHASE_STATUS_SOLD_OUT = 2
+    }
+}

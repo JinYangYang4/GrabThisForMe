@@ -72,7 +72,9 @@ data class GoodsStateEntity(
     val saleNumber: Long = 0,
     val stock: Int = 0,
     val isSoldOut: Boolean = false,
-    val isHot: Boolean = false
+    val isHot: Boolean = false,
+    val purchaseStatus: Int = 0,
+    val soldCount: Long = 0L
 )
 
 data class GoodsBundleEntity(
@@ -98,4 +100,3 @@ data class GoodsBundleEntity(
     )
     val trade: SecondhandTradeEntity?
 )
-

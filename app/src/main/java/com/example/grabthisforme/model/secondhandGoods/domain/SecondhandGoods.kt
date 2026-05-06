@@ -13,6 +13,7 @@ open class SecondhandGoods(
     id: Long,
     name: String,
     message: String,
+    category: Goods.GoodsCategory = Goods.GoodsCategory.CLOTHING,
     secondhandPrice: Double,
     sale_number: Long,
     pic: String,
@@ -20,13 +21,15 @@ open class SecondhandGoods(
     val quality: String,
     val usedTime: String?,
     val tradeStatus: Int = SecondhandTradeInfo.STATUS_ON_SALE,
-    val negotiable: Boolean = true
+    val negotiable: Boolean = true,  //可否议价
+    purchaseStatus: Int = GoodsStateInfo.PURCHASE_STATUS_NO_PURCHASE,
+    soldCount: Long = 0L
 ) : Goods(
     baseInfo = GoodsBaseInfo(
         id = id,
         name = name,
         message = message,
-        category = Goods.GoodsCategory.CLOTHING
+        category = category
     ),
     priceInfo = GoodsPriceInfo(
         price = secondhandPrice
@@ -35,7 +38,9 @@ open class SecondhandGoods(
         pic = pic
     ),
     stateInfo = GoodsStateInfo(
-        saleNumber = sale_number
+        saleNumber = sale_number,
+        purchaseStatus = purchaseStatus,
+        soldCount = soldCount
     )
 ) {
     val saleUser: User? = saleUser

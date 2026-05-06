@@ -8,6 +8,7 @@ import com.example.grabthisforme.model.order.domain.OrderGoodsInfo
 import com.example.grabthisforme.model.order.domain.OrderIdentity
 import com.example.grabthisforme.model.order.domain.OrderParties
 import com.example.grabthisforme.model.order.domain.OrderRouteInfo
+import com.example.grabthisforme.model.order.domain.OrderStatusInfo
 import com.example.grabthisforme.model.order.domain.OrderTimeInfo
 import com.example.grabthisforme.model.user.domain.User
 
@@ -70,6 +71,10 @@ fun OrderDto.toDomain(): Order {
         timeInfo = OrderTimeInfo(
             startTime = startTime,
             endTime = endTime
+        ),
+        statusInfo = OrderStatusInfo(
+            status = orderStatus,
+            isAccepted = isAccepted
         )
     )
 }
@@ -92,7 +97,9 @@ fun Order.toDto(): OrderDto {
         aimPosition = aimPosition,
         atPosition = atPosition,
         startTime = startTime,
-        endTime = endTime
+        endTime = endTime,
+        orderStatus = orderStatus,
+        isAccepted = isAccepted
     )
 }
 
@@ -124,6 +131,10 @@ fun OrderEntity.toDomain(): Order {
         timeInfo = OrderTimeInfo(
             startTime = startTime,
             endTime = endTime
+        ),
+        statusInfo = OrderStatusInfo(
+            status = orderStatus,
+            isAccepted = isAccepted
         )
     )
 }
@@ -146,6 +157,8 @@ fun Order.toEntity(): OrderEntity {
         aimPosition = aimPosition,
         atPosition = atPosition,
         startTime = startTime,
-        endTime = endTime
+        endTime = endTime,
+        orderStatus = orderStatus,
+        isAccepted = isAccepted
     )
 }

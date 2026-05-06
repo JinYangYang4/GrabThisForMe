@@ -8,7 +8,8 @@ data class Order(
     val parties: OrderParties,
     val goodsInfo: OrderGoodsInfo,
     val routeInfo: OrderRouteInfo,
-    val timeInfo: OrderTimeInfo
+    val timeInfo: OrderTimeInfo,
+    val statusInfo: OrderStatusInfo = OrderStatusInfo()
 ) {
     val orderId: String get() = identity.orderId
     val sender: User? get() = parties.sender
@@ -22,6 +23,8 @@ data class Order(
     val at_position: String get() = atPosition
     val startTime: Long get() = timeInfo.startTime
     val endTime: Long get() = timeInfo.endTime
+    val orderStatus: Int get() = statusInfo.status
+    val isAccepted: Boolean get() = statusInfo.isAccepted
 
     constructor(
         sender: User? = null,
@@ -32,7 +35,9 @@ data class Order(
         aim_position: String = "",
         at_position: String = "",
         startTime: Long = 0L,
-        endTime: Long = 0L
+        endTime: Long = 0L,
+        orderStatus: Int = OrderStatusInfo.STATUS_PENDING_RECEIPT,
+        isAccepted: Boolean = false
     ) : this(
         identity = OrderIdentity(orderId),
         parties = OrderParties(sender = sender, buyer = buyer),
@@ -45,6 +50,10 @@ data class Order(
         timeInfo = OrderTimeInfo(
             startTime = startTime,
             endTime = endTime
+        ),
+        statusInfo = OrderStatusInfo(
+            status = orderStatus,
+            isAccepted = isAccepted
         )
     )
 
