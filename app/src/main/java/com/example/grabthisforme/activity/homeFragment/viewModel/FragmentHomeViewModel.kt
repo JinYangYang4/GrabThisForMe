@@ -3,9 +3,16 @@ package com.example.grabthisforme.activity.homeFragment.viewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.grabthisforme.R
+import com.example.grabthisforme.model.order.data.repository.OrderRepository
+import com.example.grabthisforme.model.order.domain.Order
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
 
-class FragmentHomeViewModel : ViewModel() {
+@HiltViewModel
+class FragmentHomeViewModel @Inject constructor(
+    private val orderRepository: OrderRepository
+) : ViewModel() {
     private var isAnimating = false
     private var alreadyShow = false
     private var rvTaskHeight = 0
@@ -19,6 +26,9 @@ class FragmentHomeViewModel : ViewModel() {
 
     private val _outerRvAtBottom = MutableLiveData(false)
     val  outerRvAtBottom : LiveData<Boolean> get() = _outerRvAtBottom
+
+    val currentTaskOrders: StateFlow<List<Order>> = orderRepository.currentOrderList
+
     fun setOuterRvAtBottom(atBottom : Boolean){
         _outerRvAtBottom.value = atBottom
     }

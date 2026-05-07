@@ -1,11 +1,88 @@
-package com.example.grabthisforme.model.Order.data.repository
+package com.example.grabthisforme.model.order.data.repository
 
+import com.example.grabthisforme.model.order.data.dao.OrderDao
+import com.example.grabthisforme.model.order.data.mock.OrderMockData
 import com.example.grabthisforme.model.order.domain.Order
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.example.grabthisforme.model.order.domain.OrderStatusInfo
+import com.example.grabthisforme.model.user.data.repository.UserRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class OrderRepository {
-    private val _currentOrderList = MutableStateFlow< List<Order>?>(emptyList())
-    val currentOrderList : StateFlow<List<Order>?> = _currentOrderList.asStateFlow()
+@Singleton
+class OrderRepository @Inject constructor(
+    private val orderDao: OrderDao,
+    private val userRepository: UserRepository
+) {
+    companion object {
+        const val PAGE_PENDING_RECEIVE = 0
+        const val PAGE_MY_SEND = 1
+        const val PAGE_HISTORY = 2
+    }
+
+    private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    private val sourceOrders: StateFlow<List<Order>> = orderDao.getAllOrders()
+        .map { orders ->
+            if (orders.isEmpty()) OrderMockData.getOrderList() else orders
+                .filter {it.isCurrentTaskOrder(userRepository.currentUserId.value)}
+        }
+        .stateIn(
+            scope = repositoryScope,
+            started = SharingStarted.Eagerly,
+            initialValue = OrderMockData.getOrderList()
+        )
+
+    val allOrderList: StateFlow<List<Order>> = sourceOrders
+
+    val currentOrderList: StateFlow<List<Order>> = combine(
+        sourceOrders,
+        userRepository.currentUserId
+    ) { orders, currentUserId ->
+        orders.filter { it.isCurrentTaskOrder(currentUserId) }
+    }.stateIn(
+        scope = repositoryScope,
+        started = SharingStarted.Eagerly,
+        initialValue = emptyList()
+    )
+
+    val mySendOrderList: StateFlow<List<Order>> = combine(
+        sourceOrders,
+        userRepository.currentUserId
+    ) { orders, currentUserId ->
+        if (currentUserId == null) {
+            emptyList()
+        } else {
+            orders.filter { it.sender?.id == currentUserId }
+        }
+    }.stateIn(
+        scope = repositoryScope,
+        started = SharingStarted.Eagerly,
+        initialValue = emptyList()
+    )
+
+    val historyOrderList: StateFlow<List<Order>> = sourceOrders
+
+    fun ordersByPage(page: Int): StateFlow<List<Order>> {
+        return when (page) {
+            PAGE_PENDING_RECEIVE -> currentOrderList
+            PAGE_MY_SEND -> mySendOrderList
+            PAGE_HISTORY -> historyOrderList
+            else -> allOrderList
+        }
+    }
+
+    private fun Order.isCurrentTaskOrder(currentUserId: Long?): Boolean {
+        return (orderStatus == OrderStatusInfo.STATUS_PENDING_RECEIPT ||
+            orderStatus == OrderStatusInfo.STATUS_PENDING_DELIVERY) &&
+                (sender?.id == currentUserId || buyer.id == currentUserId)
+    }
 }

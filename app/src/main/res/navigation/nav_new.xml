@@ -71,6 +71,9 @@
         <action
             android:id="@+id/action_blankFragment_to_postTopicFragemnt"
             app:destination="@id/postTopicFragemnt" />
+        <action
+            android:id="@+id/action_blankFragment_to_registerStoreFragment"
+            app:destination="@id/registerStoreFragment" />
     </fragment>
     <fragment
         android:id="@+id/fragmentSignIn"
@@ -175,4 +178,8 @@
         android:id="@+id/postTopicFragemnt"
         android:name="com.example.grabthisforme.activity.fragment_misc.post_topic.view.PostTopicFragemnt"
         android:label="PostTopicFragemnt" />
+    <fragment
+        android:id="@+id/registerStoreFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.register_store.view.RegisterStoreFragment"
+        android:label="RegisterStoreFragment" />
 </navigation>

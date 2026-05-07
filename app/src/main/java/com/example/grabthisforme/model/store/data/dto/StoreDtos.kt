@@ -6,7 +6,8 @@ import java.math.BigDecimal
 data class StoreIdentityDto(
     val id: Long,
     val name: String = "",
-    val type: String = ""
+    val type: String = "",
+    val ownerId: Long = 0L
 )
 
 data class StoreLocationDto(

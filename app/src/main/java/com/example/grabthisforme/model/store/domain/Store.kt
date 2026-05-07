@@ -13,6 +13,7 @@ data class Store(
     val goodsAll: List<Goods>? = null
 ) {
     val id: Long get() = identity.id
+    val ownerId: Long get() = identity.ownerId
     val name: String get() = identity.name
     val type: String get() = identity.type
     val address: String get() = location.address
@@ -33,6 +34,7 @@ data class Store(
         type: String,
         address: String,
         id: Long = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE,
+        ownerId: Long = 0L,
         phone: String? = null,
         businessHours: String? = null,
         latitude: Double? = null,
@@ -49,7 +51,8 @@ data class Store(
         identity = StoreIdentity(
             id = id,
             name = name,
-            type = type
+            type = type,
+            ownerId = ownerId
         ),
         location = StoreLocation(
             address = address,

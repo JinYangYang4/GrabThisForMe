@@ -9,6 +9,8 @@ import com.example.grabthisforme.model.order.data.entity.OrderEntity
 import com.example.grabthisforme.model.order.domain.Order
 import com.example.grabthisforme.model.order.mapper.toDomain
 import com.example.grabthisforme.model.order.mapper.toEntity
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 @Dao
 interface OrderDao {
@@ -20,10 +22,10 @@ interface OrderDao {
     suspend fun upsertAll(entities: List<OrderEntity>)
 
     @Query("SELECT * FROM order_cache WHERE orderId = :orderId LIMIT 1")
-    suspend fun getOrderEntity(orderId: String): OrderEntity?
+    fun getOrderEntityFlow(orderId: String): Flow<OrderEntity?>
 
     @Query("SELECT * FROM order_cache ORDER BY startTime DESC")
-    suspend fun getAllOrderEntities(): List<OrderEntity>
+    fun getAllOrderEntitiesFlow(): Flow<List<OrderEntity>>
 
     @Query("DELETE FROM order_cache WHERE orderId = :orderId")
     suspend fun deleteById(orderId: String)
@@ -38,11 +40,13 @@ interface OrderDao {
         upsertAll(orders.map { it.toEntity() })
     }
 
-    suspend fun getOrder(orderId: String): Order? {
-        return getOrderEntity(orderId)?.toDomain()
+    fun getOrder(orderId: String): Flow<Order?> {
+        return getOrderEntityFlow(orderId).map { it?.toDomain() }
     }
 
-    suspend fun getAllOrders(): List<Order> {
-        return getAllOrderEntities().map { it.toDomain() }
+    fun getAllOrders(): Flow<List<Order>> {
+        return getAllOrderEntitiesFlow().map { entities ->
+            entities.map { it.toDomain() }
+        }
     }
 }

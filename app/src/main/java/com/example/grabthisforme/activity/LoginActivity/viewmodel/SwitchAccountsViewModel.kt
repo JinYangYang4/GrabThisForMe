@@ -5,51 +5,37 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.grabthisforme.model.user.data.dao.UserDao
+import com.example.grabthisforme.model.user.data.repository.UserRepository
 import com.example.grabthisforme.model.user.domain.User
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SwitchAccountsViewModel @Inject constructor(
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _testUserList = MutableLiveData<MutableList<User>>()
     val testUserList: LiveData<MutableList<User>> = _testUserList
-    private var allUser : MutableList<User> = mutableListOf()
 
     init {
-        loadTestUserItems()
-    }
-    private fun loadTestUserItems() {
         viewModelScope.launch {
-            allUser = userDao.getAllLoginUsers().toMutableList()
-            _testUserList.postValue(allUser)
+            userRepository.allLoginUsers.collectLatest { users ->
+                _testUserList.postValue(users.toMutableList())
+            }
         }
     }
-
-
 
     fun deleteUser(user: User) {
         viewModelScope.launch {
             userDao.deleteUserById(user.id)
         }
-        allUser = allUser.filter { it.id != user.id }.toMutableList()
-        _testUserList.value = allUser
     }
 
     fun insertUser(user: User) {
-        val updatedList = allUser.map {
-            it.withCurrent(false)
-        }.toMutableList()
-
-        val newUser = user.withCurrent(true)
-        updatedList.removeAll { it.id == newUser.id }
-        updatedList.add(0, newUser)
-        allUser = updatedList
-        _testUserList.postValue(allUser)
-
         viewModelScope.launch {
             userDao.loginAndSetCurrent(user)
         }

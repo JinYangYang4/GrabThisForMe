@@ -9,7 +9,7 @@ import com.example.grabthisforme.model.goods.domain.Goods
 import com.example.grabthisforme.model.goods.domain.GoodsStateInfo
 import com.example.grabthisforme.model.secondhandGoods.domain.SecondhandGoods
 import com.example.grabthisforme.model.secondhandGoods.domain.SecondhandTradeInfo
-import com.example.grabthisforme.model.user.data.dao.UserDao
+import com.example.grabthisforme.model.user.data.repository.UserRepository
 import com.example.grabthisforme.model.user.domain.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateSecondHandGoodsViewModel @Inject constructor(
     private val goodsDao: GoodsDao,
-    private val userDao: UserDao
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _createResult = MutableLiveData<CreateSecondhandResult>()
@@ -67,7 +67,7 @@ class CreateSecondHandGoodsViewModel @Inject constructor(
 
         viewModelScope.launch {
             runCatching {
-                val saleUser = userDao.getCurrentUser() ?: buildFallbackUser()
+                val saleUser = userRepository.currentUser.value ?: buildFallbackUser()
                 val goods = SecondhandGoods(
                     saleUser = saleUser,
                     id = System.currentTimeMillis(),

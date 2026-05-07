@@ -260,14 +260,14 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="20dp"
-                                android:text="@{viewModel.drawerUserName}"
+                                android:text="@{viewModel.currentUser.name}"
                                 android:textSize="18sp">
                             </TextView>
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="20dp"
-                                android:text="@{viewModel.drawerAccountText}"
+                                android:text="@{String.valueOf(viewModel.currentUser.id)}"
                                 android:textSize="14sp"/>
 
                         </LinearLayout>
@@ -514,6 +514,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
                                     android:gravity="center_horizontal"
+                                    android:id="@+id/ll_register_store_owner"
                                     android:orientation="vertical">
                                     <ImageView
                                         android:layout_width="45dp"
@@ -535,6 +536,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
+                                    android:id="@+id/ll_register_runer"
                                     android:gravity="center_horizontal"
                                     android:orientation="vertical">
                                     <ImageView

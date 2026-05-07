@@ -3,11 +3,15 @@ package com.example.grabthisforme.activity.mainactivity.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.grabthisforme.model.user.data.repository.UserRepository
+import com.example.grabthisforme.model.user.domain.User
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor() : ViewModel() {
+class MainViewModel @Inject constructor(userRepository: UserRepository) : ViewModel() {
     private var _drawerOpenState = MutableLiveData(false)
     val drawerOpenState: LiveData<Boolean> get() = _drawerOpenState
 
@@ -25,6 +29,15 @@ class MainViewModel @Inject constructor() : ViewModel() {
 
     private val _drawerAccountText = MutableLiveData("账号：1233231")
     val drawerAccountText: LiveData<String> = _drawerAccountText
+    private var _currentUser = MutableLiveData<User?>()
+    val currentUser : LiveData<User?> = _currentUser
+    init {
+        viewModelScope.launch {
+            userRepository.currentUser.collect { user ->
+                _currentUser.postValue(user)
+            }
+        }
+    }
 
     fun openNewFragment_ture() {
         _openNewFragment.value = true

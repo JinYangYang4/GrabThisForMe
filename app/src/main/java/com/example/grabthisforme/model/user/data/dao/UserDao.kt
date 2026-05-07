@@ -12,6 +12,8 @@ import com.example.grabthisforme.model.user.domain.User
 import com.example.grabthisforme.model.user.mapper.toAccountEntity
 import com.example.grabthisforme.model.user.mapper.toDomain
 import com.example.grabthisforme.model.user.mapper.toProfileEntity
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 @Dao
 interface UserDao {
@@ -36,10 +38,10 @@ interface UserDao {
 
     @Transaction
     @Query("SELECT * FROM user_account WHERE isCurrent = 1 LIMIT 1")
-    suspend fun getCurrentUserBundle(): UserBundleEntity?
+    fun getCurrentUserBundleFlow(): Flow<UserBundleEntity?>
 
-    suspend fun getCurrentUser(): User? {
-        return getCurrentUserBundle()?.toDomain()
+    fun getCurrentUser(): Flow<User?> {
+        return getCurrentUserBundleFlow().map { it?.toDomain() }
     }
 
     @Query("UPDATE user_account SET isCurrent = 0 WHERE isCurrent = 1")
@@ -47,10 +49,12 @@ interface UserDao {
 
     @Transaction
     @Query("SELECT * FROM user_account ORDER BY isCurrent DESC, createTime DESC")
-    suspend fun getAllLoginUserBundles(): List<UserBundleEntity>
+    fun getAllLoginUserBundlesFlow(): Flow<List<UserBundleEntity>>
 
-    suspend fun getAllLoginUsers(): List<User> {
-        return getAllLoginUserBundles().map { it.toDomain() }
+    fun getAllLoginUsers(): Flow<List<User>> {
+        return getAllLoginUserBundlesFlow().map { bundles ->
+            bundles.map { it.toDomain() }
+        }
     }
 
     @Query("UPDATE user_account SET isCurrent = 0")

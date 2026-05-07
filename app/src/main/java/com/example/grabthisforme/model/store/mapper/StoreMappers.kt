@@ -17,7 +17,8 @@ fun StoreIdentityDto.toDomainInfo(): StoreIdentity {
     return StoreIdentity(
         id = id,
         name = name,
-        type = type
+        type = type,
+        ownerId = ownerId
     )
 }
 
@@ -63,7 +64,8 @@ fun Store.toDto(): StoreDto {
         identity = StoreIdentityDto(
             id = id,
             name = name,
-            type = type
+            type = type,
+            ownerId = ownerId
         ),
         location = StoreLocationDto(
             address = address,

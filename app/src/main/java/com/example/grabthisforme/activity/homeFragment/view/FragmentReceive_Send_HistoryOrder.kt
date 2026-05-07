@@ -5,37 +5,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.grabthisforme.activity.mainactivity.view.OrderMessageBottomSheetFragment
 import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewOrderAdapter
+import com.example.grabthisforme.activity.homeFragment.viewModel.OrderPageViewModel
 import com.example.grabthisforme.databinding.FragmentReceiveOrderBinding
-import com.example.grabthisforme.model.order.data.dao.OrderDao
-import com.example.grabthisforme.model.order.data.mock.OrderMockData
-import com.example.grabthisforme.model.order.domain.Order
-import com.example.grabthisforme.model.order.domain.OrderStatusInfo
-import com.example.grabthisforme.model.user.data.dao.UserDao
+import com.example.grabthisforme.model.order.data.repository.OrderRepository
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class FragmentReceive_Send_HistoryOrder : Fragment() {
     private var _binding: FragmentReceiveOrderBinding? = null
     private val binding get() = _binding!!
     private lateinit var orderAdapter: RecyclerViewOrderAdapter
-
-    @Inject
-    lateinit var orderDao: OrderDao
-
-    @Inject
-    lateinit var userDao: UserDao
+    private val viewModel: OrderPageViewModel by viewModels()
 
     companion object {
         private const val ARG_PAGE = "arg_page"
-        private const val PAGE_PENDING_RECEIVE = 0
-        private const val PAGE_MY_SEND = 1
-        private const val PAGE_HISTORY = 2
 
         fun newInstance(page: Int): FragmentReceive_Send_HistoryOrder {
             return FragmentReceive_Send_HistoryOrder().apply {
@@ -47,7 +37,8 @@ class FragmentReceive_Send_HistoryOrder : Fragment() {
     }
 
     private val page: Int
-        get() = arguments?.getInt(ARG_PAGE, PAGE_PENDING_RECEIVE) ?: PAGE_PENDING_RECEIVE
+        get() = arguments?.getInt(ARG_PAGE, OrderRepository.PAGE_PENDING_RECEIVE)
+            ?: OrderRepository.PAGE_PENDING_RECEIVE
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,32 +69,10 @@ class FragmentReceive_Send_HistoryOrder : Fragment() {
     }
 
     private fun loadOrders() {
-        lifecycleScope.launch {
-            val currentUser = userDao.getCurrentUser()
-            val dbOrders = orderDao.getAllOrders()
-            val sourceOrders = if (dbOrders.isEmpty()) OrderMockData.getOrderList() else dbOrders
-            val filteredOrders = filterByPage(sourceOrders, currentUser?.id)
-            orderAdapter.userId = currentUser?.id
-            orderAdapter.submitList(filteredOrders)
-        }
-    }
-
-    private fun filterByPage(orders: List<Order>, currentUserId: Long?): List<Order> {
-        return when (page) {
-            PAGE_PENDING_RECEIVE -> {
-                orders.filter {
-                    it.orderStatus == OrderStatusInfo.STATUS_PENDING_RECEIPT ||
-                        it.orderStatus == OrderStatusInfo.STATUS_PENDING_DELIVERY
-                }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.ordersByPage(page).collectLatest { orderList ->
+                orderAdapter.submitList(orderList)
             }
-
-            PAGE_MY_SEND -> {
-                if (currentUserId == null) emptyList()
-                else orders.filter { it.sender?.id == currentUserId }
-            }
-
-            PAGE_HISTORY -> orders
-            else -> orders
         }
     }
 

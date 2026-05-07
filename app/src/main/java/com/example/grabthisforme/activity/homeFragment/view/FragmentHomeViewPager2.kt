@@ -14,8 +14,10 @@ import com.example.grabthisforme.activity.homeFragment.viewModel.FragmentHomeVie
 import com.example.grabthisforme.databinding.FragmentTaskBinding
 import com.example.grabthisforme.model.order.data.mock.OrderMockData
 import com.example.grabthisforme.model.order.domain.Order
+import dagger.hilt.android.AndroidEntryPoint
 
 
+@AndroidEntryPoint
 class FragmentHomeViewPager2 : Fragment() {
 
     private var _binding: FragmentTaskBinding? = null

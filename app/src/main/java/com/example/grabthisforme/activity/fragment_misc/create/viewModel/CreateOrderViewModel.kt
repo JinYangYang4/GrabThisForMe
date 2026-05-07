@@ -1,5 +1,6 @@
 package com.example.grabthisforme.activity.fragment_misc.create.viewModel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,7 +9,7 @@ import com.example.grabthisforme.model.goods.domain.Goods
 import com.example.grabthisforme.model.order.data.dao.OrderDao
 import com.example.grabthisforme.model.order.domain.Order
 import com.example.grabthisforme.model.order.domain.OrderStatusInfo
-import com.example.grabthisforme.model.user.data.dao.UserDao
+import com.example.grabthisforme.model.user.data.repository.UserRepository
 import com.example.grabthisforme.model.user.domain.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -19,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateOrderViewModel @Inject constructor(
     private val orderDao: OrderDao,
-    private val userDao: UserDao
+    private val userRepository: UserRepository
 ) : ViewModel() {
     private val _buyGoodsMode = MutableLiveData(true)
     val buyGoodsMode: LiveData<Boolean> get() = _buyGoodsMode
@@ -46,6 +47,7 @@ class CreateOrderViewModel @Inject constructor(
     fun setStartTime(value: String) {
         _startTime.value = value
     }
+
 
     fun setEndTime(value: String) {
         _endTime.value = value
@@ -157,7 +159,8 @@ class CreateOrderViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             runCatching {
-                val buyer = userDao.getCurrentUser() ?: buildFallbackUser()
+                val buyer = userRepository.currentUser.value ?: buildFallbackUser()
+                Log.d("test11", "saveOrderInternal:${userRepository.currentUser.value?.id} ")
                 val order = Order(
                     sender = null,
                     orderId = "ORDER_${System.currentTimeMillis()}",

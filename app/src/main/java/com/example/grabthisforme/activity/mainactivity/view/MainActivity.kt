@@ -74,6 +74,7 @@ class MainActivity : AppCompatActivity() {
         initRvUser()
         initRvStore()
         nestedScrollviewTouchListener()
+        initHandleSidebarClick()
     }
     fun viewModelObserve(){
         viewModel.drawerOpenState.observe(this){ openState ->
@@ -111,6 +112,7 @@ class MainActivity : AppCompatActivity() {
             navHostFragment.navController.navigate(R.id.fragmentMy)
             viewModel.selectTab(3)
         }
+
 
         //零散片段
         navNewFragment = supportFragmentManager.findFragmentById(binding.navNewFragment.id) as NavHostFragment
@@ -173,8 +175,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             onBackPressedDispatcher.addCallback(this,backCallback)
-
-
+    }
+    fun initHandleSidebarClick(){
+        binding.llRegisterStoreOwner.setOnClickListener {
+            navNewFragment.navController.navigate(R.id.action_blankFragment_to_registerStoreFragment)
+            binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+        }
     }
 
     fun intentToMiscFragment(id : Int){
