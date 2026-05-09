@@ -32,11 +32,6 @@
 .\gradlew.bat test
 ```
 
-如果出现 SDK 路径错误，在项目根目录 `local.properties` 配置：
-```properties
-sdk.dir=你的AndroidSdk绝对路径
-```
-
 ## 核心架构
 ### UI 层
 - 组织方式：`activity/.../view` + `viewModel`
