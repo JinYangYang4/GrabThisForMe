@@ -3,7 +3,6 @@ package com.example.grabthisforme.activity.homeFragment.view
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,11 +11,13 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.AnimationSet
 import android.view.animation.TranslateAnimation
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.mainactivity.view.OrderMessageBottomSheetFragment
@@ -36,8 +37,8 @@ class FragmentHome : Fragment() {
     private var _binding : FragmentHomeBinding ?= null
     private val binding get() = _binding!!
 
-    private lateinit var homeViewModel: FragmentHomeViewModel
-    private lateinit var sharedViewModel: MainViewModel
+    private val homeViewModel: FragmentHomeViewModel by viewModels()
+    private val sharedViewModel: MainViewModel by activityViewModels()
     private lateinit var adapter1: RecyclerViewTaskAdapter
     private lateinit var adapter2: RecyclerViewStoreAdapter
     
@@ -46,13 +47,6 @@ class FragmentHome : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentHomeBinding.inflate(inflater,container,false)
-        homeViewModel = ViewModelProvider(requireActivity()).get(FragmentHomeViewModel::class.java)
-        sharedViewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = homeViewModel
-
-
-        initObserve()
         binding.llDropdown.setOnClickListener {
             if (homeViewModel.GetRvTaskIsOpen()){
                 closeRvTaskAnimation()
@@ -75,15 +69,25 @@ class FragmentHome : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = homeViewModel
+        initObserve()
         initRecyclerViewTask()
         initRecyclerViewStore()
     }
 
     fun initObserve(){
+        sharedViewModel.currentUser.observe(viewLifecycleOwner){user ->
+            Glide.with(this)
+                .load(user?.headPic)
+                .placeholder(R.drawable.cat)
+                .error(R.drawable.cat)
+                .into(binding.ivHeadPic)
+        }
     }
     fun initOperationBar(){
         binding.llItemOrder.setOnClickListener {
-            (requireActivity() as MainActivity).intentToMiscFragment_ac(0)
+            (requireActivity() as MainActivity).intentToMiscFragment_Order_ac(0)
         }
         binding.llCreateOrder.setOnClickListener {
             (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_createOrderFragment)

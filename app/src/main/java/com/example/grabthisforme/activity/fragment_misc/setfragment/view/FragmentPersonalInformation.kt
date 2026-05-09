@@ -6,10 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.bumptech.glide.Glide
+import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.fragment_misc.setfragment.viewmodel.PersonalInfoViewModel
 import com.example.grabthisforme.databinding.FragmentPersonalInformationBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FragmentPersonalInformation : Fragment() {
 
     private var _binding: FragmentPersonalInformationBinding? = null
@@ -30,30 +34,29 @@ class FragmentPersonalInformation : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initListener()
+        initObserve()
     }
 
     private fun initListener() {
         binding.ivBack.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
-
-        // 头像点击事件（可选：跳转到更换头像页面）
-        binding.ivAvatar.setOnClickListener {
-
-        }
-        binding.itemName.setOnClickListener {
+        binding.llSetMyInformation.setOnClickListener {
+            (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_personalInformation_to_editPersonalInformationFragment)
         }
 
-        binding.itemGender.setOnClickListener {
-        }
+    }
+    fun initObserve(){
+        viewModel.headPic.observe(viewLifecycleOwner){headPicUrl ->
+            if (headPicUrl.isBlank()) {
+                binding.ivAvatar.setImageResource(R.drawable.ic_add)
+            }
+            Glide.with(this)
+                .load(headPicUrl)
+                .placeholder(R.drawable.cat)
+                .error(R.drawable.cat)
+                .into(binding.ivAvatar)
 
-        binding.itemRegion.setOnClickListener {
-        }
-
-        binding.itemMobile.setOnClickListener {
-        }
-
-        binding.itemSignature.setOnClickListener {
         }
     }
     override fun onResume() {

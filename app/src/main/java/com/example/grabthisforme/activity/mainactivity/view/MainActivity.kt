@@ -19,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.GridLayoutManager
+import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.adapter.RVRecentStoreAdapter
 import com.example.grabthisforme.activity.mainactivity.adapter.RVRecentlyUserAdapter
@@ -55,7 +56,7 @@ class MainActivity : AppCompatActivity() {
     private val cachedFragments = setOf(
         "com.example.grabthisforme.activity.communityFragment.view.FragmentCommunity",
         "com.example.grabthisforme.activity.informationFragment.view.FragmentInformation",
-        "com.example.grabthisforme.activity.myFragment.FragmentMy",
+        "com.example.grabthisforme.activity.myfragment.view.FragmentMy",
         "com.example.grabthisforme.activity.homeFragment.view.FragmentHomeContainer"
     )
 
@@ -80,10 +81,19 @@ class MainActivity : AppCompatActivity() {
         viewModel.drawerOpenState.observe(this){ openState ->
             if (openState){
                 binding.drawerLayout.openDrawer(GravityCompat.START)
+            }else{
+                binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
             }
         }
         viewModel.openNewFragment.observe(this){value ->
             isOpenNewFragment = value
+        }
+        viewModel.currentUser.observe(this){user ->
+            Glide.with(this)
+                .load(user?.headPic)
+                .placeholder(R.drawable.cat)
+                .error(R.drawable.cat)
+                .into(binding.ivHeadPic)
         }
     }
     fun initNavigationBottom(){
@@ -128,7 +138,10 @@ class MainActivity : AppCompatActivity() {
         }
             backCallback = object : OnBackPressedCallback(true){
                 override fun handleOnBackPressed() {
-
+                    if (viewModel.drawerOpenState.value){
+                        viewModel.drawerOpenStateToClose()
+                        return
+                    }
                     if (isOrderBottomSheetFragment && isOpenNewFragment){
                         showBottomBar()
                     }else if (isOpenNewFragment){
@@ -178,19 +191,35 @@ class MainActivity : AppCompatActivity() {
     }
     fun initHandleSidebarClick(){
         binding.llRegisterStoreOwner.setOnClickListener {
-            navNewFragment.navController.navigate(R.id.action_blankFragment_to_registerStoreFragment)
-            binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+            intentToMiscFragment(R.id.action_blankFragment_to_registerStoreFragment)
         }
+        binding.llSetBtn.setOnClickListener {
+            intentToMiscFragment(R.id.action_blankFragment_to_setFragment)
+        }
+        binding.llHistoryOrderBtn.setOnClickListener {
+            intentToMiscFragment_Order_ac(2)
+        }
+        binding.llCouponBtn.setOnClickListener {
+            intentToMiscFragment(R.id.action_blankFragment_to_couponFragment)
+        }
+
     }
 
     fun intentToMiscFragment(id : Int){
         val navController = navNewFragment.navController
         navController.navigate(id)
+        if (viewModel.drawerOpenState.value){
+            binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+        }
+
     }
-    fun intentToMiscFragment_ac(ac : Int){
+    fun intentToMiscFragment_Order_ac(ac : Int){
         val navController = navNewFragment.navController
         val action = BlankFragmentDirections.actionBlankFragmentToOrderExecutorFragment(ac)
         navController.navigate(action)
+        if (viewModel.drawerOpenState.value){
+            binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+        }
     }
     fun innerBottomBar(){
         viewModel.openNewFragment_ture()

@@ -17,7 +17,7 @@
 
     <keep_state_fragment
         android:id="@+id/fragmentMy"
-        android:name="com.example.grabthisforme.activity.myFragment.FragmentMy"
+        android:name="com.example.grabthisforme.activity.myfragment.view.FragmentMy"
         tools:layout="@layout/fragment_my" >
     </keep_state_fragment>
     <keep_state_fragment

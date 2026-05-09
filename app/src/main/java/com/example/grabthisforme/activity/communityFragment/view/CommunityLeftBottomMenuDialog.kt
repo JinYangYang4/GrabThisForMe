@@ -46,6 +46,10 @@ class CommunityLeftBottomMenuDialog : DialogFragment() {
             dismiss()
             (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_postTopicFragemnt)
         }
+        binding.llAddFriend.setOnClickListener {
+            dismiss()
+            (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_fragmentSearchFriendOrGroupOrConversation2)
+        }
     }
     override fun onStart() {
         super.onStart()

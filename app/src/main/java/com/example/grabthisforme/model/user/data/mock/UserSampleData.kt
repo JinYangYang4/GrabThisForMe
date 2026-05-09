@@ -38,7 +38,10 @@ internal object UserSampleData {
                     accountName = templateUser.accountName,
                     passwordHash = templateUser.account.passwordHash,
                     lastLoginTime = templateUser.account.lastLoginTime,
-                    setting = templateUser.setting
+                    setting = templateUser.setting,
+                    likeCount = (10..999).random().toLong(),
+                    fanCount = (5..500).random().toLong(),
+                    followCount = (10..800).random().toLong()
                 )
             )
         }
@@ -58,12 +61,15 @@ internal object UserSampleData {
                         headPic = "https://example.com/avatar/${(1..10).random()}.png",
                         phone = "138${(10000000..99999999).random()}",
                         email = "test_${UUID.randomUUID().toString().substring(0, 6)}@example.com",
-                        gender = (0..1).random(),
-                        isVip = Math.random() > 0.5,
-                        signature = "virtual user signature"
-                    )
-                }
+                    gender = (0..1).random(),
+                    isVip = Math.random() > 0.5,
+                    signature = "virtual user signature",
+                    likeCount = (100..999).random().toLong(),
+                    fanCount = (50..500).random().toLong(),
+                    followCount = (20..300).random().toLong()
+                )
             }
+        }
         }
         return mockUser!!
     }

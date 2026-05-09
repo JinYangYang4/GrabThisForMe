@@ -334,7 +334,7 @@ class FragmentChat : Fragment(), BottomSheetDialogPhoto.OnPhotosSelectedListener
         )
     }
     private fun showPhotoBottomSheet() {
-        val photoBottomSheet = BottomSheetDialogPhoto.newInstance()
+        val photoBottomSheet = BottomSheetDialogPhoto.newInstance(BottomSheetDialogPhoto.SELECT_UNLIMIT)
         photoBottomSheet.show(childFragmentManager, "PhotoBottomSheet")
         photoBottomSheet.setOnPhotosSelectedListener(this)
     }

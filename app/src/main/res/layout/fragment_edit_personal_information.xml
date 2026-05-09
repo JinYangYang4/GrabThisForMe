@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/gray_mid_light"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/ll_top_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_arc_gradient_green_just_two_color"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingTop="30dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="10dp">
+
+            <ImageView
+                android:id="@+id/iv_back"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_back" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:text="编辑个人信息"
+                android:textColor="@color/white"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nested_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/white">
+
+            <LinearLayout
+                android:id="@+id/ll_form_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/bg_round_stripe"
+                    android:backgroundTint="@color/white"
+                    android:elevation="2dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="账号信息"
+                        android:textColor="#333333"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:hint="用户ID（不可修改）"
+                        app:boxStrokeWidth="0dp"
+                        app:hintEnabled="true"
+                        app:boxStrokeColor="@color/green_light"
+                        app:hintTextColor="@color/green_light"
+                        app:cursorColor="@color/green_light">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_user_id"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:enabled="false"
+                            android:focusable="false"
+                            android:paddingVertical="8dp"
+                            android:textColor="#666666"
+                            android:textSize="15sp"
+                            tools:text="10001" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="账号名"
+                        app:boxStrokeWidth="0dp"
+                        app:hintEnabled="true"
+                        app:boxStrokeColor="@color/green_light"
+                        app:hintTextColor="@color/green_light"
+                        app:cursorColor="@color/green_light">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_account_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:paddingVertical="8dp"
+                            android:textSize="15sp"
+                            tools:text="user_zhangsan" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/bg_round_stripe"
+                    android:backgroundTint="@color/white"
+                    android:elevation="2dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="个人资料"
+                        android:textColor="#333333"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:background="#E8E8E8" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="选择头像(可不填)"
+                            android:textSize="15sp"
+                            android:textColor="#999999"/>
+
+                        <ImageView
+                            android:id="@+id/iv_head_pic"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
+                            android:layout_marginTop="8dp"
+                            android:src="@drawable/ic_add"
+                            android:scaleType="centerCrop"/>
+                    </LinearLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:hint="昵称（displayName）"
+                        app:boxStrokeWidth="0dp"
+                        app:hintEnabled="true"
+                        app:boxStrokeColor="@color/green_light"
+                        app:hintTextColor="@color/green_light"
+                        app:cursorColor="@color/green_light">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_display_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:paddingVertical="8dp"
+                            android:textSize="15sp"
+                            tools:text="张三" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="手机号（phone）"
+                        app:boxStrokeWidth="0dp"
+                        app:hintEnabled="true"
+                        app:boxStrokeColor="@color/green_light"
+                        app:hintTextColor="@color/green_light"
+                        app:cursorColor="@color/green_light">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_phone"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:inputType="phone"
+                            android:paddingVertical="8dp"
+                            android:textSize="15sp"
+                            tools:text="13800138000" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="邮箱（email）"
+                        app:boxStrokeWidth="0dp"
+                        app:hintEnabled="true"
+                        app:boxStrokeColor="@color/green_light"
+                        app:hintTextColor="@color/green_light"
+                        app:cursorColor="@color/green_light">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_email"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:inputType="textEmailAddress"
+                            android:paddingVertical="8dp"
+                            android:textSize="15sp"
+                            tools:text="user@example.com" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="性别"
+                            android:textColor="#333333"
+                            android:textSize="15sp" />
+
+                        <RadioGroup
+                            android:id="@+id/rg_gender"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="20dp"
+                            android:orientation="horizontal">
+
+                            <RadioButton
+                                android:id="@+id/rb_gender_unknown"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="未知"
+                                android:textColor="@color/radio_text_selector"
+                                android:textSize="14sp"
+                                app:buttonTint="@color/radio_button_tint" />
+
+                            <RadioButton
+                                android:id="@+id/rb_gender_male"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="14dp"
+                                android:text="男"
+                                android:textColor="@color/radio_text_selector"
+                                android:textSize="14sp"
+                                app:buttonTint="@color/radio_button_tint" />
+
+                            <RadioButton
+                                android:id="@+id/rb_gender_female"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="14dp"
+                                android:text="女"
+                                android:textColor="@color/radio_text_selector"
+                                android:textSize="14sp"
+                                app:buttonTint="@color/radio_button_tint" />
+                        </RadioGroup>
+                    </LinearLayout>
+
+                    <com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.NestedScrollableHost
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/bg_round_stripe"
+                            android:clipToOutline="true">
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="1dp"
+                                android:background="@drawable/bg_round_stripe"
+                                android:backgroundTint="@color/white"
+                                android:elevation="4dp"
+                                android:hint="个性签名（signature）"
+                                app:boxStrokeWidth="0dp"
+                                app:hintEnabled="true"
+                                app:boxStrokeColor="@color/green_light"
+                                app:hintTextColor="@color/green_light"
+                                app:cursorColor="@color/green_light">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/et_signature"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="120dp"
+                                    android:background="@null"
+                                    android:gravity="top"
+                                    android:inputType="textMultiLine"
+                                    android:maxLines="5"
+                                    android:paddingVertical="8dp"
+                                    android:textSize="15sp"
+                                    tools:text="人生如逆旅，我亦是行人。" />
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+                    </com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.NestedScrollableHost>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/bg_round_stripe"
+                    android:clipToOutline="true"
+                    android:elevation="2dp"
+                    android:padding="1dp">
+
+                    <Button
+                        android:id="@+id/btn_save_user_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_round_stripe_orange"
+                        app:backgroundTint="@color/green_light"
+                        android:text="保存修改"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+</layout>

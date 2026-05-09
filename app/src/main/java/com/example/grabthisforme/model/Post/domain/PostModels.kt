@@ -1,7 +1,5 @@
 package com.example.grabthisforme.model.post.domain
 
-import com.example.grabthisforme.model.user.domain.User
-
 data class PostIdentity(
     val postId: String,
     val createTime: Long
@@ -13,7 +11,9 @@ data class PostContent(
 )
 
 data class PostAuthor(
-    val user: User
+    val authorId: Long,
+    val authorName: String = "",
+    val authorAvatarUrl: String = ""
 )
 
 data class PostStats(

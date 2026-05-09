@@ -5,7 +5,8 @@ import com.example.grabthisforme.model.user.data.mock.UserSampleData
 data class User(
     val account: UserAccount,
     val profile: UserProfile,
-    val setting: UserSetting? = null
+    val setting: UserSetting? = null,
+    val statistics: UserStatistics = UserStatistics()
 ) {
     val id: Long get() = account.userId
     val accountName: String get() = account.accountName
@@ -18,6 +19,9 @@ data class User(
     val createTime: Long get() = account.createTime
     val isVip: Boolean get() = profile.isVip
     val signature: String? get() = profile.signature
+    val likeCount: Long get() = statistics.likeCount
+    val fanCount: Long get() = statistics.fanCount
+    val followCount: Long get() = statistics.followCount
 
     constructor(
         id: Long,
@@ -33,7 +37,10 @@ data class User(
         accountName: String = name,
         passwordHash: String = "",
         lastLoginTime: Long? = null,
-        setting: UserSetting? = null
+        setting: UserSetting? = null,
+        likeCount: Long = 0L,
+        fanCount: Long = 0L,
+        followCount: Long = 0L
     ) : this(
         account = UserAccount(
             userId = id,
@@ -53,7 +60,12 @@ data class User(
             isVip = isVip,
             signature = signature
         ),
-        setting = setting
+        setting = setting,
+        statistics = UserStatistics(
+            likeCount = likeCount,
+            fanCount = fanCount,
+            followCount = followCount
+        )
     )
 
     fun getInfoSummary(): String {
@@ -67,6 +79,20 @@ data class User(
     fun withCurrent(isCurrent: Boolean): User {
         return copy(
             account = account.copy(isCurrent = isCurrent)
+        )
+    }
+
+    fun withStatistics(
+        likeCount: Long = statistics.likeCount,
+        fanCount: Long = statistics.fanCount,
+        followCount: Long = statistics.followCount
+    ): User {
+        return copy(
+            statistics = statistics.copy(
+                likeCount = likeCount,
+                fanCount = fanCount,
+                followCount = followCount
+            )
         )
     }
 

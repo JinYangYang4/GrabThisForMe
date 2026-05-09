@@ -27,7 +27,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class BottomSheetDialogPhoto : BottomSheetDialogFragment(){
+class BottomSheetDialogPhoto(val type : Int) : BottomSheetDialogFragment(){
+    companion object {
+        fun newInstance(type: Int): BottomSheetDialogPhoto {
+            return BottomSheetDialogPhoto(type)
+        }
+        const val SELECT_NUM_LIMIT = 1
+        const val SELECT_UNLIMIT = 0
+    }
+
 
     private var _binding: BottomSheetDialogPhotoBinding? = null
     private val binding get() = _binding!!
@@ -102,7 +110,7 @@ class BottomSheetDialogPhoto : BottomSheetDialogFragment(){
     }
 
     private fun initRecyclerView() {
-        photoAdapter = PhotoRecyclerViewAdapter { photoItem, isSelected -> }
+        photoAdapter = PhotoRecyclerViewAdapter(type)
         binding.rvPhotos.apply {
             layoutManager = GridLayoutManager(context, 3)
             adapter = photoAdapter
@@ -170,7 +178,7 @@ class BottomSheetDialogPhoto : BottomSheetDialogFragment(){
                     sortOrder
                 )?.use { cursor ->
                     val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-                    val maxCount = 100
+                    val maxCount = 1000
                     var count = 0
                     while (cursor.moveToNext() && count < maxCount) {
                         val id = cursor.getLong(idColumn)
@@ -208,9 +216,5 @@ class BottomSheetDialogPhoto : BottomSheetDialogFragment(){
         listener = null
     }
 
-    companion object {
-        fun newInstance(): BottomSheetDialogPhoto {
-            return BottomSheetDialogPhoto()
-        }
-    }
+
 }

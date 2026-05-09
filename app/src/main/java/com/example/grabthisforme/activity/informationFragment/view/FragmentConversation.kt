@@ -7,17 +7,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentMessageBinding
 import com.example.grabthisforme.activity.informationFragment.adapter.ConversationRecyclerViewAdapter
+import com.example.grabthisforme.activity.informationFragment.viewmodel.InformationViewModel
 import com.example.grabthisforme.model.conversation.domain.Conversation
 
 class FragmentConversation : Fragment() {
 
     private  var _binding: FragmentMessageBinding? = null
-
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -43,5 +45,6 @@ class FragmentConversation : Fragment() {
         Log.d("test111", "initRecyclerView: ")
         messageAdapter.submitList(conversationList)
     }
+
 
 }

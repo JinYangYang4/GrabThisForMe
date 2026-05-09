@@ -26,6 +26,12 @@ data class UserProfile(
     }
 }
 
+data class UserStatistics(
+    val likeCount: Long = 0L,
+    val fanCount: Long = 0L,
+    val followCount: Long = 0L
+)
+
 data class UserSetting(
     val themeMode: Int = 0,
     val homePageMode: Int = 0,

@@ -24,6 +24,7 @@
                     android:layout_height="36dp"
                     android:src="@drawable/cat"
                     android:background="@drawable/bg_circle"
+                    android:scaleType="centerCrop"
                     android:clipToOutline="true" />
 
                 <LinearLayout

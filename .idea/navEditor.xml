@@ -131,8 +131,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="12" />
-                            <option name="y" value="124" />
+                            <option name="x" value="7" />
+                            <option name="y" value="554" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -158,6 +158,11 @@
                               </value>
                             </entry>
                             <entry key="action_blankFragment_to_fragmentSearchFriendOrGroupOrConversation">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_blankFragment_to_fragmentSearchFriendOrGroupOrConversation2">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -188,6 +193,11 @@
                               </value>
                             </entry>
                             <entry key="action_blankFragment_to_postTopicFragemnt">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_blankFragment_to_registerStoreFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -258,6 +268,18 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="editPersonalInformationFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="785" />
+                            <option name="y" value="2263" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="fragmentAccountSecurity">
                     <value>
                       <LayoutPositions>
@@ -299,8 +321,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="306" />
-                            <option name="y" value="3395" />
+                            <option name="x" value="84" />
+                            <option name="y" value="3391" />
                           </Point>
                         </option>
                       </LayoutPositions>

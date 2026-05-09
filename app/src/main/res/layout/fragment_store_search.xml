@@ -48,7 +48,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@null"
-                    android:hint="搜索你想要的话题"
+                    android:hint="搜索你想要商品"
                     android:textColor="@android:color/black"
                     android:textColorHint="@color/gray_mid"
                     android:text="@{viewModel.searchInput}"

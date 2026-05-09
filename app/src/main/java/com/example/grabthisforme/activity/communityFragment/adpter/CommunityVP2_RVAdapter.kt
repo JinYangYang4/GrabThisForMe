@@ -40,7 +40,7 @@ class CommunityVP2_RVAdapter(val clickListener:(taskId : String) -> Unit) : List
         fun bind(post: Post, clickListener: (String) -> Unit) {
             binding.sendTime.text = formatTimestampToDateTime(post.createTime.toLong())
             binding.contents.text = post.content
-            binding.senderName.text = post.author.name
+            binding.senderName.text = post.authorName
             binding.clItem.setOnClickListener {
                 clickListener.invoke(post.postId)
             }

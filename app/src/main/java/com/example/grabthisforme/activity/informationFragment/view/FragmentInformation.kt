@@ -7,15 +7,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.activity.viewModels
+import androidx.fragment.app.activityViewModels
+import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.informationFragment.adapter.InformationPagerAdapter
+import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
 import com.example.grabthisforme.databinding.FragmentInformationBinding
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 
-class                                            FragmentInformation : Fragment() {
+@AndroidEntryPoint
+class FragmentInformation : Fragment() {
     private var _binding : FragmentInformationBinding?=null
     private val binding get() = _binding!!
+    private val sharedViewModel : MainViewModel by activityViewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -26,9 +33,11 @@ class                                            FragmentInformation : Fragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.lifecycleOwner = viewLifecycleOwner
         initVP2()
         val targetView = view.findViewById<ImageView>(R.id.iv_Add)
         iv_Add_init(targetView.id)
+        initObserve()
     }
     fun initVP2(){
         Log.d("test111", "Fragment onCreateView") // 确认Fragment是否加载
@@ -50,9 +59,22 @@ class                                            FragmentInformation : Fragment(
             fragmentManager?.let { menuDialog.show(it, "left_bottom_menu") }
         }
     }
+    fun initObserve(){
+        sharedViewModel.currentUser.observe(viewLifecycleOwner){user ->
+            Glide.with(this)
+                .load(user?.headPic)
+                .placeholder(R.drawable.cat)
+                .error(R.drawable.cat)
+                .into(binding.ivAvatar)
+        }
+    }
+
     fun initClickL(){
         binding.llSearch.setOnClickListener {
             (requireActivity()as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_fragmentSearchFriendOrGroupOrConversation)
+        }
+        binding.ivAvatar.setOnClickListener {
+            sharedViewModel.drawerOpenStateToOpen()
         }
     }
 }

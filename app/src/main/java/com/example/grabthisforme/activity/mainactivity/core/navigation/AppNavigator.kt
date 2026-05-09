@@ -21,7 +21,7 @@ class AppNavigator(
     private val cachedFragments = setOf(
         "com.example.grabthisforme.activity.communityFragment.view.FragmentCommunity",
         "com.example.grabthisforme.activity.informationFragment.view.FragmentInformation",
-        "com.example.grabthisforme.activity.myFragment.FragmentMy",
+        "com.example.grabthisforme.activity.myfragment.view.FragmentMy",
         "com.example.grabthisforme.activity.homeFragment.view.FragmentHomeContainer",
         "com.example.grabthisforme.activity.homeFragment.view.FragmentHome",
         "com.example.grabthisforme.activity.homeFragment.view.FragmentHome1"

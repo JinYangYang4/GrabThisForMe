@@ -17,7 +17,8 @@
     <fragment
         android:id="@+id/createOrderFragment"
         android:name="com.example.grabthisforme.activity.fragment_misc.create.view.CreateOrderFragment"
-        android:label="CreateOrderFragment" />
+        android:label="CreateOrderFragment"
+        tools:layout="@layout/fragment_create_order"/>
     <fragment
         android:id="@+id/blankFragment"
         android:name="com.example.grabthisforme.activity.fragment_misc.default_entry.view.BlankFragment"
@@ -74,23 +75,30 @@
         <action
             android:id="@+id/action_blankFragment_to_registerStoreFragment"
             app:destination="@id/registerStoreFragment" />
+        <action
+            android:id="@+id/action_blankFragment_to_fragmentSearchFriendOrGroupOrConversation2"
+            app:destination="@id/fragmentSearchFriendOrGroupOrConversation" />
     </fragment>
     <fragment
         android:id="@+id/fragmentSignIn"
         android:name="com.example.grabthisforme.activity.fragment_misc.sign_inFragment.view.FragmentSignIn"
-        android:label="FragmentSignIn" />
+        android:label="FragmentSignIn"
+        tools:layout="@layout/fragment_sign_in"/>
     <fragment
         android:id="@+id/couponFragment"
         android:name="com.example.grabthisforme.activity.fragment_misc.couponFragment.view.CouponFragment"
-        android:label="CouponFragment" />
+        android:label="CouponFragment"
+        tools:layout="@layout/fragment_coupon"/>
     <fragment
         android:id="@+id/createSecondHandGoods"
         android:name="com.example.grabthisforme.activity.fragment_misc.create.view.CreateSecondHandGoods"
-        android:label="CreateSecondHandGoods" />
+        android:label="CreateSecondHandGoods"
+        tools:layout="@layout/fragment_create_secondhand_goods"/>
     <fragment
         android:id="@+id/secondHandGoodFragment"
         android:name="com.example.grabthisforme.activity.fragment_misc.secondhand_goodsFragment.view.SecondHandGoodFragment"
-        android:label="SecondHandGoodFragment" >
+        android:label="SecondHandGoodFragment"
+        tools:layout="@layout/fragment_secondhand_goods">
         <action
             android:id="@+id/action_secondHandGoodFragment_to_searchGoodsFragment"
             app:destination="@id/searchGoodsFragment" />
@@ -98,16 +106,18 @@
     <fragment
         android:id="@+id/postDetailFragment"
         android:name="com.example.grabthisforme.activity.fragment_misc.postDetailFragment.view.PostDetailFragment"
-        android:label="PostDetailFragment" />
+        android:label="PostDetailFragment"
+        tools:layout="@layout/fragment_post_detail"/>
     <fragment
         android:id="@+id/fragmentChat"
         android:name="com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.FragmentChat"
         android:label="FragmentChat"
-        tools:layout="@layout/fragment_chat"/>
+        tools:layout="@layout/fragment_chat" />
     <fragment
         android:id="@+id/myLoveFragment"
         android:name="com.example.grabthisforme.activity.fragment_misc.my_love.view.MyLoveFragment"
-        android:label="MyLoveFragment" >
+        android:label="MyLoveFragment"
+        tools:layout="@layout/fragment_my_love">
         <action
             android:id="@+id/action_myLoveFragment_to_postDetailFragment"
             app:destination="@id/postDetailFragment" />
@@ -115,7 +125,8 @@
     <fragment
         android:id="@+id/myTopicFragment"
         android:name="com.example.grabthisforme.activity.fragment_misc.my_topic.view.MyTopicFragment"
-        android:label="MyTopicFragment" >
+        android:label="MyTopicFragment"
+        tools:layout="@layout/fragment_my_topic">
         <action
             android:id="@+id/action_myTopicFragment_to_postDetailFragment"
             app:destination="@id/postDetailFragment" />
@@ -123,7 +134,8 @@
     <fragment
         android:id="@+id/setFragment"
         android:name="com.example.grabthisforme.activity.fragment_misc.setfragment.view.FragmentSet"
-        android:label="SetFragment" >
+        android:label="SetFragment"
+        tools:layout="@layout/fragment_set">
         <action
             android:id="@+id/action_setFragment_to_personalInformation"
             app:destination="@id/personalInformation" />
@@ -137,11 +149,17 @@
     <fragment
         android:id="@+id/personalInformation"
         android:name="com.example.grabthisforme.activity.fragment_misc.setfragment.view.FragmentPersonalInformation"
-        android:label="PersonalInformation" />
+        android:label="PersonalInformation"
+        tools:layout="@layout/fragment_personal_information">
+        <action
+            android:id="@+id/action_personalInformation_to_editPersonalInformationFragment"
+            app:destination="@id/editPersonalInformationFragment" />
+    </fragment>
     <fragment
         android:id="@+id/fragmentAccountSecurity"
         android:name="com.example.grabthisforme.activity.fragment_misc.setfragment.view.FragmentAccountSecurity"
-        android:label="FragmentAccountSecurity" />
+        android:label="FragmentAccountSecurity"
+        tools:layout="@layout/fragment_account_security"/>
     <fragment
         android:id="@+id/fragmentChatBackground"
         android:name="com.example.grabthisforme.activity.fragment_misc.setfragment.view.FragmentChatBackground"
@@ -150,19 +168,23 @@
     <fragment
         android:id="@+id/searchGoodsFragment"
         android:name="com.example.grabthisforme.activity.fragment_misc.searchFragment.view.SearchGoodsFragment"
-        android:label="SearchGoodsFragment" />
+        android:label="SearchGoodsFragment"
+        tools:layout="@layout/fragment_search_goods"/>
     <fragment
         android:id="@+id/searchCommunityFragment"
         android:name="com.example.grabthisforme.activity.fragment_misc.searchCommunityFragment.view.SearchCommunityFragment"
-        android:label="SearchCommunityFragment" />
+        android:label="SearchCommunityFragment"
+        tools:layout="@layout/fragment_search_commnunity"/>
     <fragment
         android:id="@+id/fragmentSearchFriendOrGroupOrConversation"
         android:name="com.example.grabthisforme.activity.fragment_misc.searchFriendOrGroupOrConversation.view.FragmentSearchFriendOrGroupOrConversation"
-        android:label="FragmentSearchFriendOrGroupOrConversation" />
+        android:label="FragmentSearchFriendOrGroupOrConversation"
+        tools:layout="@layout/fragment_search_friend_group_conversation"/>
     <fragment
         android:id="@+id/storeFragment"
         android:name="com.example.grabthisforme.activity.fragment_misc.storeFragment.view.StoreFragment"
-        android:label="StoreFragment" >
+        android:label="StoreFragment"
+        tools:layout="@layout/fragment_store">
         <action
             android:id="@+id/action_storeFragment_to_storeSearchFragment"
             app:destination="@id/storeSearchFragment" />
@@ -173,13 +195,21 @@
     <fragment
         android:id="@+id/storeSearchFragment"
         android:name="com.example.grabthisforme.activity.fragment_misc.storeFragment.view.StoreSearchFragment"
-        android:label="StoreSearchFragment" />
+        android:label="StoreSearchFragment"
+        tools:layout="@layout/fragment_store_search"/>
     <fragment
         android:id="@+id/postTopicFragemnt"
-        android:name="com.example.grabthisforme.activity.fragment_misc.post_topic.view.PostTopicFragemnt"
-        android:label="PostTopicFragemnt" />
+        android:name="com.example.grabthisforme.activity.fragment_misc.post_topic.view.PostTopicFragment"
+        android:label="PostTopicFragemnt"
+        tools:layout="@layout/fragment_create_post"/>
     <fragment
         android:id="@+id/registerStoreFragment"
         android:name="com.example.grabthisforme.activity.fragment_misc.register_store.view.RegisterStoreFragment"
-        android:label="RegisterStoreFragment" />
+        android:label="RegisterStoreFragment"
+        tools:layout="@layout/fragment_store_owner_register"/>
+    <fragment
+        android:id="@+id/editPersonalInformationFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.setfragment.view.EditPersonalInformationFragment"
+        android:label="EditPersonalInformationFragment"
+        tools:layout="@layout/fragment_edit_personal_information"/>
 </navigation>

@@ -11,14 +11,18 @@ import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.fragment_misc.chat_fragment.modle.PhotoItem
 import com.example.grabthisforme.databinding.RvPhotoItemBinding
 
-class PhotoRecyclerViewAdapter(
-    private val onPhotoSelect: (PhotoItem, Boolean) -> Unit
-) : ListAdapter<PhotoItem, PhotoRecyclerViewAdapter.PhotoViewHolder>(PhotoDiffCallback()) {
+class PhotoRecyclerViewAdapter(val type : Int) : ListAdapter<PhotoItem,
+        PhotoRecyclerViewAdapter.PhotoViewHolder>(PhotoDiffCallback()) {
+    companion object{
+        const val SELECT_NUM_LIMIT = 1
+        const val SELECT_UNLIMIT = 0
+    }
+    private var lastSelectedPos = -1
 
     inner class PhotoViewHolder(private val binding: RvPhotoItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(photoItem: PhotoItem, onPhotoSelect: (PhotoItem, Boolean) -> Unit) {
+        fun bind(photoItem: PhotoItem) {
             val context = binding.root.context
             Glide.with(context)
                 .load(photoItem.uri)
@@ -32,11 +36,23 @@ class PhotoRecyclerViewAdapter(
             )
 
             binding.root.setOnClickListener {
-                val newState = !photoItem.isSelected
-                val newList = currentList.toMutableList()
-                newList[adapterPosition] = photoItem.copy(isSelected = newState)
-                submitList(newList)
-                onPhotoSelect(photoItem, newState)
+                if (type == SELECT_UNLIMIT){
+                    val newState = !photoItem.isSelected
+                    val currentItem = getItem(adapterPosition)
+                    currentItem.isSelected = newState
+                    notifyItemChanged(adapterPosition)
+                }else {
+                    if (lastSelectedPos != -1) {
+                        getItem(lastSelectedPos).isSelected = false
+                        notifyItemChanged(lastSelectedPos)
+                    }
+                    val newState = !photoItem.isSelected
+                    val currentItem = getItem(adapterPosition)
+                    currentItem.isSelected = newState
+                    lastSelectedPos = adapterPosition
+                    notifyItemChanged(adapterPosition)
+                }
+
             }
         }
     }
@@ -50,7 +66,7 @@ class PhotoRecyclerViewAdapter(
         return PhotoViewHolder(binding)
     }
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
-        holder.bind(getItem(position), onPhotoSelect)
+        holder.bind(getItem(position))
     }
     class PhotoDiffCallback : DiffUtil.ItemCallback<PhotoItem>() {
         override fun areItemsTheSame(oldItem: PhotoItem, newItem: PhotoItem): Boolean {

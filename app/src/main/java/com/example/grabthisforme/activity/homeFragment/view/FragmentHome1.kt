@@ -1,19 +1,18 @@
 package com.example.grabthisforme.activity.homeFragment.view
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
+import com.bumptech.glide.Glide
 
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
 
 import com.example.grabthisforme.activity.homeFragment.adapter.HomePagerAdapter
-import com.example.grabthisforme.activity.homeFragment.viewModel.FragmentHomeViewModel
 import com.example.grabthisforme.databinding.FragmentHome1Binding
 import com.example.grabthisforme.model.XAxisValueFormatter.XAxisValueFormatter
 import com.github.mikephil.charting.animation.Easing
@@ -36,16 +35,17 @@ class FragmentHome1 : Fragment() {
     private var _binding : FragmentHome1Binding ?= null
     private val binding get() = _binding!!
 
-    private lateinit var sharedViewModel: MainViewModel
-    private lateinit var homeViewModel: FragmentHomeViewModel
+    private val sharedViewModel: MainViewModel by activityViewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentHome1Binding.inflate(inflater,container,false)
-        sharedViewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
-        homeViewModel = ViewModelProvider(requireActivity()).get(FragmentHomeViewModel::class.java)
+        return binding.root
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         binding.IGet.setOnClickListener {
             sharedViewModel.toPage(0)
         }
@@ -54,13 +54,22 @@ class FragmentHome1 : Fragment() {
         }
         initVp2()
         initView()
+        initObserve()
         setupRadarChart(binding.radarChart)
         setupHorizontalBarChart(binding.barChart)
-        return binding.root
+    }
+    fun initObserve(){
+        sharedViewModel.currentUser.observe(viewLifecycleOwner){user ->
+            Glide.with(this)
+                .load(user?.headPic)
+                .placeholder(R.drawable.cat)
+                .error(R.drawable.cat)
+                .into(binding.ivHeadPic)
+        }
     }
     fun initView(){
         binding.llItemOrder.setOnClickListener {
-            (requireActivity() as MainActivity).intentToMiscFragment_ac(1)
+            (requireActivity() as MainActivity).intentToMiscFragment_Order_ac(1)
         }
         binding.llSignIn.setOnClickListener {
             (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_fragmentSignIn)

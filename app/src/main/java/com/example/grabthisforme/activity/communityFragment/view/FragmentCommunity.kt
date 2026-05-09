@@ -7,16 +7,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.activity.viewModels
+import androidx.fragment.app.activityViewModels
+import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.communityFragment.adpter.CommunityPagerAdapter
+import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
 import com.example.grabthisforme.databinding.FragmentCommunityBinding
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class FragmentCommunity : Fragment() {
     private  var _binding : FragmentCommunityBinding? = null
     private val binding get() = _binding!!
+    private val sharedViewModel : MainViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,6 +38,16 @@ class FragmentCommunity : Fragment() {
         val targetView = view.findViewById<ImageView>(R.id.iv_Add)
         iv_Add_init(targetView.id)
         initClickListener()
+        initObserve()
+    }
+    fun initObserve(){
+        sharedViewModel.currentUser.observe(viewLifecycleOwner){user ->
+            Glide.with(this)
+                .load(user?.headPic)
+                .placeholder(R.drawable.cat)
+                .error(R.drawable.cat)
+                .into(binding.ivAvatar)
+        }
     }
     fun initVP2(){
         val adapter = CommunityPagerAdapter(this)
@@ -52,6 +68,9 @@ class FragmentCommunity : Fragment() {
         binding.llSearch.setOnClickListener {
             Log.d("test11", "iv_Add_init: ")
             (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_searchCommunityFragment)
+        }
+        binding.ivAvatar.setOnClickListener {
+            sharedViewModel.drawerOpenStateToOpen()
         }
     }
     fun iv_Add_init(targetView : Int){

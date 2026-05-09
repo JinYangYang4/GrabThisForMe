@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.grabthisforme.activity.fragment_misc.register_store.viewmodel.RegisterStoreViewModel" />
+    </data>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -66,18 +72,11 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="店主"
+                        android:text="@{`店长：` + viewModel.currentUser.name}"
                         android:textColor="#333333"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="店主ID会自动绑定为当前注册用户ID"
-                        android:textColor="#999999"
-                        android:textSize="13sp" />
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
@@ -96,7 +95,8 @@
                             android:enabled="false"
                             android:focusable="false"
                             android:paddingVertical="8dp"
-                            android:textColor="#666666"
+                            android:text="@{viewModel.ownerIdText}"
+                            android:textColor="@color/blue_light"
                             android:textSize="15sp"
                             android:textStyle="bold"
                             tools:text="10001" />
@@ -130,13 +130,17 @@
                         android:layout_marginBottom="8dp"
                         android:background="#E8E8E8" />
 
+                    <!-- 店铺名称 -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="* 店铺名称"
+                        app:boxBackgroundMode="outline"
+                        app:boxStrokeColor="@color/blue_light"
                         app:boxStrokeWidth="0dp"
+                        app:boxStrokeWidthFocused="1dp"
                         app:hintEnabled="true"
-                        app:hintTextColor="#999999">
+                        app:hintTextColor="@color/blue_light">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_store_name"
@@ -144,16 +148,23 @@
                             android:layout_height="wrap_content"
                             android:background="@null"
                             android:paddingVertical="8dp"
-                            android:textSize="15sp" />
+                            android:textColor="@color/blue_light"
+                            android:textSize="15sp"
+                            android:cursorVisible="true"
+                            android:textCursorDrawable="@color/blue_light"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- 店铺类型 -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="* 店铺类型"
+                        app:boxBackgroundMode="outline"
+                        app:boxStrokeColor="@color/blue_light"
                         app:boxStrokeWidth="0dp"
+                        app:boxStrokeWidthFocused="1dp"
                         app:hintEnabled="true"
-                        app:hintTextColor="#999999">
+                        app:hintTextColor="@color/blue_light">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_store_type"
@@ -161,16 +172,23 @@
                             android:layout_height="wrap_content"
                             android:background="@null"
                             android:paddingVertical="8dp"
-                            android:textSize="15sp" />
+                            android:textColor="@color/blue_light"
+                            android:textSize="15sp"
+                            android:cursorVisible="true"
+                            android:textCursorDrawable="@color/blue_light"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- 店铺地址 -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="* 店铺地址"
+                        app:boxBackgroundMode="outline"
+                        app:boxStrokeColor="@color/blue_light"
                         app:boxStrokeWidth="0dp"
+                        app:boxStrokeWidthFocused="1dp"
                         app:hintEnabled="true"
-                        app:hintTextColor="#999999">
+                        app:hintTextColor="@color/blue_light">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_store_address"
@@ -178,16 +196,23 @@
                             android:layout_height="wrap_content"
                             android:background="@null"
                             android:paddingVertical="8dp"
-                            android:textSize="15sp" />
+                            android:textColor="@color/blue_light"
+                            android:textSize="15sp"
+                            android:cursorVisible="true"
+                            android:textCursorDrawable="@color/blue_light"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- 联系电话 -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="联系电话（可选）"
+                        android:hint="* 联系电话"
+                        app:boxBackgroundMode="outline"
+                        app:boxStrokeColor="@color/blue_light"
                         app:boxStrokeWidth="0dp"
+                        app:boxStrokeWidthFocused="1dp"
                         app:hintEnabled="true"
-                        app:hintTextColor="#999999">
+                        app:hintTextColor="@color/blue_light">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_phone"
@@ -196,26 +221,81 @@
                             android:background="@null"
                             android:inputType="phone"
                             android:paddingVertical="8dp"
-                            android:textSize="15sp" />
+                            android:textColor="@color/blue_light"
+                            android:textSize="15sp"
+                            android:cursorVisible="true"
+                            android:textCursorDrawable="@color/blue_light"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputLayout
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="营业时间:"
+                        android:textSize="13sp"
+                        android:layout_marginTop="8dp"/>
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="营业时间（可选）"
-                        app:boxStrokeWidth="0dp"
-                        app:hintEnabled="true"
-                        app:hintTextColor="#999999">
+                        android:orientation="horizontal">
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_business_hours"
-                            android:layout_width="match_parent"
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:background="@null"
-                            android:paddingVertical="8dp"
+                            android:layout_weight="1"
+                            android:hint="开始时间"
+                            app:boxBackgroundMode="outline"
+                            app:boxStrokeColor="@color/blue_light"
+                            app:boxStrokeWidth="0dp"
+                            app:boxStrokeWidthFocused="1dp"
+                            app:hintEnabled="true"
+                            app:hintTextColor="@color/blue_light">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/et_start_time"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="15sp"
+                                android:paddingVertical="8dp"
+                                android:focusable="false"
+                                android:text="@{viewModel.startTime}"
+                                android:textColor="@color/blue_light"
+                                android:background="@null"
+                                android:textCursorDrawable="@color/blue_light"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=" - "
                             android:textSize="15sp"
-                            tools:text="09:00 - 22:00" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                            android:paddingHorizontal="8dp"
+                            android:gravity="center"/>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="结束时间"
+                            app:boxBackgroundMode="outline"
+                            app:boxStrokeColor="@color/blue_light"
+                            app:boxStrokeWidth="0dp"
+                            app:boxStrokeWidthFocused="1dp"
+                            app:hintEnabled="true"
+                            app:hintTextColor="@color/blue_light">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/et_end_time"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="15sp"
+                                android:paddingVertical="8dp"
+                                android:focusable="false"
+                                android:text="@{viewModel.endTime}"
+                                android:textColor="@color/blue_light"
+                                android:background="@null"
+                                android:textCursorDrawable="@color/blue_light"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -227,9 +307,12 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:hint="起送金额"
+                            app:boxBackgroundMode="outline"
+                            app:boxStrokeColor="@color/blue_light"
                             app:boxStrokeWidth="0dp"
+                            app:boxStrokeWidthFocused="1dp"
                             app:hintEnabled="true"
-                            app:hintTextColor="#999999">
+                            app:hintTextColor="@color/blue_light">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/et_min_order_amount"
@@ -238,7 +321,10 @@
                                 android:background="@null"
                                 android:inputType="numberDecimal"
                                 android:paddingVertical="8dp"
-                                android:textSize="15sp" />
+                                android:textColor="@color/blue_light"
+                                android:textSize="15sp"
+                                android:cursorVisible="true"
+                                android:textCursorDrawable="@color/blue_light"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <View
@@ -250,9 +336,12 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:hint="配送费"
+                            app:boxBackgroundMode="outline"
+                            app:boxStrokeColor="@color/blue_light"
                             app:boxStrokeWidth="0dp"
+                            app:boxStrokeWidthFocused="1dp"
                             app:hintEnabled="true"
-                            app:hintTextColor="#999999">
+                            app:hintTextColor="@color/blue_light">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/et_delivery_fee"
@@ -261,35 +350,46 @@
                                 android:background="@null"
                                 android:inputType="numberDecimal"
                                 android:paddingVertical="8dp"
-                                android:textSize="15sp" />
+                                android:textColor="@color/blue_light"
+                                android:textSize="15sp"
+                                android:cursorVisible="true"
+                                android:textCursorDrawable="@color/blue_light"/>
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
-                    <com.google.android.material.textfield.TextInputLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="店铺图片链接（可选）"
-                        app:boxStrokeWidth="0dp"
-                        app:hintEnabled="true"
-                        app:hintTextColor="#999999">
+                        android:orientation="vertical"
+                        android:layout_marginTop="8dp">
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_store_pic"
-                            android:layout_width="match_parent"
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@null"
-                            android:inputType="textUri"
-                            android:paddingVertical="8dp"
-                            android:textSize="15sp" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                            android:text="选择头像(可不填)"
+                            android:textSize="15sp"
+                            android:textColor="#999999"/>
 
+                        <ImageView
+                            android:id="@+id/iv_head_pic"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
+                            android:layout_marginTop="8dp"
+                            android:src="@drawable/ic_add"
+                            android:scaleType="centerCrop"/>
+                    </LinearLayout>
+
+                    <!-- 店铺标签 -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="店铺标签（可选，逗号分隔）"
+                        app:boxBackgroundMode="outline"
+                        app:boxStrokeColor="@color/blue_light"
                         app:boxStrokeWidth="0dp"
+                        app:boxStrokeWidthFocused="1dp"
                         app:hintEnabled="true"
-                        app:hintTextColor="#999999">
+                        app:hintTextColor="@color/blue_light">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_store_tags"
@@ -297,7 +397,10 @@
                             android:layout_height="wrap_content"
                             android:background="@null"
                             android:paddingVertical="8dp"
+                            android:textColor="@color/blue_light"
                             android:textSize="15sp"
+                            android:cursorVisible="true"
+                            android:textCursorDrawable="@color/blue_light"
                             tools:text="零食, 快送, 附近" />
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -324,7 +427,9 @@
                             android:id="@+id/switch_is_open"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="true" />
+                            android:checked="true"
+                            android:thumbTint="@color/blue_light"
+                            android:trackTint="@color/blue_light"/>
                     </LinearLayout>
                 </LinearLayout>
 

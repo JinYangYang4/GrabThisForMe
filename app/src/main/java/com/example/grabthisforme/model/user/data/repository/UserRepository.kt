@@ -39,4 +39,12 @@ class UserRepository@Inject constructor(
             started = SharingStarted.Eagerly,
             initialValue = emptyList()
         )
+
+    suspend fun upsertUser(user: User) {
+        userDao.saveUser(user)
+    }
+
+    suspend fun upsertAndSetCurrent(user: User) {
+        userDao.loginAndSetCurrent(user)
+    }
 }

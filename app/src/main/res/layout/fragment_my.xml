@@ -3,6 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="sharedViewModel"
+            type="com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel" />
+    </data>
     <androidx.constraintlayout.widget.ConstraintLayout
 
         android:layout_width="match_parent"
@@ -22,22 +28,22 @@
                 android:layout_height="70dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="60dp"
-                android:background="@color/white"
+                android:background="@drawable/bg_circle"
                 android:clipToOutline="true"
                 android:scaleType="centerCrop"
                 android:src="@drawable/cat"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/tv_user_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:text="张三"
-                android:textColor="@android:color/black"
-                android:textSize="18sp"
-                android:textStyle="bold"
+                <TextView
+                    android:id="@+id/tv_user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:text='@{sharedViewModel.currentUser != null ? sharedViewModel.currentUser.name : ""}'
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/tv_user_id"
                 app:layout_constraintStart_toEndOf="@+id/iv_head_pic"
                 app:layout_constraintTop_toTopOf="@+id/iv_head_pic"
@@ -49,7 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="ID: 1008611"
+                android:text='@{sharedViewModel.currentUser != null ? `ID: ` + String.valueOf(sharedViewModel.currentUser.id) : `ID: `}'
                 android:textColor="@android:color/darker_gray"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="@+id/iv_head_pic"
@@ -96,7 +102,7 @@
                         android:id="@+id/tv_like_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="128"
+                        android:text='@{sharedViewModel.currentUser != null ? String.valueOf(sharedViewModel.currentUser.likeCount) : "0"}'
                         android:textColor="@android:color/black"
                         android:textSize="16sp"
                         android:textStyle="bold"/>
@@ -121,7 +127,7 @@
                         android:id="@+id/tv_fans_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="56"
+                        android:text='@{sharedViewModel.currentUser != null ? String.valueOf(sharedViewModel.currentUser.fanCount) : "0"}'
                         android:textColor="@android:color/black"
                         android:textSize="16sp"
                         android:textStyle="bold"/>
@@ -146,7 +152,7 @@
                         android:id="@+id/tv_follow_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="89"
+                        android:text='@{sharedViewModel.currentUser != null ? String.valueOf(sharedViewModel.currentUser.followCount) : "0"}'
                         android:textColor="@android:color/black"
                         android:textSize="16sp"
                         android:textStyle="bold"/>

@@ -10,10 +10,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
 import com.example.grabthisforme.R
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
+import com.example.grabthisforme.databinding.CommunityDialogLeftBottomMenuBinding
+import com.example.grabthisforme.databinding.InformationDialogLeftBottomMenuBinding
 
 
 class InformationLeftBottomMenuDialog: DialogFragment() {
-
+    private var _binding : InformationDialogLeftBottomMenuBinding ?= null
+    private val binding get() = _binding!!
     companion object {
         // 创建一个静态方法来传递目标视图的 ID
         fun newInstance(targetImageViewId: Int): InformationLeftBottomMenuDialog {
@@ -23,14 +27,29 @@ class InformationLeftBottomMenuDialog: DialogFragment() {
             dialog.arguments = args
             return dialog
         }
+
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // 这里加载自定义的对话框布局
-        return inflater.inflate(R.layout.information_dialog_left_bottom_menu, container, false)
+    ): View {
+        _binding = InformationDialogLeftBottomMenuBinding.inflate(layoutInflater,container,false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initClicked()
+    }
+    private fun initClicked(){
+        binding.llCreateGroup.setOnClickListener {
+            dismiss()
+        }
+        binding.llAddFriend.setOnClickListener {
+            dismiss()
+            (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_fragmentSearchFriendOrGroupOrConversation2)
+        }
     }
     override fun onStart() {
         super.onStart()

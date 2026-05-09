@@ -193,6 +193,7 @@
                             android:layout_height="wrap_content"
                             android:background="@drawable/bg_round_stripe"
                             android:gravity="center_vertical"
+                            android:id="@+id/ll_set_btn"
                             android:padding="4dp"
                             android:backgroundTint="@color/gray_translucent_dark">
                             <TextView
@@ -246,7 +247,6 @@
                             android:id="@+id/iv_head_pic"
                             android:layout_width="60dp"
                             android:layout_height="60dp"
-                            android:padding="2dp"
                             android:backgroundTint="@color/white_fff8"
                             android:background="@drawable/bg_circle"
                             android:scaleType="centerCrop"
@@ -419,6 +419,7 @@
                                 android:layout_margin="5dp"
                                 android:orientation="horizontal">
                                 <LinearLayout
+                                    android:id="@+id/ll_history_order_btn"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
@@ -440,6 +441,7 @@
                                         android:text="历史订单"/>
                                 </LinearLayout>
                                 <LinearLayout
+                                    android:id="@+id/ll_coupon_btn"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
