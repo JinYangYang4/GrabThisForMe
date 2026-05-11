@@ -30,7 +30,7 @@ class PostTopicFragment : Fragment() {
     private var _binding: FragmentCreatePostBinding? = null
     private val binding get() = _binding!!
     private val viewModel: PostTopicViewModel by viewModels()
-    private val imagesAdapter = ImagesRecyclerviewAdapter()
+    private lateinit var imagesAdapter : ImagesRecyclerviewAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,11 +78,18 @@ class PostTopicFragment : Fragment() {
         binding.llNested.setOnClickListener {
             clearInputFocus()
         }
+        binding.tilPostContent.setOnClickListener {
+            binding.itPostContent.requestFocus()
+            val inputMethodManager =
+                requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.showSoftInput(binding.itPostContent, InputMethodManager.SHOW_IMPLICIT)
+        }
         binding.root.setOnClickListener {
             clearInputFocus()
         }
     }
     private fun initImagesRV(){
+        imagesAdapter = ImagesRecyclerviewAdapter({})
         binding.rvImages.apply {
             layoutManager = GridLayoutManager(context, 3)
             adapter = imagesAdapter

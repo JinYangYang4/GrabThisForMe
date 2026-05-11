@@ -79,19 +79,8 @@
                         android:layout_marginVertical="8dp"
                         android:background="#E8E8E8" />
 
-                    <TextView
-                        android:id="@+id/tv_post_time_hint"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="发布时间：发布时自动生成"
-                        android:layout_margin="10dp"
-                        android:textColor="#999999"
-                        android:textSize="13sp" />
 
-                    <com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.NestedScrollableHost
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -104,7 +93,7 @@
                             <com.google.android.material.textfield.TextInputLayout
                                 android:id="@+id/til_post_content"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
+                                android:layout_height="360dp"
                                 android:layout_margin="1dp"
                                 android:background="@drawable/bg_round_stripe"
                                 android:backgroundTint="@color/white"
@@ -114,21 +103,26 @@
                                 app:boxStrokeWidth="0dp"
                                 app:hintEnabled="true"
                                 app:hintTextColor="#999999">
-
-                                <com.google.android.material.textfield.TextInputEditText
-                                    android:id="@+id/it_post_content"
+                                <com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.NestedScrollableHost
                                     android:layout_width="match_parent"
-                                    android:layout_height="360dp"
-                                    android:background="@null"
-                                    android:gravity="top"
-                                    android:inputType="textMultiLine"
-                                    android:maxLines="17"
-                                    android:layout_marginBottom="6dp"
-                                    android:paddingVertical="8dp"
-                                    android:textSize="15sp" />
+                                    android:layout_height="wrap_content">
+                                    <com.google.android.material.textfield.TextInputEditText
+                                        android:id="@+id/it_post_content"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:background="@null"
+                                        android:gravity="top"
+                                        android:inputType="textMultiLine"
+                                        android:maxLines="17"
+                                        android:textSize="15sp"
+                                        android:textCursorDrawable="@drawable/cursor_custom"
+                                        />
+                                </com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.NestedScrollableHost>
+
+
                             </com.google.android.material.textfield.TextInputLayout>
                         </LinearLayout>
-                    </com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.NestedScrollableHost>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -171,6 +165,7 @@
                             android:visibility="gone"
                             android:id="@+id/rv_images"
                             android:layout_margin="2dp"
+                            android:layout_marginTop="5dp"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"/>
                     </LinearLayout>
@@ -211,7 +206,7 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="16dp"
+                        android:layout_marginVertical="16dp"
                         android:layout_marginTop="10dp"
                         android:background="@drawable/bg_round_stripe"
                         android:clipToOutline="true"
@@ -229,10 +224,7 @@
                             app:backgroundTint="@color/white"
                             android:textSize="16sp" />
                     </LinearLayout>
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
+
 
                     <LinearLayout
                         android:layout_width="wrap_content"

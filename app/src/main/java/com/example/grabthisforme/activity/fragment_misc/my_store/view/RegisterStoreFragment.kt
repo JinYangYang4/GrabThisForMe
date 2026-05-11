@@ -1,4 +1,4 @@
-package com.example.grabthisforme.activity.fragment_misc.register_store.view
+package com.example.grabthisforme.activity.fragment_misc.my_store.view
 
 import android.content.Context
 import android.graphics.Color
@@ -16,7 +16,7 @@ import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.bigkoo.pickerview.builder.TimePickerBuilder
 import com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.BottomSheetDialogPhoto
-import com.example.grabthisforme.activity.fragment_misc.register_store.viewmodel.RegisterStoreViewModel
+import com.example.grabthisforme.activity.fragment_misc.my_store.viewmodel.RegisterStoreViewModel
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentStoreOwnerRegisterBinding
 import dagger.hilt.android.AndroidEntryPoint

@@ -7,14 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.grabthisforme.activity.mainactivity.view.OrderMessageBottomSheetFragment
 import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewOrderAdapter
 import com.example.grabthisforme.activity.homeFragment.viewModel.FragmentHomeViewModel
 import com.example.grabthisforme.databinding.FragmentTaskBinding
 import com.example.grabthisforme.model.order.data.mock.OrderMockData
-import com.example.grabthisforme.model.order.domain.Order
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -24,7 +26,6 @@ class FragmentHomeViewPager2 : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var taskAdapter: RecyclerViewOrderAdapter
-    private  var mockList : List<Order> ?= null
     private lateinit var homeViewModel: FragmentHomeViewModel
 
     companion object {
@@ -43,8 +44,16 @@ class FragmentHomeViewPager2 : Fragment() {
         arguments?.getInt(KEY_TYPE) ?: 0
     }
 
-    fun loadAllTask(){
-        mockList = OrderMockData.getOrderList()
+    fun loadAllTask() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            homeViewModel.currentTaskOrders.collectLatest { orderList ->
+                if (orderList.isEmpty()) {
+                    taskAdapter.submitList(OrderMockData.getOrderList())
+                } else {
+                    taskAdapter.submitList(orderList)
+                }
+            }
+        }
     }
 
 
@@ -61,8 +70,8 @@ class FragmentHomeViewPager2 : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        loadData()
         initRecyclerView()
+        loadData()
     }
     @SuppressLint("ClickableViewAccessibility")
     private fun initRecyclerView() {
@@ -76,7 +85,6 @@ class FragmentHomeViewPager2 : Fragment() {
             adapter = taskAdapter
 
         }
-        taskAdapter.submitList(OrderMockData.getOrderList())
     }
     private fun loadData() {
         when (taskType) {

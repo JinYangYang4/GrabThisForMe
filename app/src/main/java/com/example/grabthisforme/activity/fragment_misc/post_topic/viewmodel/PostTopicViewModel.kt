@@ -4,19 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.grabthisforme.model.post.data.dao.PostDao
-import com.example.grabthisforme.model.post.domain.Post
-import com.example.grabthisforme.model.post.domain.PostAuthor
-import com.example.grabthisforme.model.user.data.repository.UserRepository
-import com.example.grabthisforme.model.user.domain.User
+import com.example.grabthisforme.model.post.data.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class PostTopicViewModel @Inject constructor(
-    private val postDao: PostDao,
-    private val userRepository: UserRepository
+    private val postRepository: PostRepository
 ) : ViewModel() {
     private val _contentText = MutableLiveData("")
     val contentText: LiveData<String> get() = _contentText
@@ -75,22 +70,7 @@ class PostTopicViewModel @Inject constructor(
 
         viewModelScope.launch {
             runCatching {
-                val author = userRepository.currentUser.value ?: buildFallbackUser()
-                val now = System.currentTimeMillis()
-                val post = Post(
-                    postId = "POST_$now",
-                    content = content,
-                    images = images,
-                    createTime = now,
-                    author = PostAuthor(
-                        authorId = author.id,
-                        authorName = author.name,
-                        authorAvatarUrl = author.headPic
-                    ),
-                    likeCount = 0,
-                    commentCount = 0
-                )
-                postDao.savePost(post)
+                postRepository.publishPost(content = content, images = images)
             }.onSuccess {
                 draftState = PostDraftState()
                 _contentText.postValue("")
@@ -133,16 +113,6 @@ class PostTopicViewModel @Inject constructor(
 
     private fun refreshPublishState() {
         _canPublish.value = _contentText.value.orEmpty().trim().isNotBlank()
-    }
-
-    private fun buildFallbackUser(): User {
-        val now = System.currentTimeMillis()
-        return User(
-            id = now,
-            name = "GuestUser",
-            headPic = "",
-            isCurrent = true
-        )
     }
 }
 

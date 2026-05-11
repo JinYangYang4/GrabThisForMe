@@ -316,6 +316,18 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="fragmentMyStore">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-249" />
+                            <option name="y" value="493" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="fragmentSearchFriendOrGroupOrConversation">
                     <value>
                       <LayoutPositions>
@@ -403,6 +415,15 @@
                             <option name="y" value="2262" />
                           </Point>
                         </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_personalInformation_to_editPersonalInformationFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
                       </LayoutPositions>
                     </value>
                   </entry>
@@ -435,8 +456,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-228" />
-                            <option name="y" value="439" />
+                            <option name="x" value="-469" />
+                            <option name="y" value="494" />
                           </Point>
                         </option>
                       </LayoutPositions>

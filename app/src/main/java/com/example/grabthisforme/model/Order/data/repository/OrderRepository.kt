@@ -1,7 +1,6 @@
 package com.example.grabthisforme.model.order.data.repository
 
 import com.example.grabthisforme.model.order.data.dao.OrderDao
-import com.example.grabthisforme.model.order.data.mock.OrderMockData
 import com.example.grabthisforme.model.order.domain.Order
 import com.example.grabthisforme.model.order.domain.OrderStatusInfo
 import com.example.grabthisforme.model.user.data.repository.UserRepository
@@ -11,7 +10,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
@@ -31,14 +29,10 @@ class OrderRepository @Inject constructor(
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val sourceOrders: StateFlow<List<Order>> = orderDao.getAllOrders()
-        .map { orders ->
-            if (orders.isEmpty()) OrderMockData.getOrderList() else orders
-                .filter {it.isCurrentTaskOrder(userRepository.currentUserId.value)}
-        }
         .stateIn(
             scope = repositoryScope,
             started = SharingStarted.Eagerly,
-            initialValue = OrderMockData.getOrderList()
+            initialValue = emptyList()
         )
 
     val allOrderList: StateFlow<List<Order>> = sourceOrders

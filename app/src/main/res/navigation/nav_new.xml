@@ -73,11 +73,11 @@
             android:id="@+id/action_blankFragment_to_postTopicFragemnt"
             app:destination="@id/postTopicFragemnt" />
         <action
-            android:id="@+id/action_blankFragment_to_registerStoreFragment"
-            app:destination="@id/registerStoreFragment" />
-        <action
             android:id="@+id/action_blankFragment_to_fragmentSearchFriendOrGroupOrConversation2"
             app:destination="@id/fragmentSearchFriendOrGroupOrConversation" />
+        <action
+            android:id="@+id/action_blankFragment_to_fragmentMyStore"
+            app:destination="@id/fragmentMyStore" />
     </fragment>
     <fragment
         android:id="@+id/fragmentSignIn"
@@ -204,7 +204,7 @@
         tools:layout="@layout/fragment_create_post"/>
     <fragment
         android:id="@+id/registerStoreFragment"
-        android:name="com.example.grabthisforme.activity.fragment_misc.register_store.view.RegisterStoreFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.my_store.view.RegisterStoreFragment"
         android:label="RegisterStoreFragment"
         tools:layout="@layout/fragment_store_owner_register"/>
     <fragment
@@ -212,4 +212,12 @@
         android:name="com.example.grabthisforme.activity.fragment_misc.setfragment.view.EditPersonalInformationFragment"
         android:label="EditPersonalInformationFragment"
         tools:layout="@layout/fragment_edit_personal_information"/>
+    <fragment
+        android:id="@+id/fragmentMyStore"
+        android:name="com.example.grabthisforme.activity.fragment_misc.my_store.view.FragmentMyStore"
+        android:label="FragmentMyStore" >
+        <action
+            android:id="@+id/action_fragmentMyStore_to_registerStoreFragment"
+            app:destination="@id/registerStoreFragment" />
+    </fragment>
 </navigation>

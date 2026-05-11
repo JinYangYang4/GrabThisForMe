@@ -9,19 +9,31 @@ import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.databinding.RvPostImagesBinding
 
-class ImagesRecyclerviewAdapter : ListAdapter<String, ImagesRecyclerviewAdapter.ViewHolder>(
+class ImagesRecyclerviewAdapter(
+    private val clickListener: (imageUrl: String) -> Unit
+) : ListAdapter<String, ImagesRecyclerviewAdapter.ViewHolder>(
     ImageDiffCallback()
 ) {
+    private var hiddenCount: Int = 0
+
     inner class ViewHolder(
         private val binding: RvPostImagesBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(imageUrl: String) {
+        fun bind(imageUrl: String, position: Int) {
             Glide.with(binding.root.context)
                 .load(imageUrl)
                 .placeholder(R.drawable.ic_add)
                 .error(R.drawable.ic_add)
                 .into(binding.ivPhoto)
+            binding.ivPhoto.setOnClickListener {
+                clickListener.invoke(imageUrl)
+            }
+            val showMore = hiddenCount > 0 && position == currentList.lastIndex
+            binding.llMoreSize.visibility = if (showMore) android.view.View.VISIBLE else android.view.View.GONE
+            if (showMore) {
+                binding.tvMoreSize.text = "+$hiddenCount"
+            }
         }
     }
 
@@ -35,7 +47,12 @@ class ImagesRecyclerviewAdapter : ListAdapter<String, ImagesRecyclerviewAdapter.
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), position)
+    }
+
+    fun submitImages(images: List<String>, hiddenCount: Int) {
+        this.hiddenCount = hiddenCount.coerceAtLeast(0)
+        submitList(images)
     }
 
     private class ImageDiffCallback : DiffUtil.ItemCallback<String>() {

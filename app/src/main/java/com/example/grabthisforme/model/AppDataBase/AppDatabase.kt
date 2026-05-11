@@ -20,6 +20,8 @@ import com.example.grabthisforme.model.post.data.entity.PostEntity
 import com.example.grabthisforme.model.order.data.dao.OrderDao
 import com.example.grabthisforme.model.order.data.entity.OrderEntity
 import com.example.grabthisforme.model.secondhandGoods.data.entity.SecondhandTradeEntity
+import com.example.grabthisforme.model.store.data.dao.StoreDao
+import com.example.grabthisforme.model.store.data.entity.StoreEntity
 import com.example.grabthisforme.model.user.data.dao.UserDao
 import com.example.grabthisforme.model.user.data.entity.UserAccountEntity
 import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
@@ -37,9 +39,10 @@ import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
         ConversationEntity::class,
         SecondhandTradeEntity::class,
         OrderEntity::class,
-        PostEntity::class
+        PostEntity::class,
+        StoreEntity::class
     ],
-    version = 12,
+    version = 13,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -50,6 +53,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun conversationDao(): ConversationDao
     abstract fun orderDao(): OrderDao
     abstract fun postDao(): PostDao
+    abstract fun storeDao(): StoreDao
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null

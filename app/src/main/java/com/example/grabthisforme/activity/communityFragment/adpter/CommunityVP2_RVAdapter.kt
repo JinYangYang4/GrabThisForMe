@@ -1,11 +1,14 @@
 package com.example.grabthisforme.activity.communityFragment.adpter
 
 import android.annotation.SuppressLint
+import android.view.View
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.grabthisforme.activity.communityFragment.custom.MaxLinesGridLayoutManager
+import com.example.grabthisforme.activity.fragment_misc.post_topic.adapter.ImagesRecyclerviewAdapter
 import com.example.grabthisforme.databinding.PostRvItemBinding
 import com.example.grabthisforme.model.post.domain.Post
 import java.text.SimpleDateFormat
@@ -29,7 +32,19 @@ class CommunityVP2_RVAdapter(val clickListener:(taskId : String) -> Unit) : List
         holder.bind(post,clickListener)
     }
     class ViewHolder(val binding: PostRvItemBinding) : RecyclerView.ViewHolder(binding.root){
+        private val imagesAdapter = ImagesRecyclerviewAdapter { }
+
+        init {
+            binding.rvPostImages.apply {
+                adapter = imagesAdapter
+                layoutManager = MaxLinesGridLayoutManager(context, 3, 3)
+                isNestedScrollingEnabled = false
+            }
+        }
+
         companion object{
+            private const val MAX_IMAGE_COUNT = 9
+
             fun inflateFrom(parent: ViewGroup): ViewHolder{
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding =  PostRvItemBinding.inflate(layoutInflater,parent,false)
@@ -41,6 +56,18 @@ class CommunityVP2_RVAdapter(val clickListener:(taskId : String) -> Unit) : List
             binding.sendTime.text = formatTimestampToDateTime(post.createTime.toLong())
             binding.contents.text = post.content
             binding.senderName.text = post.authorName
+
+            val images = post.images.filter { it.isNotBlank() }
+            val visibleImages = images.take(MAX_IMAGE_COUNT)
+            val hiddenCount = images.size - visibleImages.size
+
+            if (visibleImages.isEmpty()) {
+                binding.rvPostImages.visibility = View.GONE
+            } else {
+                binding.rvPostImages.visibility = View.VISIBLE
+                imagesAdapter.submitImages(visibleImages, hiddenCount)
+            }
+
             binding.clItem.setOnClickListener {
                 clickListener.invoke(post.postId)
             }
@@ -71,4 +98,3 @@ class CommunityVP2_RVAdapter(val clickListener:(taskId : String) -> Unit) : List
     }
 
 }
-

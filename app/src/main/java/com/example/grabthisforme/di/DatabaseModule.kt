@@ -8,6 +8,7 @@ import com.example.grabthisforme.model.goods.data.dao.GoodsDao
 import com.example.grabthisforme.model.messageContent.data.dao.MessageDao
 import com.example.grabthisforme.model.post.data.dao.PostDao
 import com.example.grabthisforme.model.order.data.dao.OrderDao
+import com.example.grabthisforme.model.store.data.dao.StoreDao
 import com.example.grabthisforme.model.user.data.dao.UserDao
 import dagger.Module
 import dagger.Provides
@@ -57,5 +58,10 @@ object DatabaseModule {
     @Provides
     fun providePostDao(database: AppDatabase): PostDao {
         return database.postDao()
+    }
+
+    @Provides
+    fun provideStoreDao(database: AppDatabase): StoreDao {
+        return database.storeDao()
     }
 }

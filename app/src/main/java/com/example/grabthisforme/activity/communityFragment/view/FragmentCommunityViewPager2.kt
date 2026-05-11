@@ -5,16 +5,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.grabthisforme.R
-import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.communityFragment.adpter.CommunityVP2_RVAdapter
+import com.example.grabthisforme.activity.communityFragment.viewmodel.CommunityViewModel
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentCommunityViewpager2Binding
-import com.example.grabthisforme.model.post.data.mock.PostMockData
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FragmentCommunityViewPager2 : Fragment(){
     private var _binding: FragmentCommunityViewpager2Binding? = null
     private val binding get() = _binding!!
+    private val viewModel: CommunityViewModel by viewModels()
+    private lateinit var adapter: CommunityVP2_RVAdapter
 
     companion object {
         private const val KEY_TYPE = "task_type"
@@ -47,15 +52,21 @@ class FragmentCommunityViewPager2 : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRV()
+        initObserve()
 
     }
-    fun initRV(){
-        val adapter = CommunityVP2_RVAdapter(){
+    private fun initRV() {
+        adapter = CommunityVP2_RVAdapter {
             (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_postDetailFragment)
         }
         binding.rvTask.adapter = adapter
         binding.rvTask.layoutManager = LinearLayoutManager(requireContext())
-        adapter.submitList(PostMockData.getPostList())
+    }
+
+    private fun initObserve() {
+        viewModel.postList.observe(viewLifecycleOwner) { posts ->
+            adapter.submitList(posts)
+        }
     }
 
 

@@ -1,21 +1,21 @@
-package com.example.grabthisforme.activity.fragment_misc.register_store.viewmodel
+package com.example.grabthisforme.activity.fragment_misc.my_store.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.grabthisforme.model.store.data.repository.StoreRepository
 import com.example.grabthisforme.model.store.domain.Store
-import com.example.grabthisforme.model.user.data.repository.UserRepository
 import com.example.grabthisforme.model.user.domain.User
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import javax.inject.Inject
 
 @HiltViewModel
 class RegisterStoreViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val storeRepository: StoreRepository
 ) : ViewModel() {
     private val _ownerIdText = MutableLiveData("")
     val ownerIdText: LiveData<String> get() = _ownerIdText
@@ -25,15 +25,16 @@ class RegisterStoreViewModel @Inject constructor(
 
     private val _endTime = MutableLiveData("")
     val endTime: LiveData<String> get() = _endTime
-    private var _currentUser = MutableLiveData<User?>()
-    val currentUser : LiveData<User?> get() = _currentUser
+
+    private val _currentUser = MutableLiveData<User?>()
+    val currentUser: LiveData<User?> get() = _currentUser
 
     private val _createResult = MutableLiveData<RegisterStoreResult>()
     val createResult: LiveData<RegisterStoreResult> get() = _createResult
 
     init {
         viewModelScope.launch {
-            userRepository.currentUser.collectLatest { currentUser ->
+            storeRepository.currentUser.collectLatest { currentUser ->
                 _ownerIdText.value = currentUser?.id?.toString().orEmpty()
                 _currentUser.postValue(currentUser)
             }
@@ -91,10 +92,7 @@ class RegisterStoreViewModel @Inject constructor(
 
         viewModelScope.launch {
             runCatching {
-                val owner = userRepository.currentUser.value ?: buildFallbackUser()
-                Store(
-                    id = System.currentTimeMillis(),
-                    ownerId = owner.id,
+                storeRepository.registerStore(
                     name = storeName,
                     type = storeType,
                     address = storeAddress,
@@ -103,7 +101,7 @@ class RegisterStoreViewModel @Inject constructor(
                     minOrderAmount = minOrderAmount,
                     deliveryFee = deliveryFee,
                     isOpen = isOpen,
-                    pic = pic.takeIf { it.isNotBlank() },
+                    pic = pic,
                     tags = tags
                 )
             }.onSuccess { store ->
@@ -129,16 +127,6 @@ class RegisterStoreViewModel @Inject constructor(
         val cleanedValue = value.trim().replace(",", "")
         if (cleanedValue.isBlank()) return BigDecimal.ZERO
         return runCatching { BigDecimal(cleanedValue) }.getOrDefault(BigDecimal.ZERO)
-    }
-
-    private fun buildFallbackUser(): User {
-        val now = System.currentTimeMillis()
-        return User(
-            id = now,
-            name = "GuestUser",
-            headPic = "",
-            isCurrent = true
-        )
     }
 }
 

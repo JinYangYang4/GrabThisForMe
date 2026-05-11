@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.example.grabthisforme.activity.fragment_misc.register_store.viewmodel.RegisterStoreViewModel" />
+            type="com.example.grabthisforme.activity.fragment_misc.my_store.viewmodel.RegisterStoreViewModel" />
     </data>
 
     <LinearLayout

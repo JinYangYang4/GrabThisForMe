@@ -191,7 +191,7 @@ class MainActivity : AppCompatActivity() {
     }
     fun initHandleSidebarClick(){
         binding.llRegisterStoreOwner.setOnClickListener {
-            intentToMiscFragment(R.id.action_blankFragment_to_registerStoreFragment)
+            intentToMiscFragment(R.id.action_blankFragment_to_fragmentMyStore)
         }
         binding.llSetBtn.setOnClickListener {
             intentToMiscFragment(R.id.action_blankFragment_to_setFragment)
