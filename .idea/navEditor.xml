@@ -157,6 +157,11 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
+                            <entry key="action_blankFragment_to_fragmentMyStore">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                             <entry key="action_blankFragment_to_fragmentSearchFriendOrGroupOrConversation">
                               <value>
                                 <LayoutPositions />
@@ -193,11 +198,6 @@
                               </value>
                             </entry>
                             <entry key="action_blankFragment_to_postTopicFragemnt">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                            <entry key="action_blankFragment_to_registerStoreFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -324,6 +324,20 @@
                             <option name="x" value="-249" />
                             <option name="y" value="493" />
                           </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_fragmentMyStore_to_registerStoreFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_fragmentMyStore_to_storeOwnerFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
                         </option>
                       </LayoutPositions>
                     </value>
@@ -561,6 +575,18 @@
                               </value>
                             </entry>
                           </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="storeOwnerFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-268" />
+                            <option name="y" value="950" />
+                          </Point>
                         </option>
                       </LayoutPositions>
                     </value>

@@ -37,6 +37,9 @@ class CreateOrderViewModel @Inject constructor(
     private val _expressEndTime = MutableLiveData("")
     val expressEndTime: LiveData<String> get() = _expressEndTime
 
+    private val _goodsPic = MutableLiveData("")
+    val goodsPic: LiveData<String> get() = _goodsPic
+
     private val _createResult = MutableLiveData<CreateOrderResult>()
     val createResult: LiveData<CreateOrderResult> get() = _createResult
 
@@ -59,6 +62,10 @@ class CreateOrderViewModel @Inject constructor(
 
     fun setExpressEndTime(value: String) {
         _expressEndTime.value = value
+    }
+
+    fun setGoodsPic(value: String) {
+        _goodsPic.value = value
     }
 
     fun submitBuyGoodsOrder(

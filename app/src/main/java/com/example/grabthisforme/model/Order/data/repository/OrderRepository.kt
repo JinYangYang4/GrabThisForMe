@@ -10,7 +10,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -35,10 +34,21 @@ class OrderRepository @Inject constructor(
             initialValue = emptyList()
         )
 
-    val allOrderList: StateFlow<List<Order>> = sourceOrders
+    private val annotatedOrders: StateFlow<List<Order>> = combine(
+        sourceOrders,
+        userRepository.currentUserId
+    ) { orders, currentUserId ->
+        orders.withBuyerSelf(currentUserId)
+    }.stateIn(
+        scope = repositoryScope,
+        started = SharingStarted.Eagerly,
+        initialValue = emptyList()
+    )
+
+    val allOrderList: StateFlow<List<Order>> = annotatedOrders
 
     val currentOrderList: StateFlow<List<Order>> = combine(
-        sourceOrders,
+        annotatedOrders,
         userRepository.currentUserId
     ) { orders, currentUserId ->
         orders.filter { it.isCurrentTaskOrder(currentUserId) }
@@ -49,7 +59,7 @@ class OrderRepository @Inject constructor(
     )
 
     val mySendOrderList: StateFlow<List<Order>> = combine(
-        sourceOrders,
+        annotatedOrders,
         userRepository.currentUserId
     ) { orders, currentUserId ->
         if (currentUserId == null) {
@@ -63,7 +73,7 @@ class OrderRepository @Inject constructor(
         initialValue = emptyList()
     )
 
-    val historyOrderList: StateFlow<List<Order>> = sourceOrders
+    val historyOrderList: StateFlow<List<Order>> = annotatedOrders
 
     fun ordersByPage(page: Int): StateFlow<List<Order>> {
         return when (page) {
@@ -77,6 +87,12 @@ class OrderRepository @Inject constructor(
     private fun Order.isCurrentTaskOrder(currentUserId: Long?): Boolean {
         return (orderStatus == OrderStatusInfo.STATUS_PENDING_RECEIPT ||
             orderStatus == OrderStatusInfo.STATUS_PENDING_DELIVERY) &&
-                (sender?.id == currentUserId || buyer.id == currentUserId)
+                (sender?.id == currentUserId || isBuyerSelf)
+    }
+
+    private fun List<Order>.withBuyerSelf(currentUserId: Long?): List<Order> {
+        return map { order ->
+            order.copy(isBuyerSelf = order.buyer.id == currentUserId)
+        }
     }
 }

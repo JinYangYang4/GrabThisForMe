@@ -75,7 +75,8 @@ fun OrderDto.toDomain(): Order {
         statusInfo = OrderStatusInfo(
             status = orderStatus,
             isAccepted = isAccepted
-        )
+        ),
+        isBuyerSelf = false
     )
 }
 
@@ -135,7 +136,8 @@ fun OrderEntity.toDomain(): Order {
         statusInfo = OrderStatusInfo(
             status = orderStatus,
             isAccepted = isAccepted
-        )
+        ),
+        isBuyerSelf = false
     )
 }
 

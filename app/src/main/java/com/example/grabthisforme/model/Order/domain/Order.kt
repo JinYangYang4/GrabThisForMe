@@ -9,7 +9,8 @@ data class Order(
     val goodsInfo: OrderGoodsInfo,
     val routeInfo: OrderRouteInfo,
     val timeInfo: OrderTimeInfo,
-    val statusInfo: OrderStatusInfo = OrderStatusInfo()
+    val statusInfo: OrderStatusInfo = OrderStatusInfo(),
+    val isBuyerSelf: Boolean = false
 ) {
     val orderId: String get() = identity.orderId
     val sender: User? get() = parties.sender
@@ -37,7 +38,8 @@ data class Order(
         startTime: Long = 0L,
         endTime: Long = 0L,
         orderStatus: Int = OrderStatusInfo.STATUS_PENDING_RECEIPT,
-        isAccepted: Boolean = false
+        isAccepted: Boolean = false,
+        isBuyerSelf: Boolean = false
     ) : this(
         identity = OrderIdentity(orderId),
         parties = OrderParties(sender = sender, buyer = buyer),
@@ -54,7 +56,8 @@ data class Order(
         statusInfo = OrderStatusInfo(
             status = orderStatus,
             isAccepted = isAccepted
-        )
+        ),
+        isBuyerSelf = isBuyerSelf
     )
 
     fun isExpired(currentTime: Long = System.currentTimeMillis()): Boolean {

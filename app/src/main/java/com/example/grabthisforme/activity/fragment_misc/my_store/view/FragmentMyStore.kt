@@ -40,7 +40,9 @@ class FragmentMyStore : Fragment() {
     }
 
     private fun initRecyclerView() {
-        storeAdapter = MyStoreRecyclerViewAdapter {}
+        storeAdapter = MyStoreRecyclerViewAdapter {
+            (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_fragmentMyStore_to_storeOwnerFragment)
+        }
         binding.rvStoreList.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
             adapter = storeAdapter

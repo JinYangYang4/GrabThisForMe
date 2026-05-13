@@ -215,9 +215,22 @@
     <fragment
         android:id="@+id/fragmentMyStore"
         android:name="com.example.grabthisforme.activity.fragment_misc.my_store.view.FragmentMyStore"
-        android:label="FragmentMyStore" >
+        android:label="FragmentMyStore"
+        tools:layout="@layout/fragment_my_store">
         <action
             android:id="@+id/action_fragmentMyStore_to_registerStoreFragment"
             app:destination="@id/registerStoreFragment" />
+        <action
+            android:id="@+id/action_fragmentMyStore_to_storeOwnerFragment"
+            app:destination="@id/storeOwnerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/storeOwnerFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.storeFragment.view.StoreOwnerFragment"
+        android:label="StoreOwnerFragment"
+        tools:layout="@layout/fragment_store_owner">
+        <action
+            android:id="@+id/action_storeOwnerFragment_to_storeSearchFragment"
+            app:destination="@id/storeSearchFragment" />
     </fragment>
 </navigation>

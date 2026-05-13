@@ -2,23 +2,25 @@ package com.example.grabthisforme.activity.fragment_misc.create.view
 
 import android.content.Context
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import com.bumptech.glide.Glide
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.bigkoo.pickerview.builder.TimePickerBuilder
+import com.example.grabthisforme.R
+import com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.BottomSheetDialogPhoto
 import com.example.grabthisforme.activity.fragment_misc.create.viewModel.CreateOrderViewModel
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentCreateOrderBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -45,6 +47,7 @@ class CreateOrderFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initView()
         observeCreateResult()
+        observeGoodsPic()
         ViewCompat.setOnApplyWindowInsetsListener(requireView()) { _, insets ->
             val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
             if (!imeVisible && _binding != null) {
@@ -66,6 +69,12 @@ class CreateOrderFragment : Fragment() {
             if (result.success) {
                 parentFragmentManager.popBackStack()
             }
+        }
+    }
+
+    private fun observeGoodsPic() {
+        viewModel.goodsPic.observe(viewLifecycleOwner) { photoUrl ->
+            renderGoodsPicture(photoUrl)
         }
     }
 
@@ -97,6 +106,9 @@ class CreateOrderFragment : Fragment() {
             val current = binding.tvSaleNumber.text.toString().toLongOrNull() ?: 1L
             binding.tvSaleNumber.text = current.plus(1).coerceAtMost(999L).toString()
         }
+        binding.ivGoodsPic.setOnClickListener {
+            showPhotoSelector()
+        }
 
         binding.btnCreateOrder.setOnClickListener {
             clearInputFocus()
@@ -105,7 +117,7 @@ class CreateOrderFragment : Fragment() {
                     goodsName = binding.tiGoodsName.text?.toString()?.trim().orEmpty(),
                     goodsPriceText = binding.tiGoodsPrice.text?.toString()?.trim().orEmpty(),
                     goodsMessage = binding.tiGoodsMessage.text?.toString()?.trim().orEmpty(),
-                    goodsPic = binding.ivGoodsPic.tag?.toString().orEmpty(),
+                    goodsPic = viewModel.goodsPic.value.orEmpty(),
                     saleNumber = binding.tvSaleNumber.text.toString().toLongOrNull() ?: 1L,
                     aimPosition = binding.tiAimPosition.text?.toString()?.trim().orEmpty(),
                     shelfNumber = binding.tiShelfNumber.text?.toString()?.trim().orEmpty(),
@@ -199,6 +211,29 @@ class CreateOrderFragment : Fragment() {
         binding.llNested.setOnClickListener {
             clearInputFocus()
         }
+    }
+
+    private fun showPhotoSelector() {
+        val photoBottomSheet = BottomSheetDialogPhoto.newInstance(BottomSheetDialogPhoto.SELECT_NUM_LIMIT)
+        photoBottomSheet.setOnPhotosSelectedListener(object : BottomSheetDialogPhoto.OnPhotosSelectedListener {
+            override fun onPhotosSelected(photos: List<Uri>) {
+                val goodsUri = photos.firstOrNull() ?: return
+                viewModel.setGoodsPic(goodsUri.toString())
+            }
+        })
+        photoBottomSheet.show(childFragmentManager, "OrderGoodsPhotoBottomSheet")
+    }
+
+    private fun renderGoodsPicture(photoUrl: String) {
+        if (photoUrl.isBlank()) {
+            binding.ivGoodsPic.setImageResource(R.drawable.ic_add)
+            return
+        }
+        Glide.with(this)
+            .load(photoUrl)
+            .placeholder(R.drawable.ic_add)
+            .error(R.drawable.ic_add)
+            .into(binding.ivGoodsPic)
     }
 
     override fun onResume() {
