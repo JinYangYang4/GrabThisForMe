@@ -3,6 +3,7 @@ package com.example.grabthisforme.activity.homeFragment.view
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,11 +15,13 @@ import android.view.animation.TranslateAnimation
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
+import com.example.grabthisforme.activity.fragment_misc.default_entry.view.BlankFragmentDirections
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.mainactivity.view.OrderMessageBottomSheetFragment
 import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
@@ -27,7 +30,6 @@ import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewStore
 import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewTaskAdapter
 import com.example.grabthisforme.activity.homeFragment.viewModel.FragmentHomeViewModel
 import com.example.grabthisforme.databinding.FragmentHomeBinding
-import com.example.grabthisforme.model.store.domain.Store
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -156,22 +158,22 @@ class FragmentHome : Fragment() {
         }
     }
     fun initRecyclerViewStore() {
-        adapter2 = RecyclerViewStoreAdapter() {store ->
-            (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_storeFragment)
-        }
-
-        val gridLayoutManager = GridLayoutManager(requireContext(), 2)
-        gridLayoutManager.orientation = GridLayoutManager.VERTICAL
+        adapter2 = RecyclerViewStoreAdapter(onStoreClickListener = { store ->
+            Log.d("test11", "initRecyclerViewStore: ")
+            val dir =BlankFragmentDirections.actionBlankFragmentToStoreFragment(store.id)
+            (requireActivity() as MainActivity).NewNavController_navgite(dir)
+        })
 
         binding.rvSomeGoods.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL,false)
             adapter = adapter2
         }
 
-
-
-        val storeList = Store.createVirtualStores()
-        adapter2.submitList(storeList)
+        viewLifecycleOwner.lifecycleScope.launch {
+            homeViewModel.allStores.collectLatest { storeList ->
+                adapter2.submitList(storeList)
+            }
+        }
     }
     private fun showDropdownWithSlideAnimation() {
         if (!homeViewModel.GetAlreadyShow()){

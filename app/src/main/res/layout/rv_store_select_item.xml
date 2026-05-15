@@ -5,6 +5,7 @@
         android:layout_width="80dp"
         android:layout_height="50dp"
         android:gravity="center"
+        android:elevation="4dp"
         android:background="@color/gray_mid_light">
         <TextView
             android:id="@+id/tv_category"

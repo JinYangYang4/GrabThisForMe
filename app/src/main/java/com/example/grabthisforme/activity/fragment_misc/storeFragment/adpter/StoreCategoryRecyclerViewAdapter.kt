@@ -49,7 +49,7 @@ class StoreCategoryRecyclerViewAdapter(
         ) {
             binding.tvCategory.text = category
             if (isSelected) {
-                binding.root.setBackgroundResource(R.drawable.bg_rectangle_white)
+                binding.root.setBackgroundResource(android.R.color.transparent)
             } else if (position == selectedPosition - 1){
                 binding.root.setBackgroundResource(R.drawable.bg_rectangle_gray_rigtht_bottom_round)
             } else if (position == selectedPosition + 1){

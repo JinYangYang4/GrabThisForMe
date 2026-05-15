@@ -23,6 +23,7 @@ import com.example.grabthisforme.model.user.domain.User
 fun Goods.toBaseEntity(): GoodsBaseEntity {
     return GoodsBaseEntity(
         goodsId = id,
+        storeId = storeId,
         name = name,
         message = message,
         categoryKey = category?.name
@@ -66,6 +67,7 @@ fun GoodsBundleEntity.toDomain(): Goods {
     }
     return Goods(
         id = base.goodsId,
+        storeId = base.storeId,
         name = base.name,
         message = base.message,
         price = price?.price ?: 0.0,
@@ -123,6 +125,7 @@ fun GoodsBundleEntity.toDomainSecondhandOrNull(): SecondhandGoods? {
 fun GoodsBaseDto.toDomainInfo(): GoodsBaseInfo {
     return GoodsBaseInfo(
         id = id,
+        storeId = storeId,
         name = name,
         message = message,
         category = category?.let { key ->
@@ -172,6 +175,7 @@ fun Goods.toDto(): GoodsDto {
     return GoodsDto(
         base = GoodsBaseDto(
             id = id,
+            storeId = storeId,
             name = name,
             message = message,
             category = category?.name

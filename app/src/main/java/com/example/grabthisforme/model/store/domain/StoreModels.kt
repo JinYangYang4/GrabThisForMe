@@ -1,5 +1,6 @@
 package com.example.grabthisforme.model.store.domain
 
+import com.example.grabthisforme.model.goods.domain.Goods
 import java.math.BigDecimal
 
 data class StoreIdentity(
@@ -28,4 +29,9 @@ data class StoreCommercialInfo(
 
 data class StoreStatistics(
     val salesVolume: Long = 0
+)
+
+data class StoreGoodsGroup(
+    val category: String = "",
+    val goods: List<Goods> = emptyList()
 )

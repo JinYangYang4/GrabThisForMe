@@ -2,6 +2,7 @@ package com.example.grabthisforme.model.goods.data.dto
 
 data class GoodsBaseDto(
     val id: Long,
+    val storeId: Long = 0L,
     val name: String = "",
     val message: String = "",
     val category: String? = null

@@ -21,6 +21,7 @@ import com.example.grabthisforme.model.secondhandGoods.data.entity.SecondhandTra
 import com.example.grabthisforme.model.secondhandGoods.domain.SecondhandGoods
 import com.example.grabthisforme.model.secondhandGoods.mapper.toDomain
 import com.example.grabthisforme.model.secondhandGoods.mapper.toTradeEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface GoodsDao {
@@ -55,12 +56,21 @@ interface GoodsDao {
     }
 
     @Transaction
+    suspend fun saveGoodsBatch(goodsList: List<Goods>) {
+        goodsList.forEach { saveGoods(it) }
+    }
+
+    @Transaction
     @Query("SELECT * FROM goods_base WHERE goodsId = :goodsId LIMIT 1")
     suspend fun getGoodsBundle(goodsId: Long): GoodsBundleEntity?
 
     @Transaction
     @Query("SELECT * FROM goods_base ORDER BY goodsId DESC")
     suspend fun getAllGoodsBundles(): List<GoodsBundleEntity>
+
+    @Transaction
+    @Query("SELECT * FROM goods_base ORDER BY goodsId DESC")
+    fun observeAllGoodsBundles(): Flow<List<GoodsBundleEntity>>
 
     suspend fun getAllGoods(): List<Goods> {
         return getAllGoodsBundles().map { it.toDomain() }

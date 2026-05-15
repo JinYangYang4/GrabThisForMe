@@ -16,6 +16,7 @@ import androidx.core.view.GravityCompat
 
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavDirections
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -220,6 +221,9 @@ class MainActivity : AppCompatActivity() {
         if (viewModel.drawerOpenState.value){
             binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         }
+    }
+    fun NewNavController_navgite(action: NavDirections){
+        val navController = navNewFragment.navController.navigate(action)
     }
     fun innerBottomBar(){
         viewModel.openNewFragment_ture()

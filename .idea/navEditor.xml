@@ -244,6 +244,18 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="creatGoodsFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="createOrderFragment">
                     <value>
                       <LayoutPositions>
@@ -559,7 +571,7 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="306" />
-                            <option name="y" value="546" />
+                            <option name="y" value="550" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -587,6 +599,20 @@
                             <option name="x" value="-268" />
                             <option name="y" value="950" />
                           </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_storeOwnerFragment_to_creatGoodsFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_storeOwnerFragment_to_storeSearchFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
                         </option>
                       </LayoutPositions>
                     </value>

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.fragment_misc.my_store.adapter.MyStoreRecyclerViewAdapter
@@ -41,7 +42,8 @@ class FragmentMyStore : Fragment() {
 
     private fun initRecyclerView() {
         storeAdapter = MyStoreRecyclerViewAdapter {
-            (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_fragmentMyStore_to_storeOwnerFragment)
+            val dir = FragmentMyStoreDirections.actionFragmentMyStoreToStoreOwnerFragment(it.id)
+            findNavController().navigate(dir)
         }
         binding.rvStoreList.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)

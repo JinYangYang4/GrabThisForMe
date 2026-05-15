@@ -16,6 +16,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_margin="10dp"
+            android:scaleType="centerCrop"
             android:background="@drawable/bg_round_stripe_orange_small_corners"
             android:clipToOutline="true"/>
         <TextView

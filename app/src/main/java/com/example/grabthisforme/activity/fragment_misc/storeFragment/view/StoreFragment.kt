@@ -1,12 +1,15 @@
 package com.example.grabthisforme.activity.fragment_misc.storeFragment.view
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
@@ -18,6 +21,8 @@ import com.example.grabthisforme.databinding.FragmentStoreBinding
 import com.example.grabthisforme.extension.setMaxVisibleItems
 import com.example.grabthisforme.model.goods.domain.Goods
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class StoreFragment : Fragment() {
@@ -30,7 +35,9 @@ class StoreFragment : Fragment() {
 
     private lateinit var categoryAdapter: StoreCategoryRecyclerViewAdapter
     private var currentAlreadySelectList = mutableListOf<Goods>()
+    private var currentStoreId: Long? = null
 
+    private val args : StoreFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,14 +52,14 @@ class StoreFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        storeViewModel.loadStore(args.storeId)
         initCategoryRecyclerView()
         initGoodsRecyclerView()
+        initAlreadySelectRecyclerView()
         showGoods()
         initObserve()
-        initAlreadySelectRecyclerView()
         initCLickListener()
         handleBackPressed()
-        currentAlreadySelectList = Goods.get20RepeatGoods().toMutableList()
     }
     private fun handleBackPressed() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : androidx.activity.OnBackPressedCallback(true) {
@@ -78,7 +85,7 @@ class StoreFragment : Fragment() {
             requireActivity().supportFragmentManager.popBackStack()
         }
         binding.llPriceTotal.setOnClickListener {
-            storeViewModel.setMySelectGoosView(!storeViewModel.isOpenMySelectGoosView.value)
+            storeViewModel.setMySelectGoosView(!(storeViewModel.isOpenMySelectGoosView.value ?: false))
         }
         binding.flGrayBg.setOnClickListener {
             storeViewModel.setMySelectGoosView(false)
@@ -95,9 +102,33 @@ class StoreFragment : Fragment() {
         storeViewModel.isOpenMySelectGoosView.observe(viewLifecycleOwner){isOpen ->
             showGoodsMenu(isOpen)
         }
-    }
-    private fun showStore(){
-        storeViewModel.setShowStorePage(true)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    storeViewModel.currentStore.collectLatest { store ->
+                        val storeId = store?.id
+                        if (currentStoreId != storeId) {
+                            currentStoreId = storeId
+                            currentAlreadySelectList = mutableListOf()
+                            alreadySelectAdapter.submitList(emptyList())
+                        }
+                        val categories = store?.category?.ifEmpty { null }
+                        if (!categories.isNullOrEmpty()) {
+                            categoryAdapter.setCategoryList(categories)
+                        }
+                    }
+                }
+                launch {
+                    storeViewModel.goodsList.collectLatest { goodsList ->
+                        goodsAdapter.submitList(goodsList)
+                        if (currentAlreadySelectList.isEmpty()) {
+                            currentAlreadySelectList = goodsList.toMutableList()
+                            alreadySelectAdapter.submitList(currentAlreadySelectList.toList())
+                        }
+                    }
+                }
+            }
+        }
     }
     private fun showGoods(){
         storeViewModel.setShowStorePage(false)
@@ -116,7 +147,6 @@ class StoreFragment : Fragment() {
             itemAnimator = null
             setHasFixedSize(true)
         }
-        goodsAdapter.submitList(Goods.get20RepeatGoods())
     }
     private fun initCategoryRecyclerView() {
         categoryAdapter = StoreCategoryRecyclerViewAdapter { category, position ->
@@ -165,28 +195,26 @@ class StoreFragment : Fragment() {
             onItemClick = { goods ->
             },
             onMinusClick = { goods ->
-
+                val index = currentAlreadySelectList.indexOfFirst { it.id == goods.id }
+                if (index < 0) return@AlreadySelectGoodsRecyclerViewAdapter
                 if (goods.selectedCount > 1) {
                     goods.selectedCount--
+                    alreadySelectAdapter.notifyItemChanged(index)
                 } else {
-                    val newList = currentAlreadySelectList.toMutableList()
-                    newList.remove(goods)
-                    alreadySelectAdapter.submitList(newList)
+                    currentAlreadySelectList.removeAt(index)
+                    alreadySelectAdapter.submitList(currentAlreadySelectList.toList())
                 }
-                alreadySelectAdapter.notifyItemChanged(
-                    currentAlreadySelectList.indexOf(goods)
-                )
             },
             onPlusClick = { goods ->
+                val index = currentAlreadySelectList.indexOfFirst { it.id == goods.id }
+                if (index < 0) return@AlreadySelectGoodsRecyclerViewAdapter
                 goods.selectedCount++
-                alreadySelectAdapter.notifyItemChanged(
-                    currentAlreadySelectList.indexOf(goods)
-                )
+                alreadySelectAdapter.notifyItemChanged(index)
             }
         )
         binding.rvAlreadySelect.layoutManager = LinearLayoutManager(context)
         binding.rvAlreadySelect.adapter = alreadySelectAdapter
-        alreadySelectAdapter.submitList(Goods.get20RepeatGoods())
+        alreadySelectAdapter.submitList(currentAlreadySelectList.toList())
     }
 
     override fun onResume() {

@@ -2,6 +2,7 @@ package com.example.grabthisforme.model.goods.domain
 
 data class GoodsBaseInfo(
     val id: Long,
+    val storeId: Long = 0L,
     val name: String = "",
     val message: String = "",
     val category: Goods.GoodsCategory? = null

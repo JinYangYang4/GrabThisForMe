@@ -191,12 +191,19 @@
         <action
             android:id="@+id/action_storeFragment_to_fragmentChat"
             app:destination="@id/fragmentChat" />
+        <argument
+            android:name="storeId"
+            app:argType="long" />
     </fragment>
     <fragment
         android:id="@+id/storeSearchFragment"
         android:name="com.example.grabthisforme.activity.fragment_misc.storeFragment.view.StoreSearchFragment"
         android:label="StoreSearchFragment"
-        tools:layout="@layout/fragment_store_search"/>
+        tools:layout="@layout/fragment_store_search">
+        <argument
+            android:name="storeId"
+            app:argType="long" />
+    </fragment>
     <fragment
         android:id="@+id/postTopicFragemnt"
         android:name="com.example.grabthisforme.activity.fragment_misc.post_topic.view.PostTopicFragment"
@@ -232,5 +239,19 @@
         <action
             android:id="@+id/action_storeOwnerFragment_to_storeSearchFragment"
             app:destination="@id/storeSearchFragment" />
+        <action
+            android:id="@+id/action_storeOwnerFragment_to_creatGoodsFragment"
+            app:destination="@id/creatGoodsFragment" />
+        <argument
+            android:name="storeId"
+            app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/creatGoodsFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.create.view.CreateGoodsFragment"
+        android:label="CreatGoodsFragment"
+        tools:layout="@layout/fragment_creat_goods">
+        <argument android:name="storeId"
+            app:argType="long" />
     </fragment>
 </navigation>

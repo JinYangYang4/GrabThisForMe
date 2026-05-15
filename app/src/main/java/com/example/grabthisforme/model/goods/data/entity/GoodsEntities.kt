@@ -11,6 +11,7 @@ import com.example.grabthisforme.model.secondhandGoods.data.entity.SecondhandTra
 @Entity(tableName = "goods_base")
 data class GoodsBaseEntity(
     @PrimaryKey val goodsId: Long,
+    val storeId: Long = 0L,
     val name: String,
     val message: String,
     val categoryKey: String? = null

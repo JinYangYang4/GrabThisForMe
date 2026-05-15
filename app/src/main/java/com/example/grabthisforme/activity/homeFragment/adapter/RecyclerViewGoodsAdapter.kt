@@ -4,9 +4,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
+
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.grabthisforme.R
 import com.example.grabthisforme.databinding.RvGoodsItemBinding
 import com.example.grabthisforme.model.goods.domain.Goods
 
@@ -45,8 +48,12 @@ class RecyclerViewGoodsAdapter(
                 binding.llGoods.visibility = View.VISIBLE
             }
             binding.goodsPrice.text = goods.price.toString()
-
             binding.goodsMessage.text = goods.name
+            Glide.with(binding.root.context)
+                .load(goods.pic)
+                .error(R.drawable.food_pic)
+                .placeholder(R.drawable.food_pic)
+                .into(binding.ivGoodsPic)
         }
 
     }

@@ -1,150 +1,591 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="viewModel"
+            type="com.example.grabthisforme.activity.fragment_misc.storeFragment.viewModel.StoreOwnerViewModel" />
+    </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipChildren="true"
         android:background="@color/white_fff8">
-
         <LinearLayout
             android:id="@+id/ll_top_bar"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginTop="30dp"
-            android:gravity="center_vertical"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
+            android:gravity="center_vertical"
+            android:layout_marginTop="30dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp">
             <ImageView
                 android:id="@+id/iv_back"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:layout_marginEnd="10dp"
-                android:src="@drawable/ic_back" />
+                android:src="@drawable/ic_back"
+                android:layout_marginEnd="10dp"/>
 
             <LinearLayout
                 android:id="@+id/ll_search"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
                 android:layout_weight="1"
+                android:padding="4dp"
+                android:layout_margin="10dp"
                 android:background="@drawable/bg_round_stripe"
                 android:backgroundTint="@color/gray_mid_light"
-                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="4dp">
-
+                android:gravity="center_vertical">
                 <ImageView
                     android:layout_width="18dp"
                     android:layout_height="18dp"
-                    android:alpha="0.5"
+                    android:src="@drawable/ic_search"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/ic_search" />
-
+                    android:alpha="0.5"/>
                 <TextView
+                    android:layout_marginStart="13dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="13dp"
-                    android:layout_marginEnd="30dp"
-                    android:text="搜索店铺商品"
-                    android:textSize="13sp" />
+                    android:text="搜索店内商品，约100样"
+                    android:textSize="13sp"
+                    android:layout_marginEnd="30dp"/>
             </LinearLayout>
-
-            <ImageView
-                android:id="@+id/iv_customer_service"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginStart="13dp"
-                android:src="@drawable/ic_information_whit_store" />
-
-            <ImageView
-                android:id="@+id/iv_add_to_love"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginStart="13dp"
-                android:src="@drawable/ic_love_store" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/ll_owner_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="12dp"
-            android:background="@drawable/bg_rounded_white"
-            android:backgroundTint="@color/white"
-            android:orientation="vertical"
-            android:padding="12dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ll_top_bar">
-
-            <TextView
-                android:id="@+id/tv_store_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="店主商品页"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_store_desc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="主营代买、日用品和零食配送"
-                android:textColor="@color/gray_700"
-                android:textSize="12sp" />
-
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal">
-
+                android:orientation="vertical"
+                android:layout_marginStart="13dp"
+                android:gravity="center">
+                <ImageView
+                    android:id="@+id/iv_add_sell_goods"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_add"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="商品 20"
-                    android:textColor="@color/black"
-                    android:textSize="12sp" />
+                    android:text="上架商品"
+                    android:textSize="10sp"/>
+            </LinearLayout>
 
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ll_select_function"
+            app:layout_constraintTop_toBottomOf="@id/ll_top_bar"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:id="@+id/ll__allGoods"
+                android:layout_marginLeft="25dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
-                    android:text="销量 100+"
-                    android:textColor="@color/black"
-                    android:textSize="12sp" />
+                    android:textSize="14sp"
+                    android:text="全部商品">
+                </TextView>
+                <LinearLayout
+                    android:layout_width="25dp"
+                    android:layout_height="4dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/bg_round_stripe"
+                    android:id="@+id/ll_select_back_orange_goods"
+                    android:visibility="@{viewModel.showStorePage ? View.GONE : View.VISIBLE}"
+                    android:backgroundTint="@color/orange_primary"
+                    tools:ignore="Orientation">
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_marginLeft="25dp"
+                android:id="@+id/ll_store"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:text="商家">
+                </TextView>
+                <LinearLayout
+                    android:id="@+id/ll_select_back_orange_store"
+                    android:layout_marginTop="5dp"
+                    android:layout_width="25dp"
+                    android:layout_height="4dp"
+                    android:background="@drawable/bg_round_stripe"
+                    android:visibility="@{viewModel.showStorePage ? View.VISIBLE : View.GONE}"
+                    android:backgroundTint="@color/orange_primary"
+                    tools:ignore="Orientation">
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/tv_goods_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="12dp"
-            android:text="店主商品"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ll_owner_info" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_owner_goods"
-            android:layout_width="0dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_goods"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:elevation="0dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_goods_title" />
+            app:layout_constraintTop_toBottomOf="@id/ll_select_function"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="10sp"
+            android:visibility="@{viewModel.showStorePage ? View.GONE : View.VISIBLE}">
+            <LinearLayout
+                android:id="@+id/ll_select_goods"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
 
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="10sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:orientation="horizontal">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal">
+                    <TextView
+                        android:id="@+id/tv_edit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="编辑"
+                        android:textStyle="bold"
+                        android:textColor="@color/red_cherry"/>
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_category"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal">
+                    <TextView
+                        android:id="@+id/tv_add_goods"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="添加商品+"
+                        android:textStyle="bold"
+                        android:textColor="@color/red_cherry"/>
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_goods"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_store"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="@{viewModel.showStorePage ? View.VISIBLE : View.GONE}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ll_select_function"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="10sp">
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:layout_editor_absoluteX="0dp"
+                tools:layout_editor_absoluteY="0dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="12dp">
+
+                    <!-- 1. 商家头部信息 -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cl_shop_header"
+                        android:background="@drawable/bg_rounded_white"
+                        android:backgroundTint="#FFFFFF"
+                        android:padding="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <!-- 商家名称 -->
+                        <TextView
+                            android:id="@+id/tv_shop_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="万家自选"
+                            android:textColor="@android:color/black"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <!-- 已售数量 -->
+                        <TextView
+                            android:id="@+id/tv_sale_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="已售100+"
+                            android:textColor="#888888"
+                            android:textSize="12sp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/tv_shop_name" />
+
+                        <!-- 地址信息 -->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/cl_address"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="20dp"
+                            app:layout_constraintEnd_toStartOf="@id/iv_call"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/tv_sale_count">
+
+                            <TextView
+                                android:id="@+id/tv_address"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="20dp"
+                                android:ellipsize="end"
+                                android:maxLines="2"
+                                android:text="桂林市秀峰区三多路18号2单元402室(原:秀峰区三多路28号2栋1-4-2号房)"
+                                android:textColor="#888888"
+                                android:textSize="12sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <ImageView
+                                android:id="@+id/iv_arrow"
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:src="@drawable/ic_arrow_right"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <ImageView
+                            android:id="@+id/iv_call"
+                            android:layout_width="17dp"
+                            android:layout_height="17dp"
+                            android:src="@drawable/ic_call"
+                            app:layout_constraintBottom_toBottomOf="@id/cl_address"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/cl_address" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    <!-- 1. 商家服务信息 -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cl_service"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:background="@drawable/bg_rounded_white"
+                        android:backgroundTint="#FFFFFF"
+                        android:layout_marginTop="16dp"
+                        app:layout_constraintTop_toBottomOf="@id/cl_shop_header">
+
+                        <!-- 模块标题 -->
+                        <TextView
+                            android:id="@+id/tv_service_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="商家服务"
+                            android:textColor="@android:color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+
+                        <!-- 在线咨询 -->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/cl_chat"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <ImageView
+                                android:id="@+id/iv_chat_icon"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:layout_marginTop="10dp"
+                                android:src="@drawable/ic_information_whit_store"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/tv_chat_title"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="在线咨询"
+                                android:textColor="@android:color/black"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@+id/iv_chat_icon"
+                                app:layout_constraintStart_toEndOf="@id/iv_chat_icon"
+                                app:layout_constraintTop_toTopOf="@id/iv_chat_icon" />
+
+                            <TextView
+                                android:id="@+id/tv_chat_desc"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="商家提供在线服务"
+                                android:textColor="#888888"
+                                android:textSize="12sp"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="@id/tv_chat_title"
+                                app:layout_constraintTop_toBottomOf="@id/tv_chat_title" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    <!-- 3. 公告模块 -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cl_notice"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:background="@drawable/bg_rounded_white"
+                        android:backgroundTint="#FFFFFF"
+                        android:layout_marginTop="16dp"
+                        app:layout_constraintTop_toBottomOf="@id/cl_service">
+
+                        <TextView
+                            android:id="@+id/tv_notice_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="公告"
+                            android:textColor="@android:color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tv_notice_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="欢迎光临，很高兴为您服务~"
+                            android:textColor="#888888"
+                            android:textSize="14sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/tv_notice_title" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <!-- 4. 基础信息模块 -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/cl_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:layout_marginTop="16dp"
+                        android:background="@drawable/bg_rounded_white"
+                        android:backgroundTint="#FFFFFF"
+                        app:layout_constraintTop_toBottomOf="@id/cl_notice">
+
+                        <TextView
+                            android:id="@+id/tv_info_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="基础信息"
+                            android:textColor="@android:color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <!-- 查看商家资质 -->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/cl_qualification"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            app:layout_constraintTop_toBottomOf="@id/tv_info_title">
+
+                            <ImageView
+                                android:id="@+id/iv_qualification_icon"
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:src="@drawable/ic_qualification"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/tv_qualification"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="查看商家资质"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="@id/iv_qualification_icon"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@id/iv_qualification_icon"
+                                app:layout_constraintTop_toTopOf="@id/iv_qualification_icon" />
+
+                            <ImageView
+                                android:id="@+id/iv_qualification_arrow"
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:src="@drawable/ic_arrow_right"
+                                app:layout_constraintBottom_toBottomOf="@id/tv_qualification"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="@id/tv_qualification" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <!-- 配送服务 -->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/cl_delivery"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            app:layout_constraintTop_toBottomOf="@id/cl_qualification">
+
+                            <ImageView
+                                android:id="@+id/iv_delivery_icon"
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:src="@drawable/ic_run"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/tv_delivery"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="配送服务: 由商家提供配送服务"
+                                android:textColor="@android:color/black"
+                                android:textSize="14sp"
+                                app:layout_constraintBottom_toBottomOf="@id/iv_delivery_icon"
+                                app:layout_constraintStart_toEndOf="@id/iv_delivery_icon"
+                                app:layout_constraintTop_toTopOf="@id/iv_delivery_icon" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <!-- 营业时间 -->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/cl_business_hours"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            app:layout_constraintTop_toBottomOf="@id/cl_delivery">
+
+                            <ImageView
+                                android:id="@+id/iv_business_hours_icon"
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:src="@drawable/ic_watch"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/tv_business_hours"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="营业时间: 9：00 - 23：00"
+                                android:textColor="@android:color/black"
+                                android:textSize="14sp"
+                                app:layout_constraintBottom_toBottomOf="@id/iv_business_hours_icon"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@id/iv_business_hours_icon"
+                                app:layout_constraintTop_toTopOf="@id/iv_business_hours_icon" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:layout_marginTop="16dp"
+                        android:background="@drawable/bg_rounded_white"
+                        android:backgroundTint="#FFFFFF"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/cl_info">
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintTop_toTopOf="parent"
+                            android:padding="10dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+                            <ImageView
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:src="@drawable/ic_information_whit_store"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="在线客服"/>
+                        </LinearLayout>
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="10dp"
+                            android:background="@drawable/bg_rounded_white"
+                            android:backgroundTint="@color/gray_600"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintTop_toTopOf="parent"
+                            android:padding="10dp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+                            <ImageView
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:src="@drawable/ic_call"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="电话服务"/>
+                        </LinearLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.core.widget.NestedScrollView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

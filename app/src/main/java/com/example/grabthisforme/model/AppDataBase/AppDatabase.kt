@@ -42,7 +42,7 @@ import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
         PostEntity::class,
         StoreEntity::class
     ],
-    version = 13,
+    version = 16,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

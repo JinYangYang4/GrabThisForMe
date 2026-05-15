@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.grabthisforme.model.goods.data.dao.GoodsDao
+import com.example.grabthisforme.model.goods.data.repository.GoodsRepository
 import com.example.grabthisforme.model.goods.domain.Goods
 import com.example.grabthisforme.model.goods.domain.GoodsStateInfo
 import com.example.grabthisforme.model.secondhandGoods.domain.SecondhandGoods
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateSecondHandGoodsViewModel @Inject constructor(
-    private val goodsDao: GoodsDao,
+    private val goodsRepository: GoodsRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
 
@@ -85,7 +85,7 @@ class CreateSecondHandGoodsViewModel @Inject constructor(
                     purchaseStatus = GoodsStateInfo.PURCHASE_STATUS_NO_PURCHASE,
                     soldCount = 0L
                 )
-                goodsDao.saveSecondhandGoods(goods)
+                goodsRepository.saveSecondhandGoods(goods)
             }.onSuccess {
                 _createResult.postValue(
                     CreateSecondhandResult(

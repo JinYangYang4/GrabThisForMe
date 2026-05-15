@@ -7,20 +7,24 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.viewModels
 import com.example.grabthisforme.databinding.FragmentOrderMessageBottomMessageBinding
-
-import com.example.grabthisforme.model.goods.domain.Goods
+import com.example.grabthisforme.model.goods.data.repository.GoodsRepository
 import com.example.grabthisforme.model.order.data.mock.OrderMockData
 import com.example.grabthisforme.model.order.domain.Order
 import com.example.grabthisforme.model.user.domain.User
 import com.example.grabthisforme.activity.mainactivity.viewmodel.OrderMessageViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class OrderMessageBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: FragmentOrderMessageBottomMessageBinding? = null
     private  var order : Order? = null
     private val binding get() = _binding!!
     private val viewModel: OrderMessageViewModel by viewModels()
+    @Inject
+    lateinit var goodsRepository: GoodsRepository
     companion object {
         private const val ARG_ORDER_DATA = "order_data"
         fun newInstance(orderId: String): OrderMessageBottomSheetFragment {
@@ -53,7 +57,7 @@ class OrderMessageBottomSheetFragment : BottomSheetDialogFragment() {
             sender = User.getVirtualUser(),
             orderId = orderId,
             buyer = User.getVirtualUser(),
-            goods = Goods.getSingleVirtualGoods()
+            goods = goodsRepository.getSingleDisplayGoods()
         )
     }
     fun initView(){

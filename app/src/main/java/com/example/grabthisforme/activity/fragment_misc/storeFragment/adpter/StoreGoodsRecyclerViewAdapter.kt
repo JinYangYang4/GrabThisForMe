@@ -37,6 +37,7 @@ class StoreGoodsRecyclerViewAdapter(
             onAddClick: (Goods) -> Unit,
             onItemClick: (Goods) -> Unit
         ) {
+
             binding.tvTitle.text = goods.name
             binding.tvTag.text = goods.tag.ifEmpty { "秒送" }
             binding.tvPriceSingle.text = String.format("¥%.2f", goods.price)

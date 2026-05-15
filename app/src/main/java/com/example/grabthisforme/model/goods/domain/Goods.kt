@@ -10,6 +10,7 @@ open class Goods(
 ) {
 
     val id: Long get() = baseInfo.id
+    val storeId: Long get() = baseInfo.storeId
     val name: String get() = baseInfo.name
     val message: String get() = baseInfo.message
     val category: Goods.GoodsCategory? get() = baseInfo.category
@@ -34,6 +35,7 @@ open class Goods(
 
     constructor(
         id: Long,
+        storeId: Long = 0L,
         name: String = "",
         message: String = "",
         price: Double = 0.0,
@@ -53,6 +55,7 @@ open class Goods(
     ) : this(
         baseInfo = GoodsBaseInfo(
             id = id,
+            storeId = storeId,
             name = name,
             message = message,
             category = category
@@ -85,6 +88,7 @@ open class Goods(
     fun withSelectedCount(selectedCount: Int): Goods {
         return Goods(
             id = id,
+            storeId = storeId,
             name = name,
             message = message,
             price = price,

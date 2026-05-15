@@ -28,5 +28,6 @@ data class StoreEntity(
     val pic: String? = null,
     val rating: Float = 0.0f,
     val tags: String = "",
+    val goodsGroupsJson: String = "",
     val salesVolume: Long = 0L
 )
