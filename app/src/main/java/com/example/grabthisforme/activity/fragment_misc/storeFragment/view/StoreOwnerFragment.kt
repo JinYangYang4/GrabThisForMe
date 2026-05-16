@@ -50,6 +50,17 @@ class StoreOwnerFragment : Fragment() {
         initCategoryRecyclerView()
         initGoodsRecyclerView()
         initObserve()
+        observeStoreDetails()
+    }
+
+    private fun observeStoreDetails() {
+        viewModel.storeNameText.observe(viewLifecycleOwner) { binding.tvShopName.text = it }
+        viewModel.storeSaleCountText.observe(viewLifecycleOwner) { binding.tvSaleCount.text = it }
+        viewModel.storeAddressText.observe(viewLifecycleOwner) { binding.tvAddress.text = it }
+        viewModel.storeServiceText.observe(viewLifecycleOwner) { binding.tvChatDesc.text = it }
+        viewModel.storeNoticeText.observe(viewLifecycleOwner) { binding.tvNoticeContent.text = it }
+        viewModel.storeDeliveryText.observe(viewLifecycleOwner) { binding.tvDelivery.text = it }
+        viewModel.storeBusinessHoursText.observe(viewLifecycleOwner) { binding.tvBusinessHours.text = it }
     }
 
     private fun initCategoryRecyclerView() {

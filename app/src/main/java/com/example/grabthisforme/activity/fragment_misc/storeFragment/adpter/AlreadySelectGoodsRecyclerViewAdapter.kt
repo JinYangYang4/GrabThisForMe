@@ -3,11 +3,13 @@ package com.example.grabthisforme.activity.fragment_misc.storeFragment.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.grabthisforme.R
+import com.example.grabthisforme.activity.fragment_misc.storeFragment.adpter.StoreOwnerTagRecyclerViewAdapter
 import com.example.grabthisforme.databinding.RvAlreadySelectItemBinding
-
-
 import com.example.grabthisforme.model.goods.domain.Goods
 
 class AlreadySelectGoodsRecyclerViewAdapter(
@@ -21,16 +23,24 @@ class AlreadySelectGoodsRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val goods = getItem(position)
-        holder.bind(goods, onItemClick, onMinusClick, onPlusClick)
+        holder.bind(getItem(position), onItemClick, onMinusClick, onPlusClick)
     }
 
     class ViewHolder(val binding: RvAlreadySelectItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        private val tagAdapter = StoreOwnerTagRecyclerViewAdapter()
+
+        init {
+            binding.rvTag.layoutManager =
+                LinearLayoutManager(binding.root.context, RecyclerView.HORIZONTAL, false)
+            binding.rvTag.adapter = tagAdapter
+            binding.rvTag.itemAnimator = null
+            binding.rvTag.setHasFixedSize(true)
+        }
 
         companion object {
             fun inflate(parent: ViewGroup): ViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
-                val binding =RvAlreadySelectItemBinding.inflate(inflater, parent, false)
+                val binding = RvAlreadySelectItemBinding.inflate(inflater, parent, false)
                 return ViewHolder(binding)
             }
         }
@@ -42,27 +52,36 @@ class AlreadySelectGoodsRecyclerViewAdapter(
             onPlusClick: (Goods) -> Unit
         ) {
             binding.tvTitle.text = goods.name
-            binding.tvTag.text = goods.tag.ifEmpty { "秒送" }
-            binding.tvPriceSingle.text = String.format("¥%.2f", goods.price)
+            tagAdapter.submitList(goods.toTagList())
+            binding.tvPriceSingle.text = String.format("楼%.2f", goods.price)
             binding.tvPriceDiscount.text = when {
                 goods.discountTag.isNotEmpty() -> goods.discountTag
-                goods.discountPrice > 0 -> String.format("买3件¥%.2f/件", goods.discountPrice)
+                goods.discountPrice > 0 -> String.format("浼樻儬浠?楼%.2f", goods.discountPrice)
                 else -> ""
             }
-
+            Glide.with(binding.root.context)
+                .load(goods.pic)
+                .placeholder(R.drawable.food_pic)
+                .error(R.drawable.food_pic)
+                .into(binding.ivGoods)
             binding.tvSaleNumber.text = goods.selectedCount.toString()
-            binding.root.setOnClickListener {
-                onItemClick(goods)
-                goods.discountPrice
-            }
+            binding.root.setOnClickListener { onItemClick(goods) }
+            binding.btnMinus.setOnClickListener { onMinusClick(goods) }
+            binding.btnPlus.setOnClickListener { onPlusClick(goods) }
+        }
 
-            binding.btnMinus.setOnClickListener {
-                onMinusClick(goods)
+        private fun Goods.toTagList(): List<String> {
+            val tags = mutableListOf<String>()
+            if (discountTag.isNotBlank()) {
+                tags.add(discountTag)
             }
-
-            binding.btnPlus.setOnClickListener {
-                onPlusClick(goods)
+            if (tag.isNotBlank()) {
+                tags.addAll(tag.split(Regex("[,/;|\\s]+")).filter { it.isNotBlank() })
             }
+            if (tags.isEmpty()) {
+                tags.add("默认")
+            }
+            return tags.distinct()
         }
     }
 
@@ -72,11 +91,13 @@ class AlreadySelectGoodsRecyclerViewAdapter(
         }
 
         override fun areContentsTheSame(oldItem: Goods, newItem: Goods): Boolean {
-            // 对比所有会变的字段，保证UI自动刷新
-            return oldItem.id == newItem.id
-                    && oldItem.name == newItem.name
-                    && oldItem.price == newItem.price
-                    && oldItem.selectedCount == newItem.selectedCount
+            return oldItem.id == newItem.id &&
+                oldItem.name == newItem.name &&
+                oldItem.price == newItem.price &&
+                oldItem.selectedCount == newItem.selectedCount &&
+                oldItem.discountPrice == newItem.discountPrice &&
+                oldItem.discountTag == newItem.discountTag &&
+                oldItem.tag == newItem.tag
         }
     }
 }

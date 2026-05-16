@@ -34,7 +34,6 @@ class StoreFragment : Fragment() {
     private lateinit var alreadySelectAdapter : AlreadySelectGoodsRecyclerViewAdapter
 
     private lateinit var categoryAdapter: StoreCategoryRecyclerViewAdapter
-    private var currentAlreadySelectList = mutableListOf<Goods>()
     private var currentStoreId: Long? = null
 
     private val args : StoreFragmentArgs by navArgs()
@@ -58,8 +57,19 @@ class StoreFragment : Fragment() {
         initAlreadySelectRecyclerView()
         showGoods()
         initObserve()
+        observeStoreDetails()
         initCLickListener()
         handleBackPressed()
+    }
+
+    private fun observeStoreDetails() {
+        storeViewModel.storeNameText.observe(viewLifecycleOwner) { binding.tvShopName.text = it }
+        storeViewModel.storeSaleCountText.observe(viewLifecycleOwner) { binding.tvSaleCount.text = it }
+        storeViewModel.storeAddressText.observe(viewLifecycleOwner) { binding.tvAddress.text = it }
+        storeViewModel.storeServiceText.observe(viewLifecycleOwner) { binding.tvChatDesc.text = it }
+        storeViewModel.storeNoticeText.observe(viewLifecycleOwner) { binding.tvNoticeContent.text = it }
+        storeViewModel.storeDeliveryText.observe(viewLifecycleOwner) { binding.tvDelivery.text = it }
+        storeViewModel.storeBusinessHoursText.observe(viewLifecycleOwner) { binding.tvBusinessHours.text = it }
     }
     private fun handleBackPressed() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : androidx.activity.OnBackPressedCallback(true) {
@@ -97,6 +107,9 @@ class StoreFragment : Fragment() {
             (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_storeFragment_to_fragmentChat)
         }
         binding.ivAddToLove.setOnClickListener {}
+        binding.tvDeleteAll.setOnClickListener {
+            storeViewModel.clearSelectedGoods()
+        }
     }
     private fun initObserve(){
         storeViewModel.isOpenMySelectGoosView.observe(viewLifecycleOwner){isOpen ->
@@ -109,8 +122,7 @@ class StoreFragment : Fragment() {
                         val storeId = store?.id
                         if (currentStoreId != storeId) {
                             currentStoreId = storeId
-                            currentAlreadySelectList = mutableListOf()
-                            alreadySelectAdapter.submitList(emptyList())
+                            storeViewModel.clearSelectedGoods()
                         }
                         val categories = store?.category?.ifEmpty { null }
                         if (!categories.isNullOrEmpty()) {
@@ -121,13 +133,12 @@ class StoreFragment : Fragment() {
                 launch {
                     storeViewModel.goodsList.collectLatest { goodsList ->
                         goodsAdapter.submitList(goodsList)
-                        if (currentAlreadySelectList.isEmpty()) {
-                            currentAlreadySelectList = goodsList.toMutableList()
-                            alreadySelectAdapter.submitList(currentAlreadySelectList.toList())
-                        }
                     }
                 }
             }
+        }
+        storeViewModel.currentAlreadySelectList.observe(viewLifecycleOwner) { selectedList ->
+            alreadySelectAdapter.submitList(selectedList.toList())
         }
     }
     private fun showGoods(){
@@ -136,7 +147,7 @@ class StoreFragment : Fragment() {
     private fun initGoodsRecyclerView() {
         goodsAdapter = StoreGoodsRecyclerViewAdapter(
             onAddClick = { goods ->
-                 storeViewModel.addGoods(goods.price)
+                 storeViewModel.addGoods(goods)
             },
             onItemClick = { goods ->
             }
@@ -195,26 +206,16 @@ class StoreFragment : Fragment() {
             onItemClick = { goods ->
             },
             onMinusClick = { goods ->
-                val index = currentAlreadySelectList.indexOfFirst { it.id == goods.id }
-                if (index < 0) return@AlreadySelectGoodsRecyclerViewAdapter
-                if (goods.selectedCount > 1) {
-                    goods.selectedCount--
-                    alreadySelectAdapter.notifyItemChanged(index)
-                } else {
-                    currentAlreadySelectList.removeAt(index)
-                    alreadySelectAdapter.submitList(currentAlreadySelectList.toList())
-                }
+                storeViewModel.decreaseSelectedGoods(goods)
             },
             onPlusClick = { goods ->
-                val index = currentAlreadySelectList.indexOfFirst { it.id == goods.id }
-                if (index < 0) return@AlreadySelectGoodsRecyclerViewAdapter
-                goods.selectedCount++
-                alreadySelectAdapter.notifyItemChanged(index)
+                storeViewModel.increaseSelectedGoods(goods)
             }
         )
+
         binding.rvAlreadySelect.layoutManager = LinearLayoutManager(context)
         binding.rvAlreadySelect.adapter = alreadySelectAdapter
-        alreadySelectAdapter.submitList(currentAlreadySelectList.toList())
+        alreadySelectAdapter.submitList(emptyList())
     }
 
     override fun onResume() {
