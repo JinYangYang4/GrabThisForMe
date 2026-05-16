@@ -9,6 +9,14 @@
         <item name="behavior_peekHeight">500dp</item>
 
     </style>
+    <style name="BottomSheetStyleTransparent" parent="Widget.Design.BottomSheet.Modal">
+        <item name="behavior_peekHeight">500dp</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+    <style name="BottomSheetDialogTransparentTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetStyleTransparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
     <style name="BottomSheetStyle_black" parent="Widget.Design.BottomSheet.Modal">
         <item name="behavior_peekHeight">500dp</item>
         <item name="android:background">@android:color/black</item>

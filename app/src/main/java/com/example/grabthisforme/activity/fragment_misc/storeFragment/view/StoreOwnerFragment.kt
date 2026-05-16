@@ -31,6 +31,7 @@ class StoreOwnerFragment : Fragment() {
     private lateinit var goodsAdapter: StoreOwnerRecyclerViewAdapter
     private lateinit var categoryAdapter: StoreCategoryRecyclerViewAdapter
     private val viewModel: StoreOwnerViewModel by viewModels()
+    private var currentCategoryList: List<String> = listOf("全部", "未分类")
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,6 +47,7 @@ class StoreOwnerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.loadStore(args.storeId)
+        initCategoryManagerDialogResult()
         initClick()
         initCategoryRecyclerView()
         initGoodsRecyclerView()
@@ -88,6 +90,9 @@ class StoreOwnerFragment : Fragment() {
         binding.tvAddGoods.setOnClickListener {
 
         }
+        binding.tvEdit.setOnClickListener {
+            showCategoryManagerDialog()
+        }
         binding.llStore.setOnClickListener {
             viewModel.setShowStorePage(true)
         }
@@ -101,7 +106,8 @@ class StoreOwnerFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.categoryList.collectLatest { categories ->
-                        categoryAdapter.setCategoryList(categories)
+                        currentCategoryList = categories
+                        categoryAdapter.setCategoryList(currentCategoryList)
                     }
                 }
                 launch {
@@ -124,6 +130,27 @@ class StoreOwnerFragment : Fragment() {
             adapter = goodsAdapter
             itemAnimator = null
             setHasFixedSize(true)
+        }
+    }
+
+    private fun showCategoryManagerDialog() {
+        val dialog = CategoryManagerBottomDialogFragment.newInstance(ArrayList(currentCategoryList))
+        dialog.show(childFragmentManager, "category_manager_bottom_dialog")
+    }
+
+    private fun initCategoryManagerDialogResult() {
+        childFragmentManager.setFragmentResultListener(
+            CategoryManagerBottomDialogFragment.REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val updatedList = bundle.getStringArrayList(
+                CategoryManagerBottomDialogFragment.RESULT_KEY_CATEGORY_LIST
+            ).orEmpty()
+            if (updatedList.isNotEmpty()) {
+                currentCategoryList = updatedList
+                viewModel.updateStoreCategories(updatedList)
+                categoryAdapter.setCategoryList(currentCategoryList)
+            }
         }
     }
 

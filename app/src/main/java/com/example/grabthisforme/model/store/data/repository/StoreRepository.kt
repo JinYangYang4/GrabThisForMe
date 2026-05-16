@@ -71,6 +71,10 @@ class StoreRepository @Inject constructor(
         storeDao.saveStore(store)
     }
 
+    suspend fun updateStore(store: Store) {
+        storeDao.saveStore(store)
+    }
+
     suspend fun saveStores(stores: List<Store>) {
         storeDao.saveStores(stores)
     }

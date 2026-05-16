@@ -95,6 +95,19 @@ class StoreOwnerViewModel @Inject constructor(
         _showStorePage.value = showStore
     }
 
+    fun updateStore(store: Store) {
+        viewModelScope.launch {
+            runCatching {
+                storeRepository.updateStore(store)
+            }
+        }
+    }
+
+    fun updateStoreCategories(categories: List<String>) {
+        val currentStore = currentStore.value ?: return
+        updateStore(currentStore.withCategories(categories))
+    }
+
     fun addGoodsToCategory(
         store: Store,
         category: String,

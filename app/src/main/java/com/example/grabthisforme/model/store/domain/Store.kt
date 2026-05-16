@@ -112,7 +112,7 @@ data class Store(
             val goodsList = goodsAll.orEmpty()
             val normalizedCategories = categories.map { it.trim() }
                 .filter { it.isNotBlank() }
-                .distinct()
+                .distinct() //去重
 
             if (normalizedCategories.isEmpty()) {
                 return if (goodsList.isEmpty()) {
