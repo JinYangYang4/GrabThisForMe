@@ -138,7 +138,13 @@ class StoreFragment : Fragment() {
             }
         }
         storeViewModel.currentAlreadySelectList.observe(viewLifecycleOwner) { selectedList ->
+            if(selectedList.size == 0){
+                storeViewModel.setMySelectGoosView(false)
+            }
             alreadySelectAdapter.submitList(selectedList.toList())
+            binding.rvAlreadySelect.post {
+                binding.rvAlreadySelect.setMaxVisibleItems(4)
+            }
         }
     }
     private fun showGoods(){
@@ -176,7 +182,8 @@ class StoreFragment : Fragment() {
             binding.llAlreadySelectGoods.alpha = 0f
             binding.llAlreadySelectGoods.visibility = View.VISIBLE
             binding.rvAlreadySelect.post {
-                binding.rvAlreadySelect.setMaxVisibleItems(6)
+                binding.rvAlreadySelect.itemAnimator = null
+                binding.rvAlreadySelect.setMaxVisibleItems(4)
                 binding.llAlreadySelectGoods.translationY = binding.llAlreadySelectGoods.height.toFloat()
 
                 binding.llAlreadySelectGoods.animate()

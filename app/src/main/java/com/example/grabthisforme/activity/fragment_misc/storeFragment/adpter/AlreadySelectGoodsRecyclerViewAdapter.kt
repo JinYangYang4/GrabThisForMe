@@ -34,7 +34,6 @@ class AlreadySelectGoodsRecyclerViewAdapter(
                 LinearLayoutManager(binding.root.context, RecyclerView.HORIZONTAL, false)
             binding.rvTag.adapter = tagAdapter
             binding.rvTag.itemAnimator = null
-            binding.rvTag.setHasFixedSize(true)
         }
 
         companion object {
@@ -53,10 +52,9 @@ class AlreadySelectGoodsRecyclerViewAdapter(
         ) {
             binding.tvTitle.text = goods.name
             tagAdapter.submitList(goods.toTagList())
-            binding.tvPriceSingle.text = String.format("楼%.2f", goods.price)
+            binding.tvPriceSingle.text = String.format("￥%.2f", goods.price)
             binding.tvPriceDiscount.text = when {
-                goods.discountTag.isNotEmpty() -> goods.discountTag
-                goods.discountPrice > 0 -> String.format("浼樻儬浠?楼%.2f", goods.discountPrice)
+                goods.discountPrice > 0 -> String.format("折扣价%.2f", goods.discountPrice)
                 else -> ""
             }
             Glide.with(binding.root.context)

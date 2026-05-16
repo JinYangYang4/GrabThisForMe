@@ -147,8 +147,8 @@ class StoreViewModel @Inject constructor(
         _priceTotal.value = 0.0
     }
 
-    fun setMySelectGoosView(open: Boolean) {
-        _openMySelectGoosView.value = open
+    fun setMySelectGoosView(isOpen: Boolean) {
+        _openMySelectGoosView.value = isOpen
     }
 
     fun setShowStorePage(showStore: Boolean) {

@@ -12,7 +12,6 @@
             android:id="@+id/tv_tag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="秒送"
             android:textColor="@color/white_fff8"
             android:textSize="10sp"
             android:layout_marginHorizontal="1dp"
