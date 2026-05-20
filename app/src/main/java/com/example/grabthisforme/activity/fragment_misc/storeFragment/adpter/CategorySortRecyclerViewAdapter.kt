@@ -1,22 +1,48 @@
 package com.example.grabthisforme.activity.fragment_misc.storeFragment.adpter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.grabthisforme.databinding.RvCategorySortItemBinding
+import java.util.Collections
 
 class CategorySortRecyclerViewAdapter :
-    ListAdapter<String, CategorySortRecyclerViewAdapter.ViewHolder>(CategoryDiffCallback()) {
+    RecyclerView.Adapter<CategorySortRecyclerViewAdapter.ViewHolder>() {
+
+    private val items = mutableListOf<String>()
+
+    init {
+        setHasStableIds(true)
+    }
+
+    fun submitList(list: List<String>) {
+        items.clear()
+        items.addAll(list)
+        notifyDataSetChanged()
+    }
 
     fun moveItem(fromPosition: Int, toPosition: Int) {
-        val current = currentList
-        if (fromPosition !in current.indices || toPosition !in current.indices) return
-        val updated = current.toMutableList()
-        val item = updated.removeAt(fromPosition)
-        updated.add(toPosition, item)
-        submitList(updated)
+        if (fromPosition !in items.indices || toPosition !in items.indices) return
+        if (fromPosition == toPosition) return
+        if (fromPosition < toPosition) {
+            for (index in fromPosition until toPosition) {
+                Collections.swap(items, index, index + 1)
+            }
+        } else {
+            for (index in fromPosition downTo toPosition + 1) {
+                Collections.swap(items, index, index - 1)
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition)
+    }
+
+    fun getCurrentItems(): List<String> = items.toList()
+
+    override fun getItemCount(): Int = items.size
+
+    override fun getItemId(position: Int): Long {
+        return items[position].hashCode().toLong()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -24,7 +50,7 @@ class CategorySortRecyclerViewAdapter :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(items[position])
     }
 
     class ViewHolder(private val binding: RvCategorySortItemBinding) :
@@ -40,16 +66,6 @@ class CategorySortRecyclerViewAdapter :
                 val binding = RvCategorySortItemBinding.inflate(inflater, parent, false)
                 return ViewHolder(binding)
             }
-        }
-    }
-
-    class CategoryDiffCallback : DiffUtil.ItemCallback<String>() {
-        override fun areItemsTheSame(oldItem: String, newItem: String): Boolean {
-            return oldItem == newItem
-        }
-
-        override fun areContentsTheSame(oldItem: String, newItem: String): Boolean {
-            return oldItem == newItem
         }
     }
 }

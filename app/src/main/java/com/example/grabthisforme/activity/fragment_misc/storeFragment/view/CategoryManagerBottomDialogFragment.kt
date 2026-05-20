@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,17 +40,6 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.BottomSheetDialogTransparentTheme)
     }
-//
-//    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-//        return BottomSheetDialog(requireContext(), theme).apply {
-//            setOnShowListener {
-//                val bottomSheet = findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-//                bottomSheet?.setBackgroundColor(Color.TRANSPARENT)
-//                (bottomSheet?.background as? MaterialShapeDrawable)?.fillColor =
-//                    ColorStateList.valueOf(Color.TRANSPARENT)
-//            }
-//        }
-//    }
 
 
     override fun onCreateView(
@@ -142,7 +132,6 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
         binding.rvSortCategory.apply {
             layoutManager = GridLayoutManager(requireContext(), 4)
             adapter = sortAdapter
-            itemAnimator = null
             setHasFixedSize(true)
         }
 
@@ -170,7 +159,9 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
                 if (viewHolder.itemViewType != target.itemViewType) return false
                 val from = viewHolder.bindingAdapterPosition
                 val to = target.bindingAdapterPosition
+                if (from == RecyclerView.NO_POSITION || to == RecyclerView.NO_POSITION) return false
                 sortAdapter.moveItem(from, to)
+                applySortedResult(sortAdapter.getCurrentItems())
                 return true
             }
 
@@ -179,14 +170,13 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
             override fun isLongPressDragEnabled(): Boolean = true
         })
         itemTouchHelper.attachToRecyclerView(binding.rvSortCategory)
-
         refreshCategoryAdapters()
     }
 
     private fun initClickEvents() {
         binding.tvCancel.setOnClickListener { dismiss() }
         binding.tvConfirm.setOnClickListener {
-            dispatchCategoryResult(sortAdapter.currentList.toList())
+            dispatchCategoryResult(categoryList)
             dismiss()
         }
 
@@ -241,7 +231,13 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
             refreshCategoryAdapters()
         }
     }
-
+    private fun applySortedResult(sorted: List<String>) {
+        if (categoryList == sorted) return
+        categoryList.clear()
+        categoryList.addAll(sorted)
+        renameAdapter.submitList(sorted)
+        deleteAdapter.submitList(sorted)
+    }
     private fun refreshCategoryAdapters() {
         renameAdapter.submitList(categoryList.toList())
         deleteAdapter.submitList(categoryList.toList())

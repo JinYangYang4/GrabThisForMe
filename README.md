@@ -1,104 +1,131 @@
 # GrabThisForMe
 
-一个基于 Android Kotlin 的校园代取/跑腿 + 社区 + 商城 + 二手 + 消息应用原型。
+校园场景的 Android Kotlin 原型项目，覆盖跑腿、社区、商城、二手和消息等核心流程。
 
-## 快速上下文（给新同事/新对话AI）
-- 技术形态：以 `XML + DataBinding + MVVM` 为主，`Compose` 已开启但不是主要 UI 实现。
-- 入口 Activity：`MainActivity`（主流程）+ `LoginActivity`（登录流程）。
-- 导航策略：主底栏与零散业务页面分成两个 `NavHostFragment`（同屏切换）。
-- 数据层现状：核心业务大量使用 mock，部分模块已做 Room 持久化与分层改造。
-- 最近新增规范：`docs/skills/` 下维护可复用 UI skill 文档（表单生成统一风格）。
+## 项目现状
+
+- 架构：`MVVM + XML + DataBinding`，同时启用 `Jetpack Compose`（目前不是主要 UI 实现方式）
+- 导航：主流程与零散业务页拆分为两个 `NavHostFragment`
+- 数据层：部分流程仍使用 mock 数据，核心模块已接入 `Room + Hilt + DataStore`
+- 当前阶段：以功能验证和模块化重构并行为主
 
 ## 功能概览
+
 - 首页双模式：`我来取` / `找人取`
-- 订单：创建订单、任务列表、订单详情、历史
-- 社区：帖子流、帖子详情、评论/回复、点赞、分享
+- 订单：创建、列表、详情、历史
+- 社区：帖子流、详情、评论回复、点赞、分享
 - 消息：会话列表、好友/群组、聊天（文本/相册/拍照/图片预览）
-- 商城：店铺页、商品列表、加购面板、店铺搜索
-- 二手：二手商品列表、分类浏览、发布二手商品
-- 账户：登录、注册、找回密码、切换账号
-- 个人中心：我的喜欢、我的话题、设置、个人信息、账户安全
-- 搜索：商品/社区/好友群聊/店铺 多场景搜索历史
+- 商城：店铺页、商品列表、购物车入口、店铺搜索
+- 二手：列表、分类浏览、发布流程
+- 账号：登录、注册、找回密码、账号切换
+- 个人中心：收藏、话题、设置、个人信息、账号安全
+- 搜索：商品/社区/好友群聊/店铺等多场景历史搜索
 
-## 环境与构建
-### 基础要求
+## 开发环境
+
 - Android Studio（建议稳定版）
-- JDK 11（项目编译目标）
-- Android SDK：`compileSdk=36`，`targetSdk=36`，`minSdk=24`
+- JDK 11
+- Android SDK：
+  - `compileSdk = 36`
+  - `targetSdk = 36`
+  - `minSdk = 24`
+- Gradle Wrapper：`8.13`
+- AGP：`8.11.2`
+- Kotlin：`2.0.21`
 
-### 本地运行
+## 快速运行
+
+Windows:
+
 ```powershell
 .\gradlew.bat assembleDebug
 .\gradlew.bat test
 ```
 
+macOS / Linux:
+
+```bash
+./gradlew assembleDebug
+./gradlew test
+```
+
 ## 核心架构
+
 ### UI 层
-- 组织方式：`activity/.../view` + `viewModel`
-- 状态驱动：`ViewModel + LiveData + DataBinding`
+
+- 目录组织：`activity/.../view` + `.../viewmodel`
+- 状态管理：`ViewModel + LiveData + DataBinding`
 - 主要布局目录：`app/src/main/res/layout`
 
 ### 导航层
-- 主导航（底栏四大页）：`app/src/main/res/navigation/nav_graph.xml`
-- 登录导航：`app/src/main/res/navigation/nav_graph_login.xml`
-- 杂项业务导航（创建订单/帖子详情/聊天等）：`app/src/main/res/navigation/nav_new.xml`
-- 关键实现：`MainActivity` 中维护两个 `NavHostFragment`，通过 `openNewFragment` 状态控制显示。
+
+- 主导航：`app/src/main/res/navigation/nav_graph.xml`
+- 首页子图：`app/src/main/res/navigation/nav_graph_home.xml`
+- 登录流：`app/src/main/res/navigation/nav_graph_login.xml`
+- 零散业务流：`app/src/main/res/navigation/nav_new.xml`
 
 ### 数据层
-- DI：Hilt（`@HiltAndroidApp` + `di/DatabaseModule.kt`）
-- Room 数据库：`model/AppDataBase/AppDatabase.kt`
+
+- 依赖注入：Hilt（`@HiltAndroidApp` + `di/DatabaseModule.kt`）
+- 数据库：`model/AppDataBase/AppDatabase.kt`
   - DB 名称：`grab_this_for_me_core_db`
   - 迁移策略：`fallbackToDestructiveMigration()`
-  - 当前版本：`version = 9`
-- 已接入 DAO：`SearchDao`、`UserDao`、`GoodsDao`、`MessageDao`、`ConversationDao`、`OrderDao`
-- DataStore：`model/user/data/datastore/UserSettingsDataStore.kt`
+  - 当前版本：`version = 16`
+- 已注入 DAO：
+  - `SearchDao`
+  - `UserDao`
+  - `GoodsDao`
+  - `MessageDao`
+  - `ConversationDao`
+  - `OrderDao`
+  - `PostDao`
+  - `StoreDao`
+- 本地偏好：`model/user/data/datastore/UserSettingsDataStore.kt`
 
-## 模型分层与目录约定
-模型目录位于 `app/src/main/java/com/example/grabthisforme/model/`，当前采用“模块内分层”：
-- `data/dto`：网络/传输模型
-- `data/entity`：Room 实体
-- `data/dao`：数据库访问
-- `domain`：业务模型
-- `mapper`：模型转换（常见链路：`dto -> domain <-> entity`）
+## 目录约定
 
-当前已较完整分层的模块（示例）：
+主模型目录：`app/src/main/java/com/example/grabthisforme/model/`
+
+当前主要模块：
+
 - `goods`
 - `secondhandGoods`
 - `user`
-- `store`（DTO + Domain，不含 Entity）
+- `store`
 - `conversation`
 - `messageContent`
 - `Order`
 - `Post`
 
-注意：目录名存在历史大小写混用（例如 `model/Post`、`model/Order`），但 Kotlin 包名使用小写 `model.post`、`model.order`。新增代码请保持包名小写并遵循现有模块结构。
+说明：
 
-## 关键入口文件索引
+- 历史目录名里存在大小写混用（如 `Order`、`Post`）
+- Kotlin 包名应保持小写（如 `model.order`、`model.post`）
+- 新增代码请优先遵循现有模块内部的 `data / domain / mapper` 分层
+
+## 关键入口文件
+
 - Application：`app/src/main/java/com/example/grabthisforme/activity/myApp/MyApp.kt`
 - 主 Activity：`app/src/main/java/com/example/grabthisforme/activity/mainactivity/view/MainActivity.kt`
 - 登录 Activity：`app/src/main/java/com/example/grabthisforme/activity/LoginActivity/view/LoginActivity.kt`
-- DB 定义：`app/src/main/java/com/example/grabthisforme/model/AppDataBase/AppDatabase.kt`
-- Hilt DB 注入：`app/src/main/java/com/example/grabthisforme/di/DatabaseModule.kt`
+- Hilt DB 模块：`app/src/main/java/com/example/grabthisforme/di/DatabaseModule.kt`
+- Room DB 定义：`app/src/main/java/com/example/grabthisforme/model/AppDataBase/AppDatabase.kt`
+- AndroidManifest：`app/src/main/AndroidManifest.xml`
 
-## UI Skill 文档（批量生成同风格页面）
-位于 `docs/skills/`：
+## 权限说明
+
+- 相册读取：聊天选图
+- 相机：拍照发送
+- `FileProvider`：拍照 URI 安全共享
+
+## UI Skill 文档
+
+位置：`docs/skills/`
+
 - 总索引：`docs/skills/README.md`
 - UI 分类：`docs/skills/ui/README.md`
 - 表单分类：`docs/skills/ui/forms/README.md`
 - 创建类表单规范：`docs/skills/ui/forms/create-data-entry/SKILL.md`
-- 认证页规范（登录/注册/找回）：`docs/skills/ui/forms/auth-login-register-recover/SKILL.md`
+- 认证页规范：`docs/skills/ui/forms/auth-login-register-recover/SKILL.md`
 
-后续新增 skill 建议结构：
-- `docs/skills/ui/<子域>/<skill-id>/SKILL.md`
 
-## 权限说明
-- 相册读取：聊天选图
-- 相机：拍照发送
-- FileProvider：拍照 URI 安全共享
-
-## 当前阶段说明
-- 项目偏原型验证，部分数据与流程仍为 mock。
-- 存在一定历史代码风格差异（命名、目录层级、大小写），重构按模块渐进进行。
-
-## License
-仓库当前未声明开源 License。
