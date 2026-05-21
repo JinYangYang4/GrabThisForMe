@@ -1,16 +1,37 @@
 ﻿package com.example.grabthisforme.activity.fragment_misc.storeFragment.view
 
-import android.app.Dialog
-import android.content.res.ColorStateList
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Color as ComposeColor
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -19,10 +40,19 @@ import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.fragment_misc.storeFragment.adpter.CategoryManageRecyclerViewAdapter
 import com.example.grabthisforme.activity.fragment_misc.storeFragment.adpter.CategorySortRecyclerViewAdapter
 import com.example.grabthisforme.databinding.CategoryManagerBottomDialogBinding
+import com.example.grabthisforme.ui.liquidglass.components.LiquidBottomTab
+import com.example.grabthisforme.ui.liquidglass.components.LiquidBottomTabs
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.shape.MaterialShapeDrawable
+import com.kyant.backdrop.backdrops.layerBackdrop
+import com.kyant.backdrop.backdrops.rememberCanvasBackdrop
+import com.kyant.backdrop.backdrops.rememberLayerBackdrop
+import android.graphics.Canvas
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 
 class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
 
@@ -35,6 +65,8 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
 
     private val categoryList: MutableList<String> = mutableListOf()
     private var renameTargetIndex: Int = RecyclerView.NO_POSITION
+    private var currentTabMode by mutableStateOf(TabMode.ADD)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +89,9 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
         initCategoryData()
         initRecyclerViews()
         initClickEvents()
-        showTab(TabMode.ADD)
+        prepareTabContentContainers()
+        initTabGroup()
+        showTab(currentTabMode)
     }
 
     override fun onStart() {
@@ -180,11 +214,6 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
             dismiss()
         }
 
-        binding.tvTabAdd.setOnClickListener { showTab(TabMode.ADD) }
-        binding.tvTabRename.setOnClickListener { showTab(TabMode.RENAME) }
-        binding.tvTabDelete.setOnClickListener { showTab(TabMode.DELETE) }
-        binding.tvTabSort.setOnClickListener { showTab(TabMode.SORT) }
-
         binding.tvAddCategoryCancel.setOnClickListener {
             binding.etNewCategoryName.text?.clear()
         }
@@ -231,6 +260,111 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
             refreshCategoryAdapters()
         }
     }
+
+
+    private fun initTabGroup() {
+        binding.llTabGroup.setViewCompositionStrategy(
+            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+        )
+        binding.llTabGroup.setContent {
+            BottomTabsContent()
+        }
+    }
+    @Composable
+    private fun BottomTabsContent(){
+        val backdrop = rememberLayerBackdrop()
+        Image(
+            painter = rememberShapeBitmapPainter(R.drawable.bg_round_stripe),
+            contentDescription = null,
+            modifier = Modifier
+                .layerBackdrop(backdrop)
+                .height(80.dp)
+                .fillMaxWidth(),
+            contentScale = ContentScale.Crop
+        )
+
+
+        LiquidBottomTabs(
+            selectedTabIndex = { currentTabMode.ordinal },
+            onTabSelected = { index ->
+                TabMode.values().getOrNull(index)?.let{showTab(it,false)}
+            },
+            backdrop = backdrop,
+            tabsCount = TabMode.values().size,
+            modifier = Modifier.fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 20.dp),
+            onDragProgress = {
+                TabMode.values().getOrNull(it)?.let{(showTab(it,true))}
+            }
+        ) {
+            TabMode.values().forEach { tabMode ->
+                LiquidBottomTab(
+                    onClick = { showTab(tabMode,false) }
+                ) {
+                    BasicText(
+                        tabMode.title,
+                        style = TextStyle(ComposeColor.Black, 12f.sp)
+                    )
+                }
+            }
+        }
+
+    }
+    fun drawableToBitmap(
+        context: android.content.Context,
+        @DrawableRes resId: Int,
+        width: Int = Int.MIN_VALUE,
+        height: Int = Int.MIN_VALUE
+    ): Bitmap {
+        val drawable = context.resources.getDrawable(resId, null).mutate()
+
+        val w = if (width != Int.MIN_VALUE) width else drawable.intrinsicWidth.let {
+            if (it > 0) it else 100 // 没有固有尺寸时给一个默认值
+        }
+        val h = if (height != Int.MIN_VALUE) height else drawable.intrinsicHeight.let {
+            if (it > 0) it else 100
+        }
+
+        val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+        return bitmap
+    }
+
+    @Composable
+    fun rememberShapeBitmapPainter(@DrawableRes resId: Int, width: Int = Int.MIN_VALUE, height: Int = Int.MIN_VALUE): BitmapPainter {
+        val context = LocalContext.current
+        val bitmap = remember(resId, width, height) {
+            drawableToBitmap(context, resId, width, height)
+        }
+        return BitmapPainter(bitmap.asImageBitmap())
+    }
+
+    private fun prepareTabContentContainers() {
+        val contentViews = listOf(
+            binding.llAddCategoryContent,
+            binding.llRenameCategoryContent,
+            binding.llDeleteCategoryContent,
+            binding.llSortCategoryContent
+        )
+        contentViews.forEach { content ->
+            content.visibility = View.VISIBLE
+            content.alpha = 0f
+            content.isEnabled = false
+            content.isClickable = false
+            content.isFocusable = false
+        }
+    }
+
+    private fun setTabContentVisible(content: View, visible: Boolean) {
+        content.visibility = if (visible) View.VISIBLE else View.INVISIBLE
+        content.alpha = if (visible) 1f else 0f
+        content.isEnabled = visible
+        content.isClickable = visible
+        content.isFocusable = visible
+    }
+
     private fun applySortedResult(sorted: List<String>) {
         if (categoryList == sorted) return
         categoryList.clear()
@@ -244,29 +378,17 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
         sortAdapter.submitList(categoryList.toList())
     }
 
-    private fun showTab(tabMode: TabMode) {
-        binding.llAddCategoryContent.visibility = if (tabMode == TabMode.ADD) View.VISIBLE else View.GONE
-        binding.llRenameCategoryContent.visibility = if (tabMode == TabMode.RENAME) View.VISIBLE else View.GONE
-        binding.llDeleteCategoryContent.visibility = if (tabMode == TabMode.DELETE) View.VISIBLE else View.GONE
-        binding.llSortCategoryContent.visibility = if (tabMode == TabMode.SORT) View.VISIBLE else View.GONE
+    private fun showTab(tabMode: TabMode,comeFromDrag : Boolean = true) {
+        Log.d("test11", "showTab: $comeFromDrag")
+        if (!comeFromDrag){
+            currentTabMode = tabMode
+        }
+        setTabContentVisible(binding.llAddCategoryContent, tabMode == TabMode.ADD)
+        setTabContentVisible(binding.llRenameCategoryContent, tabMode == TabMode.RENAME)
+        setTabContentVisible(binding.llDeleteCategoryContent, tabMode == TabMode.DELETE)
+        setTabContentVisible(binding.llSortCategoryContent, tabMode == TabMode.SORT)
         if (tabMode != TabMode.RENAME) {
             binding.llRenameInputContainer.visibility = View.GONE
-        }
-        updateTabStyle(binding.tvTabAdd, tabMode == TabMode.ADD)
-        updateTabStyle(binding.tvTabRename, tabMode == TabMode.RENAME)
-        updateTabStyle(binding.tvTabDelete, tabMode == TabMode.DELETE)
-        updateTabStyle(binding.tvTabSort, tabMode == TabMode.SORT)
-    }
-
-    private fun updateTabStyle(tabView: TextView, isSelected: Boolean) {
-        if (isSelected) {
-            tabView.setBackgroundResource(R.drawable.bg_rounded_white)
-            tabView.setTextColor(requireContext().getColor(R.color.orange_primary))
-            tabView.setTypeface(null, android.graphics.Typeface.BOLD)
-        } else {
-            tabView.setBackgroundResource(android.R.color.transparent)
-            tabView.setTextColor(requireContext().getColor(R.color.gray_800))
-            tabView.setTypeface(null, android.graphics.Typeface.NORMAL)
         }
     }
 
@@ -301,7 +423,10 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private enum class TabMode {
-        ADD, RENAME, DELETE, SORT
+    private enum class TabMode(val title: String) {
+        ADD("新增"),
+        RENAME("重命名"),
+        DELETE("删除"),
+        SORT("排序")
     }
 }
