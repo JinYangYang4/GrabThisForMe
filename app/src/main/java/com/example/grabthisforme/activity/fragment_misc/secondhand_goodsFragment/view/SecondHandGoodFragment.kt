@@ -49,20 +49,11 @@ class SecondHandGoodFragment() : Fragment() {
     }
 
     private fun initViewPager() {
-        val adapter = GoodsViewPager2Adapter(this)
+        val goodsCategoryList = Goods.GoodsCategory.entries.toList()
+        val adapter = GoodsViewPager2Adapter(this, goodsCategoryList)
         binding.vpGoodsContent.adapter = adapter
-        val goodsCategoryList = listOf(
-            Goods.GoodsCategory.DIGITAL.desc,
-            Goods.GoodsCategory.CLOTHING.desc,
-            Goods.GoodsCategory.HOME.desc,
-            Goods.GoodsCategory.BOOK.desc,
-            Goods.GoodsCategory.BEAUTY.desc,
-            Goods.GoodsCategory.SPORT.desc,
-            Goods.GoodsCategory.FOOD.desc,
-            Goods.GoodsCategory.OTHER.desc
-        )
         TabLayoutMediator(binding.tlGoodsCategory,binding.vpGoodsContent,){tab,position ->
-            tab.text =goodsCategoryList.getOrNull(position)?: ""
+            tab.text = goodsCategoryList.getOrNull(position)?.desc.orEmpty()
         }.attach()
     }
 }

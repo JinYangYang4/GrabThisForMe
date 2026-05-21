@@ -1,9 +1,12 @@
 package com.example.grabthisforme.activity.fragment_misc.create.viewModel
 
+import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.grabthisforme.activity.fragment_misc.secondhand_goodsFragment.viewModel.SecondHandsViewModel
 import com.example.grabthisforme.model.goods.data.repository.GoodsRepository
 import com.example.grabthisforme.model.goods.domain.Goods
 import com.example.grabthisforme.model.goods.domain.GoodsStateInfo
@@ -24,6 +27,19 @@ class CreateSecondHandGoodsViewModel @Inject constructor(
     private val _createResult = MutableLiveData<CreateSecondhandResult>()
     val createResult: LiveData<CreateSecondhandResult> get() = _createResult
 
+    private val _selectedPhotoUri = MutableLiveData<Uri?>()
+    val selectedPhotoUri: LiveData<Uri?> get() = _selectedPhotoUri
+
+    private val _qualityList = MutableLiveData<List<String>>(
+        SecondHandsViewModel.createCreateConditionList().map { it.conditionText }
+    )
+    val qualityList: LiveData<List<String>> get() = _qualityList
+
+    fun selectPhoto(uri: Uri) {
+        _selectedPhotoUri.value = uri
+        Log.d("test11", "selectPhoto: ")
+    }
+
     fun submitSecondhandGoods(
         name: String,
         message: String,
@@ -37,31 +53,26 @@ class CreateSecondHandGoodsViewModel @Inject constructor(
         categoryText: String
     ) {
         if (name.isBlank() || message.isBlank() || secondhandPriceText.isBlank() || quality.isBlank()) {
-            _createResult.value = CreateSecondhandResult(
-                success = false,
-                message = "请先填写完整必填项"
-            )
+            _createResult.value = CreateSecondhandResult(false, "请先填写完整必填项")
+            return
+        }
+        if (pic.isBlank()) {
+            _createResult.value = CreateSecondhandResult(false, "请选择商品图片")
             return
         }
         if (categoryText.isBlank() || categoryText == "请选择商品类别") {
-            _createResult.value = CreateSecondhandResult(
-                success = false,
-                message = "请选择商品类别"
-            )
+            _createResult.value = CreateSecondhandResult(false, "请选择商品类别")
             return
         }
 
         val secondhandPrice = secondhandPriceText.toDoubleOrNull()
         if (secondhandPrice == null || secondhandPrice <= 0.0) {
-            _createResult.value = CreateSecondhandResult(
-                success = false,
-                message = "二手价格格式不正确"
-            )
+            _createResult.value = CreateSecondhandResult(false, "二手价格格式不正确")
             return
         }
 
         val originalPrice = originalPriceText.toDoubleOrNull() ?: secondhandPrice
-        val saleNumber = saleNumberText.toLongOrNull() ?: 1L
+        val saleNumber = saleNumberText.toLongOrNull()?.coerceAtLeast(1L) ?: 1L
         val category = mapCategory(categoryText)
         val enhancedMessage = if (remark.isNotBlank()) "$message\n备注：$remark" else message
 
@@ -75,7 +86,7 @@ class CreateSecondHandGoodsViewModel @Inject constructor(
                     message = enhancedMessage,
                     category = category,
                     secondhandPrice = secondhandPrice,
-                    sale_number = saleNumber.coerceAtLeast(1L),
+                    sale_number = saleNumber,
                     pic = pic,
                     originalPrice = originalPrice,
                     quality = quality,
@@ -87,18 +98,10 @@ class CreateSecondHandGoodsViewModel @Inject constructor(
                 )
                 goodsRepository.saveSecondhandGoods(goods)
             }.onSuccess {
-                _createResult.postValue(
-                    CreateSecondhandResult(
-                        success = true,
-                        message = "二手商品发布成功"
-                    )
-                )
+                _createResult.postValue(CreateSecondhandResult(true, "二手商品发布成功"))
             }.onFailure {
                 _createResult.postValue(
-                    CreateSecondhandResult(
-                        success = false,
-                        message = "发布失败: ${it.message ?: "未知错误"}"
-                    )
+                    CreateSecondhandResult(false, "发布失败: ${it.message ?: "未知错误"}")
                 )
             }
         }

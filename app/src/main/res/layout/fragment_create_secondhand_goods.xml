@@ -309,18 +309,19 @@
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="* 物品成色（如 99新、95新、8新）"
+                            android:hint="* 物品成色"
                             app:hintTextColor="#999999"
                             app:boxStrokeColor="#E8E8E8"
                             app:boxStrokeWidth="0dp"
                             app:hintEnabled="true">
 
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/it_secondhand_quality"
+                            <Spinner
+                                android:id="@+id/sp_secondhand_quality"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textSize="15sp"
-                                android:paddingVertical="8dp"
+                                android:layout_marginTop="8dp"
+                                android:popupBackground="@drawable/bg_round_stripe"
+                                android:spinnerMode="dropdown"
                                 android:background="@null"/>
                         </com.google.android.material.textfield.TextInputLayout>
 

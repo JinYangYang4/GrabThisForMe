@@ -3,19 +3,16 @@ package com.example.grabthisforme.activity.fragment_misc.secondhand_goodsFragmen
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.grabthisforme.activity.fragment_misc.secondhand_goodsFragment.view.FragmentRecyclerViewGoods
+import com.example.grabthisforme.model.goods.domain.Goods
 
+class GoodsViewPager2Adapter(
+    fragment: Fragment,
+    private val categories: List<Goods.GoodsCategory>
+) : FragmentStateAdapter(fragment) {
 
-class GoodsViewPager2Adapter(fragment : Fragment) :
-    FragmentStateAdapter(fragment) {
-
-    override fun getItemCount(): Int = 8
+    override fun getItemCount(): Int = categories.size
 
     override fun createFragment(position: Int): Fragment {
-        return when (position) {
-            0 -> FragmentRecyclerViewGoods()
-            1 -> FragmentRecyclerViewGoods()
-            2 -> FragmentRecyclerViewGoods()
-            else -> FragmentRecyclerViewGoods()
-        }
+        return FragmentRecyclerViewGoods.newInstance(categories[position])
     }
 }

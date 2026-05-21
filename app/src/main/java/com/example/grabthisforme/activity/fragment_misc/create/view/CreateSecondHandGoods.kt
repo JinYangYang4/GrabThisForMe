@@ -7,11 +7,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.bumptech.glide.Glide
+import com.example.grabthisforme.R
+import com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.BottomSheetDialogPhoto
 import com.example.grabthisforme.activity.fragment_misc.create.viewModel.CreateSecondHandGoodsViewModel
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentCreateSecondhandGoodsBinding
@@ -35,6 +39,8 @@ class CreateSecondHandGoods : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+        observeQualityOptions()
+        observeSelectedPhoto()
         observeCreateResult()
         ViewCompat.setOnApplyWindowInsetsListener(requireView()) { _, insets ->
             val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
@@ -61,6 +67,10 @@ class CreateSecondHandGoods : Fragment() {
             clearInputFocus()
         }
 
+        binding.ivSecondhandPic.setOnClickListener {
+            openPhotoPicker()
+        }
+
         binding.btnPublishSecondhand.isEnabled = true
 
         binding.btnMinus.setOnClickListener {
@@ -80,7 +90,7 @@ class CreateSecondHandGoods : Fragment() {
                 message = binding.itSecondhandMessage.text?.toString()?.trim().orEmpty(),
                 secondhandPriceText = binding.itSecondhandPrice.text?.toString()?.trim().orEmpty(),
                 originalPriceText = binding.itSecondhandOriginalPrice.text?.toString()?.trim().orEmpty(),
-                quality = binding.itSecondhandQuality.text?.toString()?.trim().orEmpty(),
+                quality = binding.spSecondhandQuality.selectedItem?.toString().orEmpty(),
                 usedTime = binding.itSecondhandUsedTime.text?.toString()?.trim().orEmpty(),
                 remark = binding.itSecondhandRemark.text?.toString()?.trim().orEmpty(),
                 saleNumberText = binding.tvSaleNumber.text?.toString()?.trim().orEmpty(),
@@ -88,6 +98,40 @@ class CreateSecondHandGoods : Fragment() {
                 categoryText = binding.spSecondhandCategory.selectedItem?.toString().orEmpty()
             )
         }
+    }
+
+    private fun observeQualityOptions() {
+        viewModel.qualityList.observe(viewLifecycleOwner) { qualityList ->
+            val adapter = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                qualityList
+            )
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            binding.spSecondhandQuality.adapter = adapter
+        }
+    }
+
+    private fun observeSelectedPhoto() {
+        viewModel.selectedPhotoUri.observe(viewLifecycleOwner) { photoUrl ->
+            if (photoUrl == null) return@observe
+            Glide.with(this)
+                .load(photoUrl)
+                .placeholder(R.drawable.ic_add)
+                .error(R.drawable.ic_add)
+                .into(binding.ivSecondhandPic)
+            binding.ivSecondhandPic.tag = photoUrl.toString()
+        }
+    }
+
+    private fun openPhotoPicker() {
+        val dialog = BottomSheetDialogPhoto.newInstance(BottomSheetDialogPhoto.SELECT_NUM_LIMIT)
+        dialog.setOnPhotosSelectedListener(object : BottomSheetDialogPhoto.OnPhotosSelectedListener {
+            override fun onPhotosSelected(photos: List<android.net.Uri>) {
+                photos.firstOrNull()?.let { viewModel.selectPhoto(it) }
+            }
+        })
+        dialog.show(childFragmentManager, "select_secondhand_photo")
     }
 
     private fun clearInputFocus(){
