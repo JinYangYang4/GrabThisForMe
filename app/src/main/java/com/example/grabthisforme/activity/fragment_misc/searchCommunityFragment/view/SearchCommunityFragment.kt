@@ -134,6 +134,7 @@ class SearchCommunityFragment : Fragment() {
         setOnItemComponentShowListener(searchAdapterHistory)
 
         binding.rvHistory.adapter = searchAdapterHistory
+        binding.rvHistory.itemAnimator = null
         searchAdapterHistory.submitList(ViewModel.searchHistoryList.value)
 
         binding.rvRecomment.layoutManager = GridLayoutManager(context, 2)

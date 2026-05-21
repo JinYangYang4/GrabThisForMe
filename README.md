@@ -4,9 +4,10 @@
 
 ## 项目现状
 
-- 架构：`MVVM + XML + DataBinding`，同时启用 `Jetpack Compose`（目前不是主要 UI 实现方式）
+- 架构：`MVVM + XML + DataBinding`，部分局部交互已接入 `Jetpack Compose`
 - 导航：主流程与零散业务页拆分为两个 `NavHostFragment`
 - 数据层：部分流程仍使用 mock 数据，核心模块已接入 `Room + Hilt + DataStore`
+- UI 效果：引入 `io.github.kyant0:backdrop`，用于液态玻璃类 Compose 组件
 - 当前阶段：以功能验证和模块化重构并行为主
 
 ## 功能概览
@@ -31,7 +32,17 @@
   - `minSdk = 24`
 - Gradle Wrapper：`8.13`
 - AGP：`8.11.2`
-- Kotlin：`2.0.21`
+- Kotlin：`2.3.10`
+- Hilt：`2.57.2`
+- Backdrop：`1.0.6`
+
+## 近期变更
+
+- `kyant.backdrop` 已从本地源码复制切换为 Maven 依赖：`io.github.kyant0:backdrop:1.0.6`
+- Kotlin 升级到 `2.3.10`，并迁移到 `compilerOptions` 配置 `jvmTarget`
+- Hilt 升级到 `2.57.2`，用于兼容新 Kotlin metadata
+- 搜索历史列表已关闭 `RecyclerView.itemAnimator`，减少删除/刷新时的闪动
+- 分类管理底部弹窗的 tab 区域已接入 Compose + LiquidBottomTabs
 
 ## 快速运行
 
@@ -127,5 +138,4 @@ macOS / Linux:
 - 表单分类：`docs/skills/ui/forms/README.md`
 - 创建类表单规范：`docs/skills/ui/forms/create-data-entry/SKILL.md`
 - 认证页规范：`docs/skills/ui/forms/auth-login-register-recover/SKILL.md`
-
 

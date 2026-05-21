@@ -1,6 +1,5 @@
 package com.example.grabthisforme.ui.liquidglass.components
 
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.spring

@@ -139,7 +139,7 @@ class MainActivity : AppCompatActivity() {
         }
             backCallback = object : OnBackPressedCallback(true){
                 override fun handleOnBackPressed() {
-                    if (viewModel.drawerOpenState.value){
+                    if (viewModel.drawerOpenState.value == true){
                         viewModel.drawerOpenStateToClose()
                         return
                     }
@@ -209,7 +209,7 @@ class MainActivity : AppCompatActivity() {
     fun intentToMiscFragment(id : Int){
         val navController = navNewFragment.navController
         navController.navigate(id)
-        if (viewModel.drawerOpenState.value){
+        if (viewModel.drawerOpenState.value == true){
             binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         }
 
@@ -218,7 +218,7 @@ class MainActivity : AppCompatActivity() {
         val navController = navNewFragment.navController
         val action = BlankFragmentDirections.actionBlankFragmentToOrderExecutorFragment(ac)
         navController.navigate(action)
-        if (viewModel.drawerOpenState.value){
+        if (viewModel.drawerOpenState.value == true){
             binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         }
     }

@@ -66,6 +66,7 @@ class FragmentSearchFriendOrGroupOrConversation : Fragment() {
         setOnItemComponentShowListener(searchAdapterHistory)
         binding.rvHistory.layoutManager =  GridLayoutManager(context, 2)
         binding.rvHistory.adapter = searchAdapterHistory
+        binding.rvHistory.itemAnimator = null
     }
     private fun initObserve(){
         viewModel.searchHistoryList.observe(viewLifecycleOwner){list ->

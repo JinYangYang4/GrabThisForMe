@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("org.jetbrains.kotlin.plugin.compose") version "2.0.0"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.3.10"
     id("androidx.navigation.safeargs.kotlin")
     id ("com.google.dagger.hilt.android")
     id ("kotlin-kapt")
@@ -43,8 +43,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
     }
 }
 
@@ -53,9 +56,11 @@ dependencies {
     val compose_version = "1.9.5"
     val navVersion = "2.7.7"
     val room_version = "2.8.4"
+    val hilt_version = "2.57.2"
+    val backdrop_version = "1.0.6"
     // Hilt
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt ("com.google.dagger:hilt-android-compiler:2.51.1")
+    implementation("com.google.dagger:hilt-android:$hilt_version")
+    kapt ("com.google.dagger:hilt-android-compiler:$hilt_version")
 
 
     implementation("com.google.android.flexbox:flexbox:3.0.0")
@@ -86,6 +91,9 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.6.8")
     implementation("androidx.compose.runtime:runtime-livedata:${compose_version}")
     implementation("androidx.activity:activity-compose:1.9.0")
+
+    implementation("io.github.kyant0:backdrop:$backdrop_version")
+
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")

@@ -172,6 +172,7 @@ class SearchGoodsFragment : Fragment(){
             orientation = LinearLayoutManager.VERTICAL
         }
         binding.rvHistory.layoutManager = gridLayoutManager
+        binding.rvHistory.itemAnimator = null
 
     }
     private fun initClickListener() {
