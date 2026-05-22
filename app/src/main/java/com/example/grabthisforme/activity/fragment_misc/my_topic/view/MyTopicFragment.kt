@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.communityFragment.adpter.CommunityVP2_RVAdapter
 import com.example.grabthisforme.databinding.FragmentMyTopicBinding
@@ -48,8 +47,9 @@ class MyTopicFragment : Fragment() {
         val layoutManager = LinearLayoutManager(context)
         layoutManager.orientation = RecyclerView.VERTICAL
         binding.rvTopic.layoutManager = layoutManager
-        topicAdapter = CommunityVP2_RVAdapter(){
-            (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_myTopicFragment_to_postDetailFragment)
+        topicAdapter = CommunityVP2_RVAdapter { postId ->
+            val action = MyTopicFragmentDirections.actionMyTopicFragmentToPostDetailFragment(postId)
+            (requireActivity() as MainActivity).NewNavController_navgite(action)
         }
         binding.rvTopic.adapter = topicAdapter
         binding.rvTopic.setHasFixedSize(true)

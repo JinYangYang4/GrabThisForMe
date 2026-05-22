@@ -41,11 +41,35 @@ data class UserProfileEntity(
     val signature: String? = null
 )
 
+@Entity(
+    tableName = "user_like",
+    foreignKeys = [
+        ForeignKey(
+            entity = UserAccountEntity::class,
+            parentColumns = ["userId"],
+            childColumns = ["userId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index(value = ["userId"], unique = true)]
+)
+data class UserLikeEntity(
+    @PrimaryKey val userId: Long,
+    val likedPostIdsJson: String = "[]",
+    val likedStoreIdsJson: String = "[]",
+    val likedGoodsIdsJson: String = "[]"
+)
+
 data class UserBundleEntity(
     @Embedded val account: UserAccountEntity,
     @Relation(
         parentColumn = "userId",
         entityColumn = "userId"
     )
-    val profile: UserProfileEntity?
+    val profile: UserProfileEntity?,
+    @Relation(
+        parentColumn = "userId",
+        entityColumn = "userId"
+    )
+    val likes: UserLikeEntity?
 )

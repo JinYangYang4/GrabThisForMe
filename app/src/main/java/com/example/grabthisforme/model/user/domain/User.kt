@@ -6,7 +6,8 @@ data class User(
     val account: UserAccount,
     val profile: UserProfile,
     val setting: UserSetting? = null,
-    val statistics: UserStatistics = UserStatistics()
+    val statistics: UserStatistics = UserStatistics(),
+    val likes: UserLike = UserLike()
 ) {
     val id: Long get() = account.userId
     val accountName: String get() = account.accountName
@@ -22,6 +23,9 @@ data class User(
     val likeCount: Long get() = statistics.likeCount
     val fanCount: Long get() = statistics.fanCount
     val followCount: Long get() = statistics.followCount
+    val likedPostIds: List<String> get() = likes.likedPostIds
+    val likedStoreIds: List<Long> get() = likes.likedStoreIds
+    val likedGoodsIds: List<Long> get() = likes.likedGoodsIds
 
     constructor(
         id: Long,
@@ -40,7 +44,10 @@ data class User(
         setting: UserSetting? = null,
         likeCount: Long = 0L,
         fanCount: Long = 0L,
-        followCount: Long = 0L
+        followCount: Long = 0L,
+        likedPostIds: List<String> = emptyList(),
+        likedStoreIds: List<Long> = emptyList(),
+        likedGoodsIds: List<Long> = emptyList()
     ) : this(
         account = UserAccount(
             userId = id,
@@ -65,6 +72,11 @@ data class User(
             likeCount = likeCount,
             fanCount = fanCount,
             followCount = followCount
+        ),
+        likes = UserLike(
+            likedPostIds = likedPostIds,
+            likedStoreIds = likedStoreIds,
+            likedGoodsIds = likedGoodsIds
         )
     )
 
@@ -92,6 +104,20 @@ data class User(
                 likeCount = likeCount,
                 fanCount = fanCount,
                 followCount = followCount
+            )
+        )
+    }
+
+    fun withLikes(
+        likedPostIds: List<String> = likes.likedPostIds,
+        likedStoreIds: List<Long> = likes.likedStoreIds,
+        likedGoodsIds: List<Long> = likes.likedGoodsIds
+    ): User {
+        return copy(
+            likes = likes.copy(
+                likedPostIds = likedPostIds,
+                likedStoreIds = likedStoreIds,
+                likedGoodsIds = likedGoodsIds
             )
         )
     }

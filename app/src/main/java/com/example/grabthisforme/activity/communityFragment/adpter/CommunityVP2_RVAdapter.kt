@@ -4,9 +4,12 @@ import android.annotation.SuppressLint
 import android.view.View
 import android.view.LayoutInflater
 import android.view.ViewGroup
+
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.communityFragment.custom.MaxLinesGridLayoutManager
 import com.example.grabthisforme.activity.fragment_misc.post_topic.adapter.ImagesRecyclerviewAdapter
 import com.example.grabthisforme.databinding.PostRvItemBinding
@@ -56,7 +59,6 @@ class CommunityVP2_RVAdapter(val clickListener:(taskId : String) -> Unit) : List
             binding.sendTime.text = formatTimestampToDateTime(post.createTime.toLong())
             binding.contents.text = post.content
             binding.senderName.text = post.authorName
-
             val images = post.images.filter { it.isNotBlank() }
             val visibleImages = images.take(MAX_IMAGE_COUNT)
             val hiddenCount = images.size - visibleImages.size
@@ -67,6 +69,12 @@ class CommunityVP2_RVAdapter(val clickListener:(taskId : String) -> Unit) : List
                 binding.rvPostImages.visibility = View.VISIBLE
                 imagesAdapter.submitImages(visibleImages, hiddenCount)
             }
+            Glide.with(binding.root.context)
+                .load(post.authorAvatarUrl)
+                .placeholder(R.drawable.cat)
+                .error(R.drawable.cat)
+                .into(binding.ivAvatar)
+
 
             binding.clItem.setOnClickListener {
                 clickListener.invoke(post.postId)

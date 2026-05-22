@@ -32,6 +32,18 @@ data class UserStatistics(
     val followCount: Long = 0L
 )
 
+data class UserLike(
+    val likedPostIds: List<String> = emptyList(),
+    val likedStoreIds: List<Long> = emptyList(),
+    val likedGoodsIds: List<Long> = emptyList()
+) {
+    fun hasLikedPost(postId: String): Boolean = likedPostIds.contains(postId)
+
+    fun hasLikedStore(storeId: Long): Boolean = likedStoreIds.contains(storeId)
+
+    fun hasLikedGoods(goodsId: Long): Boolean = likedGoodsIds.contains(goodsId)
+}
+
 data class UserSetting(
     val themeMode: Int = 0,
     val homePageMode: Int = 0,

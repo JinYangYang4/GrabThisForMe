@@ -16,6 +16,7 @@ import com.example.grabthisforme.model.messageContent.data.dao.MessageDao
 import com.example.grabthisforme.model.conversation.data.entity.ConversationEntity
 import com.example.grabthisforme.model.messageContent.data.entity.MessageEntity
 import com.example.grabthisforme.model.post.data.dao.PostDao
+import com.example.grabthisforme.model.post.data.entity.PostCommentEntity
 import com.example.grabthisforme.model.post.data.entity.PostEntity
 import com.example.grabthisforme.model.order.data.dao.OrderDao
 import com.example.grabthisforme.model.order.data.entity.OrderEntity
@@ -24,6 +25,7 @@ import com.example.grabthisforme.model.store.data.dao.StoreDao
 import com.example.grabthisforme.model.store.data.entity.StoreEntity
 import com.example.grabthisforme.model.user.data.dao.UserDao
 import com.example.grabthisforme.model.user.data.entity.UserAccountEntity
+import com.example.grabthisforme.model.user.data.entity.UserLikeEntity
 import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
 
 @Database(
@@ -31,6 +33,7 @@ import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
         SearchContent::class,
         UserAccountEntity::class,
         UserProfileEntity::class,
+        UserLikeEntity::class,
         GoodsBaseEntity::class,
         GoodsPriceEntity::class,
         GoodsUiEntity::class,
@@ -40,9 +43,10 @@ import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
         SecondhandTradeEntity::class,
         OrderEntity::class,
         PostEntity::class,
+        PostCommentEntity::class,
         StoreEntity::class
     ],
-    version = 16,
+    version = 17,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

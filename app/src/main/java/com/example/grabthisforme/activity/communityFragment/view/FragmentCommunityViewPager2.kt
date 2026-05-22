@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.communityFragment.adpter.CommunityVP2_RVAdapter
 import com.example.grabthisforme.activity.communityFragment.viewmodel.CommunityViewModel
+import com.example.grabthisforme.activity.fragment_misc.default_entry.view.BlankFragmentDirections
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentCommunityViewpager2Binding
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,6 +19,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class FragmentCommunityViewPager2 : Fragment(){
     private var _binding: FragmentCommunityViewpager2Binding? = null
     private val binding get() = _binding!!
+
     private val viewModel: CommunityViewModel by viewModels()
     private lateinit var adapter: CommunityVP2_RVAdapter
 
@@ -37,9 +39,6 @@ class FragmentCommunityViewPager2 : Fragment(){
         arguments?.getInt(KEY_TYPE) ?: 0
     }
 
-
-
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -56,8 +55,9 @@ class FragmentCommunityViewPager2 : Fragment(){
 
     }
     private fun initRV() {
-        adapter = CommunityVP2_RVAdapter {
-            (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_postDetailFragment)
+        adapter = CommunityVP2_RVAdapter {postId ->
+            val dir =BlankFragmentDirections.actionBlankFragmentToPostDetailFragment(postId)
+            (requireActivity() as MainActivity).NewNavController_navgite(dir)
         }
         binding.rvTask.adapter = adapter
         binding.rvTask.layoutManager = LinearLayoutManager(requireContext())

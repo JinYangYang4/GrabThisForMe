@@ -5,6 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Reply
 import com.example.grabthisforme.databinding.RvReplayItemBinding
 
@@ -16,13 +18,32 @@ class ReplyRecyclerViewAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(reply: Reply) {
-            val beCommenterName = reply.beCommenter?.name ?: "Someone"
-            binding.tvReplyToTip.text = "Reply to $beCommenterName:"
-            binding.tvReplyUsername.text = reply.commenter?.name ?: "Anonymous"
-            binding.tvReplyContent.text = reply.message ?: "No reply content"
-            binding.tvReplyTime.text = "10 min ago"
+            val beCommenterName = reply.beCommenter?.name ?: "匿名"
+            binding.tvReplyToTip.text = "回复 $beCommenterName:"
+            binding.tvReplyUsername.text = reply.commenter?.name ?: "匿名"
+            binding.tvReplyContent.text = reply.message ?: ""
+            binding.tvReplyTime.text =  formatTimeLeft(reply.time)
+            Glide.with(binding.root.context)
+                .load(reply.commenter?.headPic)
+                .placeholder(R.drawable.cat)
+                .error(R.drawable.cat)
+                .into(binding.ivReplyAvatar)
+
+
             itemView.setOnClickListener {
                 onReplyClick?.invoke(reply)
+            }
+        }
+        private fun formatTimeLeft(sendTime: Long): String {
+            val duration =  System.currentTimeMillis() - sendTime
+            if (duration <= 60*1000) return "刚刚"
+
+            val hours = duration / (1000 * 60 * 60)
+            val minutes = (duration % (1000 * 60 * 60)) / (1000 * 60)
+
+            return when {
+                hours > 0 -> "${hours}小时前"
+                else -> "${minutes} 分钟前"
             }
         }
     }

@@ -107,7 +107,11 @@
         android:id="@+id/postDetailFragment"
         android:name="com.example.grabthisforme.activity.fragment_misc.postDetailFragment.view.PostDetailFragment"
         android:label="PostDetailFragment"
-        tools:layout="@layout/fragment_post_detail"/>
+        tools:layout="@layout/fragment_post_detail">
+        <argument
+            android:name="postId"
+            app:argType="string" />
+    </fragment>
     <fragment
         android:id="@+id/fragmentChat"
         android:name="com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.FragmentChat"

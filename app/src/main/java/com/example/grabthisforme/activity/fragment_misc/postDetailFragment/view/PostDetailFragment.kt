@@ -2,38 +2,43 @@ package com.example.grabthisforme.activity.fragment_misc.postDetailFragment.view
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
+import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
+import com.example.grabthisforme.activity.communityFragment.custom.MaxLinesGridLayoutManager
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.adapter.CommentRecyclerViewAdapter
-import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Comment
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.viewModel.PostDetailViewModel
+import com.example.grabthisforme.activity.fragment_misc.post_topic.adapter.ImagesRecyclerviewAdapter
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentPostDetailBinding
-import com.example.grabthisforme.model.user.domain.User
 import com.google.android.material.appbar.AppBarLayout
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class PostDetailFragment : Fragment() {
     private var _binding: FragmentPostDetailBinding? = null
-    private lateinit var viewModel: PostDetailViewModel
     private val binding get() = _binding!!
-    private var isListenerActive = true
-    private var the_commentPosition: Int = -1
-    private var the_parentCommentId: Long = -1
+    private val viewModel: PostDetailViewModel by viewModels()
+
+    private var theCommentPosition: Int = -1
+    private var theParentCommentId: Long = -1
+    private lateinit var commentAdapter: CommentRecyclerViewAdapter
+    private lateinit var postImagesAdapter: ImagesRecyclerviewAdapter
 
     enum class InputActionType {
         POST_COMMENT,
@@ -41,9 +46,6 @@ class PostDetailFragment : Fragment() {
     }
 
     private var inputActionType: InputActionType = InputActionType.POST_COMMENT
-    private var adapter = CommentRecyclerViewAdapter()
-
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,14 +58,14 @@ class PostDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(requireActivity()).get(PostDetailViewModel::class.java)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
 
         initView()
+        initRecyclerViewComment()
+        initInput()
         initObserve()
         initClickListeners()
-        initRecyclerViewComment()
         initAppBarOffsetListener()
 
         ViewCompat.setOnApplyWindowInsetsListener(requireView()) { _, insets ->
@@ -88,11 +90,22 @@ class PostDetailFragment : Fragment() {
         )
     }
 
-    fun initRecyclerViewComment() {
-        adapter = CommentRecyclerViewAdapter(
+    private fun initView() {
+        postImagesAdapter = ImagesRecyclerviewAdapter { }
+        binding.rvPostImages.apply {
+            adapter = postImagesAdapter
+            layoutManager = MaxLinesGridLayoutManager(requireContext(), 3, 4)
+            isNestedScrollingEnabled = false
+        }
+        binding.tvSend.isEnabled = false
+        binding.tvSend.alpha = 0.5f
+    }
+
+    private fun initRecyclerViewComment() {
+        commentAdapter = CommentRecyclerViewAdapter(
             onItemClick = { _, position, commentId ->
-                the_commentPosition = position
-                the_parentCommentId = commentId
+                theCommentPosition = position
+                theParentCommentId = commentId
                 inputActionType = InputActionType.REPLY_COMMENT
                 viewModel.setInputVisible(true)
                 showKeyboard(binding.etMessageInput)
@@ -102,25 +115,43 @@ class PostDetailFragment : Fragment() {
                     binding.rvComments.smoothScrollToPosition(position)
                 }
             },
-            onReplyItemClick = { _, position, commentId ->
-                the_commentPosition = position
-                the_parentCommentId = commentId
+            onReplyItemClick = { reply, position, commentId ->
+                theCommentPosition = position
+                theParentCommentId = commentId
                 inputActionType = InputActionType.REPLY_COMMENT
                 viewModel.setInputVisible(true)
+                binding.etMessageInput.setText("")
+                viewModel.updateInputText("")
                 showKeyboard(binding.etMessageInput)
             }
         )
-        binding.rvComments.adapter = adapter
-        binding.rvComments.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        adapter.submitList(viewModel.commentList.value)
+        binding.rvComments.adapter = commentAdapter
+        binding.rvComments.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        commentAdapter.submitList(viewModel.commentList.value)
+    }
+
+    private fun initInput() {
+        binding.etMessageInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.updateInputText(s?.toString().orEmpty())
+            }
+
+            override fun afterTextChanged(s: Editable?) = Unit
+        })
     }
 
     private fun initAppBarOffsetListener() {
         binding.appBar.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { _, verticalOffset ->
-            val offsetAbs = Math.abs(verticalOffset)
+            val offsetAbs = kotlin.math.abs(verticalOffset)
             val avatarAreaHeight = dp2px(60)
             val isAvatarCovered = offsetAbs >= avatarAreaHeight
-            val alpha = kotlin.math.min(Math.abs(offsetAbs.toFloat() - dp2px(60).toFloat()) / dp2px(60), 1f)
+            val alpha = kotlin.math.min(
+                kotlin.math.abs(verticalOffset.toFloat() - dp2px(60).toFloat()) / dp2px(60),
+                1f
+            )
             viewModel.setHeaderCovered(isAvatarCovered)
             if (isAvatarCovered) {
                 binding.llHead.alpha = alpha
@@ -132,36 +163,37 @@ class PostDetailFragment : Fragment() {
 
     private fun dp2px(dp: Int): Int {
         val density = requireContext().resources.displayMetrics.density
-        return (dp * density + 0.5).toInt()
+        return (dp * density + 0.5f).toInt()
     }
-
-    private fun initView() {}
 
     private fun initClickListeners() {
         binding.ivBack.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
         binding.llComment.setOnClickListener {
-            viewModel.setInputVisible(true)
             inputActionType = InputActionType.POST_COMMENT
+            viewModel.setInputVisible(true)
             showKeyboard(binding.etMessageInput)
         }
         binding.tvSend.setOnClickListener {
-            if (inputActionType == InputActionType.POST_COMMENT) {
-                sendCommentToPostMan()
+            val sent = if (inputActionType == InputActionType.POST_COMMENT) {
+                viewModel.submitComment()
             } else {
-                sendReplyToComment(the_commentPosition, the_parentCommentId)
+                viewModel.submitReply(theCommentPosition, theParentCommentId)
+            }
+
+            if (sent) {
+                if (inputActionType == InputActionType.REPLY_COMMENT) {
+                    commentAdapter.expandComment(theParentCommentId)
+                } else {
+                    scrollCommentsToTop()
+                }
+                binding.etMessageInput.clearFocus()
+                hideKeyboard()
             }
         }
-        var alreadyLike = false
         binding.llLove.setOnClickListener {
-            if (alreadyLike) {
-                viewModel.removeLike()
-                alreadyLike = false
-            } else {
-                viewModel.addLike()
-                alreadyLike = true
-            }
+            viewModel.toggleLike()
         }
         binding.llShare.setOnClickListener {
             val shareBottomSheet = PostShareBottomSheetDialogFragment.newInstance()
@@ -169,19 +201,7 @@ class PostDetailFragment : Fragment() {
         }
     }
 
-    fun sendCommentToPostMan() {
-        val newComment = Comment(
-            id = System.currentTimeMillis(),
-            time = System.currentTimeMillis(),
-            message = (binding.etMessageInput.text.toString() ?: "").trim(),
-            imageUrls = emptyList(),
-            commenter = User(id = 1, name = "User1", headPic = ""),
-            replies = emptyList()
-        )
-        viewModel.addComment(newComment)
-        binding.etMessageInput.clearFocus()
-        viewModel.clearInputText()
-        hideKeyboard()
+    private fun scrollCommentsToTop() {
         lifecycleScope.launch {
             delay(100)
             val layoutManager = binding.rvComments.layoutManager as LinearLayoutManager
@@ -195,31 +215,17 @@ class PostDetailFragment : Fragment() {
         }
     }
 
-    fun sendReplyToComment(commentPosition: Int, parentCommentId: Long, beCommenter: User? = null) {
-        val replyContent = (binding.etMessageInput.text.toString() ?: "").trim()
-        if (replyContent.isEmpty()) {
-            Toast.makeText(requireContext(), "Reply content cannot be empty", Toast.LENGTH_SHORT).show()
-            return
-        }
-        val newReply = viewModel.createReply(
-            parentCommentId = parentCommentId,
-            message = replyContent,
-            beCommenter = beCommenter
-        )
-
-        viewModel.addReplyToComment(commentPosition, newReply)
-        adapter.expandComment(parentCommentId)
-
-        binding.etMessageInput.clearFocus()
-        viewModel.clearInputText()
-        hideKeyboard()
-    }
-
-    fun initObserve() {
+    private fun initObserve() {
         viewModel.commentList.observe(viewLifecycleOwner) { list ->
-            adapter.submitList(list)
+            commentAdapter.submitList(list)
+            binding.tvCommentCount.text = "评论 ${viewModel.commentCount.value ?: list.size}"
         }
-        viewModel.likeCount.observe(viewLifecycleOwner) { _ ->
+        viewModel.commentCount.observe(viewLifecycleOwner) { count ->
+            binding.tvCommentCount.text = "评论 $count"
+        }
+        viewModel.canSend.observe(viewLifecycleOwner) { enabled ->
+            binding.tvSend.isEnabled = enabled
+            binding.tvSend.alpha = if (enabled) 1f else 0.5f
         }
         viewModel.loveIconRes.observe(viewLifecycleOwner) { isLove ->
             if (isLove) {
@@ -227,6 +233,25 @@ class PostDetailFragment : Fragment() {
             } else {
                 binding.ivLove.setImageResource(R.drawable.ic_unselected)
             }
+        }
+        viewModel.postAvatarUrl.observe(viewLifecycleOwner) { avatarUrl ->
+            Glide.with(this)
+                .load(avatarUrl)
+                .placeholder(R.drawable.cat)
+                .error(R.drawable.cat)
+                .into(binding.ivPostAvatar)
+            Glide.with(this)
+                .load(avatarUrl)
+                .placeholder(R.drawable.cat)
+                .error(R.drawable.cat)
+                .into(binding.ivTopAvatar)
+        }
+        viewModel.postImageList.observe(viewLifecycleOwner) { images ->
+            val visibleImages = images.take(MAX_IMAGE_COUNT)
+            val hiddenCount = images.size - visibleImages.size
+            binding.rvPostImages.visibility =
+                if (visibleImages.isEmpty()) View.GONE else View.VISIBLE
+            postImagesAdapter.submitImages(visibleImages, hiddenCount)
         }
     }
 
@@ -238,7 +263,8 @@ class PostDetailFragment : Fragment() {
     }
 
     private fun hideKeyboard() {
-        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm =
+            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
     }
 
@@ -250,12 +276,15 @@ class PostDetailFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        isListenerActive = true
         (requireActivity() as MainActivity).innerBottomBar()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val MAX_IMAGE_COUNT = 12
     }
 }

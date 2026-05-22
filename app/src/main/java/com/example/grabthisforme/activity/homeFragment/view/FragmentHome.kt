@@ -159,7 +159,6 @@ class FragmentHome : Fragment() {
     }
     fun initRecyclerViewStore() {
         adapter2 = RecyclerViewStoreAdapter(onStoreClickListener = { store ->
-            Log.d("test11", "initRecyclerViewStore: ")
             val dir =BlankFragmentDirections.actionBlankFragmentToStoreFragment(store.id)
             (requireActivity() as MainActivity).NewNavController_navgite(dir)
         })

@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Comment
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Reply
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.ui.state.CommentUiState
@@ -89,14 +91,30 @@ class CommentRecyclerViewAdapter(
                     onReplyItemClick?.invoke(reply, currentPosition, comment.id)
                 }
             )
+            Glide.with(binding.root.context)
+                .load(comment.commenter?.headPic)
+                .placeholder(R.drawable.cat)
+                .error(R.drawable.cat)
+                .into(binding.ivCommentAvatar)
             binding.rvCommentReplies.adapter = replyAdapter
             binding.tvCommentUsername.text = comment.commenter?.name ?: DEFAULT_USER_NAME
             binding.tvCommentContent.text = comment.message ?: DEFAULT_COMMENT_CONTENT
             binding.tvCommentTime.text = DEFAULT_TIME_TEXT
-
+            binding.tvCommentTime.text = formatTimeLeft(comment.time)
             refreshReplyUI(state)
         }
+        private fun formatTimeLeft(sendTime: Long): String {
+            val duration =  System.currentTimeMillis() - sendTime
+            if (duration <= 60*1000) return "刚刚"
 
+            val hours = duration / (1000 * 60 * 60)
+            val minutes = (duration % (1000 * 60 * 60)) / (1000 * 60)
+
+            return when {
+                hours > 0 -> "${hours}小时前"
+                else -> "${minutes} 分钟前"
+            }
+        }
         private fun getOrCreateCommentUiState(comment: Comment): CommentUiState {
             return commentUiStateMap.getOrPut(comment.id) {
                 CommentUiState(commentId = comment.id)
