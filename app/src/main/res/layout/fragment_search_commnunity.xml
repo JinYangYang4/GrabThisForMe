@@ -10,7 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/gray_mid_light"
+        android:background="@color/gray_light"
         android:orientation="vertical">
         <LinearLayout
             android:layout_width="match_parent"
@@ -48,7 +48,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@null"
-                    android:hint="搜索你想要的话题"
+                    android:hint="搜索话题"
                     android:textColor="@android:color/black"
                     android:textColorHint="@color/gray_mid"
                     android:text="@{viewModel.searchInput}"
@@ -100,7 +100,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="搜索历史"
+                            android:text="历史记录"
                             android:textColor="@android:color/black"
                             android:textSize="13sp"
                             android:textStyle="bold"/>
@@ -158,7 +158,7 @@
                         android:id="@+id/tv_not_history"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="暂无搜索记录，快去搜索试试吧！"
+                        android:text="暂无"
                         android:visibility="@{viewModel.historyEmpty ? View.VISIBLE : View.GONE}" />
                 </LinearLayout>
                 <LinearLayout
@@ -180,7 +180,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="猜你想搜"
+                            android:text="推荐搜索"
                             android:textColor="@android:color/black"
                             android:textSize="13sp"
                             android:textStyle="bold"/>
@@ -213,21 +213,10 @@
                         android:visibility="@{viewModel.recommendVisible ? View.VISIBLE : View.GONE}"
                         android:layout_marginTop="8dp" />
                 </LinearLayout>
-                <LinearLayout
+                <androidx.compose.ui.platform.ComposeView
+                    android:id="@+id/ll_intent_to_ai"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:background="@drawable/bg_rounded_white"
-                    android:backgroundTint="@color/gray_translucent_dark"
-                    android:layout_marginHorizontal="40dp"
-                    android:layout_marginTop="30dp"
-                    android:gravity="center">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="已接入DeepSeek模型(去使用)"
-                        android:textSize="19sp"
-                        android:textColor="@color/gray_800"/>
-                </LinearLayout>
+                    android:layout_height="wrap_content" />
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>

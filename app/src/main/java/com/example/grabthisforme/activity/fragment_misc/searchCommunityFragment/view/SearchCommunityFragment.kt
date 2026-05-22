@@ -4,9 +4,24 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.fragment_misc.searchCommunityFragment.viewModle.SearchCommunityViewModel
 import com.example.grabthisforme.activity.fragment_misc.searchCommunityFragment.viewModle.SearchCommunityViewModelFactory
@@ -16,6 +31,11 @@ import com.example.grabthisforme.activity.homeFragment.adapter.SearchHistoryRecy
 
 import com.example.grabthisforme.databinding.FragmentSearchCommnunityBinding
 import com.example.grabthisforme.model.AppDataBase.AppDatabase
+import com.example.grabthisforme.ui.liquidglass.components.LiquidButton
+import com.example.grabthisforme.ui.liquidglass.rememberShapeBitmapPainter
+import com.kyant.backdrop.backdrops.layerBackdrop
+import com.kyant.backdrop.backdrops.rememberLayerBackdrop
+
 
 
 class SearchCommunityFragment : Fragment() {
@@ -56,6 +76,7 @@ class SearchCommunityFragment : Fragment() {
         initClickEvents()
         initViewModel()
         initRecyclerView()
+        initAiEntryButton()
         observeViewModelData()
     }
     fun initViewModel(){
@@ -74,6 +95,15 @@ class SearchCommunityFragment : Fragment() {
 
     private fun initViews() {
         ViewModel.setDeleteMode(false)
+    }
+
+    private fun initAiEntryButton() {
+        binding.llIntentToAi.setViewCompositionStrategy(
+            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+        )
+        binding.llIntentToAi.setContent {
+            IntentToAiButton()
+        }
     }
 
     private fun initClickEvents() {
@@ -157,6 +187,39 @@ class SearchCommunityFragment : Fragment() {
         searchAdapterHistory.onComponentShowChanged(false)
     }
     private fun refreshRecommendList() {
+    }
+
+    @Composable
+    private fun IntentToAiButton() {
+        val backdrop = rememberLayerBackdrop()
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Image(
+                painter = rememberShapeBitmapPainter(R.drawable.bg_round_stripe_gray_light),
+                contentDescription = null,
+                modifier = Modifier
+                    .matchParentSize()
+                    .layerBackdrop(backdrop),
+                contentScale = ContentScale.Crop
+            )
+
+            LiquidButton(
+                onClick = {},
+                backdrop = backdrop,
+                modifier = Modifier.fillMaxWidth()
+                    .padding(20.dp,40.dp,20.dp,40.dp),
+                tint = Color.Blue.copy(alpha = 0.12f),
+                surfaceColor = Color.Cyan.copy(alpha = 0.5f)
+            ) {
+                Text(
+                    text = "使用Ai模型",
+                    style = TextStyle(
+                        Color(0xFFFFFFFF),
+                        fontSize = 15.sp
+                    )
+                )
+            }
+        }
     }
 
     override fun onResume() {
