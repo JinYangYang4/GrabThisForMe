@@ -113,6 +113,7 @@ class CreateSecondHandGoodsViewModel @Inject constructor(
             id = now,
             name = "GuestUser",
             headPic = "",
+            passwordHash = "",
             isCurrent = true
         )
     }

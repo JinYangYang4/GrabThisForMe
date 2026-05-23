@@ -153,6 +153,7 @@ object PostDetailMockData {
         return User(
             id = userId,
             name = userName,
+            passwordHash = "",
             headPic = headPicUrl
         )
     }

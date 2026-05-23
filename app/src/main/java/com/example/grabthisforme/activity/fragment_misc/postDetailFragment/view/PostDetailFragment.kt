@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearSmoothScroller
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.communityFragment.custom.MaxLinesGridLayoutManager
+import com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.PhotoPreviewDialog
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.adapter.CommentRecyclerViewAdapter
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.viewModel.PostDetailViewModel
 import com.example.grabthisforme.activity.fragment_misc.post_topic.adapter.ImagesRecyclerviewAdapter
@@ -91,7 +92,17 @@ class PostDetailFragment : Fragment() {
     }
 
     private fun initView() {
-        postImagesAdapter = ImagesRecyclerviewAdapter { }
+        postImagesAdapter = ImagesRecyclerviewAdapter { position ->
+            val imageUris = viewModel.postImageList.value
+                .orEmpty()
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+            if (imageUris.isEmpty()) return@ImagesRecyclerviewAdapter
+            val initialIndex = position.coerceIn(0, imageUris.lastIndex)
+            PhotoPreviewDialog
+                .newInstance(imageUris, initialIndex)
+                .show(childFragmentManager, "PhotoPreviewDialog")
+        }
         binding.rvPostImages.apply {
             adapter = postImagesAdapter
             layoutManager = MaxLinesGridLayoutManager(requireContext(), 3, 4)

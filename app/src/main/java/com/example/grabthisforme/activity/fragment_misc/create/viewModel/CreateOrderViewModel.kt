@@ -214,6 +214,7 @@ class CreateOrderViewModel @Inject constructor(
             id = now,
             name = "GuestUser",
             headPic = "",
+            passwordHash = "",
             isCurrent = true
         )
     }

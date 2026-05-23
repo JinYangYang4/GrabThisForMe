@@ -3,6 +3,7 @@ package com.example.grabthisforme.model.user.data.repository
 import com.example.grabthisforme.model.user.data.dao.UserDao
 import com.example.grabthisforme.model.user.domain.User
 import com.example.grabthisforme.model.user.domain.UserLike
+import com.example.grabthisforme.model.user.domain.UserStatistics
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -56,6 +57,19 @@ class UserRepository@Inject constructor(
             likedPostIds = updatedLikes.likedPostIds,
             likedStoreIds = updatedLikes.likedStoreIds,
             likedGoodsIds = updatedLikes.likedGoodsIds
+        )
+        userDao.saveUser(updatedUser)
+        return updatedUser
+    }
+
+    suspend fun updateCurrentUserStatistics(transform: (UserStatistics) -> UserStatistics): User? {
+        val user = currentUser.value ?: return null
+        val updatedStatistics = transform(user.statistics)
+        val updatedUser = user.withStatistics(
+            likeCount = updatedStatistics.likeCount,
+            fanCount = updatedStatistics.fanCount,
+            followCount = updatedStatistics.followCount,
+            selfPosts = updatedStatistics.selfPosts
         )
         userDao.saveUser(updatedUser)
         return updatedUser

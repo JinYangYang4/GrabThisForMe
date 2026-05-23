@@ -109,6 +109,11 @@ class PostRepository @Inject constructor(
 
     suspend fun deletePost(postId: String) {
         postDao.deleteById(postId)
+        userRepository.updateCurrentUserStatistics { statistics ->
+            statistics.copy(
+                selfPosts = statistics.selfPosts.filterNot { it == postId }
+            )
+        }
     }
 
     suspend fun addComment(postId: String, comment: Comment): List<Comment> {
@@ -175,6 +180,12 @@ class PostRepository @Inject constructor(
         )
         postDao.savePost(post)
         postDao.insertCommentIfAbsent(PostCommentEntity(postId = post.postId))
+        userRepository.updateCurrentUserStatistics { statistics ->
+            val updatedSelfPosts = statistics.selfPosts.toMutableList().apply {
+                if (!contains(post.postId)) add(0, post.postId)
+            }
+            statistics.copy(selfPosts = updatedSelfPosts)
+        }
         return post
     }
 

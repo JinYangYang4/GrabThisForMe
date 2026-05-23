@@ -6,11 +6,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.grabthisforme.activity.fragment_misc.setfragment.viewmodel.AccountSecurityViewModel
 import com.example.grabthisforme.databinding.FragmentAccountSecurityBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FragmentAccountSecurity : Fragment() {
     private var _binding: FragmentAccountSecurityBinding? = null
     private val binding get() = _binding!!
@@ -30,8 +34,15 @@ class FragmentAccountSecurity : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initViewData()
         initClickListener()
+        initObserve()
     }
     private fun initViewData() {
+        binding.etOriginalPwd.doAfterTextChanged { editable ->
+            viewModel.updateOriginalPassword(editable?.toString().orEmpty())
+        }
+        binding.etNewPwd.doAfterTextChanged { editable ->
+            viewModel.updateNewPassword(editable?.toString().orEmpty())
+        }
         binding.etOriginalPwd.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 binding.etOriginalPwd.clearFocus()
@@ -53,8 +64,25 @@ class FragmentAccountSecurity : Fragment() {
         binding.ivBack.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
+        binding.llSubmit.setOnClickListener {
+            viewModel.submitPasswordChange()
+        }
     }
 
+    private fun initObserve() {
+        viewModel.canSubmit.observe(viewLifecycleOwner) { canSubmit ->
+            binding.llSubmit.isEnabled = canSubmit
+            binding.llSubmit.isClickable = canSubmit
+        }
+        viewModel.submitResult.observe(viewLifecycleOwner) { result ->
+            Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+            if (result.success) {
+                binding.etOriginalPwd.setText("")
+                binding.etNewPwd.setText("")
+                parentFragmentManager.popBackStack()
+            }
+        }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -90,6 +90,7 @@ class FragmentRegister : Fragment() {
         val newUser = User(
             name = userName,
             id = userId,
+            passwordHash = password,
             headPic = ""
         )
 

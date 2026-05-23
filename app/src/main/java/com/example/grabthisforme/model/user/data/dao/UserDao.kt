@@ -9,11 +9,13 @@ import com.example.grabthisforme.model.user.data.entity.UserAccountEntity
 import com.example.grabthisforme.model.user.data.entity.UserBundleEntity
 import com.example.grabthisforme.model.user.data.entity.UserLikeEntity
 import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
+import com.example.grabthisforme.model.user.data.entity.UserStatisticsEntity
 import com.example.grabthisforme.model.user.domain.User
 import com.example.grabthisforme.model.user.mapper.toAccountEntity
 import com.example.grabthisforme.model.user.mapper.toDomain
 import com.example.grabthisforme.model.user.mapper.toLikeEntity
 import com.example.grabthisforme.model.user.mapper.toProfileEntity
+import com.example.grabthisforme.model.user.mapper.toStatisticsEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -27,12 +29,16 @@ interface UserDao {
     suspend fun upsertProfile(profile: UserProfileEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertStatistics(statistics: UserStatisticsEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertLike(like: UserLikeEntity)
 
     @Transaction
     suspend fun saveUser(user: User) {
         upsertAccount(user.toAccountEntity())
         upsertProfile(user.toProfileEntity())
+        upsertStatistics(user.toStatisticsEntity())
         upsertLike(user.toLikeEntity())
     }
 

@@ -4,6 +4,7 @@ import com.example.grabthisforme.model.user.data.entity.UserAccountEntity
 import com.example.grabthisforme.model.user.data.entity.UserBundleEntity
 import com.example.grabthisforme.model.user.data.entity.UserLikeEntity
 import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
+import com.example.grabthisforme.model.user.data.entity.UserStatisticsEntity
 import com.example.grabthisforme.model.user.domain.User
 import com.example.grabthisforme.model.user.domain.UserAccount
 import com.example.grabthisforme.model.user.domain.UserProfile
@@ -61,6 +62,16 @@ fun User.toProfileEntity(): UserProfileEntity {
     )
 }
 
+fun User.toStatisticsEntity(): UserStatisticsEntity {
+    return UserStatisticsEntity(
+        userId = id,
+        likeCount = likeCount,
+        fanCount = fanCount,
+        followCount = followCount,
+        selfPostsJson = selfPosts.toJsonArrayString()
+    )
+}
+
 fun User.toLikeEntity(): UserLikeEntity {
     return UserLikeEntity(
         userId = id,
@@ -72,6 +83,7 @@ fun User.toLikeEntity(): UserLikeEntity {
 
 fun UserBundleEntity.toDomain(): User {
     val profileEntity = profile
+    val statisticsEntity = statistics
     val likeEntity = likes
     return User(
         id = account.userId,
@@ -87,6 +99,10 @@ fun UserBundleEntity.toDomain(): User {
         accountName = account.accountName,
         passwordHash = account.passwordHash,
         lastLoginTime = account.lastLoginTime,
+        likeCount = statisticsEntity?.likeCount ?: 0L,
+        fanCount = statisticsEntity?.fanCount ?: 0L,
+        followCount = statisticsEntity?.followCount ?: 0L,
+        selfPosts = statisticsEntity?.selfPostsJson?.toStringList().orEmpty(),
         likedPostIds = likeEntity?.likedPostIdsJson?.toStringList().orEmpty(),
         likedStoreIds = likeEntity?.likedStoreIdsJson?.toLongList().orEmpty(),
         likedGoodsIds = likeEntity?.likedGoodsIdsJson?.toLongList().orEmpty()
@@ -95,6 +111,7 @@ fun UserBundleEntity.toDomain(): User {
 
 fun UserAccountEntity.toDomain(
     profile: UserProfileEntity? = null,
+    statistics: UserStatisticsEntity? = null,
     likes: UserLikeEntity? = null
 ): User {
     return User(
@@ -111,6 +128,10 @@ fun UserAccountEntity.toDomain(
         accountName = accountName,
         passwordHash = passwordHash,
         lastLoginTime = lastLoginTime,
+        likeCount = statistics?.likeCount ?: 0L,
+        fanCount = statistics?.fanCount ?: 0L,
+        followCount = statistics?.followCount ?: 0L,
+        selfPosts = statistics?.selfPostsJson?.toStringList().orEmpty(),
         likedPostIds = likes?.likedPostIdsJson?.toStringList().orEmpty(),
         likedStoreIds = likes?.likedStoreIdsJson?.toLongList().orEmpty(),
         likedGoodsIds = likes?.likedGoodsIdsJson?.toLongList().orEmpty()

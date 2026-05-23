@@ -19,7 +19,11 @@ import java.util.Date
 import java.util.Locale
 
 
-class CommunityVP2_RVAdapter(val clickListener:(taskId : String) -> Unit) : ListAdapter<Post,
+class CommunityVP2_RVAdapter(
+    private val clickListener:(taskId : String) -> Unit,
+    private val onAvatarClick: (Post) -> Unit = {},
+    private val onPostImageClick: (Post, Int) -> Unit = { _, _ -> }
+) : ListAdapter<Post,
         CommunityVP2_RVAdapter.ViewHolder>(
     ViewHolder.TaskDiffItemCallback()){
     override fun onCreateViewHolder(
@@ -32,10 +36,16 @@ class CommunityVP2_RVAdapter(val clickListener:(taskId : String) -> Unit) : List
         position: Int
     ) {
         val post = getItem(position)
-        holder.bind(post,clickListener)
+        holder.bind(post, clickListener, onAvatarClick, onPostImageClick)
     }
     class ViewHolder(val binding: PostRvItemBinding) : RecyclerView.ViewHolder(binding.root){
-        private val imagesAdapter = ImagesRecyclerviewAdapter { }
+        private var currentPost: Post? = null
+        private var currentPostImageClick: ((Post, Int) -> Unit)? = null
+        private val imagesAdapter = ImagesRecyclerviewAdapter { position ->
+            currentPost?.let { post ->
+                currentPostImageClick?.invoke(post, position)
+            }
+        }
 
         init {
             binding.rvPostImages.apply {
@@ -55,7 +65,14 @@ class CommunityVP2_RVAdapter(val clickListener:(taskId : String) -> Unit) : List
             }
 
         }
-        fun bind(post: Post, clickListener: (String) -> Unit) {
+        fun bind(
+            post: Post,
+            clickListener: (String) -> Unit,
+            onAvatarClick: (Post) -> Unit,
+            onPostImageClick: (Post, Int) -> Unit
+        ) {
+            currentPost = post
+            currentPostImageClick = onPostImageClick
             binding.sendTime.text = formatTimestampToDateTime(post.createTime.toLong())
             binding.contents.text = post.content
             binding.senderName.text = post.authorName
@@ -78,6 +95,9 @@ class CommunityVP2_RVAdapter(val clickListener:(taskId : String) -> Unit) : List
 
             binding.clItem.setOnClickListener {
                 clickListener.invoke(post.postId)
+            }
+            binding.ivAvatar.setOnClickListener {
+                onAvatarClick.invoke(post)
             }
         }
 

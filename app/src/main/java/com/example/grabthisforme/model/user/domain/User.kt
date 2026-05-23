@@ -23,6 +23,7 @@ data class User(
     val likeCount: Long get() = statistics.likeCount
     val fanCount: Long get() = statistics.fanCount
     val followCount: Long get() = statistics.followCount
+    val selfPosts: List<String> get() = statistics.selfPosts
     val likedPostIds: List<String> get() = likes.likedPostIds
     val likedStoreIds: List<Long> get() = likes.likedStoreIds
     val likedGoodsIds: List<Long> get() = likes.likedGoodsIds
@@ -45,6 +46,7 @@ data class User(
         likeCount: Long = 0L,
         fanCount: Long = 0L,
         followCount: Long = 0L,
+        selfPosts: List<String> = emptyList(),
         likedPostIds: List<String> = emptyList(),
         likedStoreIds: List<Long> = emptyList(),
         likedGoodsIds: List<Long> = emptyList()
@@ -71,7 +73,8 @@ data class User(
         statistics = UserStatistics(
             likeCount = likeCount,
             fanCount = fanCount,
-            followCount = followCount
+            followCount = followCount,
+            selfPosts = selfPosts
         ),
         likes = UserLike(
             likedPostIds = likedPostIds,
@@ -97,13 +100,15 @@ data class User(
     fun withStatistics(
         likeCount: Long = statistics.likeCount,
         fanCount: Long = statistics.fanCount,
-        followCount: Long = statistics.followCount
+        followCount: Long = statistics.followCount,
+        selfPosts: List<String> = statistics.selfPosts
     ): User {
         return copy(
             statistics = statistics.copy(
                 likeCount = likeCount,
                 fanCount = fanCount,
-                followCount = followCount
+                followCount = followCount,
+                selfPosts = selfPosts
             )
         )
     }

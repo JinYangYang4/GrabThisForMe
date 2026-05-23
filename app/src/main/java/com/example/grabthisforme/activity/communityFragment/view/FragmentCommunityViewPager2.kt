@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.communityFragment.adpter.CommunityVP2_RVAdapter
+import com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.PhotoPreviewDialog
 import com.example.grabthisforme.activity.communityFragment.viewmodel.CommunityViewModel
 import com.example.grabthisforme.activity.fragment_misc.default_entry.view.BlankFragmentDirections
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
@@ -55,10 +56,22 @@ class FragmentCommunityViewPager2 : Fragment(){
 
     }
     private fun initRV() {
-        adapter = CommunityVP2_RVAdapter {postId ->
-            val dir =BlankFragmentDirections.actionBlankFragmentToPostDetailFragment(postId)
-            (requireActivity() as MainActivity).NewNavController_navgite(dir)
-        }
+        adapter = CommunityVP2_RVAdapter(
+            clickListener = { postId ->
+                val dir = BlankFragmentDirections.actionBlankFragmentToPostDetailFragment(postId)
+                (requireActivity() as MainActivity).NewNavController_navgite(dir)
+            },
+            onPostImageClick = { post, clickedPosition ->
+                val imageUris = post.images
+                    .map { it.trim() }
+                    .filter { it.isNotEmpty() }
+                if (imageUris.isEmpty()) return@CommunityVP2_RVAdapter
+                val initialIndex = clickedPosition.coerceIn(0, imageUris.lastIndex)
+                PhotoPreviewDialog
+                    .newInstance(imageUris, initialIndex)
+                    .show(childFragmentManager, "PhotoPreviewDialog")
+            }
+        )
         binding.rvTask.adapter = adapter
         binding.rvTask.layoutManager = LinearLayoutManager(requireContext())
     }

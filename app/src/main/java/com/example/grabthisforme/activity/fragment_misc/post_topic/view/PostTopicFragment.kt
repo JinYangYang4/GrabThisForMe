@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.BottomSheetDialogPhoto
+import com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.PhotoPreviewDialog
 import com.example.grabthisforme.activity.fragment_misc.post_topic.adapter.ImagesRecyclerviewAdapter
 import com.example.grabthisforme.activity.fragment_misc.post_topic.viewmodel.PostTopicActionType
 import com.example.grabthisforme.activity.fragment_misc.post_topic.viewmodel.PostTopicViewModel
@@ -89,7 +90,17 @@ class PostTopicFragment : Fragment() {
         }
     }
     private fun initImagesRV(){
-        imagesAdapter = ImagesRecyclerviewAdapter({})
+        imagesAdapter = ImagesRecyclerviewAdapter { position ->
+            val imageUris = viewModel.selectedImages.value
+                .orEmpty()
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+            if (imageUris.isEmpty()) return@ImagesRecyclerviewAdapter
+            val initialIndex = position.coerceIn(0, imageUris.lastIndex)
+            PhotoPreviewDialog
+                .newInstance(imageUris, initialIndex)
+                .show(childFragmentManager, "PhotoPreviewDialog")
+        }
         binding.rvImages.apply {
             layoutManager = GridLayoutManager(context, 3)
             adapter = imagesAdapter

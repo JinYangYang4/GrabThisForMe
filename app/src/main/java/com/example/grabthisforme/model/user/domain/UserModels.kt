@@ -29,7 +29,8 @@ data class UserProfile(
 data class UserStatistics(
     val likeCount: Long = 0L,
     val fanCount: Long = 0L,
-    val followCount: Long = 0L
+    val followCount: Long = 0L,
+    val selfPosts: List<String> = emptyList()
 )
 
 data class UserLike(

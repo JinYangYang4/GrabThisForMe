@@ -10,7 +10,7 @@ import com.example.grabthisforme.R
 import com.example.grabthisforme.databinding.RvPostImagesBinding
 
 class ImagesRecyclerviewAdapter(
-    private val clickListener: (imageUrl: String) -> Unit
+    private val clickListener: (position: Int) -> Unit
 ) : ListAdapter<String, ImagesRecyclerviewAdapter.ViewHolder>(
     ImageDiffCallback()
 ) {
@@ -27,7 +27,7 @@ class ImagesRecyclerviewAdapter(
                 .error(R.drawable.ic_add)
                 .into(binding.ivPhoto)
             binding.ivPhoto.setOnClickListener {
-                clickListener.invoke(imageUrl)
+                clickListener.invoke(position)
             }
             val showMore = hiddenCount > 0 && position == currentList.lastIndex
             binding.llMoreSize.visibility = if (showMore) android.view.View.VISIBLE else android.view.View.GONE

@@ -42,6 +42,26 @@ data class UserProfileEntity(
 )
 
 @Entity(
+    tableName = "user_statistics",
+    foreignKeys = [
+        ForeignKey(
+            entity = UserAccountEntity::class,
+            parentColumns = ["userId"],
+            childColumns = ["userId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index(value = ["userId"], unique = true)]
+)
+data class UserStatisticsEntity(
+    @PrimaryKey val userId: Long,
+    val likeCount: Long = 0L,
+    val fanCount: Long = 0L,
+    val followCount: Long = 0L,
+    val selfPostsJson: String = "[]"
+)
+
+@Entity(
     tableName = "user_like",
     foreignKeys = [
         ForeignKey(
@@ -67,6 +87,11 @@ data class UserBundleEntity(
         entityColumn = "userId"
     )
     val profile: UserProfileEntity?,
+    @Relation(
+        parentColumn = "userId",
+        entityColumn = "userId"
+    )
+    val statistics: UserStatisticsEntity?,
     @Relation(
         parentColumn = "userId",
         entityColumn = "userId"

@@ -27,12 +27,14 @@ import com.example.grabthisforme.model.user.data.dao.UserDao
 import com.example.grabthisforme.model.user.data.entity.UserAccountEntity
 import com.example.grabthisforme.model.user.data.entity.UserLikeEntity
 import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
+import com.example.grabthisforme.model.user.data.entity.UserStatisticsEntity
 
 @Database(
     entities = [
         SearchContent::class,
         UserAccountEntity::class,
         UserProfileEntity::class,
+        UserStatisticsEntity::class,
         UserLikeEntity::class,
         GoodsBaseEntity::class,
         GoodsPriceEntity::class,
@@ -46,7 +48,7 @@ import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
         PostCommentEntity::class,
         StoreEntity::class
     ],
-    version = 17,
+    version = 18,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
