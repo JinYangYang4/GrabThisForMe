@@ -15,7 +15,7 @@ import com.example.grabthisforme.databinding.RvChatMessageItemBinding
 import com.example.grabthisforme.model.messageContent.domain.MessageContent
 import java.util.Date
 
-typealias OnImageClick = (String) -> Unit
+typealias OnImageClick = (MessageContent) -> Unit
 class ChatMessageRecyclerViewAdapter(private val clickListener : (MessageContent) -> Unit,private val onImageClick: OnImageClick) : ListAdapter<MessageContent, ChatMessageRecyclerViewAdapter.ViewHolder>(MessageDiffCallback()) {
     inner class ViewHolder(private val binding: RvChatMessageItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(message: MessageContent,clickListener: (MessageContent) -> Unit) {
@@ -30,8 +30,8 @@ class ChatMessageRecyclerViewAdapter(private val clickListener : (MessageContent
                         .error(R.drawable.ic_back_charactor2)
                         .into(binding.ivSendImage)
                     binding.ivSendImage.setOnClickListener {
-                        message.mediaUrl?.let { url ->
-                            onImageClick.invoke(url)
+                        message.mediaUrl?.let {
+                            onImageClick.invoke(message)
                         }
                     }
                 }else{
@@ -51,15 +51,15 @@ class ChatMessageRecyclerViewAdapter(private val clickListener : (MessageContent
                         .placeholder(R.drawable.ic_back_charactor2)
                         .error(R.drawable.ic_back_charactor2)
                         .into(binding.ivReceiveImage)
-                    binding.ivSendImage.setOnClickListener {
-                        message.mediaUrl?.let { url ->
-                            onImageClick.invoke(url)
+                    binding.ivReceiveImage.setOnClickListener {
+                        message.mediaUrl?.let {
+                            onImageClick.invoke(message)
                         }
                     }
                 }else{
                     binding.ivReceiveImage.visibility = View.GONE
                     binding.tvReceiveContent.visibility = View.VISIBLE
-                    binding.tvSendContent.text = message.content ?: ""
+                    binding.tvReceiveContent.text = message.content ?: ""
                 }
                 binding.llReceiveMessage.visibility = View.VISIBLE
                 binding.llSendMessage.visibility = View.GONE

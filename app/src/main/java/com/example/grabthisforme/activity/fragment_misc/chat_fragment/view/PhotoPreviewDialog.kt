@@ -1,17 +1,15 @@
 package com.example.grabthisforme.activity.fragment_misc.chat_fragment.view
 
 import android.annotation.SuppressLint
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
-import com.bumptech.glide.Glide
+import androidx.viewpager2.widget.ViewPager2
 import com.example.grabthisforme.R
+import com.example.grabthisforme.activity.fragment_misc.chat_fragment.adapter.PhotoPreviewPagerAdapter
 import com.example.grabthisforme.databinding.DialogPhotoPreviewBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 
@@ -19,17 +17,23 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 class PhotoPreviewDialog : DialogFragment() {
     private var _binding: DialogPhotoPreviewBinding? = null
     private val binding get() = _binding!!
-    private var imageUri: Uri? = null
+    private var pageChangeCallback: ViewPager2.OnPageChangeCallback? = null
 
     companion object {
-        private const val ARG_IMAGE_URI = "image_uri"
+        private const val ARG_IMAGE_URIS = "image_uris"
+        private const val ARG_INITIAL_INDEX = "initial_index"
 
         fun newInstance(uri: String): PhotoPreviewDialog {
-            val dialog = PhotoPreviewDialog()
-            val args = Bundle()
-            args.putString(ARG_IMAGE_URI, uri)
-            dialog.arguments = args
-            return dialog
+            return newInstance(listOf(uri))
+        }
+
+        fun newInstance(uris: List<String>, initialIndex: Int = 0): PhotoPreviewDialog {
+            return PhotoPreviewDialog().apply {
+                arguments = Bundle().apply {
+                    putStringArrayList(ARG_IMAGE_URIS, ArrayList(uris))
+                    putInt(ARG_INITIAL_INDEX, initialIndex)
+                }
+            }
         }
     }
 
@@ -47,41 +51,70 @@ class PhotoPreviewDialog : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        imageUri = Uri.parse(arguments?.getString(ARG_IMAGE_URI))
-        Glide.with(this)
-            .load(imageUri)
-            .fitCenter()
-            .into(binding.ivPreview)
+        val imageUris = arguments
+            ?.getStringArrayList(ARG_IMAGE_URIS)
+            .orEmpty()
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
 
+        if (imageUris.isEmpty()) {
+            dismissAllowingStateLoss()
+            return
+        }
 
-        binding.ivPreview.setOnClickListener { dismiss() }
+        val initialIndex = arguments
+            ?.getInt(ARG_INITIAL_INDEX, 0)
+            ?.coerceIn(0, imageUris.lastIndex)
+            ?: 0
+
+        binding.viewPager.adapter = PhotoPreviewPagerAdapter(imageUris) {
+            dismiss()
+        }
+        binding.viewPager.setCurrentItem(initialIndex, false)
+        updateCounter(initialIndex, imageUris.size)
+
+        pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                updateCounter(position, imageUris.size)
+            }
+        }
+        binding.viewPager.registerOnPageChangeCallback(pageChangeCallback!!)
         binding.btnClose.setOnClickListener { dismiss() }
     }
+
+    private fun updateCounter(position: Int, total: Int) {
+        binding.tvCounter.text = "${position + 1} / $total"
+        binding.tvCounter.visibility = if (total > 1) View.VISIBLE else View.GONE
+    }
+
     @SuppressLint("ResourceAsColor")
     override fun onStart() {
         super.onStart()
-        val dialog = getDialog()
-        if (dialog != null && dialog.window != null) {
-            val window = dialog.window
-            window!!.setFlags(
-                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-            )
-            val layoutParams = window!!.attributes
-            layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT
-            layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT
-            window.attributes = layoutParams
-            val bottomSheet = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-            bottomSheet?.let {
-                val behavior = BottomSheetBehavior.from(it)
-                behavior.peekHeight = WindowManager.LayoutParams.MATCH_PARENT
-                behavior.state = BottomSheetBehavior.STATE_EXPANDED
-                behavior.isDraggable = false
-            }
+        val dialog = dialog ?: return
+        val window = dialog.window ?: return
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        )
+        val layoutParams = window.attributes
+        layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT
+        layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT
+        window.attributes = layoutParams
+        val bottomSheet = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+        bottomSheet?.let {
+            val behavior = BottomSheetBehavior.from(it)
+            behavior.peekHeight = WindowManager.LayoutParams.MATCH_PARENT
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            behavior.isDraggable = false
         }
     }
 
     override fun onDestroyView() {
+        pageChangeCallback?.let {
+            binding.viewPager.unregisterOnPageChangeCallback(it)
+        }
+        binding.viewPager.adapter = null
+        pageChangeCallback = null
         super.onDestroyView()
         _binding = null
     }

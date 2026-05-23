@@ -200,8 +200,16 @@ class FragmentChat : Fragment(), BottomSheetDialogPhoto.OnPhotosSelectedListener
                 hideSoftKeyboard()
                 chatViewModel.turnKeyboardStateToFalse()
             }
-        },onImageClick = { imageUrl ->
-            val previewDialog = PhotoPreviewDialog.newInstance(imageUrl)
+        },onImageClick = { imageMessage ->
+            val imageMessages = messageList
+                .filter { it.type == MessageContent.MessageType.IMAGE }
+                .filter { !it.mediaUrl.isNullOrBlank() }
+            val imageUrls = imageMessages.mapNotNull { it.mediaUrl }
+            val initialIndex = imageMessages
+                .indexOfFirst { it.messageId == imageMessage.messageId }
+                .takeIf { it >= 0 }
+                ?: 0
+            val previewDialog = PhotoPreviewDialog.newInstance(imageUrls, initialIndex)
             previewDialog.show(childFragmentManager, "PhotoPreviewDialog")
         })
 
