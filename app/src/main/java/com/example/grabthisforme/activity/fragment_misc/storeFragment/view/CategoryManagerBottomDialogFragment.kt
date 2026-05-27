@@ -39,12 +39,14 @@ import com.kyant.backdrop.backdrops.layerBackdrop
 import com.kyant.backdrop.backdrops.rememberCanvasBackdrop
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import android.graphics.Canvas
+import android.view.KeyEvent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import com.example.grabthisforme.ui.liquidglass.components.LiquidBottomTabs
+import com.example.grabthisforme.ui.liquidglass.dialog.LiquidMessageDialogFragment
 
 class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
 
@@ -63,6 +65,7 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.BottomSheetDialogTransparentTheme)
+        isCancelable = false
     }
 
 
@@ -80,6 +83,8 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
         dialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
         initCategoryData()
         initRecyclerViews()
+        initClosePromptResultListener()
+        prepareTabContentContainers()
         initClickEvents()
         prepareTabContentContainers()
         initTabGroup()
@@ -99,7 +104,43 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
         bottomSheetDialog.window?.apply {
             setBackgroundDrawableResource(android.R.color.transparent)
         }
+        bottomSheetDialog.setOnKeyListener { _, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                if (event.action == KeyEvent.ACTION_UP) {
+                    showSaveChangesPrompt()
+                }
+                true
+            } else {
+                false
+            }
+        }
     }
+    private fun initClosePromptResultListener() {
+        childFragmentManager.setFragmentResultListener(
+            CLOSE_PROMPT_REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, result ->
+            val shouldSave = result.getBoolean(LiquidMessageDialogFragment.RESULT_CONFIRMED, false)
+            if (shouldSave) {
+                dispatchCategoryResult(categoryList)
+            }
+            dismiss()
+        }
+    }
+
+    private fun showSaveChangesPrompt() {
+        if (childFragmentManager.findFragmentByTag(LiquidMessageDialogFragment.TAG) != null) return
+        LiquidMessageDialogFragment.show(
+            fragmentManager = childFragmentManager,
+            title = "保存更改",
+            message = "是否保存当前分类管理的更改",
+            positiveText = "确认更改",
+            negativeText = "不保存",
+            requestKey = CLOSE_PROMPT_REQUEST_KEY,
+            cancelable = false
+        )
+    }
+
     private fun initCategoryData() {
         val initialCategories = arguments?.getStringArrayList(ARG_CATEGORY_LIST).orEmpty()
         categoryList.clear()
@@ -378,6 +419,7 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
         private const val ARG_CATEGORY_LIST = "arg_category_list"
         private const val CATEGORY_ALL = "全部"
         private const val CATEGORY_UNCLASSIFIED = "未分类"
+        private const val CLOSE_PROMPT_REQUEST_KEY = "category_manager_close_prompt_request_key"
 
         fun newInstance(categoryList: ArrayList<String>): CategoryManagerBottomDialogFragment {
             return CategoryManagerBottomDialogFragment().apply {
