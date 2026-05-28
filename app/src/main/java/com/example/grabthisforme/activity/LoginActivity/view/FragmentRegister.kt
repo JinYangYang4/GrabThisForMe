@@ -55,6 +55,9 @@ class FragmentRegister : Fragment() {
         binding.layoutRegister.setOnClickListener {
             getUserItem()
         }
+        binding.tvSwitchAccounts.setOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
         binding.root.setOnClickListener {
             clearInputFocus()
         }

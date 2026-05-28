@@ -43,6 +43,9 @@ class FragmentFindPassword : Fragment() {
         binding.root.setOnClickListener {
             clearInputFocus()
         }
+        binding.tvSwitchAccounts.setOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
     }
 
 
