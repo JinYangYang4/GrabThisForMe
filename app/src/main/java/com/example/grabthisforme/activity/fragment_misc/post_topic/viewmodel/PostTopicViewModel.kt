@@ -22,6 +22,12 @@ class PostTopicViewModel @Inject constructor(
     private val _selectedImageCount = MutableLiveData(0)
     val selectedImageCount: LiveData<Int> get() = _selectedImageCount
 
+    private val _contentLength = MutableLiveData(0)
+    val contentLength: LiveData<Int> get() = _contentLength
+
+    private val _draftStatusText = MutableLiveData("未开始编辑")
+    val draftStatusText: LiveData<String> get() = _draftStatusText
+
     private val _canPublish = MutableLiveData(false)
     val canPublish: LiveData<Boolean> get() = _canPublish
 
@@ -37,19 +43,26 @@ class PostTopicViewModel @Inject constructor(
     fun updateContent(content: String) {
         _contentText.value = content
         draftState = draftState.copy(content = content)
-        refreshPublishState()
+        refreshEditorState()
     }
 
     fun updateSelectedImages(imageUris: List<String>) {
         val cleanedImages = imageUris.filter { it.isNotBlank() }
         _selectedImages.value = cleanedImages
-        _selectedImageCount.value = cleanedImages.size
         draftState = draftState.copy(images = cleanedImages)
-        refreshPublishState()
+        refreshEditorState()
     }
 
     fun saveDraft() {
-        draftState = currentDraft()
+        val currentDraft = currentDraft()
+        if (currentDraft.content.isBlank() && currentDraft.images.isEmpty()) {
+            _actionResult.value = PostTopicActionResult(
+                success = false,
+                message = "当前还没有可保存的内容"
+            )
+            return
+        }
+        draftState = currentDraft
         _actionResult.value = PostTopicActionResult(
             success = true,
             message = "草稿已保存",
@@ -63,7 +76,7 @@ class PostTopicViewModel @Inject constructor(
         if (content.isBlank()) {
             _actionResult.value = PostTopicActionResult(
                 success = false,
-                message = "请输入帖子正文"
+                message = "请先输入帖子正文"
             )
             return
         }
@@ -73,17 +86,15 @@ class PostTopicViewModel @Inject constructor(
                 postRepository.publishPost(content = content, images = images)
             }.onSuccess {
                 draftState = PostDraftState()
-                _contentText.postValue("")
-                _selectedImages.postValue(emptyList())
-                _selectedImageCount.postValue(0)
-                refreshPublishState()
-                _actionResult.postValue(
+                _contentText.value = ""
+                _selectedImages.value = emptyList()
+                refreshEditorState()
+                _actionResult.value =
                     PostTopicActionResult(
                         success = true,
                         message = "帖子发布成功",
                         actionType = PostTopicActionType.PUBLISHED
                     )
-                )
             }.onFailure {
                 _actionResult.postValue(
                     PostTopicActionResult(
@@ -100,8 +111,7 @@ class PostTopicViewModel @Inject constructor(
     private fun restoreDraft() {
         _contentText.value = draftState.content
         _selectedImages.value = draftState.images
-        _selectedImageCount.value = draftState.images.size
-        refreshPublishState()
+        refreshEditorState()
     }
 
     private fun currentDraft(): PostDraftState {
@@ -111,8 +121,18 @@ class PostTopicViewModel @Inject constructor(
         )
     }
 
-    private fun refreshPublishState() {
-        _canPublish.value = _contentText.value.orEmpty().trim().isNotBlank()
+    private fun refreshEditorState() {
+        val content = _contentText.value.orEmpty()
+        val images = _selectedImages.value.orEmpty()
+        _selectedImageCount.value = images.size
+        _contentLength.value = content.length
+        _canPublish.value = content.trim().isNotBlank()
+        _draftStatusText.value = when {
+            content.isBlank() && images.isEmpty() -> "未开始编辑"
+            content.trim().isBlank() && images.isNotEmpty() -> "已添加图片，待补充正文"
+            images.isEmpty() -> "正文草稿已就绪"
+            else -> "正文和配图都已准备"
+        }
     }
 }
 

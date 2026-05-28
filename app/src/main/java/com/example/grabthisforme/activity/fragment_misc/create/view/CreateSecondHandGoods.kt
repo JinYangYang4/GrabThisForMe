@@ -88,11 +88,9 @@ class CreateSecondHandGoods : Fragment() {
         binding.llNested.setOnClickListener {
             clearInputFocus()
         }
-
         binding.ivSecondhandPic.setOnClickListener {
             openPhotoPicker()
         }
-
         binding.btnPublishSecondhand.isEnabled = true
 
         binding.btnMinus.setOnClickListener {
@@ -196,7 +194,6 @@ class CreateSecondHandGoods : Fragment() {
                     focusedRect.bottom - scrollView.height + scrollView.paddingBottom + extraSpacing
                 scrollView.smoothScrollTo(0, targetY.coerceAtLeast(0))
             }
-
             focusedRect.top - extraSpacing < visibleTop -> {
                 scrollView.smoothScrollTo(0, (focusedRect.top - extraSpacing).coerceAtLeast(0))
             }

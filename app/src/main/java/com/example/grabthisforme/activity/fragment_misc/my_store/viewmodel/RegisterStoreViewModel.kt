@@ -65,7 +65,7 @@ class RegisterStoreViewModel @Inject constructor(
         if (storeName.isBlank() || storeType.isBlank() || storeAddress.isBlank() || phone.isBlank()) {
             _createResult.value = RegisterStoreResult(
                 success = false,
-                message = "请先填写完整必填项"
+                message = "请先填写完整的必填信息"
             )
             return
         }

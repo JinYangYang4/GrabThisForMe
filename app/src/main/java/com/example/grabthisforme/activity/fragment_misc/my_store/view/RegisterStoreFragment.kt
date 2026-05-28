@@ -2,6 +2,7 @@ package com.example.grabthisforme.activity.fragment_misc.my_store.view
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,8 +14,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.bumptech.glide.Glide
 import com.bigkoo.pickerview.builder.TimePickerBuilder
+import com.bumptech.glide.Glide
+import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.BottomSheetDialogPhoto
 import com.example.grabthisforme.activity.fragment_misc.my_store.viewmodel.RegisterStoreViewModel
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
@@ -27,8 +29,8 @@ import java.util.Locale
 class RegisterStoreFragment : Fragment() {
     private var _binding: FragmentStoreOwnerRegisterBinding? = null
     private val binding get() = _binding!!
-    private val viewModel : RegisterStoreViewModel by viewModels()
-
+    private val viewModel: RegisterStoreViewModel by viewModels()
+    private var nestedScrollBaseBottomPadding = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,8 +47,23 @@ class RegisterStoreFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initView()
         observeCreateResult()
+        nestedScrollBaseBottomPadding = binding.nestedScrollView.paddingBottom
         ViewCompat.setOnApplyWindowInsetsListener(requireView()) { _, insets ->
             val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+            val imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+            val systemBottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
+            val keyboardSpace = (imeBottom - systemBottom).coerceAtLeast(0)
+            binding.nestedScrollView.setPadding(
+                binding.nestedScrollView.paddingLeft,
+                binding.nestedScrollView.paddingTop,
+                binding.nestedScrollView.paddingRight,
+                nestedScrollBaseBottomPadding + keyboardSpace
+            )
+            if (imeVisible && _binding != null) {
+                binding.nestedScrollView.postDelayed({
+                    scrollFocusedInputIntoView()
+                }, KEYBOARD_SCROLL_DELAY_MS)
+            }
             if (!imeVisible && _binding != null) {
                 clearInputFocus()
             }
@@ -70,7 +87,7 @@ class RegisterStoreFragment : Fragment() {
         binding.ivHeadPic.setOnClickListener {
             showPhotoSelector()
         }
-        binding.llFormContainer.setOnClickListener {
+        binding.llNested.setOnClickListener {
             clearInputFocus()
         }
         binding.root.setOnClickListener {
@@ -93,36 +110,69 @@ class RegisterStoreFragment : Fragment() {
             )
         }
         binding.etStartTime.setOnClickListener {
-            val timePicker = TimePickerBuilder(requireActivity()) { date, _ ->
-                val format = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA)
-                val selectTime = format.format(date)
-                viewModel.setStartTime(selectTime)
-            }
-                .setType(booleanArrayOf(true, true, true, true, true, false))
-                .setCancelText("取消")
-                .setSubmitText("确认")
-                .setTitleText("选择服务时间")
-                .setTitleColor(Color.BLACK)
-                .setSubmitColor(Color.parseColor("#FF5722"))
-                .build()
-
-            timePicker.show()
+            buildTimePicker(
+                title = "选择开始营业时间",
+                onSelected = viewModel::setStartTime
+            ).show()
         }
         binding.etEndTime.setOnClickListener {
-            val timePicker = TimePickerBuilder(requireActivity()) { date, _ ->
-                val format = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA)
-                val selectTime = format.format(date)
-                viewModel.setEndTime(selectTime)
-            }
-                .setType(booleanArrayOf(true, true, true, true, true, false)) // 显示：年、月、日、时、分（关闭秒）
-                .setCancelText("取消")
-                .setSubmitText("确认")
-                .setTitleText("选择服务时间")
-                .setTitleColor(Color.BLACK)
-                .setSubmitColor(Color.parseColor("#FF5722")) // 主题色
-                .build()
-            timePicker.show()
+            buildTimePicker(
+                title = "选择结束营业时间",
+                onSelected = viewModel::setEndTime
+            ).show()
         }
+    }
+
+    private fun buildTimePicker(
+        title: String,
+        onSelected: (String) -> Unit
+    ) = TimePickerBuilder(requireActivity()) { date, _ ->
+        val format = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA)
+        onSelected(format.format(date))
+    }
+        .setType(booleanArrayOf(true, true, true, true, true, false))
+        .setCancelText("取消")
+        .setSubmitText("确认")
+        .setTitleText(title)
+        .setTitleColor(Color.BLACK)
+        .setSubmitColor(Color.parseColor("#FF5722"))
+        .build()
+
+    private fun scrollFocusedInputIntoView() {
+        val currentFocus = requireActivity().currentFocus ?: return
+        val scrollView = binding.nestedScrollView
+        if (!isDescendantOf(currentFocus, scrollView)) return
+
+        val focusedRect = Rect()
+        currentFocus.getDrawingRect(focusedRect)
+        scrollView.offsetDescendantRectToMyCoords(currentFocus, focusedRect)
+
+        val visibleTop = scrollView.scrollY
+        val visibleBottom = visibleTop + scrollView.height - scrollView.paddingBottom
+        val extraSpacing = KEYBOARD_FOCUS_SPACING_DP.dpToPx()
+
+        when {
+            focusedRect.bottom + extraSpacing > visibleBottom -> {
+                val targetY = focusedRect.bottom - scrollView.height + scrollView.paddingBottom + extraSpacing
+                scrollView.smoothScrollTo(0, targetY.coerceAtLeast(0))
+            }
+            focusedRect.top - extraSpacing < visibleTop -> {
+                scrollView.smoothScrollTo(0, (focusedRect.top - extraSpacing).coerceAtLeast(0))
+            }
+        }
+    }
+
+    private fun isDescendantOf(child: View, parent: View): Boolean {
+        var current: View? = child
+        while (current != null) {
+            if (current == parent) return true
+            current = current.parent as? View
+        }
+        return false
+    }
+
+    private fun Int.dpToPx(): Int {
+        return (this * resources.displayMetrics.density).toInt()
     }
 
     private fun showPhotoSelector() {
@@ -138,15 +188,15 @@ class RegisterStoreFragment : Fragment() {
 
     private fun renderAvatar(avatarUrl: String) {
         if (avatarUrl.isBlank()) {
-            binding.ivHeadPic.setImageResource(com.example.grabthisforme.R.drawable.ic_add)
+            binding.ivHeadPic.setImageResource(R.drawable.market_icon_photo)
             binding.ivHeadPic.tag = null
             return
         }
         binding.ivHeadPic.tag = avatarUrl
         Glide.with(this)
             .load(avatarUrl)
-            .placeholder(com.example.grabthisforme.R.drawable.ic_add)
-            .error(com.example.grabthisforme.R.drawable.ic_add)
+            .placeholder(R.drawable.market_icon_photo)
+            .error(R.drawable.market_icon_photo)
             .into(binding.ivHeadPic)
     }
 
@@ -166,5 +216,10 @@ class RegisterStoreFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val KEYBOARD_SCROLL_DELAY_MS = 120L
+        private const val KEYBOARD_FOCUS_SPACING_DP = 24
     }
 }
