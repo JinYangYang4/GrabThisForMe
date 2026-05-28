@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
         <import type="android.view.View" />
+
         <variable
             name="viewModel"
             type="com.example.grabthisforme.activity.fragment_misc.create.viewModel.CreateOrderViewModel" />
@@ -12,591 +13,1183 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:background="@drawable/bg_create_goods_screen"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_arc_gradient_orange"
-            android:gravity="center_vertical"
-            android:paddingTop="30dp"
-            android:paddingBottom="10dp"
-            android:paddingHorizontal="16dp"
-            android:orientation="horizontal">
+            android:layout_height="278dp"
+            android:background="@drawable/bg_create_order_hero"
+            android:orientation="vertical"
+            android:paddingStart="18dp"
+            android:paddingTop="28dp"
+            android:paddingEnd="18dp"
+            android:paddingBottom="60dp">
 
-            <ImageView
-                android:id="@+id/iv_back"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:src="@drawable/ic_back" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="18dp"
-                android:text="创建订单"
-
-                android:textSize="17sp"
-                android:textStyle="bold"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_round_stripe"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:elevation="2dp"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="10dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="业务类型："
-                android:textSize="16sp"
-                android:textColor="#333333"/>
-
-            <RadioGroup
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <RadioButton
-                    android:id="@+id/rb_buy_goods"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="买商品"
-                    android:textSize="15sp"
-                    android:checked="@{viewModel.buyGoodsMode}"
-                    android:textColor="@color/radio_text_selector"
-                    app:buttonTint="@color/radio_button_tint"
-                    android:layout_marginLeft="10dp"/>
-
-                <RadioButton
-                    android:id="@+id/rb_get_express"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="取快递"
-                    android:textSize="15sp"
-                    android:checked="@{!viewModel.buyGoodsMode}"
-                    android:textColor="@color/radio_text_selector"
-                    app:buttonTint="@color/radio_button_tint"
-                    android:layout_marginLeft="20dp"/>
-            </RadioGroup>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_round_stripe"
-            android:gravity="center_vertical"
-            android:elevation="2dp"
-            android:padding="16dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginHorizontal="16dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="选择收件地址信息"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#333333"/>
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-            <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@drawable/ic_position"/>
-        </LinearLayout>
-        <androidx.core.widget.NestedScrollView
-            android:layout_width="match_parent"
-            android:id="@+id/nestedScrollView"
-            android:layout_height="0dp"
-            android:layout_marginTop="10dp"
-            android:layout_weight="1">
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/ll_nested">
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:id="@+id/iv_back"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_create_goods_icon_button"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_back"
+                        app:tint="@android:color/white" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:text="创建订单"
+                    android:textColor="@android:color/white"
+                    android:textSize="19sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:text="把需求写得清楚，接单的人会更快给你回应。"
+                android:textColor="#FFF9F5"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:maxLines="2"
+                android:text="无论是代买商品还是代取快递，都尽量把地点、时间和备注交代完整。"
+                android:textColor="#FFF2EA"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:layout_marginTop="18dp"
+                android:background="@drawable/bg_create_goods_top_glass"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:background="@drawable/bg_create_goods_chip"
+                    android:gravity="center"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:text="代买代取"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_create_goods_chip"
+                    android:gravity="center"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:text="校园即时"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="-52dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:fillViewport="true"
+            android:paddingBottom="20dp">
+
+            <LinearLayout
+                android:id="@+id/ll_nested"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="2dp">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="168dp"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/bg_create_goods_card"
+                    android:clipToOutline="true"
+                    android:elevation="4dp"
+                    android:outlineProvider="background"
+                    android:padding="6dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_create_goods_card"
+                        android:clipToOutline="true"
+                        android:contentDescription="@null"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/create_order_service_banner_v2" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:layout_gravity="bottom|start"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginBottom="14dp"
+                        android:background="@drawable/bg_create_goods_banner_badge"
+                        android:gravity="center"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:text="写清细节会更快接单"
+                        android:textColor="#9B4D1D"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <LinearLayout
-                        android:id="@+id/ll_goods_info"
-                        android:layout_width="match_parent"
-                        android:elevation="2dp"
-                        android:layout_marginHorizontal="16dp"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_rounded_white"
-                        android:backgroundTint="@color/white"
-                        android:padding="16dp"
-                        android:layout_marginTop="10dp"
+                    android:layout_marginHorizontal="10dp"
+                    android:background="@drawable/bg_create_goods_card"
+                    android:elevation="6dp"
+                    android:orientation="vertical"
+                    android:paddingStart="20dp"
+                    android:paddingTop="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingBottom="20dp">
 
-                        android:orientation="vertical"
-                        android:visibility="@{viewModel.buyGoodsMode ? View.VISIBLE : View.GONE}">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="订单类型"
+                        android:textColor="#172A2B"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="先告诉系统你要发的是代买商品还是代取快递。"
+                        android:textColor="#6A7B7C"
+                        android:textSize="13sp" />
+
+                    <RadioGroup
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/rb_buy_goods"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_create_order_toggle_option"
+                            android:button="@null"
+                            android:checked="@{viewModel.buyGoodsMode}"
+                            android:gravity="center"
+                            android:paddingHorizontal="12dp"
+                            android:text="代买商品"
+                            android:textColor="@color/create_order_toggle_text"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <RadioButton
+                            android:id="@+id/rb_get_express"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_create_order_toggle_option"
+                            android:button="@null"
+                            android:checked="@{!viewModel.buyGoodsMode}"
+                            android:gravity="center"
+                            android:paddingHorizontal="12dp"
+                            android:text="代取快递"
+                            android:textColor="@color/create_order_toggle_text"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+                    </RadioGroup>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_create_goods_card"
+                    android:elevation="4dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="18dp">
+
+                    <FrameLayout
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/bg_create_goods_field_icon">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_position" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="商品信息"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="#333333"/>
+                            android:text="收货与交付位置"
+                            android:textColor="#172A2B"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
 
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_marginVertical="8dp"
-                            android:background="#E8E8E8"/>
-
-                        <com.google.android.material.textfield.TextInputLayout
+                        <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="* 商品名称"
-                            app:hintTextColor="#999999"
-                            app:boxStrokeColor="#E8E8E8"
-                            app:boxStrokeWidth="0dp"
-                            app:hintEnabled="true">
+                            android:layout_marginTop="4dp"
+                            android:text="在下方填写目标地点、取件点或货架号，避免接单后反复确认。"
+                            android:textColor="#6A7B7C"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_goods_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_create_goods_card"
+                    android:elevation="4dp"
+                    android:orientation="vertical"
+                    android:paddingStart="20dp"
+                    android:paddingTop="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingBottom="20dp"
+                    android:visibility="@{viewModel.buyGoodsMode ? View.VISIBLE : View.GONE}">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="商品代买信息"
+                        android:textColor="#172A2B"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="把商品、价格、地点和补充要求写清楚，别人接单会更省心。"
+                        android:textColor="#6A7B7C"
+                        android:textSize="13sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_create_goods_field_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/market_icon_goods" />
+                        </FrameLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:hint="商品名称"
+                            app:boxBackgroundColor="#F6FBFA"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusBottomStart="18dp"
+                            app:boxCornerRadiusTopEnd="18dp"
+                            app:boxCornerRadiusTopStart="18dp"
+                            app:boxStrokeColor="#D8E6E3"
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="2dp"
+                            app:endIconMode="clear_text"
+                            app:hintTextColor="#7A8E8E"
+                            app:placeholderText="例如：瑞幸生椰拿铁、打印材料、面包">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/ti_goods_name"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textSize="15sp"
-                                android:paddingVertical="8dp"
-                                android:background="@null"/>
+                                android:minHeight="58dp"
+                                android:paddingVertical="10dp"
+                                android:textColor="#172A2B"
+                                android:textSize="15sp" />
                         </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_create_goods_field_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_position" />
+                        </FrameLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:hint="* 目的地"
-                            app:hintTextColor="#999999"
-                            app:boxStrokeColor="#E8E8E8"
-                            app:boxStrokeWidth="0dp"
-                            app:hintEnabled="true">
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:hint="送达地点"
+                            app:boxBackgroundColor="#F6FBFA"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusBottomStart="18dp"
+                            app:boxCornerRadiusTopEnd="18dp"
+                            app:boxCornerRadiusTopStart="18dp"
+                            app:boxStrokeColor="#D8E6E3"
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="2dp"
+                            app:endIconMode="clear_text"
+                            app:hintTextColor="#7A8E8E"
+                            app:placeholderText="例如：3号宿舍楼下、图书馆正门">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/ti_aim_position"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textSize="15sp"
-                                android:paddingVertical="8dp"
-                                android:background="@null"/>
+                                android:minHeight="58dp"
+                                android:paddingVertical="10dp"
+                                android:textColor="#172A2B"
+                                android:textSize="15sp" />
                         </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_create_goods_field_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/market_icon_price" />
+                        </FrameLayout>
+
                         <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:hint="* 商品价格（元）"
-                            app:hintTextColor="#999999"
-                            app:boxStrokeColor="#E8E8E8"
-                            app:boxStrokeWidth="0dp"
-                            app:hintEnabled="true">
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:hint="商品价格"
+                            app:boxBackgroundColor="#F6FBFA"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusBottomStart="18dp"
+                            app:boxCornerRadiusTopEnd="18dp"
+                            app:boxCornerRadiusTopStart="18dp"
+                            app:boxStrokeColor="#D8E6E3"
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="2dp"
+                            app:endIconMode="clear_text"
+                            app:hintTextColor="#7A8E8E"
+                            app:prefixText="元 ">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/ti_goods_price"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textSize="15sp"
-                                android:paddingVertical="8dp"
                                 android:inputType="numberDecimal"
-                                android:background="@null"/>
+                                android:minHeight="58dp"
+                                android:paddingVertical="10dp"
+                                android:textColor="#172A2B"
+                                android:textSize="15sp" />
                         </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:gravity="top"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_create_goods_field_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/market_icon_info" />
+                        </FrameLayout>
 
                         <com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.NestedScrollableHost
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-                            <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1">
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/ti_requirements"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:clipToOutline="true"
-                                android:background="@drawable/bg_round_stripe">
-                                <com.google.android.material.textfield.TextInputLayout
+                                android:hint="补充要求"
+                                app:boxBackgroundColor="#F6FBFA"
+                                app:boxBackgroundMode="outline"
+                                app:boxCornerRadiusBottomEnd="18dp"
+                                app:boxCornerRadiusBottomStart="18dp"
+                                app:boxCornerRadiusTopEnd="18dp"
+                                app:boxCornerRadiusTopStart="18dp"
+                                app:boxStrokeColor="#D8E6E3"
+                                app:boxStrokeWidth="1dp"
+                                app:boxStrokeWidthFocused="2dp"
+                                app:hintTextColor="#7A8E8E"
+                                app:placeholderText="例如：少冰、要发票、帮忙核对口味，可不填">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/ti_goods_message"
                                     android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:hint="要求(可不填)"
-                                    app:hintTextColor="#999999"
-                                    app:boxStrokeColor="#E8E8E8"
-                                    android:id="@+id/ti_requirements"
-                                    android:background="@drawable/bg_round_stripe"
-                                    android:elevation="4dp"
-                                    android:layout_margin="1dp"
-                                    app:boxStrokeWidth="0dp"
-                                    app:hintEnabled="true"
-                                    android:layout_marginTop="8dp">
-
-                                    <com.google.android.material.textfield.TextInputEditText
-                                        android:id="@+id/ti_goods_message"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="120dp"
-                                        android:textSize="15sp"
-                                        android:paddingVertical="8dp"
-                                        android:gravity="top"
-                                        android:inputType="textMultiLine"
-                                        android:maxLines="5"
-                                        android:background="@null"/>
-                                </com.google.android.material.textfield.TextInputLayout>
-                            </LinearLayout>
+                                    android:layout_height="124dp"
+                                    android:gravity="top"
+                                    android:inputType="textMultiLine"
+                                    android:maxLines="5"
+                                    android:paddingTop="14dp"
+                                    android:paddingBottom="14dp"
+                                    android:textColor="#172A2B"
+                                    android:textSize="15sp" />
+                            </com.google.android.material.textfield.TextInputLayout>
                         </com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.NestedScrollableHost>
+                    </LinearLayout>
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_create_goods_field_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/market_icon_store" />
+                        </FrameLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
                             android:id="@+id/ti_store"
-                            android:hint="指定店铺(可不填)"
-                            app:hintTextColor="#999999"
-                            app:boxStrokeColor="#E8E8E8"
-                            app:boxStrokeWidth="0dp"
-                            app:hintEnabled="true">
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:hint="指定店铺"
+                            app:boxBackgroundColor="#F6FBFA"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusBottomStart="18dp"
+                            app:boxCornerRadiusTopEnd="18dp"
+                            app:boxCornerRadiusTopStart="18dp"
+                            app:boxStrokeColor="#D8E6E3"
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="2dp"
+                            app:endIconMode="clear_text"
+                            app:hintTextColor="#7A8E8E"
+                            app:placeholderText="例如：一食堂便利店，可不填">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/ti_shelf_number"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textSize="15sp"
-                                android:paddingVertical="8dp"
-                                android:background="@null"/>
+                                android:minHeight="58dp"
+                                android:paddingVertical="10dp"
+                                android:textColor="#172A2B"
+                                android:textSize="15sp" />
                         </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginTop="8dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="购买数量"
-                                android:textSize="15sp"
-                                android:textColor="@color/black"
-                                android:layout_marginBottom="4dp"/>
-                            <View
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_create_goods_photo_slot"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="16dp"
+                        android:paddingTop="14dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="14dp">
 
-                            </View>
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:background="#F5F5F5"
-                                android:gravity="center">
-                                <ImageView
-                                    android:id="@+id/btn_minus"
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
-                                    android:src="@drawable/ic_decrease"
-                                    android:padding="0dp"/>
-
-                                <TextView
-                                    android:id="@+id/tv_sale_number"
-                                    android:layout_width="45dp"
-                                    android:layout_height="match_parent"
-                                    android:background="@null"
-                                    android:gravity="center"
-                                    android:paddingHorizontal="8dp"
-                                    android:text="1"
-                                    android:textColor="#333333"
-                                    android:textSize="15sp" />
-                                <ImageView
-                                    android:id="@+id/btn_plus"
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
-                                    android:src="@drawable/ic_increase"
-                                    android:padding="0dp"/>
-                            </LinearLayout>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_marginTop="8dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="商品图片(可不填)"
-                                android:textSize="15sp"
-                                android:textColor="#999999"/>
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_create_goods_field_icon">
 
                             <ImageView
-                                android:id="@+id/iv_goods_pic"
-                                android:layout_width="70dp"
-                                android:layout_height="70dp"
-                                android:layout_marginTop="8dp"
-                                android:src="@drawable/ic_add"
-                                android:scaleType="centerCrop"/>
-                        </LinearLayout>
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/market_icon_stock" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:text="购买数量"
+                            android:textColor="#172A2B"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
 
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginTop="8dp">
+                            android:layout_width="wrap_content"
+                            android:layout_height="42dp"
+                            android:background="@drawable/bg_create_goods_card"
+                            android:gravity="center_vertical"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp">
 
-                            <com.google.android.material.textfield.TextInputLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:hint="开始时间"
-                                app:hintTextColor="#999999"
-                                app:boxStrokeColor="#E8E8E8"
-                                app:boxStrokeWidth="0dp"
-                                app:hintEnabled="true">
-
-                                <com.google.android.material.textfield.TextInputEditText
-                                    android:id="@+id/et_start_time"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:textSize="15sp"
-                                    android:paddingVertical="8dp"
-                                    android:focusable="false"
-                                    android:text="@{viewModel.startTime}"
-                                    android:background="@null"/>
-                            </com.google.android.material.textfield.TextInputLayout>
+                            <ImageView
+                                android:id="@+id/btn_minus"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_decrease" />
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text=" - "
+                                android:id="@+id/tv_sale_number"
+                                android:layout_width="42dp"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:text="1"
+                                android:textColor="#172A2B"
                                 android:textSize="15sp"
-                                android:paddingHorizontal="8dp"
-                                android:gravity="center"/>
+                                android:textStyle="bold" />
 
-                            <com.google.android.material.textfield.TextInputLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:hint="结束时间"
-                                app:hintTextColor="#999999"
-                                app:boxStrokeColor="#E8E8E8"
-                                app:boxStrokeWidth="0dp"
-                                app:hintEnabled="true">
-
-                                <com.google.android.material.textfield.TextInputEditText
-                                    android:id="@+id/et_end_time"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:textSize="15sp"
-                                    android:paddingVertical="8dp"
-                                    android:focusable="false"
-                                    android:text="@{viewModel.endTime}"
-                                    android:background="@null"/>
-                            </com.google.android.material.textfield.TextInputLayout>
+                            <ImageView
+                                android:id="@+id/btn_plus"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_increase" />
                         </LinearLayout>
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/ll_express_info"
-                        android:layout_marginHorizontal="16dp"
-                        android:elevation="2dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/bg_rounded_white"
-                        android:padding="16dp"
-                        android:layout_marginTop="10dp"
-                        android:orientation="vertical"
-                        android:visibility="@{viewModel.buyGoodsMode ? View.GONE : View.VISIBLE}">
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_create_goods_photo_slot"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <ImageView
+                            android:id="@+id/iv_goods_pic"
+                            android:layout_width="96dp"
+                            android:layout_height="96dp"
+                            android:background="@drawable/bg_auth_switch_pill"
+                            android:contentDescription="@null"
+                            android:padding="18dp"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/market_icon_photo" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="快递信息"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="#333333"/>
+                            android:layout_marginStart="16dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_marginVertical="8dp"
-                            android:background="#E8E8E8"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="商品参考图"
+                                android:textColor="#172A2B"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="有图更容易让接单的人快速判断，上传清晰实拍即可。"
+                                android:textColor="#6A7B7C"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_create_goods_field_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_watch" />
+                        </FrameLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:hint="开始时间"
+                            app:boxBackgroundColor="#F6FBFA"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusBottomStart="18dp"
+                            app:boxCornerRadiusTopEnd="18dp"
+                            app:boxCornerRadiusTopStart="18dp"
+                            app:boxStrokeColor="#D8E6E3"
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="2dp"
+                            app:hintTextColor="#7A8E8E">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/et_start_time"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:focusable="false"
+                                android:minHeight="58dp"
+                                android:paddingVertical="10dp"
+                                android:text="@{viewModel.startTime}"
+                                android:textColor="#172A2B"
+                                android:textSize="15sp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_create_goods_field_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_watch" />
+                        </FrameLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:hint="结束时间"
+                            app:boxBackgroundColor="#F6FBFA"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusBottomStart="18dp"
+                            app:boxCornerRadiusTopEnd="18dp"
+                            app:boxCornerRadiusTopStart="18dp"
+                            app:boxStrokeColor="#D8E6E3"
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="2dp"
+                            app:hintTextColor="#7A8E8E">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/et_end_time"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:focusable="false"
+                                android:minHeight="58dp"
+                                android:paddingVertical="10dp"
+                                android:text="@{viewModel.endTime}"
+                                android:textColor="#172A2B"
+                                android:textSize="15sp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_express_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_create_goods_card"
+                    android:elevation="4dp"
+                    android:orientation="vertical"
+                    android:paddingStart="20dp"
+                    android:paddingTop="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingBottom="20dp"
+                    android:visibility="@{viewModel.buyGoodsMode ? View.GONE : View.VISIBLE}">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="快递代取信息"
+                        android:textColor="#172A2B"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="快递单号、取件码和柜机位置尽量完整，方便别人直接去取。"
+                        android:textColor="#6A7B7C"
+                        android:textSize="13sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_create_goods_field_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_receive" />
+                        </FrameLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/ti_tracking_number"
-                            android:hint="* 快递单号"
-                            app:hintTextColor="#999999"
-                            app:boxStrokeColor="#E8E8E8"
-                            app:boxStrokeWidth="0dp"
-                            app:hintEnabled="true">
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:hint="快递单号"
+                            app:boxBackgroundColor="#F6FBFA"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusBottomStart="18dp"
+                            app:boxCornerRadiusTopEnd="18dp"
+                            app:boxCornerRadiusTopStart="18dp"
+                            app:boxStrokeColor="#D8E6E3"
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="2dp"
+                            app:endIconMode="clear_text"
+                            app:hintTextColor="#7A8E8E"
+                            app:placeholderText="例如：SF1234567890">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/et_express_no"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textSize="15sp"
-                                android:paddingVertical="8dp"
-                                android:background="@null"/>
+                                android:minHeight="58dp"
+                                android:paddingVertical="10dp"
+                                android:textColor="#172A2B"
+                                android:textSize="15sp" />
                         </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_create_goods_field_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/market_icon_store" />
+                        </FrameLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:hint="* 快递公司"
-                            app:hintTextColor="#999999"
-                            app:boxStrokeColor="#E8E8E8"
-                            app:boxStrokeWidth="0dp"
-                            app:hintEnabled="true">
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:hint="快递公司"
+                            app:boxBackgroundColor="#F6FBFA"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusBottomStart="18dp"
+                            app:boxCornerRadiusTopEnd="18dp"
+                            app:boxCornerRadiusTopStart="18dp"
+                            app:boxStrokeColor="#D8E6E3"
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="2dp"
+                            app:endIconMode="clear_text"
+                            app:hintTextColor="#7A8E8E"
+                            app:placeholderText="例如：顺丰、京东、菜鸟">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/ti_express_company"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textSize="15sp"
-                                android:paddingVertical="8dp"
-                                android:background="@null"/>
+                                android:minHeight="58dp"
+                                android:paddingVertical="10dp"
+                                android:textColor="#172A2B"
+                                android:textSize="15sp" />
                         </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_create_goods_field_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_position" />
+                        </FrameLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:hint="* 取件位置（驿站/快递柜编号）"
-                            app:hintTextColor="#999999"
-                            app:boxStrokeColor="#E8E8E8"
-                            app:boxStrokeWidth="0dp"
-                            app:hintEnabled="true">
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:hint="取件位置"
+                            app:boxBackgroundColor="#F6FBFA"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusBottomStart="18dp"
+                            app:boxCornerRadiusTopEnd="18dp"
+                            app:boxCornerRadiusTopStart="18dp"
+                            app:boxStrokeColor="#D8E6E3"
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="2dp"
+                            app:endIconMode="clear_text"
+                            app:hintTextColor="#7A8E8E"
+                            app:placeholderText="例如：西门菜鸟驿站、快递柜A12">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/ti_express_position"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textSize="15sp"
-                                android:paddingVertical="8dp"
-                                android:background="@null"/>
+                                android:minHeight="58dp"
+                                android:paddingVertical="10dp"
+                                android:textColor="#172A2B"
+                                android:textSize="15sp" />
                         </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_create_goods_field_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/market_icon_voucher" />
+                        </FrameLayout>
+
                         <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:hint="* 取件码"
-                            app:hintTextColor="#999999"
-                            app:boxStrokeColor="#E8E8E8"
-                            app:boxStrokeWidth="0dp"
-                            app:hintEnabled="true">
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:hint="取件码"
+                            app:boxBackgroundColor="#F6FBFA"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusBottomStart="18dp"
+                            app:boxCornerRadiusTopEnd="18dp"
+                            app:boxCornerRadiusTopStart="18dp"
+                            app:boxStrokeColor="#D8E6E3"
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="2dp"
+                            app:endIconMode="clear_text"
+                            app:hintTextColor="#7A8E8E"
+                            app:placeholderText="填写短信里的取件码">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/et_pickup_code"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textSize="15sp"
-                                android:paddingVertical="8dp"
-                                android:background="@null"/>
+                                android:minHeight="58dp"
+                                android:paddingVertical="10dp"
+                                android:textColor="#172A2B"
+                                android:textSize="15sp" />
                         </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:gravity="top"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_create_goods_field_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/market_icon_info" />
+                        </FrameLayout>
+
                         <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:hint="备注(可不填)"
-                            app:hintTextColor="#999999"
-                            app:boxStrokeColor="#E8E8E8"
-                            app:boxStrokeWidth="0dp"
-                            app:hintEnabled="true">
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:hint="备注说明"
+                            app:boxBackgroundColor="#F6FBFA"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusBottomStart="18dp"
+                            app:boxCornerRadiusTopEnd="18dp"
+                            app:boxCornerRadiusTopStart="18dp"
+                            app:boxStrokeColor="#D8E6E3"
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="2dp"
+                            app:hintTextColor="#7A8E8E"
+                            app:placeholderText="例如：到了先电话联系、代垫费用另说，可不填">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/ti_express_remark"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textSize="15sp"
-                                android:paddingVertical="8dp"
-                                android:background="@null"/>
+                                android:layout_height="124dp"
+                                android:gravity="top"
+                                android:inputType="textMultiLine"
+                                android:maxLines="5"
+                                android:paddingTop="14dp"
+                                android:paddingBottom="14dp"
+                                android:textColor="#172A2B"
+                                android:textSize="15sp" />
                         </com.google.android.material.textfield.TextInputLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginTop="8dp">
-
-                            <com.google.android.material.textfield.TextInputLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:hint="开始时间"
-                                app:hintTextColor="#999999"
-                                app:boxStrokeColor="#E8E8E8"
-                                app:boxStrokeWidth="0dp"
-                                app:hintEnabled="true">
-
-                                <com.google.android.material.textfield.TextInputEditText
-                                    android:id="@+id/et_express_start_time"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:textSize="15sp"
-                                    android:paddingVertical="8dp"
-                                    android:focusable="false"
-                                    android:text="@{viewModel.expressStartTime}"
-                                    android:background="@null"/>
-                            </com.google.android.material.textfield.TextInputLayout>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text=" - "
-                                android:textSize="15sp"
-                                android:paddingHorizontal="8dp"
-                                android:gravity="center"/>
-
-                            <com.google.android.material.textfield.TextInputLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:hint="结束时间"
-                                app:hintTextColor="#999999"
-                                app:boxStrokeColor="#E8E8E8"
-                                app:boxStrokeWidth="0dp"
-                                app:hintEnabled="true">
-
-                                <com.google.android.material.textfield.TextInputEditText
-                                    android:id="@+id/et_express_end_time"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:textSize="15sp"
-                                    android:paddingVertical="8dp"
-                                    android:focusable="false"
-                                    android:text="@{viewModel.expressEndTime}"
-                                    android:background="@null"/>
-                            </com.google.android.material.textfield.TextInputLayout>
-                        </LinearLayout>
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:background="@drawable/bg_round_stripe"
-                        android:elevation="2dp"
-                        android:layout_margin="16dp"
-                        android:clipToOutline="true">
-                        <Button
-                            android:id="@+id/btn_create_order"
-                            android:layout_width="match_parent"
+                        android:layout_marginTop="14dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_create_goods_field_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_watch" />
+                        </FrameLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_margin="1dp"
-                            android:background="@drawable/bg_round_stripe_orange"
-                            app:backgroundTint="@color/orange_light"
-                            android:text="创建订单"
-                            android:textColor="#FFFFFF"
-                            android:textSize="16sp"
-                            android:enabled="false"/>
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:hint="开始时间"
+                            app:boxBackgroundColor="#F6FBFA"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusBottomStart="18dp"
+                            app:boxCornerRadiusTopEnd="18dp"
+                            app:boxCornerRadiusTopStart="18dp"
+                            app:boxStrokeColor="#D8E6E3"
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="2dp"
+                            app:hintTextColor="#7A8E8E">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/et_express_start_time"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:focusable="false"
+                                android:minHeight="58dp"
+                                android:paddingVertical="10dp"
+                                android:text="@{viewModel.expressStartTime}"
+                                android:textColor="#172A2B"
+                                android:textSize="15sp" />
+                        </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
+                        <FrameLayout
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_create_goods_field_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_watch" />
+                        </FrameLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:hint="结束时间"
+                            app:boxBackgroundColor="#F6FBFA"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusBottomEnd="18dp"
+                            app:boxCornerRadiusBottomStart="18dp"
+                            app:boxCornerRadiusTopEnd="18dp"
+                            app:boxCornerRadiusTopStart="18dp"
+                            app:boxStrokeColor="#D8E6E3"
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="2dp"
+                            app:hintTextColor="#7A8E8E">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/et_express_end_time"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:focusable="false"
+                                android:minHeight="58dp"
+                                android:paddingVertical="10dp"
+                                android:text="@{viewModel.expressEndTime}"
+                                android:textColor="#172A2B"
+                                android:textSize="15sp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
                 </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_create_order"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/bg_create_order_button"
+                    android:enabled="true"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="创建订单"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
             </LinearLayout>
-
         </androidx.core.widget.NestedScrollView>
-
-
-
     </LinearLayout>
 </layout>

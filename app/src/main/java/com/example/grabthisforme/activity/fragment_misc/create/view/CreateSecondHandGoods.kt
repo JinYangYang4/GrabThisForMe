@@ -1,13 +1,14 @@
 package com.example.grabthisforme.activity.fragment_misc.create.view
 
-
 import android.content.Context
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -26,6 +27,7 @@ class CreateSecondHandGoods : Fragment() {
     private var _binding: FragmentCreateSecondhandGoodsBinding? = null
     private val binding get() = _binding!!
     private val viewModel: CreateSecondHandGoodsViewModel by viewModels()
+    private var nestedScrollBaseBottomPadding = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,11 +41,27 @@ class CreateSecondHandGoods : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+        bindCategoryOptions()
         observeQualityOptions()
         observeSelectedPhoto()
         observeCreateResult()
+        nestedScrollBaseBottomPadding = binding.nestedScrollView.paddingBottom
         ViewCompat.setOnApplyWindowInsetsListener(requireView()) { _, insets ->
             val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+            val imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+            val systemBottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
+            val keyboardSpace = (imeBottom - systemBottom).coerceAtLeast(0)
+            binding.nestedScrollView.setPadding(
+                binding.nestedScrollView.paddingLeft,
+                binding.nestedScrollView.paddingTop,
+                binding.nestedScrollView.paddingRight,
+                nestedScrollBaseBottomPadding + keyboardSpace
+            )
+            if (imeVisible && _binding != null) {
+                binding.nestedScrollView.postDelayed({
+                    scrollFocusedInputIntoView()
+                }, KEYBOARD_SCROLL_DELAY_MS)
+            }
             if (!imeVisible && _binding != null) {
                 clearInputFocus()
             }
@@ -59,9 +77,13 @@ class CreateSecondHandGoods : Fragment() {
             }
         }
     }
+
     private fun initView() {
         binding.ivBack.setOnClickListener {
             parentFragmentManager.popBackStack()
+        }
+        binding.root.setOnClickListener {
+            clearInputFocus()
         }
         binding.llNested.setOnClickListener {
             clearInputFocus()
@@ -90,35 +112,49 @@ class CreateSecondHandGoods : Fragment() {
                 message = binding.itSecondhandMessage.text?.toString()?.trim().orEmpty(),
                 secondhandPriceText = binding.itSecondhandPrice.text?.toString()?.trim().orEmpty(),
                 originalPriceText = binding.itSecondhandOriginalPrice.text?.toString()?.trim().orEmpty(),
-                quality = binding.spSecondhandQuality.selectedItem?.toString().orEmpty(),
+                quality = binding.spSecondhandQuality.text?.toString()?.trim().orEmpty(),
                 usedTime = binding.itSecondhandUsedTime.text?.toString()?.trim().orEmpty(),
                 remark = binding.itSecondhandRemark.text?.toString()?.trim().orEmpty(),
                 saleNumberText = binding.tvSaleNumber.text?.toString()?.trim().orEmpty(),
                 pic = binding.ivSecondhandPic.tag?.toString().orEmpty(),
-                categoryText = binding.spSecondhandCategory.selectedItem?.toString().orEmpty()
+                categoryText = binding.spSecondhandCategory.text?.toString()?.trim().orEmpty()
             )
         }
+    }
+
+    private fun bindCategoryOptions() {
+        val adapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_list_item_1,
+            resources.getStringArray(R.array.secondhand_category).toList()
+        )
+        binding.spSecondhandCategory.setAdapter(adapter)
     }
 
     private fun observeQualityOptions() {
         viewModel.qualityList.observe(viewLifecycleOwner) { qualityList ->
             val adapter = ArrayAdapter(
                 requireContext(),
-                android.R.layout.simple_spinner_item,
+                android.R.layout.simple_list_item_1,
                 qualityList
             )
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            binding.spSecondhandQuality.adapter = adapter
+            binding.spSecondhandQuality.setAdapter(adapter)
         }
     }
 
     private fun observeSelectedPhoto() {
         viewModel.selectedPhotoUri.observe(viewLifecycleOwner) { photoUrl ->
-            if (photoUrl == null) return@observe
+            if (photoUrl == null) {
+                binding.ivSecondhandPic.scaleType = ImageView.ScaleType.CENTER_INSIDE
+                binding.ivSecondhandPic.setImageResource(R.drawable.market_icon_photo)
+                binding.ivSecondhandPic.tag = ""
+                return@observe
+            }
+            binding.ivSecondhandPic.scaleType = ImageView.ScaleType.CENTER_CROP
             Glide.with(this)
                 .load(photoUrl)
-                .placeholder(R.drawable.ic_add)
-                .error(R.drawable.ic_add)
+                .placeholder(R.drawable.market_icon_photo)
+                .error(R.drawable.market_icon_photo)
                 .into(binding.ivSecondhandPic)
             binding.ivSecondhandPic.tag = photoUrl.toString()
         }
@@ -134,12 +170,52 @@ class CreateSecondHandGoods : Fragment() {
         dialog.show(childFragmentManager, "select_secondhand_photo")
     }
 
-    private fun clearInputFocus(){
+    private fun clearInputFocus() {
         val currentFocus = requireActivity().currentFocus ?: return
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(currentFocus.windowToken, 0)
         currentFocus.clearFocus()
     }
+
+    private fun scrollFocusedInputIntoView() {
+        val currentFocus = requireActivity().currentFocus ?: return
+        val scrollView = binding.nestedScrollView
+        if (!isDescendantOf(currentFocus, scrollView)) return
+
+        val focusedRect = Rect()
+        currentFocus.getDrawingRect(focusedRect)
+        scrollView.offsetDescendantRectToMyCoords(currentFocus, focusedRect)
+
+        val visibleTop = scrollView.scrollY
+        val visibleBottom = visibleTop + scrollView.height - scrollView.paddingBottom
+        val extraSpacing = KEYBOARD_FOCUS_SPACING_DP.dpToPx()
+
+        when {
+            focusedRect.bottom + extraSpacing > visibleBottom -> {
+                val targetY =
+                    focusedRect.bottom - scrollView.height + scrollView.paddingBottom + extraSpacing
+                scrollView.smoothScrollTo(0, targetY.coerceAtLeast(0))
+            }
+
+            focusedRect.top - extraSpacing < visibleTop -> {
+                scrollView.smoothScrollTo(0, (focusedRect.top - extraSpacing).coerceAtLeast(0))
+            }
+        }
+    }
+
+    private fun isDescendantOf(child: View, parent: View): Boolean {
+        var current: View? = child
+        while (current != null) {
+            if (current == parent) return true
+            current = current.parent as? View
+        }
+        return false
+    }
+
+    private fun Int.dpToPx(): Int {
+        return (this * resources.displayMetrics.density).toInt()
+    }
+
     override fun onResume() {
         super.onResume()
         (requireActivity() as MainActivity).innerBottomBar()
@@ -148,5 +224,10 @@ class CreateSecondHandGoods : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val KEYBOARD_SCROLL_DELAY_MS = 120L
+        private const val KEYBOARD_FOCUS_SPACING_DP = 24
     }
 }
