@@ -13,18 +13,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:paddingStart="22dp"
-            android:paddingTop="18dp"
-            android:paddingEnd="22dp"
             android:paddingBottom="24dp">
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="178dp"
-                android:background="@drawable/bg_auth_hero_frame"
-                android:clipToOutline="true"
-                android:elevation="3dp"
-                android:outlineProvider="background">
+                android:layout_height="252dp">
 
                 <ImageView
                     android:layout_width="match_parent"
@@ -32,12 +25,20 @@
                     android:contentDescription="@null"
                     android:scaleType="centerCrop"
                     android:src="@drawable/auth_campus_life_hero" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="92dp"
+                    android:layout_gravity="bottom"
+                    android:background="@drawable/bg_auth_image_fade" />
             </FrameLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
+                android:layout_marginStart="22dp"
+                android:layout_marginTop="-46dp"
+                android:layout_marginEnd="22dp"
                 android:background="@drawable/bg_auth_card"
                 android:clipToOutline="true"
                 android:elevation="8dp"
