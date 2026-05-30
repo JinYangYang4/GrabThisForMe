@@ -65,6 +65,15 @@ class FragmentMy : Fragment() {
         binding.tvEdit.setOnClickListener {
             (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_personalInformation)
         }
+        binding.quickPost.setOnClickListener {
+            (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_fragmentMyStore)
+        }
+        binding.quickPost.setOnClickListener {
+            (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_postTopicFragemnt)
+        }
+        binding.quickCoupon.setOnClickListener {
+            (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_couponFragment)
+        }
 
     }
 
