@@ -1,77 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:background="@color/gray_mid_light"
-        android:layout_height="72dp"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp">
-        <ImageView
-            android:id="@+id/ivAvatar"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_back_charactor2"
-            android:scaleType="centerCrop"
-            android:background="@drawable/bg_circle"
-            android:clipToOutline="true"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:paddingStart="16dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="14dp">
+
+        <!-- 头像 -->
+        <FrameLayout
+            android:id="@+id/frame_avatar"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_info_avatar_ring"
+            android:padding="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/ivAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_circle"
+                android:clipToOutline="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_back_charactor2" />
+        </FrameLayout>
+
+        <!-- 未读角标 -->
+        <TextView
+            android:id="@+id/unreadBadge"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/bg_unread_badge"
+            android:gravity="center"
+            android:text="3"
+            android:textColor="@android:color/white"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/frame_avatar"
+            app:layout_constraintEnd_toEndOf="@id/frame_avatar" />
+
+        <!-- 名称 -->
         <TextView
             android:id="@+id/tvName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="张三"
-            android:textSize="16sp"
-            android:textColor="#222222"
-            android:maxLines="1"
+            android:layout_marginStart="14dp"
             android:ellipsize="end"
-            app:layout_constraintStart_toEndOf="@id/ivAvatar"
-            app:layout_constraintTop_toTopOf="@id/ivAvatar"
+            android:maxLines="1"
+            android:text="用户名"
+            android:textColor="#1A1A1A"
+            android:textSize="16sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/tvTime"
-            android:layout_marginStart="12dp"/>
+            app:layout_constraintStart_toEndOf="@id/frame_avatar"
+            app:layout_constraintTop_toTopOf="@id/frame_avatar" />
+
+        <!-- 时间 -->
         <TextView
             android:id="@+id/tvTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="12:30"
-            android:textSize="12sp"
             android:textColor="#999999"
-            app:layout_constraintTop_toTopOf="@id/tvName"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            android:textSize="12sp"
+            app:layout_constraintBaseline_toBaselineOf="@id/tvName"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- 最后一条消息 -->
         <TextView
             android:id="@+id/tvLastMsg"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="今晚一起开黑吗？"
-            android:textSize="14sp"
-            android:textColor="#888888"
-            android:maxLines="1"
+            android:layout_marginTop="6dp"
             android:ellipsize="end"
-            app:layout_constraintStart_toStartOf="@id/tvName"
-            app:layout_constraintTop_toBottomOf="@id/tvName"
-            app:layout_constraintEnd_toStartOf="@id/unreadBadge"
-            android:layout_marginTop="4dp"/>
-        <TextView
-            android:id="@+id/unreadBadge"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:background="@drawable/bg_unread_badge"
-            android:text="3"
-            android:textSize="10sp"
-            android:textColor="@android:color/white"
-            android:gravity="center"
+            android:maxLines="1"
+            android:text="最后一条消息预览..."
+            android:textColor="#888888"
+            android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/ivAvatar"/>
+            app:layout_constraintStart_toStartOf="@id/tvName"
+            app:layout_constraintTop_toBottomOf="@id/tvName" />
+
+        <!-- 底部分割线 -->
         <View
             android:layout_width="0dp"
             android:layout_height="0.5dp"
-            android:background="@color/gray_ultra_light"
-            app:layout_constraintStart_toEndOf="@+id/ivAvatar"
+            android:background="#F0EFED"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintStart_toStartOf="@id/tvName" />
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

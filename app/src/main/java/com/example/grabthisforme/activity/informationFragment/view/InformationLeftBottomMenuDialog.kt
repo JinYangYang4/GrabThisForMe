@@ -1,6 +1,8 @@
 package com.example.grabthisforme.activity.informationFragment.view
 
 import android.content.res.Resources
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -19,7 +21,6 @@ class InformationLeftBottomMenuDialog: DialogFragment() {
     private var _binding : InformationDialogLeftBottomMenuBinding ?= null
     private val binding get() = _binding!!
     companion object {
-        // 创建一个静态方法来传递目标视图的 ID
         fun newInstance(targetImageViewId: Int): InformationLeftBottomMenuDialog {
             val dialog = InformationLeftBottomMenuDialog()
             val args = Bundle()
@@ -58,7 +59,7 @@ class InformationLeftBottomMenuDialog: DialogFragment() {
         if (dialog != null) {
             val window = dialog.window
             val params = window?.attributes
-
+            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             // 获取传入的目标 ImageView 的 ID
             val targetImageViewId = arguments?.getInt("targetImageViewId") ?: return
 
@@ -68,12 +69,11 @@ class InformationLeftBottomMenuDialog: DialogFragment() {
             // 获取目标 ImageView 的位置
             val location = IntArray(2)
             targetImageView.getLocationOnScreen(location)  // 获取目标视图的位置 (x, y)
-            Log.d("test11", "X : ${location[0]} Y : ${location[1]}")
 
             // 计算对话框的左下角位置
             var xPos = location[0]  // 水平位置：目标 ImageView 的 x 坐标
             var yPos = location[1] + targetImageView.height  // 垂直位置：目标 ImageView 的 y 坐标 + 目标 ImageView 的高度
-            Log.d("test11", "Initial yPos : $yPos")
+
 
             // 获取屏幕高度和宽度
             val screenHeight = Resources.getSystem().displayMetrics.heightPixels
@@ -86,11 +86,12 @@ class InformationLeftBottomMenuDialog: DialogFragment() {
             // 计算目标视图到屏幕中心的 Y 距离
             val offsetY = location[1] - screenCenterY  // 负的距离，让对话框靠近视图
             yPos += offsetY
+            Log.d("test11", "onStart: $offsetY")
 
 
             val offsetX = location[0] - screenCenterX  // 负的距离，让对话框靠近视图
             xPos = offsetX
-
+            Log.d("test11", "onStart: $offsetX")
             Log.d("test11", "Adjusted xPos: $xPos, Adjusted yPos: $yPos")
 
             // 设置对话框的位置

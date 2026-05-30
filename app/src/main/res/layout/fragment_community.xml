@@ -1,89 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/gray_mid_light">
+        android:background="@drawable/bg_create_goods_screen"
+        android:orientation="vertical">
+
+        <!-- ═══════ Top Bar ═══════ -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_marginTop="30dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed"
-                android:padding="10dp">
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_info_top_bar"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="14dp"
+            android:paddingTop="38dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="14dp">
+
+            <!-- 头像 -->
+            <FrameLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_info_avatar_ring"
+                android:padding="2dp">
 
                 <ImageView
                     android:id="@+id/ivAvatar"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@drawable/cat"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:background="@drawable/bg_circle"
+                    android:clipToOutline="true"
                     android:scaleType="centerCrop"
-                    android:clipToOutline="true" />
+                    android:src="@drawable/cat" />
+            </FrameLayout>
 
-                <LinearLayout
-                    android:id="@+id/ll_search"
-                    android:layout_width="0dp"
+            <!-- 搜索栏 -->
+            <LinearLayout
+                android:id="@+id/ll_search"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_info_search"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:alpha="0.45"
+                    android:src="@drawable/ic_search" />
+
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_weight="1"
-                    android:padding="6dp"
-                    android:background="@drawable/bg_rounded_white_outline"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:layout_marginStart="8dp"
+                    android:text="搜索吐槽 / 话题"
+                    android:textColor="#8A7E74"
+                    android:textSize="15sp" />
+            </LinearLayout>
 
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:src="@drawable/ic_search"
-                        android:alpha="0.5" />
+            <!-- 添加按钮 -->
+            <FrameLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_create_goods_icon_button"
+                android:backgroundTint="#24D0A888">
 
-                    <TextView
-                        android:layout_marginStart="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="搜索吐槽 / 话题"
-                        android:textSize="16sp"
-                        android:textColor="@color/black" />
-                </LinearLayout>
                 <ImageView
                     android:id="@+id/iv_Add"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:src="@drawable/ic_add"
-                    android:clipToOutline="true" />
-            </LinearLayout>
-            <LinearLayout
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_add" />
+            </FrameLayout>
+        </LinearLayout>
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_info_top_bar"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingBottom="4dp">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/tabLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:tabMode="scrollable"
-                    android:background="@color/gray_mid_light"
-                    android:layout_weight="1"
-                    app:tabIndicatorColor="@color/green_primary"
-                    app:tabSelectedTextColor="@color/green_primary"
-                    app:tabTextColor="@color/black"
-                    app:tabRippleColor="@null"/>
-            </LinearLayout>
-
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/viewpager2"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+                android:background="@android:color/transparent"
+                app:tabIndicatorColor="@android:color/transparent"
+                app:tabIndicatorHeight="0dp"
+                app:tabMode="scrollable"
+                app:tabRippleColor="@android:color/transparent"
+                app:tabSelectedTextColor="#2D3748"
+                app:tabTextAppearance="@style/InfoTabText"
+                app:tabTextColor="#999999" />
         </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <!-- ═══════ ViewPager2 (6 tabs) ═══════ -->
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewpager2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
 </layout>

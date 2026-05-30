@@ -2,6 +2,7 @@ package com.example.grabthisforme.activity.informationFragment.view
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -9,12 +10,15 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.fragment.app.activityViewModels
+import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.informationFragment.adapter.InformationPagerAdapter
 import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
 import com.example.grabthisforme.databinding.FragmentInformationBinding
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -50,8 +54,42 @@ class FragmentInformation : Fragment() {
             "全部",
         )
         TabLayoutMediator(binding.tabLayout, binding.viewpager2) { tab, position ->
-            tab.text = titles[position]
+            val customView = LayoutInflater.from(requireContext())
+                .inflate(R.layout.tab_pill_item, binding.tabLayout, false)
+            val textView = customView.findViewById<TextView>(R.id.tab_text)
+            textView.text = titles[position]
+            tab.customView = customView
         }.attach()
+
+
+
+        val tabCount = binding.tabLayout.tabCount
+
+        binding.viewpager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                // 当前正在被滑出的 Tab 索引
+                val currentTab = binding.tabLayout.getTabAt(position)
+                // 下一个将被滑入的 Tab 索引（如果没有下一页则忽略）
+                val nextTab = if (position + 1 < tabCount) binding.tabLayout.getTabAt(position + 1) else null
+
+                // 获取自定义视图中的 TextView
+                val currentTextView = currentTab?.customView?.findViewById<TextView>(R.id.tab_text)
+                val nextTextView = nextTab?.customView?.findViewById<TextView>(R.id.tab_text)
+                 currentTextView?.background?.alpha = ((1 - positionOffset) * 255).toInt()
+                 nextTextView?.background?.alpha = (positionOffset * 255).toInt()
+            }
+
+            override fun onPageSelected(position: Int) {
+                // 滑动结束后，确保选中 Tab 的透明度归位（防止浮点误差）
+                for (i in 0 until tabCount) {
+                    val tab = binding.tabLayout.getTabAt(i)
+                    val textView = tab?.customView?.findViewById<TextView>(R.id.tab_text)
+                    textView?.background?.alpha = if (i == position) 255 else 0
+                }
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {}
+        })
     }
     fun iv_Add_init(targetView : Int){
         binding.ivAdd.setOnClickListener {view ->
