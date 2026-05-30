@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
@@ -9,25 +8,26 @@
             name="sharedViewModel"
             type="com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel" />
     </data>
-    <androidx.constraintlayout.widget.ConstraintLayout
 
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/gray_mid_light"
-        tools:ignore="MissingConstraints">
+        android:background="@drawable/bg_create_goods_screen"
+        android:orientation="vertical">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/bg_head"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white">
+            android:background="@drawable/bg_my_hero">
 
+            <!-- 头像 -->
             <ImageView
                 android:id="@+id/iv_head_pic"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="60dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="52dp"
                 android:background="@drawable/bg_circle"
                 android:clipToOutline="true"
                 android:scaleType="centerCrop"
@@ -35,293 +35,615 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/tv_user_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:text='@{sharedViewModel.currentUser != null ? sharedViewModel.currentUser.name : ""}'
-                    android:textColor="@android:color/black"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
+            <!-- 编辑资料标签 -->
+            <TextView
+                android:id="@+id/tv_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_create_goods_top_glass"
+                android:gravity="center"
+                android:paddingStart="10dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="3dp"
+                android:layout_marginEnd="20dp"
+                android:text="编辑资料"
+                android:textColor="@android:color/white"
+                android:textSize="11sp"
+                android:layout_marginBottom="40dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <!-- 用户名 -->
+            <TextView
+                android:id="@+id/tv_user_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text='@{sharedViewModel.currentUser != null ? sharedViewModel.currentUser.name : "未登录"}'
+                android:textColor="@android:color/white"
+                android:textSize="22sp"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/tv_user_id"
                 app:layout_constraintStart_toEndOf="@+id/iv_head_pic"
                 app:layout_constraintTop_toTopOf="@+id/iv_head_pic"
                 app:layout_constraintVertical_chainStyle="packed" />
 
-
+            <!-- 用户ID -->
             <TextView
                 android:id="@+id/tv_user_id"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="6dp"
                 android:text='@{sharedViewModel.currentUser != null ? `ID: ` + String.valueOf(sharedViewModel.currentUser.id) : `ID: `}'
-                android:textColor="@android:color/darker_gray"
+                android:textColor="#FFE0CC"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="@+id/iv_head_pic"
                 app:layout_constraintStart_toStartOf="@+id/tv_user_name"
                 app:layout_constraintTop_toBottomOf="@+id/tv_user_name" />
 
+            <!-- 个性签名 -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="24dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="这个人很懒，什么都没写～"
+                android:textColor="#FFF0E0"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toStartOf="@+id/tv_edit"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/iv_head_pic"
+                android:paddingBottom="40dp"/>
             <View
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
-                app:layout_constraintTop_toBottomOf="@+id/iv_head_pic"/>
+                android:layout_height="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:background="@drawable/bg_round_rect_top_small_bottom_no"
+                android:backgroundTint="#FFF7F0">
+
+            </View>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/simple_message"
+
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@color/white"
-            android:paddingVertical="10dp"
-            app:layout_constraintTop_toBottomOf="@+id/bg_head">
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clipToPadding="false">
 
             <LinearLayout
-                android:id="@+id/ll_statistics"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginBottom="20dp"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:weightSum="3"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                android:orientation="vertical"
+                android:background="@drawable/bg_create_goods_screen">
 
-                <LinearLayout
-                    android:layout_width="0dp"
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/simple_message"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_create_goods_card"
+                    android:elevation="2dp"
+                    android:paddingVertical="20dp">
 
-                    <TextView
-                        android:id="@+id/tv_like_count"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:id="@+id/ll_statistics"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text='@{sharedViewModel.currentUser != null ? String.valueOf(sharedViewModel.currentUser.likeCount) : "0"}'
-                        android:textColor="@android:color/black"
-                        android:textSize="16sp"
-                        android:textStyle="bold"/>
+                        android:layout_marginHorizontal="8dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:weightSum="3"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="获赞"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="12sp"/>
-                </LinearLayout>
+                        <!-- 获赞 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="0dp"
+                            <TextView
+                                android:id="@+id/tv_like_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text='@{sharedViewModel.currentUser != null ? String.valueOf(sharedViewModel.currentUser.likeCount) : "0"}'
+                                android:textColor="#2D3748"
+                                android:textSize="22sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="获赞"
+                                android:textColor="#718096"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="36dp"
+                            android:background="#EEEEEE" />
+
+                        <!-- 粉丝 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tv_fans_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text='@{sharedViewModel.currentUser != null ? String.valueOf(sharedViewModel.currentUser.fanCount) : "0"}'
+                                android:textColor="#2D3748"
+                                android:textSize="22sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="粉丝"
+                                android:textColor="#718096"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="36dp"
+                            android:background="#EEEEEE" />
+
+                        <!-- 关注 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tv_follow_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text='@{sharedViewModel.currentUser != null ? String.valueOf(sharedViewModel.currentUser.followCount) : "0"}'
+                                android:textColor="#2D3748"
+                                android:textSize="22sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="关注"
+                                android:textColor="#718096"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/bg_create_goods_card"
+                    android:elevation="2dp"
+                    android:paddingVertical="16dp">
                     <TextView
-                        android:id="@+id/tv_fans_count"
+                        android:id="@+id/tv_ll_function"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text='@{sharedViewModel.currentUser != null ? String.valueOf(sharedViewModel.currentUser.fanCount) : "0"}'
-                        android:textColor="@android:color/black"
+                        android:layout_marginTop="10dp"
+                        android:text="常用功能"
+                        android:layout_marginStart="20dp"
+                        android:textColor="#2D3748"
                         android:textSize="16sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="粉丝"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="12sp"/>
-                </LinearLayout>
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:weightSum="4"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_ll_function">
 
-                <LinearLayout
-                    android:layout_width="0dp"
+                        <!-- 我的店铺 -->
+                        <LinearLayout
+                            android:id="@+id/quick_shop"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="6dp">
+
+                            <FrameLayout
+                                android:layout_width="44dp"
+                                android:layout_height="44dp"
+                                android:foreground="?attr/selectableItemBackgroundBorderless"
+                                android:background="@drawable/bg_my_quick_icon_shop"
+                                android:clipToOutline="true">
+
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_store" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="我的店铺"
+                                android:textColor="#2D3748"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <!-- 发布动态 -->
+                        <LinearLayout
+                            android:id="@+id/quick_post"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:clickable="true"
+                            android:focusable="true"
+
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="6dp">
+
+                            <FrameLayout
+                                android:layout_width="44dp"
+                                android:layout_height="44dp"
+                                android:foreground="?attr/selectableItemBackgroundBorderless"
+                                android:clipToOutline="true"
+                                android:background="@drawable/bg_my_quick_icon_post">
+
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_make_talk" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="发布动态"
+                                android:textColor="#2D3748"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <!-- 浏览记录 -->
+                        <LinearLayout
+                            android:id="@+id/quick_history"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="6dp">
+
+                            <FrameLayout
+                                android:layout_width="44dp"
+                                android:layout_height="44dp"
+                                android:background="@drawable/bg_my_quick_icon_history"
+                                android:foreground="?attr/selectableItemBackgroundBorderless"
+                                android:clipToOutline="true">
+
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_history" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="浏览记录"
+                                android:textColor="#2D3748"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <!-- 优惠券 -->
+                        <LinearLayout
+                            android:id="@+id/quick_coupon"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="6dp">
+
+                            <FrameLayout
+                                android:layout_width="44dp"
+                                android:layout_height="44dp"
+                                android:background="@drawable/bg_my_quick_icon_coupon"
+                                android:foreground="?attr/selectableItemBackgroundBorderless"
+                                android:clipToOutline="true">
+
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_coupon" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="优惠券"
+                                android:textColor="#2D3748"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/ll_function_list"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/bg_create_goods_card"
+                    android:elevation="2dp"
+                    android:clipToOutline="true"
+                    android:paddingVertical="4dp">
                     <TextView
-                        android:id="@+id/tv_follow_count"
+                        android:id="@+id/tv_content_manager"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text='@{sharedViewModel.currentUser != null ? String.valueOf(sharedViewModel.currentUser.followCount) : "0"}'
-                        android:textColor="@android:color/black"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="24dp"
+                        android:text="内容管理"
+                        android:textColor="#2D3748"
                         android:textSize="16sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"/>
+
+
+                    <!-- 我喜欢的 -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/item_like"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:paddingStart="18dp"
+                        android:layout_marginTop="10dp"
+                        android:paddingEnd="18dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:foreground="?attr/selectableItemBackgroundBorderless"
+                        app:layout_constraintTop_toBottomOf="@id/tv_content_manager">
+
+                        <ImageView
+                            android:id="@+id/iv_like"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/ic_like"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tv_like"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="我喜欢的"
+                            android:textColor="#2D3748"
+                            android:textSize="15sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/arrow_like"
+                            app:layout_constraintStart_toEndOf="@+id/iv_like"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/arrow_like"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:alpha="0.3"
+                            android:src="@drawable/ic_arrow_right"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="0.5dp"
+                            android:background="#F0F0F0"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="@+id/tv_like" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <!-- 我的话题 -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/item_topic"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
+                        android:foreground="?attr/selectableItemBackgroundBorderless"
+                        app:layout_constraintTop_toBottomOf="@+id/item_like">
+
+                        <ImageView
+                            android:id="@+id/iv_topic"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/ic_talk"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tv_topic"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="我的话题"
+                            android:textColor="#2D3748"
+                            android:textSize="15sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/arrow_topic"
+                            app:layout_constraintStart_toEndOf="@+id/iv_topic"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/arrow_topic"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:alpha="0.3"
+                            android:src="@drawable/ic_arrow_right"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="0.5dp"
+                            android:background="#F0F0F0"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="@+id/tv_topic" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <!-- 订单记录 -->
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/item_order"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:paddingStart="18dp"
+                        android:paddingEnd="18dp"
+                        android:foreground="?attr/selectableItemBackgroundBorderless"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/item_topic">
+
+                        <ImageView
+                            android:id="@+id/iv_order"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/order"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tv_order"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="订单记录"
+                            android:textColor="#2D3748"
+                            android:textSize="15sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/arrow_order"
+                            app:layout_constraintStart_toEndOf="@+id/iv_order"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/arrow_order"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:alpha="0.3"
+                            android:src="@drawable/ic_arrow_right"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/item_set"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginBottom="20dp"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:clipToOutline="true"
+                    android:background="@drawable/bg_create_goods_card"
+                    android:elevation="2dp"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp">
+
+                    <ImageView
+                        android:id="@+id/iv_set"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_set"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tv_set"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="关注"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="12sp"/>
-                </LinearLayout>
+                        android:layout_marginStart="14dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="设置"
+                        android:textColor="#2D3748"
+                        android:textSize="15sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/arrow_set"
+                        app:layout_constraintStart_toEndOf="@+id/iv_set"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/arrow_set"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:alpha="0.3"
+                        android:src="@drawable/ic_arrow_right"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
             </LinearLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/ll_function_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@color/white"
-            app:layout_constraintTop_toBottomOf="@+id/simple_message">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/item_like"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp">
-
-                <ImageView
-                    android:id="@+id/iv_like"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_like"
-                    android:scaleType="fitCenter"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-
-                <!-- 喜欢文字 -->
-                <TextView
-                    android:id="@+id/tv_like"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="喜欢"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp"
-                    android:layout_marginStart="12dp"
-                    app:layout_constraintStart_toEndOf="@+id/iv_like"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0.5dp"
-                    android:background="@color/gray_ultra_light"
-                    app:layout_constraintStart_toEndOf="@+id/iv_like"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/item_topic"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                app:layout_constraintTop_toBottomOf="@+id/item_like">
-
-                <ImageView
-                    android:id="@+id/iv_topic"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_talk"
-                    android:scaleType="fitCenter"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-
-                <TextView
-                    android:id="@+id/tv_topic"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="话题"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp"
-                    android:layout_marginStart="12dp"
-                    app:layout_constraintStart_toEndOf="@+id/iv_topic"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0.5dp"
-                    android:background="@color/gray_ultra_light"
-                    app:layout_constraintStart_toEndOf="@+id/iv_topic"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/item_order"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                app:layout_constraintTop_toBottomOf="@+id/item_topic">
-
-                <ImageView
-                    android:id="@+id/iv_order"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/order"
-                    android:scaleType="fitCenter"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-
-                <TextView
-                    android:id="@+id/tv_order"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="订单记录"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp"
-                    android:layout_marginStart="12dp"
-                    app:layout_constraintStart_toEndOf="@+id/iv_order"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/item_set"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="4dp"
-            android:background="@color/white"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            app:layout_constraintTop_toBottomOf="@+id/ll_function_list"
-            tools:layout_editor_absoluteX="0dp">
-
-            <ImageView
-                android:id="@+id/iv_set"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_set"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <!-- 喜欢文字 -->
-            <TextView
-                android:id="@+id/tv_set"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:text="设置"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/iv_set"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
 </layout>

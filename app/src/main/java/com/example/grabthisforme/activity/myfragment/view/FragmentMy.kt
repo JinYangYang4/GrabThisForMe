@@ -62,6 +62,9 @@ class FragmentMy : Fragment() {
         binding.itemSet.setOnClickListener {
             (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_setFragment)
         }
+        binding.tvEdit.setOnClickListener {
+            (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_personalInformation)
+        }
 
     }
 

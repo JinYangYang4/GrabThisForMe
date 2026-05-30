@@ -78,6 +78,9 @@
         <action
             android:id="@+id/action_blankFragment_to_fragmentMyStore"
             app:destination="@id/fragmentMyStore" />
+        <action
+            android:id="@+id/action_blankFragment_to_personalInformation"
+            app:destination="@id/personalInformation" />
     </fragment>
     <fragment
         android:id="@+id/fragmentSignIn"

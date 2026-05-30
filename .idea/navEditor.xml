@@ -192,6 +192,11 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
+                            <entry key="action_blankFragment_to_personalInformation">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                             <entry key="action_blankFragment_to_postDetailFragment">
                               <value>
                                 <LayoutPositions />
@@ -438,7 +443,7 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="550" />
-                            <option name="y" value="2262" />
+                            <option name="y" value="1574" />
                           </Point>
                         </option>
                         <option name="myPositions">
