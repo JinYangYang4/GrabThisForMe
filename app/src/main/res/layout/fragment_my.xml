@@ -285,7 +285,7 @@
                                 android:layout_width="44dp"
                                 android:layout_height="44dp"
                                 android:foreground="?attr/selectableItemBackgroundBorderless"
-                                android:background="@drawable/bg_my_quick_icon_shop"
+                                android:background="@drawable/bg_my_quick_icon_soft_apricot"
                                 android:clipToOutline="true">
 
                                 <ImageView
@@ -322,7 +322,7 @@
                                 android:layout_height="44dp"
                                 android:foreground="?attr/selectableItemBackgroundBorderless"
                                 android:clipToOutline="true"
-                                android:background="@drawable/bg_my_quick_icon_post">
+                                android:background="@drawable/bg_my_quick_icon_misty_mint">
 
                                 <ImageView
                                     android:layout_width="22dp"
@@ -355,7 +355,7 @@
                             <FrameLayout
                                 android:layout_width="44dp"
                                 android:layout_height="44dp"
-                                android:background="@drawable/bg_my_quick_icon_history"
+                                android:background="@drawable/bg_my_quick_icon_misty_blue"
                                 android:foreground="?attr/selectableItemBackgroundBorderless"
                                 android:clipToOutline="true">
 
@@ -390,7 +390,7 @@
                             <FrameLayout
                                 android:layout_width="44dp"
                                 android:layout_height="44dp"
-                                android:background="@drawable/bg_my_quick_icon_coupon"
+                                android:background="@drawable/bg_my_quick_icon_misty_soft_pink"
                                 android:foreground="?attr/selectableItemBackgroundBorderless"
                                 android:clipToOutline="true">
 

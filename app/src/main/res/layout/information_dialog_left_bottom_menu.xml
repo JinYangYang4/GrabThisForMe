@@ -22,7 +22,7 @@
             <FrameLayout
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:background="@drawable/bg_my_quick_icon_post">
+                android:background="@drawable/bg_my_quick_icon_misty_mint">
                 <ImageView
                     android:layout_width="16dp"
                     android:layout_height="16dp"
@@ -61,7 +61,7 @@
             <FrameLayout
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:background="@drawable/bg_my_quick_icon_shop">
+                android:background="@drawable/bg_my_quick_icon_soft_apricot">
 
                 <ImageView
                     android:layout_width="16dp"

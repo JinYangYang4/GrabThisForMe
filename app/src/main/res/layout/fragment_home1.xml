@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:ignore="MissingConstraints">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
         <variable
             name="viewModel"
@@ -15,7 +14,6 @@
         android:background="@drawable/bg_create_goods_screen"
         android:orientation="vertical">
 
-        <!-- ═══════ 顶部栏 ═══════ -->
         <LinearLayout
             android:id="@+id/toolbar_back"
             android:layout_width="match_parent"
@@ -23,14 +21,15 @@
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="14dp"
-            android:paddingTop="38dp"
+            android:paddingTop="34dp"
             android:paddingEnd="14dp"
             android:paddingBottom="10dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:background="@drawable/bg_info_search"
+                android:layout_height="38dp"
+                android:background="@drawable/bg_home_segment"
+                android:gravity="center"
                 android:orientation="horizontal"
                 android:padding="3dp">
 
@@ -40,14 +39,14 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp">
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/GetByOther"
-                        android:textColor="@color/tab_pill_text_color"
+                        android:text="帮我带"
+                        android:textColor="#6C7A76"
                         android:textSize="13sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -56,17 +55,17 @@
                     android:id="@+id/iHelpMeGet"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:background="@drawable/bg_tab_pill"
+                    android:background="@drawable/bg_home_segment_selected"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp">
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/GiveOther"
-                        android:textColor="@color/tab_pill_text_color"
+                        android:text="我去带"
+                        android:textColor="#173832"
                         android:textSize="13sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -74,12 +73,12 @@
 
             <View
                 android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_height="1dp"
                 android:layout_weight="1" />
 
             <FrameLayout
-                android:layout_width="38dp"
-                android:layout_height="38dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:background="@drawable/bg_info_avatar_ring"
                 android:padding="2dp">
 
@@ -94,15 +93,12 @@
             </FrameLayout>
         </LinearLayout>
 
-        <!-- ═══════ 搜索栏 ═══════ -->
         <LinearLayout
             android:id="@+id/ll_search"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/bg_info_search"
+            android:layout_height="44dp"
+            android:layout_marginHorizontal="12dp"
+            android:background="@drawable/bg_home_search"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="14dp"
@@ -111,29 +107,29 @@
             <ImageView
                 android:layout_width="18dp"
                 android:layout_height="18dp"
-                android:alpha="0.45"
+                android:alpha="0.55"
+                android:contentDescription="@null"
                 android:src="@drawable/ic_search" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="搜索商品 / 任务"
-                android:textColor="#8A7E74"
+                android:text="搜索可接任务、二手商品或店铺"
+                android:textColor="#687874"
                 android:textSize="14sp" />
         </LinearLayout>
 
-        <!-- ═══════ 操作栏 ═══════ -->
         <LinearLayout
             android:id="@+id/select"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="12dp"
             android:background="@drawable/bg_create_goods_card"
             android:elevation="3dp"
             android:gravity="center"
-            android:paddingVertical="12dp">
+            android:paddingVertical="14dp">
 
             <LinearLayout
                 android:id="@+id/ll_item_order"
@@ -144,24 +140,28 @@
                 android:orientation="vertical">
 
                 <FrameLayout
-                    android:layout_width="46dp"
-                    android:layout_height="46dp"
-                    android:background="@drawable/bg_my_quick_icon_shop">
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:clipToOutline="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:background="@drawable/bg_my_quick_icon_soft_apricot">
 
                     <ImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
                         android:layout_gravity="center"
+                        android:contentDescription="@null"
                         android:src="@drawable/order" />
                 </FrameLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="7dp"
                     android:text="待配送"
-                    android:textColor="#2D3748"
-                    android:textSize="12sp" />
+                    android:textColor="#22332F"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
@@ -173,24 +173,28 @@
                 android:orientation="vertical">
 
                 <FrameLayout
-                    android:layout_width="46dp"
-                    android:layout_height="46dp"
-                    android:background="@drawable/bg_my_quick_icon_post">
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_my_quick_icon_misty_soft_pink"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:clipToOutline="true">
 
                     <ImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
                         android:layout_gravity="center"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_task" />
                 </FrameLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="任务"
-                    android:textColor="#2D3748"
-                    android:textSize="12sp" />
+                    android:layout_marginTop="7dp"
+                    android:text="签到"
+                    android:textColor="#22332F"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
@@ -202,24 +206,28 @@
                 android:orientation="vertical">
 
                 <FrameLayout
-                    android:layout_width="46dp"
-                    android:layout_height="46dp"
-                    android:background="@drawable/bg_my_quick_icon_history">
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_my_quick_icon_misty_blue"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:clipToOutline="true">
 
                     <ImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
                         android:layout_gravity="center"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_goods" />
                 </FrameLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="7dp"
                     android:text="出二手"
-                    android:textColor="#2D3748"
-                    android:textSize="12sp" />
+                    android:textColor="#22332F"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
@@ -231,93 +239,147 @@
                 android:orientation="vertical">
 
                 <FrameLayout
-                    android:layout_width="46dp"
-                    android:layout_height="46dp"
-                    android:background="@drawable/bg_my_quick_icon_coupon">
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_my_quick_icon_misty_mint"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:clipToOutline="true">
 
                     <ImageView
                         android:layout_width="22dp"
                         android:layout_height="22dp"
                         android:layout_gravity="center"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_receive" />
                 </FrameLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="逛逛二手"
-                    android:textColor="#2D3748"
-                    android:textSize="12sp" />
+                    android:layout_marginTop="7dp"
+                    android:text="逛二手"
+                    android:textColor="#22332F"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- ═══════ 统计图表 + 任务列表 ═══════ -->
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="12dp"
             android:layout_weight="1">
 
             <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/appBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
-                android:background="@drawable/bg_create_goods_card"
-                android:elevation="3dp">
+                android:background="@android:color/transparent"
+                android:elevation="0dp">
 
                 <LinearLayout
+                    android:id="@+id/stats_panel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="12dp"
+                    android:background="@drawable/bg_create_goods_card"
+                    android:elevation="3dp"
+                    android:layout_marginHorizontal="12dp"
+                    android:layout_marginVertical="4dp"
+                    android:orientation="vertical"
+                    android:padding="16dp"
                     app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="6dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:padding="12dp">
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="接单状态"
+                                android:textColor="#172A2B"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:text="速度、准时和完成率会影响信任感"
+                                android:textColor="#6A7B7C"
+                                android:textSize="12sp" />
+                        </LinearLayout>
 
                         <TextView
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="跑腿能力评估"
-                            android:textColor="#2D3748"
-                            android:textSize="14sp"
+                            android:layout_height="30dp"
+                            android:background="@drawable/bg_home_chip_light"
+                            android:gravity="center"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:text="本周表现"
+                            android:textColor="#1D6F5E"
+                            android:textSize="12sp"
                             android:textStyle="bold" />
-
-                        <com.github.mikephil.charting.charts.RadarChart
-                            android:id="@+id/radarChart"
-                            android:layout_width="match_parent"
-                            android:layout_height="150dp"
-                            android:layout_marginTop="4dp" />
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:padding="12dp">
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="跑腿能力评估"
-                            android:textColor="#2D3748"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
+                            android:layout_marginEnd="6dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
-                        <com.github.mikephil.charting.charts.HorizontalBarChart
-                            android:id="@+id/barChart"
-                            android:layout_width="match_parent"
-                            android:layout_height="150dp"
-                            android:layout_marginTop="7dp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="综合能力"
+                                android:textColor="#2D3748"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <com.github.mikephil.charting.charts.RadarChart
+                                android:id="@+id/radarChart"
+                                android:layout_width="match_parent"
+                                android:layout_height="156dp"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="订单统计"
+                                android:textColor="#2D3748"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <com.github.mikephil.charting.charts.HorizontalBarChart
+                                android:id="@+id/barChart"
+                                android:layout_width="match_parent"
+                                android:layout_height="156dp"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.appbar.AppBarLayout>
@@ -326,10 +388,10 @@
                 android:id="@+id/ll_send_order"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginStart="12dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="12dp"
+                android:layout_marginHorizontal="12dp"
                 android:layout_marginBottom="6dp"
+                android:layout_marginTop="4dp"
+                android:clipToOutline="true"
                 android:background="@drawable/bg_create_goods_card"
                 android:elevation="3dp"
                 android:orientation="vertical"
@@ -339,39 +401,38 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="14dp"
                     android:text="去接单"
-                    android:textColor="#2D3748"
-                    android:textSize="16sp"
+                    android:textColor="#172A2B"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <com.google.android.material.tabs.TabLayout
                     android:id="@+id/tabLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="42dp"
                     android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
                     android:layout_marginEnd="8dp"
                     android:background="@android:color/transparent"
-                    app:tabIndicatorColor="@android:color/transparent"
-                    app:tabIndicatorHeight="0dp"
+                    app:tabIndicatorColor="#2FA28D"
+                    app:tabIndicatorHeight="3dp"
                     app:tabMode="scrollable"
                     app:tabRippleColor="@android:color/transparent"
-                    app:tabSelectedTextColor="#2D3748"
+                    app:tabSelectedTextColor="#172A2B"
                     app:tabTextAppearance="@style/InfoTabText"
-                    app:tabTextColor="#999999" />
+                    app:tabTextColor="#84928E" />
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="0.5dp"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
-                    android:background="#F0EFED" />
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="12dp"
+                    android:background="#EBF0EE" />
 
                 <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/viewpager2"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_marginBottom="8dp"
                     android:layout_weight="1" />
             </LinearLayout>
         </androidx.coordinatorlayout.widget.CoordinatorLayout>

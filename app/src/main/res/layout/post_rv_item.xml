@@ -104,7 +104,7 @@
                 android:id="@+id/btn_follow"
                 android:layout_width="wrap_content"
                 android:layout_height="28dp"
-                android:background="@drawable/bg_my_quick_icon_shop"
+                android:background="@drawable/bg_my_quick_icon_soft_apricot"
                 android:gravity="center"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"

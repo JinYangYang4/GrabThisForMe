@@ -1,18 +1,17 @@
 package com.example.grabthisforme.activity.homeFragment.view
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
-
 import com.example.grabthisforme.R
+import com.example.grabthisforme.activity.homeFragment.adapter.HomePagerAdapter
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
-
-import com.example.grabthisforme.activity.homeFragment.adapter.HomePagerAdapter
 import com.example.grabthisforme.databinding.FragmentHome1Binding
 import com.example.grabthisforme.model.XAxisValueFormatter.XAxisValueFormatter
 import com.github.mikephil.charting.animation.Easing
@@ -29,18 +28,19 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 
-
 @AndroidEntryPoint
 class FragmentHome1 : Fragment() {
-    private var _binding : FragmentHome1Binding ?= null
+    private var _binding: FragmentHome1Binding? = null
     private val binding get() = _binding!!
 
     private val sharedViewModel: MainViewModel by activityViewModels()
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentHome1Binding.inflate(inflater,container,false)
+    ): View {
+        _binding = FragmentHome1Binding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -57,9 +57,11 @@ class FragmentHome1 : Fragment() {
         initObserve()
         setupRadarChart(binding.radarChart)
         setupHorizontalBarChart(binding.barChart)
+        playEntranceAnimation(binding.llSearch, binding.select, binding.statsPanel, binding.llSendOrder)
     }
-    fun initObserve(){
-        sharedViewModel.currentUser.observe(viewLifecycleOwner){user ->
+
+    private fun initObserve() {
+        sharedViewModel.currentUser.observe(viewLifecycleOwner) { user ->
             Glide.with(this)
                 .load(user?.headPic)
                 .placeholder(R.drawable.cat)
@@ -67,7 +69,8 @@ class FragmentHome1 : Fragment() {
                 .into(binding.ivHeadPic)
         }
     }
-    fun initView(){
+
+    private fun initView() {
         binding.llItemOrder.setOnClickListener {
             (requireActivity() as MainActivity).intentToMiscFragment_Order_ac(1)
         }
@@ -83,27 +86,31 @@ class FragmentHome1 : Fragment() {
         binding.llSearch.setOnClickListener {
             (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_searchGoodsFragment)
         }
-
     }
 
-    fun initVp2(){
-        val adapter = HomePagerAdapter(this)
-        binding.viewpager2.adapter = adapter
-
-        val titles = listOf(
-            "全部任务",
-            "附近任务",
-            "紧急任务",
-            "食品类",
-            "文件类",
-            "包裹类"
-        )
+    private fun initVp2() {
+        binding.viewpager2.adapter = HomePagerAdapter(this)
+        val titles = listOf("全部任务", "附近任务", "紧急任务", "食品类", "文件类", "包裹类")
         TabLayoutMediator(binding.tabLayout, binding.viewpager2) { tab, position ->
             tab.text = titles[position]
         }.attach()
     }
-    private fun setupRadarChart(radarChart: RadarChart) {
 
+    private fun playEntranceAnimation(vararg views: View) {
+        views.forEachIndexed { index, itemView ->
+            itemView.alpha = 0f
+            itemView.translationY = 24f
+            itemView.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setStartDelay(index * 65L)
+                .setDuration(360L)
+                .setInterpolator(DecelerateInterpolator())
+                .start()
+        }
+    }
+
+    private fun setupRadarChart(radarChart: RadarChart) {
         val entries = listOf(
             RadarEntry(4.5f),
             RadarEntry(4.2f),
@@ -112,77 +119,69 @@ class FragmentHome1 : Fragment() {
             RadarEntry(4.6f)
         )
 
-        // 2. 数据集
         val dataSet = RadarDataSet(entries, "综合能力").apply {
             color = requireContext().getColor(R.color.green_primary)
             fillColor = requireContext().getColor(R.color.green_primary)
             setDrawFilled(true)
-            fillAlpha = 180
+            fillAlpha = 120
             lineWidth = 2f
-            valueTextSize = 10f
-            valueTextColor = requireContext().getColor(R.color.black)
+            valueTextSize = 0f
         }
 
         radarChart.data = RadarData(dataSet)
         radarChart.animateY(800, Easing.EaseOutBack)
-
-
-        val labels = listOf("接单速度", "准时率", "好评率", "完成率", "信誉等级")
-
         radarChart.xAxis.apply {
-            valueFormatter = XAxisValueFormatter(labels)
-            textSize = 12f
-            textColor = requireContext().getColor(R.color.black)
+            valueFormatter = XAxisValueFormatter(listOf("接单速度", "准时率", "好评率", "完成率", "信用等级"))
+            textSize = 10f
+            textColor = requireContext().getColor(R.color.text_secondary)
         }
-
         radarChart.yAxis.apply {
             axisMinimum = 0f
             axisMaximum = 5f
             setDrawLabels(false)
         }
-
         radarChart.description.isEnabled = false
         radarChart.legend.isEnabled = false
         radarChart.invalidate()
     }
-    private fun setupHorizontalBarChart(barChart: HorizontalBarChart) {
 
+    private fun setupHorizontalBarChart(barChart: HorizontalBarChart) {
         val entries = listOf(
-            BarEntry(0f, 120f), // 完成数量
-            BarEntry(1f, 150f), // 接单数量
-            BarEntry(2f, 110f)  // 准时次数
+            BarEntry(0f, 120f),
+            BarEntry(1f, 150f),
+            BarEntry(2f, 110f)
         )
         val dataSet = BarDataSet(entries, "接单统计").apply {
             color = requireContext().getColor(R.color.green_primary)
-            valueTextSize = 12f
-            valueTextColor = requireContext().getColor(R.color.black)
+            valueTextSize = 10f
+            valueTextColor = requireContext().getColor(R.color.text_secondary)
         }
         barChart.data = BarData(dataSet).apply {
             barWidth = 0.3f
         }
-        val labels = listOf("完成数量", "接单数量", "准时次数")
-
         barChart.xAxis.apply {
-            valueFormatter = IndexAxisValueFormatter(labels)
+            valueFormatter = IndexAxisValueFormatter(listOf("完成", "接单", "准时"))
             granularity = 1f
-            textSize = 12f
+            textSize = 10f
+            textColor = requireContext().getColor(R.color.text_secondary)
             setDrawGridLines(false)
             position = XAxis.XAxisPosition.BOTTOM
         }
-
         barChart.axisLeft.apply {
             axisMinimum = 0f
             axisMaximum = barChart.data.yMax * 1.3f
             setDrawGridLines(false)
         }
         barChart.axisRight.isEnabled = false
+        barChart.description.isEnabled = false
+        barChart.legend.isEnabled = false
+        barChart.setFitBars(true)
+        barChart.animateY(800)
+        barChart.invalidate()
+    }
 
-        barChart.apply {
-            description.isEnabled = false
-            legend.isEnabled = false
-            setFitBars(true)
-            animateY(800)
-            invalidate()
-        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

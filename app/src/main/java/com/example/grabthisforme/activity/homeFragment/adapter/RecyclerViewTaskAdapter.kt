@@ -37,13 +37,13 @@ class RecyclerViewTaskAdapter(
         }
 
         fun bind(order: Order, clickListener: (Long) -> Unit, userId: Long? = null) {
-            binding.sendTime.text = "\u914d\u9001\u65f6\u95f4\uff1a${formatTime(order.startTime)} - ${formatTime(order.endTime)}"
+            binding.sendTime.text = "配送时间 ${formatTime(order.startTime)} - ${formatTime(order.endTime)}"
             binding.timeLeft.text = formatTimeLeft(order.startTime, order.endTime)
-            binding.goodsMessage.text = "\u8bf4\u660e\uff1a${order.goods.message}"
-            binding.goodsName.text = "\u5546\u54c1\uff1a${order.goods.name}"
-            binding.goodsPrice.text = "\u5546\u54c1\u4ef7\u683c\uff1a\uffe5${order.goods.price}"
-            binding.shelfNumber.text = "\u8d27\u67b6\u53f7\uff1a${order.shelf_number}"
-            binding.aimPosition.text = "\u76ee\u7684\u5730\uff1a${order.aim_position}"
+            binding.goodsMessage.text = order.goods.message.ifBlank { "暂无补充说明" }
+            binding.goodsName.text = order.goods.name.ifBlank { "待采购商品" }
+            binding.goodsPrice.text = "商品价 ¥${order.goods.price}"
+            binding.shelfNumber.text = "货架号 ${order.shelf_number.ifBlank { "未填写" }}"
+            binding.aimPosition.text = "送达 ${order.aim_position.ifBlank { "待确认" }}"
 
             val goodsPhoto = order.goods.pic
             if (goodsPhoto.isNotBlank()) {
@@ -65,11 +65,10 @@ class RecyclerViewTaskAdapter(
 
             val isBuyerSelf = order.isBuyerSelf || (userId != null && order.buyer.id == userId)
             binding.ivState.visibility = View.VISIBLE
+            binding.llTaskItem.setBackgroundResource(R.drawable.bg_create_goods_card)
             if (isBuyerSelf) {
-                binding.llTaskItem.setBackgroundResource(R.drawable.bg_arc_gradient)
                 binding.ivState.setImageResource(R.drawable.ic_wait_receive)
             } else {
-                binding.llTaskItem.setBackgroundResource(R.drawable.bg_arc_gradient_green)
                 binding.ivState.setImageResource(R.drawable.ic_wait_send)
             }
 
@@ -77,6 +76,9 @@ class RecyclerViewTaskAdapter(
                 val taskId = order.orderId.toLongOrNull() ?: 0L
                 clickListener.invoke(taskId)
             }
+            itemView.alpha = 0f
+            itemView.translationY = 18f
+            itemView.animate().alpha(1f).translationY(0f).setDuration(260L).start()
         }
 
         class TaskDiffItemCallback : DiffUtil.ItemCallback<Order>() {

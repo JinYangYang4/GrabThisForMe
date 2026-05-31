@@ -39,12 +39,12 @@ class RecyclerViewOrderAdapter(
         fun bind(order: Order, clickListener: (Long) -> Unit, userId: Long?) {
             val isBuyerSelf = order.isBuyerSelf || (userId != null && order.buyer.id == userId)
 
-            binding.goodsMessage.text = "要求：${order.goods.message}"
-            binding.goodsPrice.text = "商品价格：￥${order.goods.price}"
-            binding.shelfNumber.text = "货架号：${order.shelf_number}"
-            binding.aimPosition.text = "目的地：${order.aim_position}"
-            binding.goodsName.text = "商品：${order.goods.name}"
-            binding.sendTime.text = "配送时间：${formatTime(order.startTime)} - ${formatTime(order.endTime)}"
+            binding.goodsMessage.text = order.goods.message.ifBlank { "暂无补充要求" }
+            binding.goodsPrice.text = "商品价 ¥${order.goods.price}"
+            binding.shelfNumber.text = "货架号 ${order.shelf_number.ifBlank { "未填写" }}"
+            binding.aimPosition.text = "送达 ${order.aim_position.ifBlank { "待确认" }}"
+            binding.goodsName.text = order.goods.name.ifBlank { "待采购商品" }
+            binding.sendTime.text = "配送时间 ${formatTime(order.startTime)} - ${formatTime(order.endTime)}"
             binding.timeLeft.text = formatTimeLeft(order.startTime, order.endTime)
 
             val photoUrl = order.goods.pic
@@ -52,8 +52,8 @@ class RecyclerViewOrderAdapter(
                 binding.goodsImg.visibility = View.VISIBLE
                 Glide.with(binding.root.context)
                     .load(photoUrl)
-                    .placeholder(R.drawable.ic_back_charactor2)
-                    .error(R.drawable.ic_back_charactor2)
+                    .placeholder(R.drawable.food_pic)
+                    .error(R.drawable.food_pic)
                     .into(binding.goodsImg)
             } else {
                 binding.goodsImg.visibility = View.GONE
@@ -65,15 +65,12 @@ class RecyclerViewOrderAdapter(
                 .error(R.drawable.cat)
                 .into(binding.ivHeadPic)
 
+            binding.llOrderItem.setBackgroundResource(R.drawable.bg_create_goods_card)
             if (userId != null || order.isBuyerSelf) {
                 binding.ivState.visibility = View.VISIBLE
-                if (isBuyerSelf) {
-                    binding.llOrderItem.setBackgroundResource(R.drawable.bg_arc_gradient)
-                    binding.ivState.setImageResource(R.drawable.ic_wait_receive)
-                } else {
-                    binding.llOrderItem.setBackgroundResource(R.drawable.bg_arc_gradient_green)
-                    binding.ivState.setImageResource(R.drawable.ic_wait_send)
-                }
+                binding.ivState.setImageResource(
+                    if (isBuyerSelf) R.drawable.ic_wait_receive else R.drawable.ic_wait_send
+                )
                 if (checkOrderStatus(order.endTime)) {
                     binding.ivState.setImageResource(R.drawable.ic_already_over)
                 }
@@ -87,6 +84,9 @@ class RecyclerViewOrderAdapter(
             }
             itemView.isClickable = true
             itemView.isFocusable = true
+            itemView.alpha = 0f
+            itemView.translationY = 18f
+            itemView.animate().alpha(1f).translationY(0f).setDuration(260L).start()
         }
 
         private fun formatTime(timeStamp: Long): String {
@@ -100,7 +100,7 @@ class RecyclerViewOrderAdapter(
 
         private fun checkOrderStatus(endTime: Long): Boolean {
             val currentTime = System.currentTimeMillis()
-            return currentTime <= endTime
+            return currentTime > endTime
         }
 
         private fun formatTimeLeft(startTime: Long, endTime: Long): String {

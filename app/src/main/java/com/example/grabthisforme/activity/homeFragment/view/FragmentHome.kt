@@ -11,12 +11,11 @@ import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.AnimationSet
+import android.view.animation.DecelerateInterpolator
 import android.view.animation.TranslateAnimation
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -76,6 +75,15 @@ class FragmentHome : Fragment() {
         initObserve()
         initRecyclerViewTask()
         initRecyclerViewStore()
+        playEntranceAnimation(
+            binding.homeHero,
+            binding.llSearch,
+            binding.select,
+            binding.taskSectionTitle,
+            binding.dropContainer,
+            binding.storeSectionTitle,
+            binding.rvSomeGoods
+        )
     }
 
     fun initObserve(){
@@ -105,6 +113,20 @@ class FragmentHome : Fragment() {
         }
     }
 
+    private fun playEntranceAnimation(vararg views: View) {
+        views.forEachIndexed { index, itemView ->
+            itemView.alpha = 0f
+            itemView.translationY = 24f
+            itemView.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setStartDelay(index * 55L)
+                .setDuration(360L)
+                .setInterpolator(DecelerateInterpolator())
+                .start()
+        }
+    }
+
 
     @SuppressLint("ClickableViewAccessibility")
     fun initRecyclerViewTask(){
@@ -118,7 +140,15 @@ class FragmentHome : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             homeViewModel.currentTaskOrders.collectLatest { orderList ->
-                adapter1.submitList(orderList)
+                if (orderList.isEmpty()){
+                    binding.rvTask.visibility = View.GONE
+                    binding.tvNoTask.visibility = View.VISIBLE
+                }else{
+                    binding.rvTask.visibility = View.VISIBLE
+                    binding.tvNoTask.visibility = View.GONE
+                    adapter1.submitList(orderList)
+                }
+
             }
         }
 

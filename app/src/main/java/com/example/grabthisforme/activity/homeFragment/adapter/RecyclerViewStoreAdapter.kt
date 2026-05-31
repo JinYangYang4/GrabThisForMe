@@ -30,23 +30,28 @@ class RecyclerViewStoreAdapter(
         }
 
         fun bind(store: Store) {
-            binding.tvStore.text = store.name
-            binding.tvSaleNumber.text = "销售量：${store.salesVolume}"
-            binding.tvDistance.text = "距离：3km"
+            binding.tvStore.text = store.name.ifBlank { "校园店铺" }
+            binding.tvSaleNumber.text = "已售 ${store.salesVolume}"
+            binding.tvDistance.text = "约 1km"
 
             goodsAdapter = RecyclerViewGoodsAdapter {}
             binding.rvGoods.adapter = goodsAdapter
 
             var sourceGoods = if (store.goodsAll.isNotEmpty()) store.goodsAll else Goods.get20RepeatGoods()
-            if (sourceGoods.size > 15){
+            if (sourceGoods.size > 15) {
                 sourceGoods = sourceGoods.take(14)
             }
             val goodsMutableList = sourceGoods.toMutableList()
             goodsMutableList.add(Goods(-1L))
             goodsAdapter.submitList(goodsMutableList)
+
             itemView.setOnClickListener {
                 onStoreClickListener?.invoke(store)
             }
+            itemView.alpha = 0f
+            itemView.translationY = 18f
+            itemView.animate().alpha(1f).translationY(0f).setDuration(260L).start()
+
             Glide.with(binding.root.context)
                 .load(store.pic)
                 .error(R.drawable.ic_store)
@@ -77,5 +82,4 @@ class RecyclerViewStoreAdapter(
     override fun onBindViewHolder(holder: StoreViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
-
 }
