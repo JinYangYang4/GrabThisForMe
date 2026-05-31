@@ -1,203 +1,515 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/gray_mid_light"
+        android:background="@drawable/bg_create_goods_screen"
         tools:ignore="MissingConstraints">
-
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:paddingTop="30dp"
-            android:paddingBottom="10dp"
             android:id="@+id/title_bar"
-            android:paddingHorizontal="16dp"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/iv_back"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:src="@drawable/ic_back" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="18dp"
-                android:text="设置"
-                android:textColor="@color/black"
-                android:textSize="17sp"
-                android:textStyle="bold"/>
-        </LinearLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/account_settings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@color/white"
-            app:layout_constraintTop_toBottomOf="@+id/title_bar">
-
-            <!-- 个人资料项 -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/item_profile"
+            android:orientation="vertical"
+            android:paddingTop="36dp">
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp">
-
-                <TextView
-                    android:id="@+id/tv_profile"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="个人资料"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-
-                    app:layout_constraintTop_toTopOf="parent"/>
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0.5dp"
-                    android:background="@color/gray_ultra_light"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <!-- 账号安全项 -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/item_account_security"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                app:layout_constraintTop_toBottomOf="@+id/item_profile">
-
-
-
-                <TextView
-                    android:id="@+id/tv_security"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="账号安全"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <!-- 第二组设置项：聊天、朋友权限 -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/privacy_settings"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@color/white"
-            app:layout_constraintTop_toBottomOf="@+id/account_settings">
-
-            <!-- 聊天设置项 -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/item_chat"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp">
-
-
-                <TextView
-                    android:id="@+id/tv_chat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="聊天背景"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0.5dp"
-                    android:background="@color/gray_ultra_light"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/account_operations"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@color/white"
-            app:layout_constraintTop_toBottomOf="@+id/privacy_settings">
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/item_switch_account"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp">
-
-
-
-                <TextView
-                    android:id="@+id/tv_switch_account"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="切换账号"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0.5dp"
-                    android:background="@color/gray_ultra_light"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/item_logout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                app:layout_constraintTop_toBottomOf="@+id/item_switch_account">
+                android:layout_height="42dp"
+                android:layout_marginHorizontal="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <ImageView
-                    android:id="@+id/iv_logout"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/ic_logout"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    android:id="@+id/iv_back"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:background="@drawable/bg_drawer_top_pill"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_back" />
 
                 <TextView
-                    android:id="@+id/tv_logout"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
-                    android:text="退出登录"
-                    android:textColor="#FF4444"
-                    android:textSize="16sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/iv_logout"
-                    app:layout_constraintTop_toTopOf="parent"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                    android:layout_weight="1"
+                    android:text="设置"
+                    android:textColor="@color/black"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_drawer_top_pill"
+                    android:gravity="center"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:text="已登录"
+                    android:textColor="#17382F"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:layout_marginHorizontal="16dp"
+                android:background="@drawable/bg_set_group_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_marginBottom="5dp"
+                android:elevation="2dp"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="58dp"
+                    android:layout_height="58dp"
+                    android:background="@drawable/bg_circle"
+                    android:backgroundTint="#FFFFFFFF"
+                    android:clipToOutline="true"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_set" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="账号与隐私中心"
+                        android:textColor="#142D26"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="统一管理资料、安全、聊天和登录状态"
+                        android:textColor="#587068"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="26dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_set_status_chip"
+                        android:gravity="center"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:text="推荐先完善个人资料"
+                        android:textColor="#1D6F5E"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:clipToPadding="false"
+            app:layout_constraintTop_toBottomOf="@+id/title_bar"
+            app:layout_constraintStart_toStartOf="parent"
+            android:fillViewport="true"
+            android:overScrollMode="never">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="24dp">
+
+                <LinearLayout
+                    android:id="@+id/account_settings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="14dp"
+                    android:background="@drawable/bg_set_group_card"
+                    android:elevation="2dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="账号信息"
+                        android:textColor="#172A2B"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/item_profile"
+                        android:layout_width="match_parent"
+                        android:layout_height="76dp"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_order_list_surface"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp">
+
+                        <ImageView
+                            android:id="@+id/icon_profile"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/bg_my_quick_icon_misty_mint"
+                            android:padding="10dp"
+                            android:src="@drawable/ic_my"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tv_profile"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="个人资料"
+                            android:textColor="@android:color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toStartOf="@+id/profile_more"
+                            app:layout_constraintStart_toEndOf="@id/icon_profile"
+                            app:layout_constraintTop_toTopOf="@id/icon_profile" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="头像、昵称、签名和基础信息"
+                            android:textColor="#6A7B7C"
+                            android:textSize="12sp"
+                            app:layout_constraintEnd_toStartOf="@+id/profile_more"
+                            app:layout_constraintStart_toStartOf="@id/tv_profile"
+                            app:layout_constraintTop_toBottomOf="@id/tv_profile" />
+
+                        <ImageView
+                            android:id="@+id/profile_more"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:alpha="0.5"
+                            android:src="@drawable/ic_more"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/item_account_security"
+                        android:layout_width="match_parent"
+                        android:layout_height="76dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_order_list_surface"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp">
+
+                        <ImageView
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/bg_my_quick_icon_misty_blue"
+                            android:padding="10dp"
+                            android:src="@drawable/ic_show"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tv_security"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="账号安全"
+                            android:textColor="@android:color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toStartOf="@+id/security_more"
+                            app:layout_constraintStart_toEndOf="@id/tv_security_icon_anchor"
+                            app:layout_constraintTop_toTopOf="@id/tv_security_icon_anchor" />
+
+                        <View
+                            android:id="@+id/tv_security_icon_anchor"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="修改密码，整理登录方式和账号保护"
+                            android:textColor="#6A7B7C"
+                            android:textSize="12sp"
+                            app:layout_constraintEnd_toStartOf="@+id/security_more"
+                            app:layout_constraintStart_toStartOf="@id/tv_security"
+                            app:layout_constraintTop_toBottomOf="@id/tv_security" />
+
+                        <ImageView
+                            android:id="@+id/security_more"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:alpha="0.5"
+                            android:src="@drawable/ic_more"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/privacy_settings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="14dp"
+                    android:background="@drawable/bg_set_group_card"
+                    android:elevation="2dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="体验设置"
+                        android:textColor="#172A2B"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/item_chat"
+                        android:layout_width="match_parent"
+                        android:layout_height="76dp"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_order_list_surface"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp">
+
+                        <ImageView
+                            android:id="@+id/chat_icon"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/bg_my_quick_icon_misty_soft_pink"
+                            android:padding="10dp"
+                            android:src="@drawable/ic_information"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tv_chat"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="聊天背景"
+                            android:textColor="@android:color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toStartOf="@+id/chat_more"
+                            app:layout_constraintStart_toEndOf="@id/chat_icon"
+                            app:layout_constraintTop_toTopOf="@id/chat_icon" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="切换推荐背景、相册图片或即时拍摄"
+                            android:textColor="#6A7B7C"
+                            android:textSize="12sp"
+                            app:layout_constraintEnd_toStartOf="@+id/chat_more"
+                            app:layout_constraintStart_toStartOf="@id/tv_chat"
+                            app:layout_constraintTop_toBottomOf="@id/tv_chat" />
+
+                        <ImageView
+                            android:id="@+id/chat_more"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:alpha="0.5"
+                            android:src="@drawable/ic_more"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_marginEnd="6dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_chip_mint"
+                            android:gravity="center"
+                            android:text="消息免打扰"
+                            android:textColor="#1D6F5E"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_marginStart="6dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_chip_warm"
+                            android:gravity="center"
+                            android:text="校园偏好"
+                            android:textColor="#A85B1F"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/account_operations"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="14dp"
+                    android:layout_marginBottom="5dp"
+                    android:background="@drawable/bg_set_group_card"
+                    android:elevation="2dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="账号操作"
+                        android:textColor="#172A2B"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/item_switch_account"
+                        android:layout_width="match_parent"
+                        android:layout_height="76dp"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_order_list_surface"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp">
+
+                        <ImageView
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/bg_my_quick_icon_soft_apricot"
+                            android:padding="10dp"
+                            android:src="@drawable/ic_add_switch_accounts"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tv_switch_account"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="切换账号"
+                            android:textColor="@android:color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toStartOf="@+id/switch_more"
+                            app:layout_constraintStart_toEndOf="@id/switch_icon_anchor"
+                            app:layout_constraintTop_toTopOf="@id/switch_icon_anchor" />
+
+                        <View
+                            android:id="@+id/switch_icon_anchor"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="后续可扩展多账号切换、测试号和校园身份管理"
+                            android:textColor="#6A7B7C"
+                            android:textSize="12sp"
+                            app:layout_constraintEnd_toStartOf="@+id/switch_more"
+                            app:layout_constraintStart_toStartOf="@id/tv_switch_account"
+                            app:layout_constraintTop_toBottomOf="@id/tv_switch_account" />
+
+                        <ImageView
+                            android:id="@+id/switch_more"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:alpha="0.5"
+                            android:src="@drawable/ic_more"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/item_logout"
+                        android:layout_width="match_parent"
+                        android:layout_height="76dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_set_danger_card"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp">
+
+                        <ImageView
+                            android:id="@+id/iv_logout"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/bg_drawer_logout_card"
+                            android:padding="10dp"
+                            android:src="@drawable/ic_logout"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tv_logout"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="退出登录"
+                            android:textColor="#B13D30"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/iv_logout"
+                            app:layout_constraintTop_toTopOf="@id/iv_logout" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="用于切换身份或暂时离开当前账号"
+                            android:textColor="#B16A5B"
+                            android:textSize="12sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="@id/tv_logout"
+                            app:layout_constraintTop_toBottomOf="@id/tv_logout" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

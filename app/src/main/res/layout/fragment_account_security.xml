@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <data>
         <variable
             name="viewModel"
@@ -12,182 +12,223 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/gray_translucent_dark"
+        android:background="@drawable/bg_create_goods_screen"
         tools:ignore="MissingConstraints">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:paddingTop="30dp"
-            android:paddingBottom="10dp"
             android:id="@+id/title_bar"
-            android:paddingHorizontal="16dp"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/iv_back"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:src="@drawable/ic_back" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="18dp"
-                android:text="更改密码"
-                android:textColor="@color/black"
-                android:textSize="13sp"
-                android:textStyle="bold"/>
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-            <LinearLayout
-                android:id="@+id/ll_submit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingVertical = "4dp"
-                android:paddingHorizontal="8dp"
-                android:background="@drawable/bg_rounded_white_radius_small"
-                android:backgroundTint="@{viewModel.canSubmit ? @color/green_light : @color/gray_light}"
-                android:alpha="@{viewModel.canSubmit ? 1f : 0.5f}"
-                android:clickable="@{viewModel.canSubmit}"
-                android:enabled="@{viewModel.canSubmit}">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="11sp"
-                    android:text="完成"
-                    android:textColor="@color/white_fff8"/>
-            </LinearLayout>
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/ll_toast"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/bg_rounded_white"
-            app:layout_constraintTop_toBottomOf="@+id/title_bar">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="账号安全 (Account Security)：本页面用于重新设置您的账号密码，为保障账号安全，请设置包含字母、数字和特殊符号的高强度密码，且请勿与其他平台密码重复。"
-                android:textColor="@color/gray_mid"
-                android:textSize="10sp"
-                android:lineSpacingMultiplier="1.2"
-              />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/bg_rounded_white"
             android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@+id/ll_toast">
+            android:paddingTop="36dp">
+
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="45dp"
+                android:layout_height="42dp"
+                android:layout_marginHorizontal="16dp"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/iv_back"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:background="@drawable/bg_drawer_top_pill"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_back" />
 
                 <TextView
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:text="账号："
-                    android:textColor="@android:color/black"
-                    android:textSize="13sp"/>
-
-                <TextView
-                    android:id="@+id/tv_account"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:text="@{viewModel.account}"
-                    android:textColor="@color/gray_mid"
-                    android:textSize="13sp"/>
+                    android:text="账号安全"
+                    android:textColor="@color/black"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/ll_submit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:alpha="@{viewModel.canSubmit ? 1f : 0.45f}"
+                    android:background="@drawable/bg_auth_primary_button"
+                    android:clickable="@{viewModel.canSubmit}"
+                    android:enabled="@{viewModel.canSubmit}"
+                    android:gravity="center"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="完成"
+                        android:textColor="@color/white_fff8"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
             </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:background="@color/gray_ultra_light"
-                android:layout_marginBottom="8dp"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
-
-                <TextView
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:text="原密码："
-                    android:textColor="@android:color/black"
-                    android:textSize="13sp"/>
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/et_original_pwd"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@null"
-                    android:hint="请输入原始密码"
-                    android:inputType="textPassword"
-                    android:paddingStart="5dp"
-                    android:paddingEnd="5dp"
-                    android:textColor="@android:color/black"
-                    android:textColorHint="@color/gray_mid"
-                    android:textSize="13sp"/>
-
-            </LinearLayout>
-
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:background="@color/gray_ultra_light"
-                android:layout_marginBottom="8dp"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:text="新密码："
-                    android:textColor="@android:color/black"
-                    android:textSize="13sp"/>
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/et_new_pwd"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@null"
-                    android:hint="请输入新密码（8-16位，含字母数字）"
-                    android:inputType="textPassword"
-                    android:paddingStart="5dp"
-                    android:paddingEnd="5dp"
-                    android:textColor="@android:color/black"
-                    android:textColorHint="@color/gray_mid"
-                    android:textSize="13sp"/>
-            </LinearLayout>
-
         </LinearLayout>
 
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            app:layout_constraintTop_toBottomOf="@+id/title_bar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:fillViewport="true"
+            android:overScrollMode="never">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="24dp">
+
+                <LinearLayout
+                    android:id="@+id/ll_toast"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="14dp"
+                    android:background="@drawable/bg_set_group_card"
+                    android:elevation="2dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="安全提醒"
+                        android:textColor="#172A2B"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="建议使用 8-16 位密码，并同时包含字母和数字。不要与其他平台重复使用。"
+                        android:textColor="#6A7B7C"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/password_form_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="14dp"
+                    android:background="@drawable/bg_set_group_card"
+                    android:elevation="2dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="密码修改"
+                        android:textColor="#172A2B"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_order_list_surface"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="当前账号"
+                            android:textColor="#2B4742"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_account"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@{viewModel.account}"
+                            android:textColor="#5A706B"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_chat_input"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical"
+                        android:paddingStart="16dp"
+                        android:paddingTop="10dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="原密码"
+                            android:textColor="#2B4742"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/et_original_pwd"
+                            android:layout_width="match_parent"
+                            android:layout_height="44dp"
+                            android:background="@null"
+                            android:hint="请输入当前密码"
+                            android:imeOptions="actionDone"
+                            android:inputType="textPassword"
+                            android:textColor="@android:color/black"
+                            android:textColorHint="@color/gray_mid"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_chat_input"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical"
+                        android:paddingStart="16dp"
+                        android:paddingTop="10dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="新密码"
+                            android:textColor="#2B4742"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/et_new_pwd"
+                            android:layout_width="match_parent"
+                            android:layout_height="44dp"
+                            android:background="@null"
+                            android:hint="请输入新密码，8-16 位，包含字母和数字"
+                            android:imeOptions="actionDone"
+                            android:inputType="textPassword"
+                            android:textColor="@android:color/black"
+                            android:textColorHint="@color/gray_mid"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

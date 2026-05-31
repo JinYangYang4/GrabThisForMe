@@ -39,14 +39,17 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
+    private val targetScale = 0.97f
+
+    // region nestedScrollView_menu — drawer image stretch
     private var isTouching = false
     private var originalImgHeight = 0
     private var isViewInit = false
+    private var startTouchY = 0f
+    private var currentPullDistance = 0f
     private val EXPAND_RATIO = 0.4f
     private val MAX_PULL_DISTANCE = 800f
-    private var startTouchY = 0f
-    private val targetScale = 0.97f
-    private var currentPullDistance = 0f
+    // endregion
     private var lastBackPressTime = 0L
     private var isOrderBottomSheetFragment = false
     private var isOpenNewFragment = false
@@ -75,7 +78,7 @@ class MainActivity : AppCompatActivity() {
         waitViewDrawComplete()
         initRvUser()
         initRvStore()
-        nestedScrollviewTouchListener()
+        initNestedScrollViewTouch()
         initHandleSidebarClick()
     }
     fun viewModelObserve(){
@@ -125,7 +128,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        //零散片段
+        // Main content view
         navNewFragment = supportFragmentManager.findFragmentById(binding.navNewFragment.id) as NavHostFragment
         navNewFragment.navController.setGraph(R.navigation.nav_new)
 
@@ -180,7 +183,7 @@ class MainActivity : AppCompatActivity() {
 
                             }else{
                                 lastBackPressTime = now
-                                Toast.makeText(this@MainActivity, "再次返回退出", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@MainActivity, "\u518d\u6b21\u8fd4\u56de\u9000\u51fa", Toast.LENGTH_SHORT).show()
                             }
                         }else{
                             isEnabled = false
@@ -223,7 +226,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
     fun NewNavController_navgite(action: NavDirections){
-        val navController = navNewFragment.navController.navigate(action)
+        navNewFragment.navController.navigate(action)
     }
     fun innerBottomBar(){
         viewModel.openNewFragment_ture()
@@ -239,7 +242,7 @@ class MainActivity : AppCompatActivity() {
             layoutManager = gridlayoutManager
             adapter = adapter1
         }
-        val templateUser = User(name = "李华", id = 1, headPic = "")
+        val templateUser = User(name = "\u674e\u534e", id = 1, headPic = "")
         val recentUserList = User.createVirtualUsers(templateUser,10)
         adapter1.submitList(recentUserList)
     }
@@ -250,18 +253,29 @@ class MainActivity : AppCompatActivity() {
             layoutManager = gridLayoutManager
             adapter = adapter2
         }
-        val templateStore = Store.createVirtualStores()
+        val templateStore = Store.createVirtualStores(
+            Store(
+                name = "\u6821\u56ed\u4fbf\u5229\u5e97",
+                type = "\u96f6\u98df\u996e\u54c1",
+                address = "\u751f\u6d3b\u533a"
+            )
+        )
         adapter2.submitList(templateStore)
     }
     fun drawerAnimation(){
         binding.drawerLayout.addDrawerListener(object : DrawerLayout.SimpleDrawerListener(){
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
                 super.onDrawerSlide(drawerView, slideOffset)
-                val mainContent = binding.drawerLayout.getChildAt(0) // 主视图（第一个子布局）
+                val mainContent = binding.drawerLayout.getChildAt(0) // Main content view
                 val currentScale = 1 - (1 - targetScale) * slideOffset
 
                 mainContent.scaleX = currentScale
                 mainContent.scaleY = currentScale
+
+            }
+
+            override fun onDrawerOpened(drawerView: View) {
+                super.onDrawerOpened(drawerView)
 
             }
 
@@ -276,8 +290,19 @@ class MainActivity : AppCompatActivity() {
         })
 
     }
+
+
+    // region nestedScrollView_menu — drawer image stretch
+
+    private fun waitViewDrawComplete() {
+        binding.ivBackCharactor.post {
+            originalImgHeight = binding.ivBackCharactor.height
+            isViewInit = true
+        }
+    }
+
     @SuppressLint("ClickableViewAccessibility")
-    fun nestedScrollviewTouchListener(){
+    private fun initNestedScrollViewTouch() {
         binding.nestedScrollViewMenu.setOnTouchListener { _, event ->
             if (!isViewInit) return@setOnTouchListener false
 
@@ -302,7 +327,7 @@ class MainActivity : AppCompatActivity() {
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     if (isTouching && currentPullDistance > 0) {
                         isTouching = false
-                        resetImgWithAnimation()
+                        resetImageWithAnimation()
                     }
                     isTouching = false
                     false
@@ -312,12 +337,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    private fun waitViewDrawComplete() {
-        binding.ivBackCharactor.post {
-            originalImgHeight = binding.ivBackCharactor.height
-            isViewInit = true
-        }
-    }
+
     private fun updateImageViewSize(pullDistance: Float) {
         if (pullDistance <= 0 || originalImgHeight == 0) return
         val newHeight = originalImgHeight + pullDistance.toInt()
@@ -326,7 +346,8 @@ class MainActivity : AppCompatActivity() {
         binding.ivBackCharactor.layoutParams = layoutParams
         binding.ivBackCharactor.requestLayout()
     }
-    private fun resetImgWithAnimation() {
+
+    private fun resetImageWithAnimation() {
         val startDistance = currentPullDistance
         if (startDistance <= 0) return
 
@@ -349,6 +370,8 @@ class MainActivity : AppCompatActivity() {
             start()
         }
     }
+
+    // endregion
     override fun onDestroy() {
         super.onDestroy()
     }

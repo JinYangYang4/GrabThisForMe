@@ -5,17 +5,16 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
+        android:background="@drawable/bg_order_executor_card"
         android:elevation="2dp"
-        android:padding="14dp"
-        android:background="@drawable/bg_create_goods_card"
-        android:layout_marginVertical="6dp">
+        android:layout_marginHorizontal="3dp"
+        android:foreground="?attr/selectableItemBackground"
+        android:padding="14dp">
 
         <LinearLayout
             android:id="@+id/ll_order_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
             android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -27,10 +26,10 @@
                 android:orientation="horizontal">
 
                 <FrameLayout
-                    android:layout_width="38dp"
-                    android:layout_height="38dp"
-                    android:background="@drawable/bg_info_avatar_ring"
-                    android:padding="2dp">
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/bg_order_info_tile"
+                    android:padding="3dp">
 
                     <ImageView
                         android:id="@+id/iv_head_pic"
@@ -46,7 +45,7 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginStart="11dp"
                     android:layout_weight="1"
                     android:orientation="vertical">
 
@@ -56,8 +55,9 @@
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:maxLines="1"
+                        android:text="待采购商品"
                         android:textColor="#172A2B"
-                        android:textSize="16sp"
+                        android:textSize="17sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -67,6 +67,7 @@
                         android:layout_marginTop="3dp"
                         android:ellipsize="end"
                         android:maxLines="1"
+                        android:text="配送时间"
                         android:textColor="#6A7B7C"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -74,12 +75,13 @@
                 <TextView
                     android:id="@+id/time_left"
                     android:layout_width="wrap_content"
-                    android:layout_height="28dp"
-                    android:background="@drawable/bg_home_chip_light"
+                    android:layout_height="30dp"
+                    android:background="@drawable/bg_order_status_warm"
                     android:gravity="center"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:textColor="#1D6F5E"
+                    android:text="剩余 30 分钟"
+                    android:textColor="#A85B1F"
                     android:textSize="12sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -87,19 +89,27 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="13dp"
+                android:background="@drawable/bg_order_list_surface"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:padding="10dp">
 
-                <ImageView
-                    android:id="@+id/goods_img"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:background="@drawable/bg_home_banner_card"
+                <FrameLayout
+                    android:layout_width="76dp"
+                    android:layout_height="76dp"
+                    android:background="@drawable/bg_create_goods_card"
                     android:clipToOutline="true"
-                    android:contentDescription="@null"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/food_pic" />
+                    android:outlineProvider="background">
+
+                    <ImageView
+                        android:id="@+id/goods_img"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@null"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/food_pic" />
+                </FrameLayout>
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -114,6 +124,7 @@
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:maxLines="2"
+                        android:text="补充需求"
                         android:textColor="#344541"
                         android:textSize="14sp" />
 
@@ -121,20 +132,30 @@
                         android:id="@+id/goods_price"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginTop="7dp"
+                        android:text="商品价 ¥0"
                         android:textColor="#E0674F"
-                        android:textSize="15sp"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/shelf_number"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:textColor="#7D8C88"
-                        android:textSize="12sp" />
+                        android:layout_marginTop="6dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/shelf_number"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="货架号"
+                            android:textColor="#7D8C88"
+                            android:textSize="12sp" />
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/aim_position"
@@ -143,21 +164,28 @@
                         android:layout_marginTop="3dp"
                         android:ellipsize="end"
                         android:maxLines="1"
+                        android:text="送达位置"
                         android:textColor="#7D8C88"
                         android:textSize="12sp" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/iv_state"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:elevation="3dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_wait_receive"
+        <TextView
+            android:id="@+id/tv_state_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/bg_order_status_mint"
+            android:elevation="4dp"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textColor="#1D6F5E"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/ll_order_item"
             app:layout_constraintEnd_toEndOf="@id/ll_order_item" />
     </androidx.constraintlayout.widget.ConstraintLayout>

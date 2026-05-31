@@ -10,8 +10,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
@@ -20,6 +18,8 @@ import com.example.grabthisforme.activity.fragment_misc.setfragment.viewmodel.Ed
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentEditPersonalInformationBinding
 import com.example.grabthisforme.model.user.domain.UserProfile
+import com.example.grabthisforme.util.KeyboardScrollHelper
+import com.example.grabthisforme.util.ViewAnimationUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -29,6 +29,7 @@ class EditPersonalInformationFragment : Fragment() {
     private var _binding: FragmentEditPersonalInformationBinding? = null
     private val binding get() = _binding!!
     private val viewModel: EditPersonalInformationViewModel by viewModels()
+    private var keyboardScrollHelper: KeyboardScrollHelper? = null
     private var isFormInitialized = false
 
     override fun onCreateView(
@@ -45,13 +46,17 @@ class EditPersonalInformationFragment : Fragment() {
         initView()
         observeState()
         observeSaveResult()
-        ViewCompat.setOnApplyWindowInsetsListener(requireView()) { _, insets ->
-            val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
-            if (!imeVisible && _binding != null) {
-                clearInputFocus()
-            }
-            insets
-        }
+        ViewAnimationUtils.animateStaggeredEntrance(
+            binding.accountInfoCard,
+            binding.profileCard,
+            binding.saveButtonCard
+        )
+        keyboardScrollHelper = KeyboardScrollHelper(
+            rootView = requireView(),
+            scrollView = binding.nestedScrollView,
+            density = resources.displayMetrics.density,
+            onImeHidden = { if (_binding != null) clearInputFocus() }
+        ).also { it.setup() }
     }
 
     private fun initView() {
@@ -157,6 +162,7 @@ class EditPersonalInformationFragment : Fragment() {
         currentFocus.clearFocus()
     }
 
+
     override fun onResume() {
         super.onResume()
         (requireActivity() as MainActivity).innerBottomBar()
@@ -164,6 +170,8 @@ class EditPersonalInformationFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        keyboardScrollHelper?.teardown()
+        keyboardScrollHelper = null
         _binding = null
     }
 }

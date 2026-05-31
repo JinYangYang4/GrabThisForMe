@@ -11,6 +11,7 @@ import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.fragment_misc.setfragment.viewmodel.PersonalInfoViewModel
 import com.example.grabthisforme.databinding.FragmentPersonalInformationBinding
+import com.example.grabthisforme.util.ViewAnimationUtils
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -35,6 +36,7 @@ class FragmentPersonalInformation : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initListener()
         initObserve()
+        ViewAnimationUtils.animateStaggeredEntrance(binding.infoCard)
     }
 
     private fun initListener() {

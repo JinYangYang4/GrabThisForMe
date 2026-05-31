@@ -1,27 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
+        android:layout_height="108dp"
+        android:layout_margin="4dp"
+        android:background="@drawable/bg_drawer_recent_item"
+        android:elevation="2dp"
+        android:foreground="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:clipToOutline="true"
+        android:gravity="center"
         android:orientation="vertical"
-        android:gravity="center_horizontal">
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp">
+
         <ImageView
             android:id="@+id/iv_head_pic"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:padding="2dp"
-            android:backgroundTint="@color/white_fff8"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="@drawable/bg_circle"
-            android:scaleType="centerCrop"
+            android:backgroundTint="#FFFFFF"
             android:clipToOutline="true"
-            android:src="@drawable/cat"/>
+            android:padding="2dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/cat" />
+
         <TextView
             android:id="@+id/tv_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="同学"
+            android:textColor="#203832"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_badge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="10sp"
-            android:layout_marginTop="4dp"
-            android:text="带友"/>
+            android:layout_marginTop="3dp"
+            android:text="常联系"
+            android:textColor="#78938D"
+            android:textSize="10sp" />
     </LinearLayout>
 </layout>

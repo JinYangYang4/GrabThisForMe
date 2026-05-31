@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentChatBackgroudBinding
+import com.example.grabthisforme.util.ViewAnimationUtils
 
 class FragmentChatBackground : Fragment() {
     private var _binding: FragmentChatBackgroudBinding? = null
@@ -23,6 +24,7 @@ class FragmentChatBackground : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initClickListener()
+        ViewAnimationUtils.animateStaggeredEntrance(binding.backgroundSourceCard)
     }
     private fun initClickListener() {
         binding.ivBack.setOnClickListener {

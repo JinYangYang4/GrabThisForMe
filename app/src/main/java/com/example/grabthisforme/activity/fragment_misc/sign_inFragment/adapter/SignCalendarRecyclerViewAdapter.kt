@@ -5,37 +5,39 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-
-
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.fragment_misc.sign_inFragment.model.SignCalendarDay
 import com.example.grabthisforme.databinding.RvCalendarItemBinding
 
 class SignCalendarRecyclerViewAdapter(
-    private val onSignClick: (SignCalendarDay) -> Unit // 签到点击回调
+    private val onSignClick: (SignCalendarDay) -> Unit
 ) : ListAdapter<SignCalendarDay, SignCalendarRecyclerViewAdapter.CalendarViewHolder>(DiffCallback) {
 
     inner class CalendarViewHolder(private val binding: RvCalendarItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(day: SignCalendarDay) {
 
+        fun bind(day: SignCalendarDay) {
             binding.tvDateReward.text = day.reward
+            binding.ivRewardIcon.setImageResource(
+                if (day.reward.contains("\u4f18\u60e0\u5238")) R.drawable.ic_coupon else R.drawable.ic_coin
+            )
 
             when {
                 day.isSigned -> {
-                    binding.llItem.background = binding.root.context.getDrawable(R.drawable.bg_rounded_gray)
+                    binding.llItem.background = binding.root.context.getDrawable(R.drawable.bg_sign_signed)
+                    binding.llItem.alpha = 0.85f
+                    binding.llItem.setOnClickListener(null)
                 }
                 day.isToday -> {
-                    binding.llItem.background = binding.root.context.getDrawable(R.drawable.bg_rounded_gold)
+                    binding.llItem.background = binding.root.context.getDrawable(R.drawable.bg_sign_today)
+                    binding.llItem.alpha = 1f
                     binding.llItem.setOnClickListener { onSignClick(day) }
                 }
                 else -> {
-                    binding.llItem.background = binding.root.context.getDrawable(R.drawable.bg_rounded_white_day)
+                    binding.llItem.background = binding.root.context.getDrawable(R.drawable.bg_sign_future)
+                    binding.llItem.alpha = 1f
                     binding.llItem.setOnClickListener(null)
                 }
-            }
-            if (day.day == 6){
-                binding.ivRewardIcon.setImageResource(R.drawable.ic_coupon)
             }
         }
     }
@@ -60,7 +62,6 @@ class SignCalendarRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: CalendarViewHolder, position: Int) {
-        val day = getItem(position)
-        holder.bind(day)
+        holder.bind(getItem(position))
     }
 }

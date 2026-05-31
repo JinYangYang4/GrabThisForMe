@@ -8,9 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.grabthisforme.activity.mainactivity.view.OrderMessageBottomSheetFragment
 import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewOrderAdapter
 import com.example.grabthisforme.activity.homeFragment.viewModel.OrderPageViewModel
+import com.example.grabthisforme.activity.mainactivity.view.OrderMessageBottomSheetFragment
 import com.example.grabthisforme.databinding.FragmentReceiveOrderBinding
 import com.example.grabthisforme.model.order.data.repository.OrderRepository
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,6 +52,7 @@ class FragmentReceive_Send_HistoryOrder : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
+        initEmptyState()
         loadOrders()
     }
 
@@ -61,10 +62,21 @@ class FragmentReceive_Send_HistoryOrder : Fragment() {
             orderBottomSheet.show(childFragmentManager, "OrderMessageBottomSheet")
         }
 
+        val spacingPx = (12 * resources.displayMetrics.density).toInt()
         binding.RvOrder.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = orderAdapter
             setHasFixedSize(true)
+            addItemDecoration(RecyclerViewOrderAdapter.OrderItemDecoration(spacingPx))
+        }
+    }
+
+    private fun initEmptyState() {
+        binding.tvEmptyHint.text = when (page) {
+            OrderRepository.PAGE_PENDING_RECEIVE -> "\u6682\u65e0\u5f85\u6536\u8d27\u8ba2\u5355"
+            OrderRepository.PAGE_MY_SEND -> "\u6682\u65e0\u5f85\u9001\u8d27\u8ba2\u5355"
+            OrderRepository.PAGE_HISTORY -> "\u6682\u65e0\u5386\u53f2\u8ba2\u5355"
+            else -> "\u6682\u65e0\u8ba2\u5355"
         }
     }
 
@@ -72,6 +84,9 @@ class FragmentReceive_Send_HistoryOrder : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.ordersByPage(page).collectLatest { orderList ->
                 orderAdapter.submitList(orderList)
+                val isEmpty = orderList.isEmpty()
+                binding.llEmptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
+                binding.RvOrder.visibility = if (isEmpty) View.GONE else View.VISIBLE
             }
         }
     }

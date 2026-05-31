@@ -11,8 +11,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -24,6 +22,7 @@ import com.example.grabthisforme.activity.fragment_misc.post_topic.viewmodel.Pos
 import com.example.grabthisforme.activity.fragment_misc.post_topic.viewmodel.PostTopicViewModel
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentCreatePostBinding
+import com.example.grabthisforme.util.KeyboardScrollHelper
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -32,7 +31,7 @@ class PostTopicFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: PostTopicViewModel by viewModels()
     private lateinit var imagesAdapter: ImagesRecyclerviewAdapter
-    private var nestedScrollBaseBottomPadding = 0
+    private var keyboardScrollHelper: KeyboardScrollHelper? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,28 +48,19 @@ class PostTopicFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initView()
         observeState()
-        nestedScrollBaseBottomPadding = binding.nestedScrollView.paddingBottom
-        ViewCompat.setOnApplyWindowInsetsListener(requireView()) { _, insets ->
-            val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
-            val imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
-            val systemBottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
-            val keyboardSpace = (imeBottom - systemBottom).coerceAtLeast(0)
-            binding.nestedScrollView.setPadding(
-                binding.nestedScrollView.paddingLeft,
-                binding.nestedScrollView.paddingTop,
-                binding.nestedScrollView.paddingRight,
-                nestedScrollBaseBottomPadding + keyboardSpace
-            )
-            if (imeVisible && _binding != null) {
-                binding.nestedScrollView.postDelayed({
-                    scrollFocusedInputIntoView()
-                }, KEYBOARD_SCROLL_DELAY_MS)
+        keyboardScrollHelper = KeyboardScrollHelper(
+            rootView = requireView(),
+            scrollView = binding.nestedScrollView,
+            density = resources.displayMetrics.density,
+            onImeHidden = { if (_binding != null) clearInputFocus() },
+            focusRectProvider = { view ->
+                if (view === binding.itPostContent) {
+                    buildCursorRect(binding.itPostContent)
+                } else {
+                    android.graphics.Rect().also { view.getDrawingRect(it) }
+                }
             }
-            if (!imeVisible && _binding != null) {
-                clearInputFocus()
-            }
-            insets
-        }
+        ).also { it.setup() }
     }
 
     private fun initView() {
@@ -101,15 +91,15 @@ class PostTopicFragment : Fragment() {
             viewModel.updateContent(editable?.toString().orEmpty())
             if (binding.itPostContent.hasFocus()) {
                 binding.nestedScrollView.post {
-                    scrollFocusedInputIntoView()
+                    keyboardScrollHelper?.scrollToFocused()
                 }
             }
         }
         binding.itPostContent.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 binding.nestedScrollView.postDelayed({
-                    scrollFocusedInputIntoView()
-                }, KEYBOARD_SCROLL_DELAY_MS)
+                    keyboardScrollHelper?.scrollToFocused()
+                }, 120L)
             }
         }
         binding.llNested.setOnClickListener {
@@ -190,34 +180,8 @@ class PostTopicFragment : Fragment() {
             requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.showSoftInput(binding.itPostContent, InputMethodManager.SHOW_IMPLICIT)
         binding.nestedScrollView.postDelayed({
-            scrollFocusedInputIntoView()
-        }, KEYBOARD_SCROLL_DELAY_MS)
-    }
-
-    private fun scrollFocusedInputIntoView() {
-        val currentFocus = requireActivity().currentFocus ?: return
-        val scrollView = binding.nestedScrollView
-        if (!isDescendantOf(currentFocus, scrollView)) return
-
-        val focusedRect = when (currentFocus) {
-            binding.itPostContent -> buildCursorRect(binding.itPostContent)
-            else -> Rect().also { currentFocus.getDrawingRect(it) }
-        }
-        scrollView.offsetDescendantRectToMyCoords(currentFocus, focusedRect)
-
-        val visibleTop = scrollView.scrollY
-        val visibleBottom = visibleTop + scrollView.height - scrollView.paddingBottom
-        val extraSpacing = KEYBOARD_FOCUS_SPACING_DP.dpToPx()
-
-        when {
-            focusedRect.bottom + extraSpacing > visibleBottom -> {
-                val targetY = focusedRect.bottom - scrollView.height + scrollView.paddingBottom + extraSpacing
-                scrollView.smoothScrollTo(0, targetY.coerceAtLeast(0))
-            }
-            focusedRect.top - extraSpacing < visibleTop -> {
-                scrollView.smoothScrollTo(0, (focusedRect.top - extraSpacing).coerceAtLeast(0))
-            }
-        }
+            keyboardScrollHelper?.scrollToFocused()
+        }, 120L)
     }
 
     private fun buildCursorRect(textView: TextView): Rect {
@@ -226,7 +190,7 @@ class PostTopicFragment : Fragment() {
         val selection = textView.selectionStart.coerceIn(0, textLength)
         val line = layout.getLineForOffset(selection)
         val horizontal = layout.getPrimaryHorizontal(selection).toInt()
-        val halfWidth = CARET_TARGET_HALF_WIDTH_DP.dpToPx()
+        val halfWidth = (CARET_TARGET_HALF_WIDTH_DP * resources.displayMetrics.density).toInt()
 
         return Rect(
             textView.totalPaddingLeft + horizontal - halfWidth,
@@ -234,19 +198,6 @@ class PostTopicFragment : Fragment() {
             textView.totalPaddingLeft + horizontal + halfWidth,
             textView.totalPaddingTop + layout.getLineBottom(line) - textView.scrollY
         )
-    }
-
-    private fun isDescendantOf(child: View, parent: View): Boolean {
-        var current: View? = child
-        while (current != null) {
-            if (current == parent) return true
-            current = current.parent as? View
-        }
-        return false
-    }
-
-    private fun Int.dpToPx(): Int {
-        return (this * resources.displayMetrics.density).toInt()
     }
 
     private fun clearInputFocus() {
@@ -264,12 +215,12 @@ class PostTopicFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        keyboardScrollHelper?.teardown()
+        keyboardScrollHelper = null
         _binding = null
     }
 
     companion object {
-        private const val KEYBOARD_SCROLL_DELAY_MS = 120L
-        private const val KEYBOARD_FOCUS_SPACING_DP = 24
         private const val CARET_TARGET_HALF_WIDTH_DP = 12
     }
 }

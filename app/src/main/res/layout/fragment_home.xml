@@ -396,15 +396,20 @@
                     android:layout_marginTop="10dp"
                     android:background="@drawable/bg_create_goods_card"
                     android:elevation="3dp"
+                    android:clipToOutline="true"
                     android:orientation="vertical">
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_task"
+                    <com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.NestedScrollableHost
                         android:layout_width="match_parent"
                         android:layout_height="250dp"
-                        android:clipToPadding="false"
-                        android:paddingTop="8dp"
-                        android:paddingBottom="6dp" />
+                        android:layout_margin="2dp">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_task"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:clipToPadding="false" />
+                    </com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.NestedScrollableHost>
                     <TextView
                         android:id="@+id/tv_no_task"
                         android:layout_width="wrap_content"

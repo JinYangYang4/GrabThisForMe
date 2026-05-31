@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.DecelerateInterpolator
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
@@ -13,6 +12,7 @@ import com.example.grabthisforme.activity.homeFragment.adapter.HomePagerAdapter
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
 import com.example.grabthisforme.databinding.FragmentHome1Binding
+import com.example.grabthisforme.util.ViewAnimationUtils
 import com.example.grabthisforme.model.XAxisValueFormatter.XAxisValueFormatter
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.HorizontalBarChart
@@ -57,7 +57,7 @@ class FragmentHome1 : Fragment() {
         initObserve()
         setupRadarChart(binding.radarChart)
         setupHorizontalBarChart(binding.barChart)
-        playEntranceAnimation(binding.llSearch, binding.select, binding.statsPanel, binding.llSendOrder)
+        ViewAnimationUtils.animateStaggeredEntrance(binding.llSearch, binding.select, binding.statsPanel, binding.llSendOrder)
     }
 
     private fun initObserve() {
@@ -96,19 +96,6 @@ class FragmentHome1 : Fragment() {
         }.attach()
     }
 
-    private fun playEntranceAnimation(vararg views: View) {
-        views.forEachIndexed { index, itemView ->
-            itemView.alpha = 0f
-            itemView.translationY = 24f
-            itemView.animate()
-                .alpha(1f)
-                .translationY(0f)
-                .setStartDelay(index * 65L)
-                .setDuration(360L)
-                .setInterpolator(DecelerateInterpolator())
-                .start()
-        }
-    }
 
     private fun setupRadarChart(radarChart: RadarChart) {
         val entries = listOf(

@@ -1,31 +1,32 @@
 package com.example.grabthisforme.activity.fragment_misc.all_executor.view
 
 import android.os.Bundle
-import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.example.grabthisforme.activity.mainactivity.view.MainActivity
-import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
+import androidx.viewpager2.widget.ViewPager2
+import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.homeFragment.adapter.OrderDetailViewPager2Adapter
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentOrderBottomSheetBinding
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
-//我的订单页
 class OrderExecutorFragment : Fragment() {
-
     private var _binding: FragmentOrderBottomSheetBinding? = null
-    private lateinit var sharedViewModel: MainViewModel
     private val binding get() = _binding!!
 
     companion object {
         private const val ARG_VP2_POSITION = "vp2_position"
+
         fun newInstance(vp2Position: Int): OrderExecutorFragment {
-            val fragment = OrderExecutorFragment()
-            val args = Bundle()
-            args.putInt(ARG_VP2_POSITION, vp2Position)
-            fragment.arguments = args
-            return fragment
+            return OrderExecutorFragment().apply {
+                arguments = Bundle().apply {
+                    putInt(ARG_VP2_POSITION, vp2Position)
+                }
+            }
         }
     }
 
@@ -40,10 +41,9 @@ class OrderExecutorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        sharedViewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
-        Log.d("test11", "onViewCreated: ")
         initViewPager()
         initView()
+        animateHeader()
     }
 
     override fun onResume() {
@@ -51,30 +51,88 @@ class OrderExecutorFragment : Fragment() {
         (requireActivity() as MainActivity).innerBottomBar()
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-    fun initView(){
+    private fun initView() {
         binding.ivBack.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
     }
 
     private fun initViewPager() {
-        val message = OrderExecutorFragmentArgs.fromBundle(requireArguments()).orderId ?: 0
+        val initialPosition = OrderExecutorFragmentArgs.fromBundle(requireArguments()).orderId
         val adapter = OrderDetailViewPager2Adapter(this)
         binding.viewpager2.adapter = adapter
-        binding.viewpager2.setCurrentItem(message, false)
+        binding.viewpager2.setCurrentItem(initialPosition, false)
+        binding.viewpager2.setPageTransformer(OrderPageTransformer())
 
-        val titles = listOf("待收货", "待送货", "历史订单")
+        val titles = listOf("\u5f85\u6536\u8d27", "\u5f85\u9001\u8d27", "\u5386\u53f2\u8ba2\u5355")
         TabLayoutMediator(binding.tabLayout, binding.viewpager2) { tab, position ->
-            tab.text = titles.getOrNull(position) ?: ""
+            tab.text = titles.getOrNull(position).orEmpty()
         }.attach()
+
+        binding.tabLayout.post {
+            updateTabBackgrounds(initialPosition)
+        }
+
+        binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                updateTabBackgrounds(tab.position)
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) = Unit
+
+            override fun onTabReselected(tab: TabLayout.Tab) = Unit
+        })
+
+        binding.viewpager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                updateTabBackgrounds(position)
+            }
+        })
+    }
+
+    private fun updateTabBackgrounds(selectedPosition: Int) {
+        for (i in 0 until binding.tabLayout.tabCount) {
+            val tab = binding.tabLayout.getTabAt(i) ?: continue
+            val selected = i == selectedPosition
+            tab.view.background = ContextCompat.getDrawable(
+                requireContext(),
+                if (selected) R.drawable.bg_order_tab_selected_modern
+                else R.drawable.bg_order_tab_unselected_modern
+            )
+        }
+    }
+
+    private fun animateHeader() {
+        binding.orderHero.alpha = 0f
+        binding.orderHero.translationY = -18f
+        binding.orderHero.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setDuration(280L)
+            .start()
+
+        binding.orderTabCard.alpha = 0f
+        binding.orderTabCard.translationY = 22f
+        binding.orderTabCard.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setStartDelay(80L)
+            .setDuration(260L)
+            .start()
+    }
+
+    private class OrderPageTransformer : ViewPager2.PageTransformer {
+        override fun transformPage(page: View, position: Float) {
+            val absPos = kotlin.math.abs(position)
+            page.alpha = 1f - 0.18f * absPos
+            page.translationX = -24f * position
+            page.scaleY = 1f - 0.04f * absPos
+        }
     }
 }

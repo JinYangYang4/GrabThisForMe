@@ -2,48 +2,38 @@ package com.example.grabthisforme.activity.fragment_misc.sign_inFragment.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.fragment_misc.sign_inFragment.model.CouponMallItem
 import com.example.grabthisforme.databinding.RvCouponMallItemBinding
 
 class CouponMallRecyclerViewAdapter(
     private val onExchangeClick: (CouponMallItem) -> Unit
 ) : ListAdapter<CouponMallItem, CouponMallRecyclerViewAdapter.CouponMallViewHolder>(DiffCallback) {
+
     inner class CouponMallViewHolder(private val binding: RvCouponMallItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(mallItem: CouponMallItem) {
             val coupon = mallItem.coupon
 
-            // 1. 绑定核心字段
             binding.tvCouponTitle.text = coupon.title
-            binding.tvCouponDenomination.text = "${coupon.denomination}元"
+            binding.tvCouponDenomination.text = "\u00a5${coupon.denomination.toInt()}"
             binding.tvCouponInfo.text = "${coupon.type} | ${coupon.desc}"
-            binding.tvNeedCoin.text = "需${mallItem.needCoin}金币"
+            binding.tvNeedCoin.text = "\u9700${mallItem.needCoin}\u91d1\u5e01"
+            binding.tvHotTag.text = if (mallItem.isHot) "\u70ed\u95e8" else "\u63a8\u8350"
 
-            if (mallItem.isHot) {
-                binding.tvHotTag.text = "热门"
-                binding.tvHotTag.setBackgroundColor(ContextCompat.getColor(binding.root.context, R.color.red_light))
-            } else {
-                binding.tvHotTag.text = "推荐"
-                binding.tvHotTag.setBackgroundColor(ContextCompat.getColor(binding.root.context, R.color.gray_translucent))
-            }
-
-            // 3. 绑定商城状态（可兑换/已售罄）
             when (mallItem.mallStatus) {
                 CouponMallItem.MallCouponStatus.EXCHANGEABLE -> {
                     binding.btnExchange.isEnabled = true
-                    binding.btnExchange.text = "兑换"
-                    binding.btnExchange.setBackgroundColor(binding.root.context.getColor(android.R.color.holo_blue_light))
+                    binding.btnExchange.text = "\u5151\u6362"
+                    binding.btnExchange.alpha = 1f
                 }
                 CouponMallItem.MallCouponStatus.SOLD_OUT -> {
                     binding.btnExchange.isEnabled = false
-                    binding.btnExchange.text = "已售罄"
-                    binding.btnExchange.setBackgroundColor(binding.root.context.getColor(android.R.color.darker_gray))
+                    binding.btnExchange.text = "\u5df2\u552e\u7f44"
+                    binding.btnExchange.alpha = 0.45f
                 }
             }
             binding.btnExchange.setOnClickListener {
@@ -53,7 +43,6 @@ class CouponMallRecyclerViewAdapter(
             }
         }
     }
-
 
     companion object DiffCallback : DiffUtil.ItemCallback<CouponMallItem>() {
         override fun areItemsTheSame(oldItem: CouponMallItem, newItem: CouponMallItem): Boolean {
@@ -75,7 +64,6 @@ class CouponMallRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: CouponMallViewHolder, position: Int) {
-        val mallItem = getItem(position)
-        holder.bind(mallItem)
+        holder.bind(getItem(position))
     }
 }

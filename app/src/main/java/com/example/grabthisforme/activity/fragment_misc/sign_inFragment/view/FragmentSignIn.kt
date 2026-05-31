@@ -7,13 +7,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.fragment_misc.sign_inFragment.adapter.CouponMallRecyclerViewAdapter
 import com.example.grabthisforme.activity.fragment_misc.sign_inFragment.adapter.SignCalendarRecyclerViewAdapter
 import com.example.grabthisforme.activity.fragment_misc.sign_inFragment.model.CouponMallItem
 import com.example.grabthisforme.activity.fragment_misc.sign_inFragment.model.SignCalendarDay
-
-
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentSignInBinding
 
 class FragmentSignIn : Fragment() {
@@ -21,13 +19,11 @@ class FragmentSignIn : Fragment() {
     private val binding get() = _binding!!
     private lateinit var calendarAdapter: SignCalendarRecyclerViewAdapter
 
-
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentSignInBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -38,25 +34,30 @@ class FragmentSignIn : Fragment() {
         initRvCouponMall()
         initView()
     }
-    fun initView(){
+
+    private fun initView() {
         binding.ivBack.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
     }
-    fun initRVCalendar(){
-        calendarAdapter = SignCalendarRecyclerViewAdapter(){
-            Toast.makeText(requireContext(),"签到成功", Toast.LENGTH_SHORT).show()
+
+    private fun initRVCalendar() {
+        calendarAdapter = SignCalendarRecyclerViewAdapter {
+            Toast.makeText(requireContext(), "\u7b7e\u5230\u6210\u529f", Toast.LENGTH_SHORT).show()
         }
         binding.rvCalendar.adapter = calendarAdapter
-        binding.rvCalendar.layoutManager = GridLayoutManager(requireContext(), 7) // 7列对应周日-周六
+        binding.rvCalendar.layoutManager = GridLayoutManager(requireContext(), 7)
         binding.rvCalendar.isNestedScrollingEnabled = false
         calendarAdapter.submitList(SignCalendarDay.SignTestDataSingleton.getDefault30DaysSignData())
     }
-    fun initRvCouponMall(){
-        val adapter = CouponMallRecyclerViewAdapter(){}
+
+    private fun initRvCouponMall() {
+        val adapter = CouponMallRecyclerViewAdapter {
+            Toast.makeText(requireContext(), "\u5151\u6362\u6210\u529f", Toast.LENGTH_SHORT).show()
+        }
         binding.rvCouponMall.adapter = adapter
-        binding.rvCouponMall.layoutManager = GridLayoutManager(requireContext(),3)
-        binding.rvCouponMall.isNestedScrollingEnabled = true
+        binding.rvCouponMall.layoutManager = GridLayoutManager(requireContext(), 2)
+        binding.rvCouponMall.isNestedScrollingEnabled = false
         adapter.submitList(CouponMallItem.CouponTestDataSingleton.getCouponMallTestData())
     }
 
@@ -64,8 +65,6 @@ class FragmentSignIn : Fragment() {
         super.onResume()
         (requireActivity() as MainActivity).innerBottomBar()
     }
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()

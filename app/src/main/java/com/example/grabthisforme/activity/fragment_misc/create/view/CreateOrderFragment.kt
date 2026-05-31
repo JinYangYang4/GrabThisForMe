@@ -9,10 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import com.bumptech.glide.Glide
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import androidx.fragment.app.viewModels
 import com.bigkoo.pickerview.builder.TimePickerBuilder
 import com.example.grabthisforme.R
@@ -20,6 +18,7 @@ import com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.Botto
 import com.example.grabthisforme.activity.fragment_misc.create.viewModel.CreateOrderViewModel
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentCreateOrderBinding
+import com.example.grabthisforme.util.KeyboardScrollHelper
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -29,6 +28,7 @@ class CreateOrderFragment : Fragment() {
     private var _binding: FragmentCreateOrderBinding? = null
     private val binding get() = _binding!!
     private val viewModel: CreateOrderViewModel by viewModels()
+    private var keyboardScrollHelper: KeyboardScrollHelper? = null
 
 
     override fun onCreateView(
@@ -48,13 +48,12 @@ class CreateOrderFragment : Fragment() {
         initView()
         observeCreateResult()
         observeGoodsPic()
-        ViewCompat.setOnApplyWindowInsetsListener(requireView()) { _, insets ->
-            val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
-            if (!imeVisible && _binding != null) {
-                clearInputFocus()
-            }
-            insets
-        }
+        keyboardScrollHelper = KeyboardScrollHelper(
+            rootView = requireView(),
+            scrollView = binding.nestedScrollView,
+            density = resources.displayMetrics.density,
+            onImeHidden = { if (_binding != null) clearInputFocus() }
+        ).also { it.setup() }
     }
     private fun clearInputFocus() {
         val currentFocus = requireActivity().currentFocus ?: return
@@ -243,6 +242,8 @@ class CreateOrderFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        keyboardScrollHelper?.teardown()
+        keyboardScrollHelper = null
         _binding = null
     }
 }

@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.grabthisforme.activity.fragment_misc.setfragment.viewmodel.AccountSecurityViewModel
 import com.example.grabthisforme.databinding.FragmentAccountSecurityBinding
+import com.example.grabthisforme.util.ViewAnimationUtils
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -35,6 +36,7 @@ class FragmentAccountSecurity : Fragment() {
         initViewData()
         initClickListener()
         initObserve()
+        ViewAnimationUtils.animateStaggeredEntrance(binding.llToast, binding.passwordFormCard)
     }
     private fun initViewData() {
         binding.etOriginalPwd.doAfterTextChanged { editable ->

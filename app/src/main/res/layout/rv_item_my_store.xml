@@ -1,108 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="4dp"
+        android:layout_marginVertical="7dp"
+        android:background="@drawable/bg_soft_card_26"
+        android:elevation="5dp"
+        android:foreground="?attr/selectableItemBackground"
         android:orientation="vertical"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/bg_round_stripe"
-        android:elevation="2dp"
-        android:padding="10dp"
-        >
+        android:padding="14dp">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_margin="10dp"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <!-- 店铺名称 -->
-            <TextView
-                android:id="@+id/tvShopName"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:text="店铺名称"
-                android:textSize="16sp"
-                android:textColor="@color/black"
-                android:maxLines="1"
-                android:ellipsize="end"
-                />
-            <!-- 店铺营业时间 -->
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-            <TextView
-                android:id="@+id/tvShopTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="营业时间：10:00-22:00"
-                android:textSize="12sp"
-                android:alpha="0.6"
-                android:maxLines="1"
-                android:ellipsize="end"
-                />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingHorizontal="12dp"
-            android:gravity="center_vertical">
-
-
-            <!-- 店铺头像 -->
             <ImageView
                 android:id="@+id/ivShopAvatar"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="62dp"
+                android:layout_height="62dp"
+                android:background="@drawable/bg_chip_mint"
+                android:clipToOutline="true"
+                android:padding="8dp"
                 android:scaleType="centerCrop"
-                android:background="@drawable/bg_chat_massage"
-                android:src="@drawable/ic_back_charactor2"
-                android:clipToOutline="true" />
+                android:src="@drawable/ic_store" />
 
-            <!-- 店铺信息区域 -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:orientation="vertical"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:orientation="vertical">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
+                    <TextView
+                        android:id="@+id/tvShopName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="校园店铺"
+                        android:textColor="#172A2B"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="26dp"
+                        android:background="@drawable/bg_chip_mint"
+                        android:gravity="center"
+                        android:paddingHorizontal="10dp"
+                        android:text="营业中"
+                        android:textColor="#1D6F5E"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
 
-                <!-- 店铺地址 -->
+                <TextView
+                    android:id="@+id/tvShopTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="营业时间：暂未设置"
+                    android:textColor="#6A7B7C"
+                    android:textSize="12sp" />
+
                 <TextView
                     android:id="@+id/tvShopAddress"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="店铺地址"
-                    android:textSize="14sp"
-                    android:alpha="0.7"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
                     android:maxLines="1"
-                    android:ellipsize="end" />
-
-
-
-                <!-- 店铺盈利 -->
-                <TextView
-                    android:id="@+id/tvShopProfit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="今日盈利：¥ 888.00"
-                    android:textSize="14sp"
-                    android:textColor="@color/red_cherry"
-                    android:maxLines="1"
-                    android:layout_marginTop="2dp" />
-
+                    android:text="生活区"
+                    android:textColor="#6A7B7C"
+                    android:textSize="12sp" />
             </LinearLayout>
+        </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_store_metric_tile"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp">
+
+            <TextView
+                android:id="@+id/tvShopProfit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="销量：0"
+                android:textColor="#1D6F5E"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="查看经营面板"
+                android:textColor="#49635C"
+                android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
-
-
 </layout>

@@ -35,16 +35,17 @@ class MyStoreRecyclerViewAdapter(
 
         fun bind(store: Store, clickListener: (Store) -> Unit) {
             binding.tvShopName.text = store.name
-            binding.tvShopTime.text = store.businessHours?.takeIf { it.isNotBlank() }?.let {
-                "营业时间：$it"
-            } ?: "营业时间：暂无"
+            binding.tvShopTime.text = store.businessHours
+                ?.takeIf { it.isNotBlank() }
+                ?.let { "\u8425\u4e1a\u65f6\u95f4\uff1a$it" }
+                ?: "\u8425\u4e1a\u65f6\u95f4\uff1a\u6682\u672a\u8bbe\u7f6e"
             binding.tvShopAddress.text = store.address
-            binding.tvShopProfit.text = "销量：${store.salesVolume}"
+            binding.tvShopProfit.text = "\u9500\u91cf\uff1a${store.salesVolume}"
 
             Glide.with(binding.root)
                 .load(store.pic)
-                .placeholder(R.drawable.cat)
-                .error(R.drawable.cat)
+                .placeholder(R.drawable.ic_store)
+                .error(R.drawable.ic_store)
                 .into(binding.ivShopAvatar)
 
             binding.root.setOnClickListener {

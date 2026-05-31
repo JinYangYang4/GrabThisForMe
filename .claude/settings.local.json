@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew assembleDebug)",
+      "Read(//c/Program Files/**)",
+      "Read(//d/projects/GrabThisForMe/xin/GrabThisForMe/$HOME/AppData/Local/**)",
+      "Read(//c/Users/YaoShi16Pro/AppData/Local/**)",
+      "Read(//c//**)",
+      "Bash(find /c/Users/YaoShi16Pro/AppData/Local -maxdepth 2 -name jbr -o -name jdk* -o -name jre)",
+      "Bash(find '/c/Program Files' -maxdepth 3 -name java*)",
+      "Bash(find '/c/Program Files' -maxdepth 4 -type d -iname *zulu* -o -type d -iname *jdk* -o -type d -iname *openjdk* -o -type d -iname *temurin*)",
+      "Bash(find /c/Users/YaoShi16Pro -maxdepth 5 -type d -iname *jdk*17* -o -type d -iname *zulu*17* -o -type d -iname *jbr*)",
+      "Bash(./gradlew :app:compileDebugKotlin)",
+      "Bash(./gradlew :app:processDebugResources)",
+      "Bash(./gradlew :app:processDebugResources --rerun-tasks)",
+      "Bash(./gradlew :app:dataBindingGenBaseClassesDebug --rerun-tasks)",
+      "Bash(ls:*)",
+      "Bash(./gradlew :app:dataBindingGenBaseClassesDebug)",
+      "Bash(./gradlew :app:dataBindingGenBaseClassesDebug :app:processDebugResources --rerun-tasks)"
+    ]
+  }
+}

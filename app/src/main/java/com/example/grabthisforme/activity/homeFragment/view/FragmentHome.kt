@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.AnimationSet
-import android.view.animation.DecelerateInterpolator
 import android.view.animation.TranslateAnimation
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -29,6 +28,7 @@ import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewStore
 import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewTaskAdapter
 import com.example.grabthisforme.activity.homeFragment.viewModel.FragmentHomeViewModel
 import com.example.grabthisforme.databinding.FragmentHomeBinding
+import com.example.grabthisforme.util.ViewAnimationUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -75,7 +75,7 @@ class FragmentHome : Fragment() {
         initObserve()
         initRecyclerViewTask()
         initRecyclerViewStore()
-        playEntranceAnimation(
+        ViewAnimationUtils.animateStaggeredEntrance(
             binding.homeHero,
             binding.llSearch,
             binding.select,
@@ -113,19 +113,6 @@ class FragmentHome : Fragment() {
         }
     }
 
-    private fun playEntranceAnimation(vararg views: View) {
-        views.forEachIndexed { index, itemView ->
-            itemView.alpha = 0f
-            itemView.translationY = 24f
-            itemView.animate()
-                .alpha(1f)
-                .translationY(0f)
-                .setStartDelay(index * 55L)
-                .setDuration(360L)
-                .setInterpolator(DecelerateInterpolator())
-                .start()
-        }
-    }
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -155,7 +142,7 @@ class FragmentHome : Fragment() {
         binding.rvTask.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                val isAtTop = layoutManager.findFirstCompletelyVisibleItemPosition() == 0  // 是否滑到顶部
+                val isAtTop = layoutManager.findFirstCompletelyVisibleItemPosition() == 0
                 super.onScrolled(recyclerView, dx, dy)
                 if (homeViewModel.GetIsAnimating()) return
                 when {
@@ -171,10 +158,8 @@ class FragmentHome : Fragment() {
 
         homeViewModel.rvTaskIsOpen.observe(viewLifecycleOwner){ is_open ->
             if (is_open){
-                binding.rvTask.isNestedScrollingEnabled = false
                 binding.ivDropdown.setImageResource(R.drawable.ic_pull_up)
             }else{
-                binding.rvTask.isNestedScrollingEnabled = true
                 binding.ivDropdown.setImageResource(R.drawable.ic_dropdown)
             }
         }
@@ -182,10 +167,6 @@ class FragmentHome : Fragment() {
             homeViewModel.setRvTaskHeight(binding.rvTask.height)
         }
 
-        binding.rvTask.setOnTouchListener { v, event ->
-            v.parent.requestDisallowInterceptTouchEvent(true)
-            false
-        }
     }
     fun initRecyclerViewStore() {
         adapter2 = RecyclerViewStoreAdapter(onStoreClickListener = { store ->

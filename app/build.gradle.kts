@@ -62,6 +62,7 @@ dependencies {
     implementation("com.google.dagger:hilt-android:$hilt_version")
     kapt ("com.google.dagger:hilt-android-compiler:$hilt_version")
 
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0")
 
     implementation("com.google.android.flexbox:flexbox:3.0.0")
 

@@ -1,7 +1,6 @@
 package com.example.grabthisforme.activity.fragment_misc.create.view
 
 import android.content.Context
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,8 +9,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
@@ -20,6 +17,7 @@ import com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.Botto
 import com.example.grabthisforme.activity.fragment_misc.create.viewModel.CreateSecondHandGoodsViewModel
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentCreateSecondhandGoodsBinding
+import com.example.grabthisforme.util.KeyboardScrollHelper
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -27,7 +25,7 @@ class CreateSecondHandGoods : Fragment() {
     private var _binding: FragmentCreateSecondhandGoodsBinding? = null
     private val binding get() = _binding!!
     private val viewModel: CreateSecondHandGoodsViewModel by viewModels()
-    private var nestedScrollBaseBottomPadding = 0
+    private var keyboardScrollHelper: KeyboardScrollHelper? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,28 +43,12 @@ class CreateSecondHandGoods : Fragment() {
         observeQualityOptions()
         observeSelectedPhoto()
         observeCreateResult()
-        nestedScrollBaseBottomPadding = binding.nestedScrollView.paddingBottom
-        ViewCompat.setOnApplyWindowInsetsListener(requireView()) { _, insets ->
-            val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
-            val imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
-            val systemBottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
-            val keyboardSpace = (imeBottom - systemBottom).coerceAtLeast(0)
-            binding.nestedScrollView.setPadding(
-                binding.nestedScrollView.paddingLeft,
-                binding.nestedScrollView.paddingTop,
-                binding.nestedScrollView.paddingRight,
-                nestedScrollBaseBottomPadding + keyboardSpace
-            )
-            if (imeVisible && _binding != null) {
-                binding.nestedScrollView.postDelayed({
-                    scrollFocusedInputIntoView()
-                }, KEYBOARD_SCROLL_DELAY_MS)
-            }
-            if (!imeVisible && _binding != null) {
-                clearInputFocus()
-            }
-            insets
-        }
+        keyboardScrollHelper = KeyboardScrollHelper(
+            rootView = requireView(),
+            scrollView = binding.nestedScrollView,
+            density = resources.displayMetrics.density,
+            onImeHidden = { if (_binding != null) clearInputFocus() }
+        ).also { it.setup() }
     }
 
     private fun observeCreateResult() {
@@ -175,44 +157,6 @@ class CreateSecondHandGoods : Fragment() {
         currentFocus.clearFocus()
     }
 
-    private fun scrollFocusedInputIntoView() {
-        val currentFocus = requireActivity().currentFocus ?: return
-        val scrollView = binding.nestedScrollView
-        if (!isDescendantOf(currentFocus, scrollView)) return
-
-        val focusedRect = Rect()
-        currentFocus.getDrawingRect(focusedRect)
-        scrollView.offsetDescendantRectToMyCoords(currentFocus, focusedRect)
-
-        val visibleTop = scrollView.scrollY
-        val visibleBottom = visibleTop + scrollView.height - scrollView.paddingBottom
-        val extraSpacing = KEYBOARD_FOCUS_SPACING_DP.dpToPx()
-
-        when {
-            focusedRect.bottom + extraSpacing > visibleBottom -> {
-                val targetY =
-                    focusedRect.bottom - scrollView.height + scrollView.paddingBottom + extraSpacing
-                scrollView.smoothScrollTo(0, targetY.coerceAtLeast(0))
-            }
-            focusedRect.top - extraSpacing < visibleTop -> {
-                scrollView.smoothScrollTo(0, (focusedRect.top - extraSpacing).coerceAtLeast(0))
-            }
-        }
-    }
-
-    private fun isDescendantOf(child: View, parent: View): Boolean {
-        var current: View? = child
-        while (current != null) {
-            if (current == parent) return true
-            current = current.parent as? View
-        }
-        return false
-    }
-
-    private fun Int.dpToPx(): Int {
-        return (this * resources.displayMetrics.density).toInt()
-    }
-
     override fun onResume() {
         super.onResume()
         (requireActivity() as MainActivity).innerBottomBar()
@@ -220,11 +164,8 @@ class CreateSecondHandGoods : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        keyboardScrollHelper?.teardown()
+        keyboardScrollHelper = null
         _binding = null
-    }
-
-    companion object {
-        private const val KEYBOARD_SCROLL_DELAY_MS = 120L
-        private const val KEYBOARD_FOCUS_SPACING_DP = 24
     }
 }

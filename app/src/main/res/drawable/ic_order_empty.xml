@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="80dp"
+    android:height="80dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- 包裹盒体 -->
+    <path
+        android:fillColor="#F0A878"
+        android:pathData="M3,7l3,-4h12l3,4v2H3V7z" />
+    <!-- 盒盖 -->
+    <path
+        android:fillColor="#E68654"
+        android:pathData="M2,7l2,-2h16l2,2H2z" />
+    <!-- 十字胶带竖 -->
+    <path
+        android:fillColor="#F5C8A0"
+        android:pathData="M12,3v6h-1V3H12z" />
+    <!-- 十字胶带横 -->
+    <path
+        android:fillColor="#F5C8A0"
+        android:pathData="M8,6h8v1H8V6z" />
+    <!-- 装饰圆点 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 6,10 a 1,1 0 1,0 2,0 a 1,1 0 1,0 -2,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 16,10 a 1,1 0 1,0 2,0 a 1,1 0 1,0 -2,0" />
+</vector>
