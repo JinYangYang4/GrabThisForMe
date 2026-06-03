@@ -38,36 +38,22 @@ class EditPersonalInformationViewModel @Inject constructor(
 
     fun saveUserInfo(
         accountName: String,
-        displayName: String,
         phone: String,
         email: String,
         signature: String,
         gender: Int
     ) {
         viewModelScope.launch {
-            val accountNameTrimmed = accountName.trim()
-            val displayNameTrimmed = displayName.trim()
+            val currentUser = userRepository.currentUser.value
+            val accountNameTrimmed = accountName.trim().ifBlank { currentUser?.accountName.orEmpty() }
             val phoneTrimmed = phone.trim()
             val emailTrimmed = email.trim()
             val signatureTrimmed = signature.trim()
-
-            if (accountNameTrimmed.isBlank()) {
-                _saveResult.postValue(
-                    EditPersonalSaveResult(
-                        success = false,
-                        message = "Account name cannot be empty"
-                    )
-                )
-                return@launch
-            }
-
-            val currentUser = userRepository.currentUser.value
-            val userId = currentUser?.id ?: System.currentTimeMillis()
             val avatarUrl = _formState.value.avatarUrl.ifBlank { currentUser?.headPic.orEmpty() }
-            val finalDisplayName = displayNameTrimmed.ifBlank { accountNameTrimmed }
+            val finalDisplayName = accountNameTrimmed
 
             val updatedUser = User(
-                id = userId,
+                id = currentUser?.id ?: System.currentTimeMillis(),
                 name = finalDisplayName,
                 headPic = avatarUrl,
                 phone = phoneTrimmed.takeIf { it.isNotBlank() },
@@ -100,7 +86,7 @@ class EditPersonalInformationViewModel @Inject constructor(
                 _saveResult.postValue(
                     EditPersonalSaveResult(
                         success = false,
-                        message = "Save failed: ${it.message ?: "Unknown error"}"
+                        message = "保存失败: ${it.message ?: "未知错误"}"
                     )
                 )
             }

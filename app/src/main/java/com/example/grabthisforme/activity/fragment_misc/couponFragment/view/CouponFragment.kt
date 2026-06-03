@@ -13,6 +13,7 @@ import com.example.grabthisforme.activity.fragment_misc.couponFragment.viewModel
 import com.example.grabthisforme.activity.fragment_misc.sign_inFragment.model.Coupon
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentCouponBinding
+import com.example.grabthisforme.util.ViewAnimationUtils
 
 class CouponFragment : Fragment() {
     private var _binding: FragmentCouponBinding? = null
@@ -37,6 +38,10 @@ class CouponFragment : Fragment() {
         initRVCoupon()
         initView()
         loadCouponData()
+        ViewAnimationUtils.animateStaggeredEntrance(
+            binding.couponFiltersCard,
+            binding.couponListCard
+        )
     }
 
     override fun onResume() {
@@ -48,7 +53,7 @@ class CouponFragment : Fragment() {
         couponListAdapter = CouponRecyclerViewAdapter { coupon ->
             Toast.makeText(
                 requireContext(),
-                "\u67e5\u770b ${coupon.title} \u4f7f\u7528\u8be6\u60c5",
+                "查看 ${coupon.title} 使用详情",
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -58,6 +63,7 @@ class CouponFragment : Fragment() {
             LinearLayoutManager.VERTICAL,
             false
         )
+        binding.rvCouponList.isNestedScrollingEnabled = false
     }
 
     private fun initView() {
@@ -70,33 +76,33 @@ class CouponFragment : Fragment() {
         val couponTestList = listOf(
             Coupon(
                 id = 1,
-                title = "\u6ee1100\u51cf20\u4f18\u60e0\u5238",
+                title = "满100减20优惠券",
                 denomination = 20.0f,
-                type = "\u5168\u573a\u901a\u7528",
-                desc = "\u6709\u6548\u671f7\u5929\uff0c\u8ba2\u5355\u6ee1100\u5143\u53ef\u7528",
+                type = "全场通用",
+                desc = "有效期 7 天，订单满100元可用",
                 userStatus = Coupon.UserCouponStatus.UNUSED,
                 receiveTime = "",
-                expireTime = "\u4eca\u65e5\u8d772\u5929\u540e"
+                expireTime = "今日起 7 天后"
             ),
             Coupon(
                 id = 2,
-                title = "\u996e\u54c1\u591c\u5bb5\u4e13\u4eab\u5238",
+                title = "饮品夜宵专享券",
                 denomination = 10.0f,
-                type = "\u98df\u54c1\u4e13\u7528",
-                desc = "\u6709\u6548\u671f5\u5929\uff0c\u6821\u56ed\u9910\u996e\u53ef\u7528",
+                type = "餐饮专用",
+                desc = "有效期 3 天，校园餐饮可用",
                 userStatus = Coupon.UserCouponStatus.UNUSED,
                 receiveTime = "",
-                expireTime = "\u672c\u5468\u65e5\u524d"
+                expireTime = "本周日前"
             ),
             Coupon(
                 id = 3,
-                title = "\u65e0\u95e8\u69db5\u5143\u60ca\u559c\u5238",
+                title = "无门槛5元惊喜券",
                 denomination = 5.0f,
-                type = "\u5168\u573a\u901a\u7528",
-                desc = "\u65e0\u8ba2\u5355\u91d1\u989d\u9650\u5236\uff0c\u5c0f\u989d\u8dd1\u817f\u4e5f\u80fd\u7528",
+                type = "全场通用",
+                desc = "无订单金额限制，小额跑腿也能用",
                 userStatus = Coupon.UserCouponStatus.UNUSED,
                 receiveTime = "",
-                expireTime = "\u4eca\u65e5\u8d777\u5929\u540e"
+                expireTime = "今日起 5 天后"
             )
         )
         couponListAdapter.submitList(couponTestList)

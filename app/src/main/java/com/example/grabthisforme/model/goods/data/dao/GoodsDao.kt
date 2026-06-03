@@ -72,6 +72,10 @@ interface GoodsDao {
     @Query("SELECT * FROM goods_base ORDER BY goodsId DESC")
     fun observeAllGoodsBundles(): Flow<List<GoodsBundleEntity>>
 
+    @Transaction
+    @Query("SELECT * FROM goods_base WHERE storeId = :storeId ORDER BY goodsId DESC")
+    fun observeGoodsBundlesByStoreId(storeId: Long): Flow<List<GoodsBundleEntity>>
+
     suspend fun getAllGoods(): List<Goods> {
         return getAllGoodsBundles().map { it.toDomain() }
     }

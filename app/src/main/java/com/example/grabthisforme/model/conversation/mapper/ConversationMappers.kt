@@ -4,9 +4,9 @@ import com.example.grabthisforme.model.conversation.data.dto.ConversationDto
 import com.example.grabthisforme.model.conversation.data.entity.ConversationBundleEntity
 import com.example.grabthisforme.model.conversation.data.entity.ConversationEntity
 import com.example.grabthisforme.model.conversation.domain.Conversation
-import com.example.grabthisforme.model.messageContent.domain.MessageContent
-import com.example.grabthisforme.model.messageContent.mapper.toDomain
-import com.example.grabthisforme.model.messageContent.mapper.toDto
+import com.example.grabthisforme.model.message.domain.Message
+import com.example.grabthisforme.model.message.mapper.toDomain
+import com.example.grabthisforme.model.message.mapper.toDto
 import com.example.grabthisforme.model.user.domain.User
 
 private fun String.toConversationType(): Conversation.ConversationType {
@@ -16,12 +16,7 @@ private fun String.toConversationType(): Conversation.ConversationType {
 
 private fun Conversation.ConversationType.asStoredName(): String = name
 
-private fun List<Long>.toCsv(): String = joinToString(",")
-
-private fun String.toIdList(): List<Long> =
-    split(",").mapNotNull { it.trim().takeIf(String::isNotBlank)?.toLongOrNull() }
-
-private fun String.normalizePeerType(): String = if (uppercase() == "GROUP") "GROUP" else "SINGLE"
+private fun String.normalizeConversationType(): String = if (uppercase() == "GROUP") "GROUP" else "SINGLE"
 
 private fun buildPlaceholderUser(userId: Long): User {
     return User(
@@ -31,14 +26,27 @@ private fun buildPlaceholderUser(userId: Long): User {
     )
 }
 
-private fun buildConversationPeer(peerType: String, peerUserIds: List<Long>): Conversation.ConversationPeer {
-    return when (peerType.normalizePeerType()) {
-        "GROUP" -> Conversation.ConversationPeer.Group(peerUserIds.map { buildPlaceholderUser(it) })
-        else -> Conversation.ConversationPeer.Single(peerUserIds.firstOrNull()?.let(::buildPlaceholderUser))
+fun buildConversationPeerFromIds(
+    conversationType: String,
+    peerUserIds: List<Long>
+): Conversation.ConversationPeer {
+    return buildConversationPeer(
+        conversationType = conversationType,
+        users = peerUserIds.map { buildPlaceholderUser(it) }
+    )
+}
+
+fun buildConversationPeer(
+    conversationType: String,
+    users: List<User>
+): Conversation.ConversationPeer {
+    return when (conversationType.normalizeConversationType()) {
+        "GROUP" -> Conversation.ConversationPeer.Group(users)
+        else -> Conversation.ConversationPeer.Single(users.firstOrNull())
     }
 }
 
-private fun buildPeerIds(peer: Conversation.ConversationPeer): List<Long> {
+fun buildPeerIds(peer: Conversation.ConversationPeer): List<Long> {
     return when (peer) {
         is Conversation.ConversationPeer.Single -> listOfNotNull(peer.user?.id)
         is Conversation.ConversationPeer.Group -> peer.users.map { it.id }
@@ -48,9 +56,9 @@ private fun buildPeerIds(peer: Conversation.ConversationPeer): List<Long> {
 fun ConversationDto.toDomain(): Conversation {
     return Conversation(
         conversationId = conversationId,
-        type = type.toConversationType(),
-        conversationPeer = buildConversationPeer(peerType, peerUserIds),
-        unreadCount = unreadCount,
+        type = conversationType.toConversationType(),
+        targetId = targetId,
+        conversationPeer = buildConversationPeerFromIds(conversationType, peerUserIds),
         lastMessage = lastMessage.toDomain(),
         lastTime = lastTime
     )
@@ -59,55 +67,53 @@ fun ConversationDto.toDomain(): Conversation {
 fun Conversation.toDto(): ConversationDto {
     return ConversationDto(
         conversationId = conversationId,
-        type = type.asStoredName(),
-        peerType = when (conversationPeer) {
-            is Conversation.ConversationPeer.Group -> "GROUP"
-            is Conversation.ConversationPeer.Single -> "SINGLE"
-        },
+        conversationType = type.asStoredName(),
+        targetId = targetIdOrNull(),
         peerUserIds = buildPeerIds(conversationPeer),
-        unreadCount = unreadCount,
         lastMessage = lastMessage.toDto(),
         lastTime = lastTime
     )
 }
 
-fun ConversationEntity.toDomain(lastMessage: MessageContent): Conversation {
+fun ConversationEntity.toDomain(lastMessage: Message, peerUsers: List<User>): Conversation {
     return Conversation(
         conversationId = conversationId,
-        type = type.toConversationType(),
-        conversationPeer = buildConversationPeer(peerType, peerUserIdsCsv.toIdList()),
-        unreadCount = unreadCount,
+        type = conversationType.toConversationType(),
+        targetId = targetId,
+        conversationPeer = buildConversationPeer(conversationType, peerUsers),
         lastMessage = lastMessage,
         lastTime = lastTime
     )
 }
 
-fun ConversationBundleEntity.toDomain(): Conversation {
+fun ConversationBundleEntity.toDomain(peerUsers: List<User>): Conversation {
     return conversation.toDomain(
         lastMessage = lastMessage?.toDomain()
-            ?: MessageContent(
+            ?: Message(
                 messageId = conversation.lastMessageId,
                 senderId = 0L,
-                type = MessageContent.MessageType.TEXT,
+                type = Message.MessageType.TEXT,
                 content = "",
                 timestamp = conversation.lastTime,
-                isMine = false,
-                status = MessageContent.MessageStatus.SENT
-            )
+                status = Message.MessageStatus.SENT
+            ),
+        peerUsers = peerUsers
     )
 }
 
 fun Conversation.toEntity(): ConversationEntity {
     return ConversationEntity(
         conversationId = conversationId,
-        type = type.asStoredName(),
-        peerType = when (conversationPeer) {
-            is Conversation.ConversationPeer.Group -> "GROUP"
-            is Conversation.ConversationPeer.Single -> "SINGLE"
-        },
-        peerUserIdsCsv = buildPeerIds(conversationPeer).toCsv(),
-        unreadCount = unreadCount,
+        conversationType = type.asStoredName(),
+        targetId = targetIdOrNull(),
         lastMessageId = lastMessage.messageId,
         lastTime = lastTime
     )
+}
+
+private fun Conversation.targetIdOrNull(): Long? {
+    return targetId ?: when (val peer = conversationPeer) {
+        is Conversation.ConversationPeer.Single -> peer.user?.id
+        is Conversation.ConversationPeer.Group -> null
+    }
 }

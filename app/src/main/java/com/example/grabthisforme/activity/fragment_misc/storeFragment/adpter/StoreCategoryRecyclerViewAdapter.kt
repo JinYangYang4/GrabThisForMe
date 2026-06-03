@@ -2,11 +2,8 @@ package com.example.grabthisforme.activity.fragment_misc.storeFragment.adpter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.material.FabPosition
 import androidx.recyclerview.widget.RecyclerView
 import com.example.grabthisforme.R
-
-
 import com.example.grabthisforme.databinding.RvStoreSelectItemBinding
 
 class StoreCategoryRecyclerViewAdapter(
@@ -14,9 +11,18 @@ class StoreCategoryRecyclerViewAdapter(
 ) : RecyclerView.Adapter<StoreCategoryRecyclerViewAdapter.ViewHolder>() {
     private var categoryList: List<String> = emptyList()
     private var selectedPosition = 0
+
     fun setCategoryList(list: List<String>) {
         categoryList = list
+        if (selectedPosition !in categoryList.indices) {
+            selectedPosition = 0
+        }
         notifyDataSetChanged()
+    }
+
+    fun setSelectedCategory(category: String) {
+        val targetIndex = categoryList.indexOf(category).takeIf { it >= 0 } ?: 0
+        updateSelectedPosition(targetIndex)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -29,6 +35,8 @@ class StoreCategoryRecyclerViewAdapter(
     }
 
     override fun getItemCount() = categoryList.size
+
+    fun getItem(position: Int): String = categoryList[position]
 
     class ViewHolder(val binding: RvStoreSelectItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -51,7 +59,7 @@ class StoreCategoryRecyclerViewAdapter(
             if (isSelected) {
                 binding.root.setBackgroundResource(android.R.color.transparent)
             } else if (position == selectedPosition - 1){
-                binding.root.setBackgroundResource(R.drawable.bg_rectangle_gray_rigtht_bottom_round)
+                binding.root.setBackgroundResource(R.drawable.bg_rectangle_gray_right_bottom_round)
             } else if (position == selectedPosition + 1){
                 binding.root.setBackgroundResource(R.drawable.bg_rectangle_gray_right_top_round)
             } else {

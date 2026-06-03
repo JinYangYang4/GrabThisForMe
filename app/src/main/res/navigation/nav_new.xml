@@ -43,6 +43,9 @@
             android:id="@+id/action_blankFragment_to_secondHandGoodFragment"
             app:destination="@id/secondHandGoodFragment" />
         <action
+            android:id="@+id/action_blankFragment_to_goodsFragment"
+            app:destination="@id/goodsFragment" />
+        <action
             android:id="@+id/action_blankFragment_to_postDetailFragment"
             app:destination="@id/postDetailFragment" />
         <action
@@ -105,6 +108,34 @@
         <action
             android:id="@+id/action_secondHandGoodFragment_to_searchGoodsFragment"
             app:destination="@id/searchGoodsFragment" />
+        <action
+            android:id="@+id/action_secondHandGoodFragment_to_goodsDetailFragment"
+            app:destination="@id/goodsDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/goodsFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.goodsFragment.view.GoodsFragment"
+        android:label="GoodsFragment"
+        tools:layout="@layout/fragment_goods_marketplace">
+        <action
+            android:id="@+id/action_goodsFragment_to_searchGoodsFragment"
+            app:destination="@id/searchGoodsFragment" />
+        <action
+            android:id="@+id/action_goodsFragment_to_goodsDetailFragment"
+            app:destination="@id/goodsDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/goodsDetailFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.goods_detail.view.GoodsDetailFragment"
+        android:label="GoodsDetailFragment"
+        tools:layout="@layout/fragment_goods_detail">
+        <argument
+            android:name="goodsId"
+            android:defaultValue="-1L"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_goodsDetailFragment_to_storeFragment"
+            app:destination="@id/storeFragment" />
     </fragment>
     <fragment
         android:id="@+id/postDetailFragment"
@@ -119,7 +150,17 @@
         android:id="@+id/fragmentChat"
         android:name="com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.FragmentChat"
         android:label="FragmentChat"
-        tools:layout="@layout/fragment_chat" />
+        tools:layout="@layout/fragment_chat" >
+        <argument
+            android:name="conversationId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_fragmentChat_to_userDetailFragment"
+            app:destination="@id/userDetailFragment" />
+        <action
+            android:id="@+id/action_fragmentChat_to_groupDetailFragment"
+            app:destination="@id/groupDetailFragment" />
+    </fragment>
     <fragment
         android:id="@+id/myLoveFragment"
         android:name="com.example.grabthisforme.activity.fragment_misc.my_love.view.MyLoveFragment"
@@ -174,19 +215,60 @@
         tools:layout="@layout/fragment_chat_backgroud"/>
     <fragment
         android:id="@+id/searchGoodsFragment"
-        android:name="com.example.grabthisforme.activity.fragment_misc.searchFragment.view.SearchGoodsFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.search.view.SearchGoodsFragment"
         android:label="SearchGoodsFragment"
-        tools:layout="@layout/fragment_search_goods"/>
+        tools:layout="@layout/fragment_search_goods">
+        <action
+            android:id="@+id/action_searchGoodsFragment_to_goodsFragment"
+            app:destination="@id/goodsFragment" />
+    </fragment>
     <fragment
         android:id="@+id/searchCommunityFragment"
-        android:name="com.example.grabthisforme.activity.fragment_misc.searchCommunityFragment.view.SearchCommunityFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.search.community.view.SearchCommunityFragment"
         android:label="SearchCommunityFragment"
         tools:layout="@layout/fragment_search_commnunity"/>
     <fragment
         android:id="@+id/fragmentSearchFriendOrGroupOrConversation"
-        android:name="com.example.grabthisforme.activity.fragment_misc.searchFriendOrGroupOrConversation.view.FragmentSearchFriendOrGroupOrConversation"
+        android:name="com.example.grabthisforme.activity.fragment_misc.search.friend.view.FragmentSearchFriendOrGroupOrConversation"
         android:label="FragmentSearchFriendOrGroupOrConversation"
-        tools:layout="@layout/fragment_search_friend_group_conversation"/>
+        tools:layout="@layout/fragment_search_friend_group_conversation">
+        <action
+            android:id="@+id/action_fragmentSearchFriendOrGroupOrConversation_to_userDetailFragment"
+            app:destination="@id/userDetailFragment" />
+        <action
+            android:id="@+id/action_fragmentSearchFriendOrGroupOrConversation_to_groupDetailFragment"
+            app:destination="@id/groupDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/userDetailFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.userDetail.view.UserDetailFragment"
+        android:label="UserDetailFragment"
+        tools:layout="@layout/fragment_user_detail">
+        <argument
+            android:name="userId"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_userDetailFragment_to_fragmentChat"
+            app:destination="@id/fragmentChat" />
+        <action
+            android:id="@+id/action_userDetailFragment_to_groupDetailFragment"
+            app:destination="@id/groupDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/groupDetailFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.groupDetail.view.GroupDetailFragment"
+        android:label="GroupDetailFragment"
+        tools:layout="@layout/fragment_group_detail">
+        <argument
+            android:name="groupId"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_groupDetailFragment_to_fragmentChat"
+            app:destination="@id/fragmentChat" />
+        <action
+            android:id="@+id/action_groupDetailFragment_to_userDetailFragment"
+            app:destination="@id/userDetailFragment" />
+    </fragment>
     <fragment
         android:id="@+id/storeFragment"
         android:name="com.example.grabthisforme.activity.fragment_misc.storeFragment.view.StoreFragment"
@@ -201,6 +283,9 @@
         <argument
             android:name="storeId"
             app:argType="long" />
+        <action
+            android:id="@+id/action_storeFragment_to_goodsDetailFragment"
+            app:destination="@id/goodsDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/storeSearchFragment"

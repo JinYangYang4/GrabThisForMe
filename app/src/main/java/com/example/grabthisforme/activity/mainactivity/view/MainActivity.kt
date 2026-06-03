@@ -25,6 +25,8 @@ import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.adapter.RVRecentStoreAdapter
 import com.example.grabthisforme.activity.mainactivity.adapter.RVRecentlyUserAdapter
 import com.example.grabthisforme.activity.mainactivity.core.navigation.AppNavigator
+import com.example.grabthisforme.activity.mainactivity.ui_model.toRecentStoreItemUiModel
+import com.example.grabthisforme.activity.mainactivity.ui_model.toRecentUserItemUiModel
 import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
 import com.example.grabthisforme.activity.fragment_misc.default_entry.view.BlankFragment
 import com.example.grabthisforme.activity.fragment_misc.default_entry.view.BlankFragmentDirections
@@ -183,7 +185,7 @@ class MainActivity : AppCompatActivity() {
 
                             }else{
                                 lastBackPressTime = now
-                                Toast.makeText(this@MainActivity, "\u518d\u6b21\u8fd4\u56de\u9000\u51fa", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@MainActivity, "再次返回退出", Toast.LENGTH_SHORT).show()
                             }
                         }else{
                             isEnabled = false
@@ -242,9 +244,9 @@ class MainActivity : AppCompatActivity() {
             layoutManager = gridlayoutManager
             adapter = adapter1
         }
-        val templateUser = User(name = "\u674e\u534e", id = 1, headPic = "")
+        val templateUser = User(name = "李华", id = 1, headPic = "")
         val recentUserList = User.createVirtualUsers(templateUser,10)
-        adapter1.submitList(recentUserList)
+        adapter1.submitList(recentUserList.map { it.toRecentUserItemUiModel() })
     }
     fun initRvStore(){
         val adapter2 = RVRecentStoreAdapter(){}
@@ -255,12 +257,19 @@ class MainActivity : AppCompatActivity() {
         }
         val templateStore = Store.createVirtualStores(
             Store(
-                name = "\u6821\u56ed\u4fbf\u5229\u5e97",
-                type = "\u96f6\u98df\u996e\u54c1",
-                address = "\u751f\u6d3b\u533a"
+                identity = com.example.grabthisforme.model.store.domain.StoreIdentity(
+                    id = 1L,
+                    name = "校园便利店",
+                    type = "零食饮品"
+                ),
+                location = com.example.grabthisforme.model.store.domain.StoreLocation(
+                    address = "生活区"
+                ),
+                commercialInfo = com.example.grabthisforme.model.store.domain.StoreCommercialInfo(),
+                statistics = com.example.grabthisforme.model.store.domain.StoreStatistics()
             )
         )
-        adapter2.submitList(templateStore)
+        adapter2.submitList(templateStore.map { it.toRecentStoreItemUiModel() })
     }
     fun drawerAnimation(){
         binding.drawerLayout.addDrawerListener(object : DrawerLayout.SimpleDrawerListener(){

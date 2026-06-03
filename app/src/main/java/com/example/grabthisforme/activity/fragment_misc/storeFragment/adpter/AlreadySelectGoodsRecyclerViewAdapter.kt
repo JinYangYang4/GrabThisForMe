@@ -9,14 +9,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.fragment_misc.storeFragment.adpter.StoreOwnerTagRecyclerViewAdapter
+import com.example.grabthisforme.activity.fragment_misc.storeFragment.ui_model.SelectedGoodsItemUiModel
 import com.example.grabthisforme.databinding.RvAlreadySelectItemBinding
-import com.example.grabthisforme.model.goods.domain.Goods
 
 class AlreadySelectGoodsRecyclerViewAdapter(
-    private val onItemClick: (Goods) -> Unit,
-    private val onMinusClick: (Goods) -> Unit,
-    private val onPlusClick: (Goods) -> Unit
-) : ListAdapter<Goods, AlreadySelectGoodsRecyclerViewAdapter.ViewHolder>(GoodsDiffCallback()) {
+    private val onItemClick: (SelectedGoodsItemUiModel) -> Unit,
+    private val onMinusClick: (SelectedGoodsItemUiModel) -> Unit,
+    private val onPlusClick: (SelectedGoodsItemUiModel) -> Unit
+) : ListAdapter<SelectedGoodsItemUiModel, AlreadySelectGoodsRecyclerViewAdapter.ViewHolder>(
+    GoodsDiffCallback()
+) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.inflate(parent)
@@ -34,6 +36,7 @@ class AlreadySelectGoodsRecyclerViewAdapter(
                 LinearLayoutManager(binding.root.context, RecyclerView.HORIZONTAL, false)
             binding.rvTag.adapter = tagAdapter
             binding.rvTag.itemAnimator = null
+            binding.rvTag.setHasFixedSize(true)
         }
 
         companion object {
@@ -45,57 +48,40 @@ class AlreadySelectGoodsRecyclerViewAdapter(
         }
 
         fun bind(
-            goods: Goods,
-            onItemClick: (Goods) -> Unit,
-            onMinusClick: (Goods) -> Unit,
-            onPlusClick: (Goods) -> Unit
+            item: SelectedGoodsItemUiModel,
+            onItemClick: (SelectedGoodsItemUiModel) -> Unit,
+            onMinusClick: (SelectedGoodsItemUiModel) -> Unit,
+            onPlusClick: (SelectedGoodsItemUiModel) -> Unit
         ) {
-            binding.tvTitle.text = goods.name
-            tagAdapter.submitList(goods.toTagList())
-            binding.tvPriceSingle.text = String.format("￥%.2f", goods.price)
-            binding.tvPriceDiscount.text = when {
-                goods.discountPrice > 0 -> String.format("折扣价%.2f", goods.discountPrice)
-                else -> ""
-            }
+            binding.tvTitle.text = item.title
+            tagAdapter.submitList(item.tags)
+            binding.tvPriceSingle.text = item.priceText
+            binding.tvPriceDiscount.text = item.discountText
             Glide.with(binding.root.context)
-                .load(goods.pic)
+                .load(item.imageUrl)
                 .placeholder(R.drawable.food_pic)
                 .error(R.drawable.food_pic)
                 .into(binding.ivGoods)
-            binding.tvSaleNumber.text = goods.selectedCount.toString()
-            binding.root.setOnClickListener { onItemClick(goods) }
-            binding.btnMinus.setOnClickListener { onMinusClick(goods) }
-            binding.btnPlus.setOnClickListener { onPlusClick(goods) }
-        }
-
-        private fun Goods.toTagList(): List<String> {
-            val tags = mutableListOf<String>()
-            if (discountTag.isNotBlank()) {
-                tags.add(discountTag)
-            }
-            if (tag.isNotBlank()) {
-                tags.addAll(tag.split(Regex("[,/;|\\s]+")).filter { it.isNotBlank() })
-            }
-            if (tags.isEmpty()) {
-                tags.add("默认")
-            }
-            return tags.distinct()
+            binding.tvSaleNumber.text = item.selectedCount.toString()
+            binding.root.setOnClickListener { onItemClick(item) }
+            binding.btnMinus.setOnClickListener { onMinusClick(item) }
+            binding.btnPlus.setOnClickListener { onPlusClick(item) }
         }
     }
 
-    class GoodsDiffCallback : DiffUtil.ItemCallback<Goods>() {
-        override fun areItemsTheSame(oldItem: Goods, newItem: Goods): Boolean {
-            return oldItem.id == newItem.id
+    class GoodsDiffCallback : DiffUtil.ItemCallback<SelectedGoodsItemUiModel>() {
+        override fun areItemsTheSame(
+            oldItem: SelectedGoodsItemUiModel,
+            newItem: SelectedGoodsItemUiModel
+        ): Boolean {
+            return oldItem.goodsId == newItem.goodsId
         }
 
-        override fun areContentsTheSame(oldItem: Goods, newItem: Goods): Boolean {
-            return oldItem.id == newItem.id &&
-                oldItem.name == newItem.name &&
-                oldItem.price == newItem.price &&
-                oldItem.selectedCount == newItem.selectedCount &&
-                oldItem.discountPrice == newItem.discountPrice &&
-                oldItem.discountTag == newItem.discountTag &&
-                oldItem.tag == newItem.tag
+        override fun areContentsTheSame(
+            oldItem: SelectedGoodsItemUiModel,
+            newItem: SelectedGoodsItemUiModel
+        ): Boolean {
+            return oldItem == newItem
         }
     }
 }

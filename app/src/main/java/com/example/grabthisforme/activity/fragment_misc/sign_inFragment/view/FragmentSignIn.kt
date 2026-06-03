@@ -43,7 +43,7 @@ class FragmentSignIn : Fragment() {
 
     private fun initRVCalendar() {
         calendarAdapter = SignCalendarRecyclerViewAdapter {
-            Toast.makeText(requireContext(), "\u7b7e\u5230\u6210\u529f", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "签到成功", Toast.LENGTH_SHORT).show()
         }
         binding.rvCalendar.adapter = calendarAdapter
         binding.rvCalendar.layoutManager = GridLayoutManager(requireContext(), 7)
@@ -53,7 +53,7 @@ class FragmentSignIn : Fragment() {
 
     private fun initRvCouponMall() {
         val adapter = CouponMallRecyclerViewAdapter {
-            Toast.makeText(requireContext(), "\u5151\u6362\u6210\u529f", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "兑换成功", Toast.LENGTH_SHORT).show()
         }
         binding.rvCouponMall.adapter = adapter
         binding.rvCouponMall.layoutManager = GridLayoutManager(requireContext(), 2)

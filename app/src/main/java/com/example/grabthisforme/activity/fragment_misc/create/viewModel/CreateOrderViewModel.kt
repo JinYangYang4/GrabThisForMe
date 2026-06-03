@@ -212,7 +212,7 @@ class CreateOrderViewModel @Inject constructor(
         val now = System.currentTimeMillis()
         return User(
             id = now,
-            name = "GuestUser",
+            name = "游客",
             headPic = "",
             passwordHash = "",
             isCurrent = true

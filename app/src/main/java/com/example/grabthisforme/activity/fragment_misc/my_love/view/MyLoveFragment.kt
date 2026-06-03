@@ -59,9 +59,7 @@ class MyLoveFragment : Fragment() {
                 (requireActivity() as MainActivity).NewNavController_navgite(action)
             },
             onPostImageClick = { post, clickedPosition ->
-                val imageUris = post.images
-                    .map { it.trim() }
-                    .filter { it.isNotEmpty() }
+                val imageUris = post.imageUrls
                 if (imageUris.isEmpty()) return@CommunityVP2_RVAdapter
                 val initialIndex = clickedPosition.coerceIn(0, imageUris.lastIndex)
                 PhotoPreviewDialog

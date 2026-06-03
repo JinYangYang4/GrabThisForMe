@@ -19,7 +19,7 @@ class SignCalendarRecyclerViewAdapter(
         fun bind(day: SignCalendarDay) {
             binding.tvDateReward.text = day.reward
             binding.ivRewardIcon.setImageResource(
-                if (day.reward.contains("\u4f18\u60e0\u5238")) R.drawable.ic_coupon else R.drawable.ic_coin
+                if (day.reward.contains("优惠券")) R.drawable.ic_coupon else R.drawable.ic_coin
             )
 
             when {
@@ -28,11 +28,13 @@ class SignCalendarRecyclerViewAdapter(
                     binding.llItem.alpha = 0.85f
                     binding.llItem.setOnClickListener(null)
                 }
+
                 day.isToday -> {
                     binding.llItem.background = binding.root.context.getDrawable(R.drawable.bg_sign_today)
                     binding.llItem.alpha = 1f
                     binding.llItem.setOnClickListener { onSignClick(day) }
                 }
+
                 else -> {
                     binding.llItem.background = binding.root.context.getDrawable(R.drawable.bg_sign_future)
                     binding.llItem.alpha = 1f

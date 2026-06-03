@@ -11,6 +11,7 @@ import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.homeFragment.adapter.OrderDetailViewPager2Adapter
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentOrderBottomSheetBinding
+import com.example.grabthisforme.util.ViewAnimationUtils
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -41,9 +42,9 @@ class OrderExecutorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initViewPager()
         initView()
-        animateHeader()
+        initViewPager()
+        ViewAnimationUtils.animateStaggeredEntrance(binding.statsCard, binding.tabCard)
     }
 
     override fun onResume() {
@@ -69,7 +70,7 @@ class OrderExecutorFragment : Fragment() {
         binding.viewpager2.setCurrentItem(initialPosition, false)
         binding.viewpager2.setPageTransformer(OrderPageTransformer())
 
-        val titles = listOf("\u5f85\u6536\u8d27", "\u5f85\u9001\u8d27", "\u5386\u53f2\u8ba2\u5355")
+        val titles = listOf("待收货", "待送货", "历史订单")
         TabLayoutMediator(binding.tabLayout, binding.viewpager2) { tab, position ->
             tab.text = titles.getOrNull(position).orEmpty()
         }.attach()
@@ -106,25 +107,6 @@ class OrderExecutorFragment : Fragment() {
                 else R.drawable.bg_order_tab_unselected_modern
             )
         }
-    }
-
-    private fun animateHeader() {
-        binding.orderHero.alpha = 0f
-        binding.orderHero.translationY = -18f
-        binding.orderHero.animate()
-            .alpha(1f)
-            .translationY(0f)
-            .setDuration(280L)
-            .start()
-
-        binding.orderTabCard.alpha = 0f
-        binding.orderTabCard.translationY = 22f
-        binding.orderTabCard.animate()
-            .alpha(1f)
-            .translationY(0f)
-            .setStartDelay(80L)
-            .setDuration(260L)
-            .start()
     }
 
     private class OrderPageTransformer : ViewPager2.PageTransformer {

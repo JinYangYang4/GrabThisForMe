@@ -5,14 +5,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.grabthisforme.activity.fragment_misc.secondhand_goodsFragment.model.ConditionModel
+import com.example.grabthisforme.activity.fragment_misc.secondhand_goodsFragment.ui_model.SecondhandGoodsCardUiModel
+import com.example.grabthisforme.activity.fragment_misc.secondhand_goodsFragment.ui_model.toSecondhandGoodsCardUiModel
 import com.example.grabthisforme.model.goods.data.repository.GoodsRepository
 import com.example.grabthisforme.model.goods.domain.Goods
-import com.example.grabthisforme.model.secondhandGoods.domain.SecondhandGoods
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.map
+import kotlin.collections.orEmpty
 
 @HiltViewModel
 class SecondHandsViewModel @Inject constructor(
@@ -28,8 +31,8 @@ class SecondHandsViewModel @Inject constructor(
     private val selectedGoodsCategory = MutableStateFlow<Goods.GoodsCategory?>(null)
     private val selectedQuality = MutableStateFlow(QUALITY_ALL)
 
-    private val _filteredGoodsList = MutableLiveData<List<SecondhandGoods>>(emptyList())
-    val filteredGoodsList: LiveData<List<SecondhandGoods>> = _filteredGoodsList
+    private val _filteredGoodsList = MutableLiveData<List<SecondhandGoodsCardUiModel>>(emptyList())
+    val filteredGoodsList: LiveData<List<SecondhandGoodsCardUiModel>> = _filteredGoodsList
 
     init {
         viewModelScope.launch {
@@ -41,11 +44,13 @@ class SecondHandsViewModel @Inject constructor(
                 if (goodsCategory == null) {
                     return@combine emptyList()
                 }
-                goodsList.filter { goods ->
-                    val categoryMatched = goods.category == goodsCategory
-                    val qualityMatched = quality == QUALITY_ALL || goods.quality == quality
-                    categoryMatched && qualityMatched
-                }
+                goodsList
+                    .filter { goods ->
+                        val categoryMatched = goods.category == goodsCategory
+                        val qualityMatched = quality == QUALITY_ALL || goods.quality == quality
+                        categoryMatched && qualityMatched
+                    }
+                    .map { it.toSecondhandGoodsCardUiModel() }
             }.collect { filteredGoods ->
                 _filteredGoodsList.value = filteredGoods
             }

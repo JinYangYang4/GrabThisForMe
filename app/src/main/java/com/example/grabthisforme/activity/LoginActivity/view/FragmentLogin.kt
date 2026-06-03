@@ -1,6 +1,7 @@
 package com.example.grabthisforme.activity.LoginActivity.view
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,19 +9,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.LoginActivity.viewmodel.SwitchAccountsViewModel
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentLoginBinding
+import com.example.grabthisforme.model.user.data.repository.UserRepository
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class FragmentLogin : Fragment() {
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
+
+    @Inject
+    lateinit var userRepository: UserRepository
 
     private val viewModel: SwitchAccountsViewModel by activityViewModels()
     val bottomSheet = SwitchAccountsBottomSheetDialogFragment.newInstance()
@@ -38,6 +48,7 @@ class FragmentLogin : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initView()
         initClickListener()
+        observeCurrentUser()
         ViewCompat.setOnApplyWindowInsetsListener(requireView()) { _, insets ->
             val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
             if (!imeVisible && _binding != null) {
@@ -59,6 +70,17 @@ class FragmentLogin : Fragment() {
 
     private fun initView() {}
 
+    private fun observeCurrentUser() {
+        lifecycleScope.launch {
+            userRepository.currentUser.collect { user ->
+                user?.let {
+                    binding.etUserId.setText(it.id.toString())
+                    binding.tvTitle.text = "欢迎回来，${it.name}"
+                }
+            }
+        }
+    }
+
     private fun initClickListener() {
         binding.root.setOnClickListener {
             clearInputFocus()
@@ -72,7 +94,50 @@ class FragmentLogin : Fragment() {
         binding.tvSwitchAccounts.setOnClickListener {
             bottomSheet.show(childFragmentManager, "SwitchAccountsBottomSheet")
         }
+        binding.layoutLogin.setOnClickListener {
+            handleLogin()
+        }
+    }
 
+    private fun handleLogin() {
+        val userIdText = binding.etUserId.text?.toString()?.trim()
+        val password = binding.etPassword.text?.toString()?.trim()
+
+        if (userIdText.isNullOrEmpty()) {
+            Toast.makeText(requireContext(), "请输入账号ID", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val userId = userIdText.toLongOrNull()
+        if (userId == null) {
+            Toast.makeText(requireContext(), "账号ID格式不正确", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (password.isNullOrEmpty()) {
+            Toast.makeText(requireContext(), "请输入密码", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        lifecycleScope.launch {
+            val allUsers = userRepository.allLoginUsers.value
+            val matchedUser = allUsers.find { it.id == userId }
+
+            if (matchedUser != null) {
+                userRepository.upsertAndSetCurrent(matchedUser)
+                Toast.makeText(requireContext(), "登录成功", Toast.LENGTH_SHORT).show()
+                navigateToMainActivity()
+            } else {
+                Toast.makeText(requireContext(), "账号不存在或密码错误", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun navigateToMainActivity() {
+        val intent = Intent(requireContext(), MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        requireActivity().finish()
     }
 
     override fun onStop() {

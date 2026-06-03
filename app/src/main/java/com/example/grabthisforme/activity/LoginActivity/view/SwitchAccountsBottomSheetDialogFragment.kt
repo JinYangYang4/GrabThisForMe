@@ -1,19 +1,21 @@
 package com.example.grabthisforme.activity.LoginActivity.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.grabthisforme.R
-import com.example.grabthisforme.activity.LoginActivity.adapter.SwitchAccountsRecyclerViewAdapter
-import com.example.grabthisforme.databinding.SwitchAccountBottomSheetDialogFragmentBinding
-import com.example.grabthisforme.model.user.domain.User
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.grabthisforme.activity.LoginActivity.adapter.SwitchAccountsRecyclerViewAdapter
 import com.example.grabthisforme.activity.LoginActivity.viewmodel.SwitchAccountsViewModel
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
+import com.example.grabthisforme.databinding.SwitchAccountBottomSheetDialogFragmentBinding
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SwitchAccountsBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private var _binding: SwitchAccountBottomSheetDialogFragmentBinding? = null
     private val binding get() = _binding!!
@@ -34,28 +36,17 @@ class SwitchAccountsBottomSheetDialogFragment : BottomSheetDialogFragment() {
         viewModel = ViewModelProvider(requireActivity()).get(SwitchAccountsViewModel::class.java)
         initRecyclerView()
         observeViewModelData()
-        initObserve()
-    }
-    private fun initObserve(){
-        viewModel.testUserList.observe(viewLifecycleOwner){list ->
-            adapter.submitList(ArrayList(list))
-        }
     }
 
     private fun initRecyclerView() {
         adapter = SwitchAccountsRecyclerViewAdapter(
             onItemClick = { selectedUser ->
-                Toast.makeText(
-                    requireContext(),
-                    "选中账号：${selectedUser.name}（ID：${selectedUser.id}）",
-                    Toast.LENGTH_SHORT
-                ).show()
-                dismiss()
+                viewModel.switchToUser(selectedUser.userId)
             },
-            onIvCurrentClick = {selectedUser ->
+            onIvCurrentClick = { selectedUser ->
                 Toast.makeText(
                     requireContext(),
-                    "删除账号：${selectedUser.name}",
+                    "Delete: " + selectedUser.displayName,
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -65,14 +56,32 @@ class SwitchAccountsBottomSheetDialogFragment : BottomSheetDialogFragment() {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = this@SwitchAccountsBottomSheetDialogFragment.adapter
         }
-
     }
+
+    private fun navigateToMainActivity() {
+        val intent = Intent(requireContext(), MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        requireActivity().finish()
+    }
+
     private fun observeViewModelData() {
         viewModel.testUserList.observe(viewLifecycleOwner) { userItems ->
             adapter.submitList(userItems)
         }
-    }
 
+        viewModel.switchAccountSuccess.observe(viewLifecycleOwner) { user ->
+            if (user != null) {
+                Toast.makeText(
+                    requireContext(),
+                    "已切换到 ${user.name}",
+                    Toast.LENGTH_SHORT
+                ).show()
+                dismiss()
+                navigateToMainActivity()
+            }
+        }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

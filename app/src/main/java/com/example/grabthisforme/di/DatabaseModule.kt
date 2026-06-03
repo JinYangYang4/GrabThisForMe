@@ -1,13 +1,19 @@
-package com.example.grabthisforme.di
+﻿package com.example.grabthisforme.di
 
 import android.content.Context
 import com.example.grabthisforme.model.AppDataBase.AppDatabase
 import com.example.grabthisforme.model.conversation.data.dao.ConversationDao
-import com.example.grabthisforme.activity.fragment_misc.searchFragment.model.SearchDao
+import com.example.grabthisforme.model.conversation.data.dao.ConversationUserStateDao
+import com.example.grabthisforme.activity.fragment_misc.search.model.SearchDao
+import com.example.grabthisforme.model.friendAndGroup.data.dao.FriendAndGroupDao
 import com.example.grabthisforme.model.goods.data.dao.GoodsDao
-import com.example.grabthisforme.model.messageContent.data.dao.MessageDao
+import com.example.grabthisforme.model.message.data.dao.MessageDao
 import com.example.grabthisforme.model.post.data.dao.PostDao
+import com.example.grabthisforme.model.post.data.dao.PostStatsDao
 import com.example.grabthisforme.model.order.data.dao.OrderDao
+import com.example.grabthisforme.model.relation.data.dao.ConversationRelationDao
+import com.example.grabthisforme.model.relation.data.dao.StoreRelationDao
+import com.example.grabthisforme.model.relation.data.dao.UserRelationDao
 import com.example.grabthisforme.model.store.data.dao.StoreDao
 import com.example.grabthisforme.model.user.data.dao.UserDao
 import dagger.Module
@@ -18,7 +24,7 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
-@InstallIn(SingletonComponent::class) //ActivityComponent、FragmentComponent    安装到【全局单例】生命周期
+@InstallIn(SingletonComponent::class)
 object DatabaseModule {
     @Provides
     @Singleton
@@ -50,6 +56,17 @@ object DatabaseModule {
     fun provideConversationDao(database: AppDatabase): ConversationDao {
         return database.conversationDao()
     }
+
+    @Provides
+    fun provideConversationUserStateDao(database: AppDatabase): ConversationUserStateDao {
+        return database.conversationUserStateDao()
+    }
+
+    @Provides
+    fun provideConversationRelationDao(database: AppDatabase): ConversationRelationDao {
+        return database.conversationRelationDao()
+    }
+
     @Provides
     fun provideOrderDao(database : AppDatabase) : OrderDao{
         return database.orderDao()
@@ -61,7 +78,27 @@ object DatabaseModule {
     }
 
     @Provides
+    fun providePostStatsDao(database: AppDatabase): PostStatsDao {
+        return database.postStatsDao()
+    }
+
+    @Provides
+    fun provideUserRelationDao(database: AppDatabase): UserRelationDao {
+        return database.userRelationDao()
+    }
+
+    @Provides
     fun provideStoreDao(database: AppDatabase): StoreDao {
         return database.storeDao()
+    }
+
+    @Provides
+    fun provideStoreRelationDao(database: AppDatabase): StoreRelationDao {
+        return database.storeRelationDao()
+    }
+
+    @Provides
+    fun provideFriendAndGroupDao(database: AppDatabase): FriendAndGroupDao {
+        return database.friendAndGroupDao()
     }
 }

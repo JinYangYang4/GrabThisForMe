@@ -16,7 +16,32 @@
       "Bash(./gradlew :app:dataBindingGenBaseClassesDebug --rerun-tasks)",
       "Bash(ls:*)",
       "Bash(./gradlew :app:dataBindingGenBaseClassesDebug)",
-      "Bash(./gradlew :app:dataBindingGenBaseClassesDebug :app:processDebugResources --rerun-tasks)"
+      "Bash(./gradlew :app:dataBindingGenBaseClassesDebug :app:processDebugResources --rerun-tasks)",
+      "Bash(./gradlew.bat assembleDebug)",
+      "Bash(cd:*)",
+      "Bash(xargs sed:*)",
+      "Bash(sed -i '1s/^                /    /' include_store_info.xml)",
+      "Bash(sed -i 's/^                        /                /g; s/^                    /        /g; s/^                /    /g; s/^            /  /g; s/^        /\\\\t/g; s/^    //g' include_store_info.xml)",
+      "Bash(sed -i '1s/^/<?xml version=\"\"1.0\"\" encoding=\"\"utf-8\"\"?>\\\\n<layout xmlns:android=\"\"http:\\\\/\\\\/schemas.android.com\\\\/apk\\\\/res\\\\/android\"\"\\\\n    xmlns:app=\"\"http:\\\\/\\\\/schemas.android.com\\\\/apk\\\\/res-auto\"\">\\\\n/' include_store_info.xml)",
+      "Bash(rm -f include_store_info.xml)",
+      "Bash(for f:*)",
+      "Bash(do echo:*)",
+      "Read(//d/projects/GrabThisForMe/xin/GrabThisForMe/**)",
+      "Bash(done)",
+      "Bash(grep -n android:text=\"\"[^\"\"]*[A-Za-z][^\"\"]*\"\" D:projectsGrabThisForMexinGrabThisForMeappsrcmainreslayout/*.xml)",
+      "Bash(cd /d D:projectsGrabThisForMexinGrabThisForMe)",
+      "Bash(set JAVA_HOME=D:Applicationjavajdk-21.0.11)",
+      "Bash(set GRADLE_USER_HOME=D:projectsGrabThisForMexinGrabThisForMe.gradle-user-home-local)",
+      "Bash(set PATH=%JAVA_HOME%bin)",
+      "Bash(%PATH%)",
+      "Bash(export JAVA_HOME='D:\\\\Application\\\\java\\\\jdk-21.0.11')",
+      "Bash(export GRADLE_USER_HOME='D:\\\\projects\\\\GrabThisForMe\\\\xin\\\\GrabThisForMe\\\\.gradle-user-home-local')",
+      "Bash(export PATH=\"$JAVA_HOME/bin:$PATH\")",
+      "Bash(./gradlew.bat --no-daemon --console=plain :app:compileDebugKotlin)",
+      "Bash(xxd)",
+      "Bash(sed -i '300s/.*/            \\\\/\\\\/ 启动相机/' FragmentChat.kt)",
+      "Bash(sed -i '309s/.*/    \\\\/\\\\/ 处理拍摄的照片/' FragmentChat.kt)",
+      "Bash(sed -i '325s/.*/    \\\\/\\\\/ 创建临时照片文件/' FragmentChat.kt)"
     ]
   }
 }

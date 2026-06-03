@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">GrabThisForMe</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_blank_fragment">空白占位Fragment</string>
     <string name="GetByOther">找人取</string>
     <string name="GiveOther">我来取</string>
     <string name="already_selected_count">已选 %d 件</string>

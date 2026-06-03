@@ -5,11 +5,9 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import kotlinx.coroutines.flow.Flow
 import com.example.grabthisforme.model.conversation.data.entity.ConversationBundleEntity
 import com.example.grabthisforme.model.conversation.data.entity.ConversationEntity
-import com.example.grabthisforme.model.conversation.domain.Conversation
-import com.example.grabthisforme.model.conversation.mapper.toDomain
-import com.example.grabthisforme.model.conversation.mapper.toEntity
 
 @Dao
 interface ConversationDao {
@@ -25,24 +23,35 @@ interface ConversationDao {
     suspend fun getConversationBundleById(conversationId: String): ConversationBundleEntity?
 
     @Transaction
+    @Query(
+        """
+        SELECT * FROM conversation
+        WHERE conversationType = :conversationType AND targetId = :targetId
+        LIMIT 1
+        """
+    )
+    suspend fun getConversationBundleByTarget(
+        conversationType: String,
+        targetId: Long
+    ): ConversationBundleEntity?
+
+    @Transaction
     @Query("SELECT * FROM conversation ORDER BY lastTime DESC")
     suspend fun getAllConversationBundles(): List<ConversationBundleEntity>
 
     @Query("DELETE FROM conversation WHERE conversationId = :conversationId")
     suspend fun deleteConversationById(conversationId: String)
 
-    @Transaction
-    suspend fun saveConversation(conversation: Conversation) {
-        upsertConversation(conversation.toEntity())
-    }
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertConversationIfNotExists(conversation: ConversationEntity)
 
     @Transaction
-    suspend fun getConversationById(conversationId: String): Conversation? {
-        return getConversationBundleById(conversationId)?.toDomain()
-    }
+    @Query("SELECT * FROM conversation ORDER BY lastTime DESC")
+    fun observeAllConversationBundles(): Flow<List<ConversationBundleEntity>>
 
-    @Transaction
-    suspend fun getAllConversations(): List<Conversation> {
-        return getAllConversationBundles().map { it.toDomain() }
-    }
+    @Query("SELECT COUNT(*) FROM conversation")
+    suspend fun getConversationCount(): Int
+
+    @Query("UPDATE conversation SET lastMessageId = :messageId, lastTime = :timestamp WHERE conversationId = :conversationId")
+    suspend fun updateLastMessage(conversationId: String, messageId: String, timestamp: Long)
 }

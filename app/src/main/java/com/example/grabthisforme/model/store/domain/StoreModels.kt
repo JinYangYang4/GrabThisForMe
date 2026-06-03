@@ -31,7 +31,7 @@ data class StoreStatistics(
     val salesVolume: Long = 0
 )
 
-data class StoreGoodsGroup(
+data class StoreGoodsCategory(
     val category: String = "",
     val goods: List<Goods> = emptyList()
 )

@@ -13,7 +13,6 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
         android:background="@color/gray_light">
 
         <LinearLayout
@@ -46,15 +45,13 @@
                     android:clipToOutline="true"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_back_charactor2"
-
                     tools:ignore="ContentDescription"/>
-
                 <TextView
                     android:id="@+id/tv_top_username"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="@{viewModel.postUserName}"
+                    android:text=""
                     android:textSize="16sp"
                     android:textColor="#333333"
                     android:textStyle="bold"
@@ -98,153 +95,193 @@
                     android:text="关注"/>
             </LinearLayout>
         </LinearLayout>
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:id="@+id/nsv_post_content"
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nsv_content"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:fillViewport="true"
+            android:background="@color/white"
+            android:fillViewport="false"
             app:layout_constraintBottom_toTopOf="@+id/ll_comment_input"
             app:layout_constraintTop_toBottomOf="@+id/ll_top_bar">
-            <com.google.android.material.appbar.AppBarLayout
-                android:id="@+id/appBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_scrollFlags="scroll|exitUntilCollapsed"
-                    android:orientation="vertical">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="#ffffff"
-                        android:orientation="horizontal"
-                        android:padding="16dp">
-
-                        <ImageView
-                            android:id="@+id/iv_post_avatar"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/ic_back_charactor2"
-                            android:background="@drawable/bg_circle"
-                            android:clipToOutline="true"
-                            android:scaleType="centerCrop"/>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="12dp"
-                            android:layout_marginStart="12dp"
-                            android:layout_gravity="center_vertical"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/tv_post_username"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@{viewModel.postUserName}"
-                                android:textSize="16sp"
-                                android:textColor="#333333"
-                                android:textStyle="bold"/>
-
-                            <TextView
-                                android:id="@+id/tv_post_time"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@{viewModel.postTimeText}"
-                                android:textSize="12sp"
-                                android:textColor="#999999"
-                                android:layout_marginTop="4dp"/>
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <!-- 2.2 说说正文内容 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="#ffffff"
-                        android:paddingLeft="16dp"
-                        android:paddingStart="16dp"
-                        android:paddingRight="16dp"
-                        android:paddingEnd="16dp"
-                        android:paddingBottom="12dp">
-
-                        <TextView
-                            android:id="@+id/tv_post_content"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@{viewModel.postContentText}"
-                            android:textSize="15sp"
-                            android:textColor="#666666"
-                            android:lineSpacingExtra="4dp"/>
-                    </LinearLayout>
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_post_images"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="#ffffff"
-                        android:paddingLeft="16dp"
-                        android:paddingStart="16dp"
-                        android:paddingRight="16dp"
-                        android:paddingEnd="16dp"
-                        android:paddingBottom="16dp"
-                        tools:listitem="@mipmap/ic_launcher"/>
-
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="8dp"
-                        android:background="#f8f8f8"/>
-                </LinearLayout>
-            </com.google.android.material.appbar.AppBarLayout>
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
+
+                <!-- 作者信息 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#ffffff"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:id="@+id/iv_post_avatar"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_circle"
+                        android:clipToOutline="true"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_back_charactor2"
+                        tools:ignore="ContentDescription" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_post_username"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#333333"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            tools:text="用户名" />
+
+                        <TextView
+                            android:id="@+id/tv_post_time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="#999999"
+                            android:textSize="12sp"
+                            tools:text="10分钟前" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- 正文 -->
+                <TextView
+                    android:id="@+id/tv_post_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="4dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="12dp"
+                    android:textColor="#666666"
+                    android:textSize="15sp"
+                    tools:text="帖子内容..." />
+
+                <!-- 图片 -->
+                <FrameLayout
+                    android:id="@+id/fl_images_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="16dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_images_grid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"
+                        android:overScrollMode="never" />
+                </FrameLayout>
+
+                <!-- 转发 / 评论 / 点赞 -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:background="#f8f8f8" />
+
+                <LinearLayout
+                    android:id="@+id/ll_stats"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:padding="6dp">
+
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tv_share_count"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:textSize="12sp"
-                        android:gravity="center"
                         android:layout_weight="1"
-                        android:text="转发 12"/>
+                        android:gravity="center"
+                        android:text="转发"
+                        android:textColor="#666666"
+                        android:textSize="12sp" />
+
                     <TextView
                         android:id="@+id/tv_comment_count"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:textSize="12sp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text='@{"评论 " + String.valueOf(viewModel.commentList.size())}'/>
+                        android:textColor="#666666"
+                        android:textSize="12sp"
+                        tools:text="评论 5" />
+
                     <TextView
-                        android:id="@+id/tv_love_count_top"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tv_like_count_top"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:textSize="12sp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text='@{"点赞 " + String.valueOf(viewModel.likeCount)}'/>
+                        android:textColor="#666666"
+                        android:textSize="12sp"
+                        tools:text="点赞 32" />
                 </LinearLayout>
 
 
+                <!-- 评论列表 -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_comments"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@color/white" />
-            </LinearLayout>
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never" />
 
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+        <LinearLayout
+            android:id="@+id/ll_pinned_stats"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ffffff"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/ll_top_bar">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="6dp">
+                <TextView
+                    android:id="@+id/tv_pinned_share_count"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="转发"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/tv_pinned_comment_count"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/tv_pinned_like_count"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/ll_comment_input"
@@ -278,7 +315,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"/>
-
 
             <LinearLayout
                 android:id="@+id/ll_comment"
@@ -319,15 +355,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:text='@{String.valueOf(viewModel.likeCount)}'/>
+                    android:text="0"/>
             </LinearLayout>
         </LinearLayout>
+
+        <!-- 输入框 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="@{viewModel.inputVisible ? View.VISIBLE : View.GONE}"
             android:id="@+id/ll_input"
-            android:background = "@drawable/bg_round_rect_top_small_bottom_no"
+            android:background="@drawable/bg_round_rect_top_small_bottom_no"
             android:backgroundTint="@color/white_fff8"
             android:padding="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -342,7 +380,7 @@
                 android:maxLines="7"
                 android:minHeight="30dp"
                 android:padding="12dp"
-                android:background="@drawable/bg_chat_massage"
+                android:background="@drawable/bg_chat_message"
                 android:text="@{viewModel.inputText}"
                 android:textSize="16sp" />
             <TextView
@@ -352,7 +390,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginBottom="5dp"
                 android:layout_gravity="end|bottom"
-                android:background="@drawable/bg_chat_massage"
+                android:background="@drawable/bg_chat_message"
                 android:backgroundTint="@color/blue_light"
                 android:paddingVertical="4dp"
                 android:paddingHorizontal="12dp"

@@ -22,7 +22,7 @@ private fun buildUser(
     }
     return User(
         id = userId ?: 0L,
-        name = name.ifBlank { "Anonymous" },
+        name = name.ifBlank { "匿名" },
         headPic = avatarUrl
     )
 }
@@ -50,7 +50,7 @@ fun OrderDto.toDomain(): Order {
             sender = buildUser(senderId, senderName, senderAvatarUrl),
             buyer = User(
                 id = buyerId,
-                name = buyerName.ifBlank { "Anonymous" },
+                name = buyerName.ifBlank { "匿名" },
                 headPic = buyerAvatarUrl
             )
         ),
@@ -111,7 +111,7 @@ fun OrderEntity.toDomain(): Order {
             sender = buildUser(senderId, senderName, senderAvatarUrl),
             buyer = User(
                 id = buyerId,
-                name = buyerName.ifBlank { "Anonymous" },
+                name = buyerName.ifBlank { "匿名" },
                 headPic = buyerAvatarUrl
             )
         ),

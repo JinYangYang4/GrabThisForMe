@@ -7,6 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Comment
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Reply
+import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.ui_model.PostDetailHeaderUiModel
+import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.ui_model.PostDetailStatsUiModel
+import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.ui_model.buildPostDetailStatsUiModel
+import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.ui_model.toPostDetailHeaderUiModel
 import com.example.grabthisforme.model.post.data.repository.PostRepository
 import com.example.grabthisforme.model.post.domain.Post
 import com.example.grabthisforme.model.user.data.repository.UserRepository
@@ -14,9 +18,6 @@ import com.example.grabthisforme.model.user.domain.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,34 +31,20 @@ class PostDetailViewModel @Inject constructor(
     private val _commentList = MutableLiveData<List<Comment>>(emptyList())
     val commentList: LiveData<List<Comment>> = _commentList
 
-    private val _likeCount = MutableLiveData(0)
     private val _addLike = MutableLiveData(false)
     val addLike: LiveData<Boolean> get() = _addLike
-    val likeCount: LiveData<Int> = _likeCount
 
-    private val _commentCount = MutableLiveData(0)
-    val commentCount: LiveData<Int> = _commentCount
+    private val _postHeaderUiModel = MutableLiveData(PostDetailHeaderUiModel())
+    val postHeaderUiModel: LiveData<PostDetailHeaderUiModel> = _postHeaderUiModel
+
+    private val _postStatsUiModel = MutableLiveData(PostDetailStatsUiModel())
+    val postStatsUiModel: LiveData<PostDetailStatsUiModel> = _postStatsUiModel
 
     private val _inputVisible = MutableLiveData(false)
     val inputVisible: LiveData<Boolean> get() = _inputVisible
 
     private val _headerCovered = MutableLiveData(false)
     val headerCovered: LiveData<Boolean> get() = _headerCovered
-
-    private val _postUserName = MutableLiveData("Unknown user")
-    val postUserName: LiveData<String> get() = _postUserName
-
-    private val _postTimeText = MutableLiveData("")
-    val postTimeText: LiveData<String> get() = _postTimeText
-
-    private val _postContentText = MutableLiveData("Loading post...")
-    val postContentText: LiveData<String> get() = _postContentText
-
-    private val _postAvatarUrl = MutableLiveData("")
-    val postAvatarUrl: LiveData<String> get() = _postAvatarUrl
-
-    private val _postImageList = MutableLiveData<List<String>>(emptyList())
-    val postImageList: LiveData<List<String>> get() = _postImageList
 
     private val _loveIconRes = MutableLiveData(false)
     val loveIconRes: LiveData<Boolean> get() = _loveIconRes
@@ -181,7 +168,7 @@ class PostDetailViewModel @Inject constructor(
         viewModelScope.launch {
             val comments = postRepository.getCommentListOnce(postId)
             _commentList.value = comments
-            _commentCount.value = comments.size
+            updatePostStats(commentCount = comments.size)
         }
     }
 
@@ -197,7 +184,7 @@ class PostDetailViewModel @Inject constructor(
     private fun addCommentLocal(comment: Comment) {
         val updatedList = listOf(comment) + _commentList.value.orEmpty()
         _commentList.value = updatedList
-        _commentCount.value = updatedList.size
+        updatePostStats(commentCount = updatedList.size)
     }
 
     private fun addReplyLocal(commentPosition: Int, reply: Reply) {
@@ -218,33 +205,34 @@ class PostDetailViewModel @Inject constructor(
             showMissingPostState()
             return
         }
-        _postUserName.value = post.authorName.ifBlank { "匿名" }
-        _postTimeText.value = formatPostTime(post.createTime)
-        _postContentText.value = post.content
-        _postAvatarUrl.value = post.authorAvatarUrl
-        _postImageList.value = post.images.filter { it.isNotBlank() }
-        _likeCount.value = post.likeCount
-        if (_commentList.value.isNullOrEmpty()) {
-            _commentCount.value = post.commentCount
+        _postHeaderUiModel.value = post.toPostDetailHeaderUiModel()
+        val commentCount = if (_commentList.value.isNullOrEmpty()) {
+            post.commentCount
+        } else {
+            _postStatsUiModel.value?.commentCount ?: _commentList.value?.size ?: post.commentCount
         }
+        _postStatsUiModel.value = buildPostDetailStatsUiModel(
+            likeCount = post.likeCount,
+            commentCount = commentCount
+        )
     }
 
     private fun showMissingPostState() {
-        _postUserName.value = ""
-        _postTimeText.value = ""
-        _postContentText.value = ""
-        _postAvatarUrl.value = ""
-        _postImageList.value = emptyList()
+        _postHeaderUiModel.value = PostDetailHeaderUiModel()
+        _postStatsUiModel.value = PostDetailStatsUiModel()
         _commentList.value = emptyList()
-        _likeCount.value = 0
-        _commentCount.value = 0
         _addLike.value = false
         _loveIconRes.value = false
     }
 
-    private fun formatPostTime(createTime: Long): String {
-        if (createTime <= 0L) return ""
-        val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-        return "发布于 ${formatter.format(Date(createTime))}"
+    private fun updatePostStats(
+        likeCount: Int? = null,
+        commentCount: Int? = null
+    ) {
+        val current = _postStatsUiModel.value ?: PostDetailStatsUiModel()
+        _postStatsUiModel.value = buildPostDetailStatsUiModel(
+            likeCount = likeCount ?: current.likeCount,
+            commentCount = commentCount ?: current.commentCount
+        )
     }
 }

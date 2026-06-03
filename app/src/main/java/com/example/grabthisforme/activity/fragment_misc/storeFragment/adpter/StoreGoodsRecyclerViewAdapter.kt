@@ -9,13 +9,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.fragment_misc.storeFragment.adpter.StoreOwnerTagRecyclerViewAdapter
+import com.example.grabthisforme.activity.fragment_misc.storeFragment.ui_model.StoreGoodsListItemUiModel
 import com.example.grabthisforme.databinding.RvStoreGoodsItemBinding
-import com.example.grabthisforme.model.goods.domain.Goods
 
 class StoreGoodsRecyclerViewAdapter(
-    private val onAddClick: (Goods) -> Unit,
-    private val onItemClick: (Goods) -> Unit
-) : ListAdapter<Goods, StoreGoodsRecyclerViewAdapter.ViewHolder>(GoodsDiffCallback()) {
+    private val onAddClick: (StoreGoodsListItemUiModel) -> Unit,
+    private val onItemClick: (StoreGoodsListItemUiModel) -> Unit
+) : ListAdapter<StoreGoodsListItemUiModel, StoreGoodsRecyclerViewAdapter.ViewHolder>(GoodsDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.inflate(parent)
@@ -45,49 +45,31 @@ class StoreGoodsRecyclerViewAdapter(
         }
 
         fun bind(
-            goods: Goods,
-            onAddClick: (Goods) -> Unit,
-            onItemClick: (Goods) -> Unit
+            item: StoreGoodsListItemUiModel,
+            onAddClick: (StoreGoodsListItemUiModel) -> Unit,
+            onItemClick: (StoreGoodsListItemUiModel) -> Unit
         ) {
-            binding.tvTitle.text = goods.name
-            tagAdapter.submitList(goods.toTagList())
-            binding.tvPriceSingle.text = String.format("楼%.2f", goods.price)
-            binding.tvPriceDiscount.text = when {
-                goods.discountTag.isNotEmpty() -> goods.discountTag
-                goods.discountPrice > 0 -> String.format("浼樻儬浠?楼%.2f", goods.discountPrice)
-                else -> ""
-            }
+            binding.tvTitle.text = item.title
+            tagAdapter.submitList(item.tags)
+            binding.tvPriceSingle.text = item.priceText
+            binding.tvPriceDiscount.text = item.discountText
             Glide.with(binding.root.context)
-                .load(goods.pic)
+                .load(item.imageUrl)
                 .placeholder(R.drawable.food_pic)
                 .error(R.drawable.food_pic)
                 .into(binding.ivGoods)
-            binding.root.setOnClickListener { onItemClick(goods) }
-            binding.ivAdd.setOnClickListener { onAddClick(goods) }
-        }
-
-        private fun Goods.toTagList(): List<String> {
-            val tags = mutableListOf<String>()
-            if (discountTag.isNotBlank()) {
-                tags.add(discountTag)
-            }
-            if (tag.isNotBlank()) {
-                tags.addAll(tag.split(Regex("[,/;|\\s]+")).filter { it.isNotBlank() })
-            }
-            if (tags.isEmpty()) {
-                tags.add("默认")
-            }
-            return tags.distinct()
+            binding.root.setOnClickListener { onItemClick(item) }
+            binding.ivAdd.setOnClickListener { onAddClick(item) }
         }
     }
 
-    class GoodsDiffCallback : DiffUtil.ItemCallback<Goods>() {
-        override fun areItemsTheSame(oldItem: Goods, newItem: Goods): Boolean {
-            return oldItem.id == newItem.id
+    class GoodsDiffCallback : DiffUtil.ItemCallback<StoreGoodsListItemUiModel>() {
+        override fun areItemsTheSame(oldItem: StoreGoodsListItemUiModel, newItem: StoreGoodsListItemUiModel): Boolean {
+            return oldItem.goodsId == newItem.goodsId
         }
 
-        override fun areContentsTheSame(oldItem: Goods, newItem: Goods): Boolean {
-            return oldItem.id == newItem.id
+        override fun areContentsTheSame(oldItem: StoreGoodsListItemUiModel, newItem: StoreGoodsListItemUiModel): Boolean {
+            return oldItem == newItem
         }
     }
 }

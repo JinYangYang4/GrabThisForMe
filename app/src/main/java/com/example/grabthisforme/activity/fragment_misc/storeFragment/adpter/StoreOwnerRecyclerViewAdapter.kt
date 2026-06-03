@@ -8,12 +8,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
+import com.example.grabthisforme.activity.fragment_misc.storeFragment.ui_model.StoreOwnerGoodsItemUiModel
 import com.example.grabthisforme.databinding.RvStoreOwnerGoodsItemBinding
-import com.example.grabthisforme.model.goods.domain.Goods
 
 class StoreOwnerRecyclerViewAdapter(
-    private val onItemClick: (Goods) -> Unit
-) : ListAdapter<Goods, StoreOwnerRecyclerViewAdapter.ViewHolder>(GoodsDiffCallback()) {
+    private val onItemClick: (StoreOwnerGoodsItemUiModel) -> Unit
+) : ListAdapter<StoreOwnerGoodsItemUiModel, StoreOwnerRecyclerViewAdapter.ViewHolder>(GoodsDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.inflate(parent)
@@ -42,63 +42,32 @@ class StoreOwnerRecyclerViewAdapter(
         }
 
         fun bind(
-            goods: Goods,
-            onItemClick: (Goods) -> Unit
+            item: StoreOwnerGoodsItemUiModel,
+            onItemClick: (StoreOwnerGoodsItemUiModel) -> Unit
         ) {
-            binding.tvTitle.text = goods.name
-            binding.tvPriceSingle.text = String.format("¥%.2f", goods.price)
-            binding.tvPriceDiscount.text = when {
-                goods.discountTag.isNotEmpty() -> goods.discountTag
-                goods.discountPrice > 0 -> String.format("优惠价：¥%.2f", goods.discountPrice)
-                else -> ""
-            }
-            if (goods.stock > 0){
-                binding.tvAdd.text = "库存：${goods.stock}"
-            }else{
-                binding.tvAdd.text = "售罄"
-            }
-
-            tagAdapter.submitList(goods.toTagList())
+            binding.tvTitle.text = item.title
+            binding.tvPriceSingle.text = item.priceText
+            binding.tvPriceDiscount.text = item.discountText
+            binding.tvAdd.text = item.stockText
+            tagAdapter.submitList(item.tags)
 
             Glide.with(binding.root.context)
-                .load(goods.pic)
+                .load(item.imageUrl)
                 .placeholder(R.drawable.food_pic)
                 .error(R.drawable.food_pic)
                 .into(binding.ivGoods)
 
-            binding.root.setOnClickListener { onItemClick(goods) }
-
-        }
-
-        private fun Goods.toTagList(): List<String> {
-            val tags = mutableListOf<String>()
-            if (discountTag.isNotBlank()) {
-                tags.add(discountTag)
-            }
-            if (tag.isNotBlank()) {
-                tags.addAll(tag.split(Regex("[,/;|\\s]+")).filter { it.isNotBlank() })
-            }
-            if (tags.isEmpty()) {
-                tags.add("普通")
-            }
-            return tags.distinct()
+            binding.root.setOnClickListener { onItemClick(item) }
         }
     }
 
-    class GoodsDiffCallback : DiffUtil.ItemCallback<Goods>() {
-        override fun areItemsTheSame(oldItem: Goods, newItem: Goods): Boolean {
-            return oldItem.id == newItem.id
+    class GoodsDiffCallback : DiffUtil.ItemCallback<StoreOwnerGoodsItemUiModel>() {
+        override fun areItemsTheSame(oldItem: StoreOwnerGoodsItemUiModel, newItem: StoreOwnerGoodsItemUiModel): Boolean {
+            return oldItem.goodsId == newItem.goodsId
         }
 
-        override fun areContentsTheSame(oldItem: Goods, newItem: Goods): Boolean {
-            return oldItem.id == newItem.id &&
-                oldItem.name == newItem.name &&
-                oldItem.price == newItem.price &&
-                oldItem.discountPrice == newItem.discountPrice &&
-                oldItem.discountTag == newItem.discountTag &&
-                oldItem.tag == newItem.tag &&
-                oldItem.pic == newItem.pic &&
-                oldItem.stock == newItem.stock
+        override fun areContentsTheSame(oldItem: StoreOwnerGoodsItemUiModel, newItem: StoreOwnerGoodsItemUiModel): Boolean {
+            return oldItem == newItem
         }
     }
 }

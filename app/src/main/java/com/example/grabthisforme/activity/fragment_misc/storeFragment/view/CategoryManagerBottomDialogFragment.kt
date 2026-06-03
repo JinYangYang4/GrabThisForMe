@@ -45,6 +45,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import com.example.grabthisforme.model.store.domain.Store
 import com.example.grabthisforme.ui.liquidglass.components.LiquidBottomTabs
 import com.example.grabthisforme.ui.liquidglass.dialog.LiquidMessageDialogFragment
 
@@ -58,6 +59,7 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
     private lateinit var sortAdapter: CategorySortRecyclerViewAdapter
 
     private val categoryList: MutableList<String> = mutableListOf()
+    private val renamedCategories: MutableMap<String, String> = linkedMapOf()
     private var renameTargetIndex: Int = RecyclerView.NO_POSITION
     private var currentTabMode by mutableStateOf(TabMode.ADD)
 
@@ -144,6 +146,7 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
     private fun initCategoryData() {
         val initialCategories = arguments?.getStringArrayList(ARG_CATEGORY_LIST).orEmpty()
         categoryList.clear()
+        renamedCategories.clear()
         categoryList.addAll(
             initialCategories.map { it.trim() }
                 .filter { it.isNotBlank() }
@@ -287,6 +290,7 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
                 Toast.makeText(requireContext(), "该分类暂不支持重命名", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            recordRename(categoryList[renameTargetIndex], newName)
             categoryList[renameTargetIndex] = newName
             binding.llRenameInputContainer.visibility = View.GONE
             renameTargetIndex = RecyclerView.NO_POSITION
@@ -403,8 +407,34 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
     private fun dispatchCategoryResult(categories: List<String>) {
         parentFragmentManager.setFragmentResult(
             REQUEST_KEY,
-            bundleOf(RESULT_KEY_CATEGORY_LIST to ArrayList(categories))
+            bundleOf(
+                RESULT_KEY_CATEGORY_LIST to ArrayList(categories),
+                RESULT_KEY_RENAMED_OLD_LIST to ArrayList(renamedCategories.keys.toList()),
+                RESULT_KEY_RENAMED_NEW_LIST to ArrayList(renamedCategories.values.toList())
+            )
         )
+    }
+
+    private fun recordRename(oldName: String, newName: String) {
+        val normalizedOldName = oldName.trim()
+        val normalizedNewName = newName.trim()
+        if (normalizedOldName.isBlank() || normalizedNewName.isBlank()) return
+        if (normalizedOldName == normalizedNewName) return
+
+        val originalName = renamedCategories
+            .entries
+            .firstOrNull { it.value == normalizedOldName }
+            ?.key
+            ?: normalizedOldName
+
+        renamedCategories.entries
+            .filter { it.value == normalizedOldName }
+            .map { it.key }
+            .forEach { key ->
+                renamedCategories[key] = normalizedNewName
+            }
+        renamedCategories.remove(normalizedOldName)
+        renamedCategories[originalName] = normalizedNewName
     }
 
     override fun onDestroyView() {
@@ -415,10 +445,12 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
     companion object {
         const val REQUEST_KEY = "category_manager_request_key"
         const val RESULT_KEY_CATEGORY_LIST = "category_manager_result_category_list"
+        const val RESULT_KEY_RENAMED_OLD_LIST = "category_manager_result_renamed_old_list"
+        const val RESULT_KEY_RENAMED_NEW_LIST = "category_manager_result_renamed_new_list"
 
         private const val ARG_CATEGORY_LIST = "arg_category_list"
-        private const val CATEGORY_ALL = "全部"
-        private const val CATEGORY_UNCLASSIFIED = "未分类"
+        private const val CATEGORY_ALL = Store.CATEGORY_ALL
+        private const val CATEGORY_UNCLASSIFIED = Store.CATEGORY_UNCLASSIFIED
         private const val CLOSE_PROMPT_REQUEST_KEY = "category_manager_close_prompt_request_key"
 
         fun newInstance(categoryList: ArrayList<String>): CategoryManagerBottomDialogFragment {

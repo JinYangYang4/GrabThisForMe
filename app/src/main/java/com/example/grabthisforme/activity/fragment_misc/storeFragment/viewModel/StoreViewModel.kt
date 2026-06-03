@@ -1,28 +1,38 @@
 package com.example.grabthisforme.activity.fragment_misc.storeFragment.viewModel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.grabthisforme.activity.fragment_misc.searchFragment.model.SearchContent
-import com.example.grabthisforme.activity.fragment_misc.searchFragment.model.SearchDao
+import com.example.grabthisforme.activity.fragment_misc.search.model.SearchContent
+import com.example.grabthisforme.activity.fragment_misc.search.model.SearchDao
+import com.example.grabthisforme.activity.fragment_misc.storeFragment.ui_model.SelectedGoodsItemUiModel
+import com.example.grabthisforme.activity.fragment_misc.storeFragment.ui_model.StoreGoodsListItemUiModel
+import com.example.grabthisforme.activity.fragment_misc.storeFragment.ui_model.toSelectedGoodsItemUiModel
+import com.example.grabthisforme.activity.fragment_misc.storeFragment.ui_model.toStoreGoodsListItemUiModel
 import com.example.grabthisforme.model.goods.domain.Goods
 import com.example.grabthisforme.model.store.data.repository.StoreRepository
 import com.example.grabthisforme.model.store.domain.Store
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.util.Locale
+import javax.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import kotlinx.coroutines.flow.first
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class StoreViewModel @Inject constructor(
     private val searchDao: SearchDao,
@@ -36,7 +46,8 @@ class StoreViewModel @Inject constructor(
 
     var fullList: MutableList<SearchContent> = mutableListOf()
     private val _priceTotal = MutableLiveData(0.0)
-    private val _currentAlreadySelectList = MutableLiveData<MutableList<Goods>>(mutableListOf())
+    private val _priceTotalText = MutableLiveData("¥0.00")
+    private val _currentAlreadySelectList = MutableLiveData<List<SelectedGoodsItemUiModel>>(emptyList())
     private val _openMySelectGoosView = MutableLiveData(false)
     private val _showStorePage = MutableLiveData(false)
     private val _deleteMode = MutableLiveData(false)
@@ -49,10 +60,12 @@ class StoreViewModel @Inject constructor(
     private val _storeNoticeText = MutableLiveData("")
     private val _storeDeliveryText = MutableLiveData("")
     private val _storeBusinessHoursText = MutableLiveData("")
+    private val selectedCategory = MutableStateFlow(Store.CATEGORY_ALL)
     private val selectedStoreId = MutableStateFlow<Long?>(null)
 
     val priceTotal: LiveData<Double> get() = _priceTotal
-    val currentAlreadySelectList: LiveData<MutableList<Goods>> get() = _currentAlreadySelectList
+    val priceTotalText: LiveData<String> get() = _priceTotalText
+    val currentAlreadySelectList: LiveData<List<SelectedGoodsItemUiModel>> get() = _currentAlreadySelectList
     val isOpenMySelectGoosView: LiveData<Boolean> get() = _openMySelectGoosView
     val showStorePage: LiveData<Boolean> get() = _showStorePage
     val deleteMode: LiveData<Boolean> get() = _deleteMode
@@ -65,6 +78,7 @@ class StoreViewModel @Inject constructor(
     val storeNoticeText: LiveData<String> get() = _storeNoticeText
     val storeDeliveryText: LiveData<String> get() = _storeDeliveryText
     val storeBusinessHoursText: LiveData<String> get() = _storeBusinessHoursText
+    val currentSelectedCategory: StateFlow<String> = selectedCategory
 
     val currentStore: StateFlow<Store?> = selectedStoreId
         .flatMapLatest { storeId ->
@@ -73,7 +87,6 @@ class StoreViewModel @Inject constructor(
             } else {
                 storeRepository.getStoreFlow(storeId)
             }
-
         }
         .stateIn(
             scope = viewModelScope,
@@ -81,13 +94,42 @@ class StoreViewModel @Inject constructor(
             initialValue = null
         )
 
-    val goodsList: StateFlow<List<Goods>> = currentStore
-        .map { it?.goodsAll.orEmpty() }
+    val storeCategories: StateFlow<List<String>> = selectedStoreId
+        .flatMapLatest { storeId ->
+            if (storeId != null && storeId > 0L) {
+                storeRepository.observeStoreCategories(storeId)
+            } else {
+                flowOf(listOf(Store.CATEGORY_ALL, Store.CATEGORY_UNCLASSIFIED))
+            }
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList()
+            initialValue = listOf(Store.CATEGORY_ALL, Store.CATEGORY_UNCLASSIFIED)
         )
+
+    val goodsList: StateFlow<List<StoreGoodsListItemUiModel>> = combine(
+        selectedStoreId,
+        selectedCategory
+    ) { storeId, category ->
+        storeId to category
+    }.flatMapLatest { (storeId, category) ->
+        loadGoodsByStoreAndCategory(storeId, category)
+    }.map { goods ->
+        goods.map { it.toStoreGoodsListItemUiModel() }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = emptyList()
+    )
+
+    private fun loadGoodsByStoreAndCategory(
+        storeId: Long?,
+        category: String
+    ): Flow<List<Goods>> {
+        if (storeId == null || storeId <= 0L) return flowOf(emptyList())
+        return storeRepository.observeGoodsByStoreAndCategory(storeId, category)
+    }
 
     init {
         viewModelScope.launch {
@@ -95,56 +137,60 @@ class StoreViewModel @Inject constructor(
                 updateStoreDetails(store)
             }
         }
+        viewModelScope.launch {
+            storeCategories.collectLatest {
+                syncSelectedCategory()
+            }
+        }
     }
-
 
     fun loadStore(storeId: Long) {
         selectedStoreId.value = storeId.takeIf { it > 0L }
+        selectedCategory.value = Store.CATEGORY_ALL
     }
 
-    fun addGoods(goods: Goods) {
-        val currentList = _currentAlreadySelectList.value?.toMutableList() ?: mutableListOf()
-        val index = currentList.indexOfFirst { it.id == goods.id }
+    fun selectCategory(category: String) {
+        selectedCategory.value = category.trim().ifBlank { Store.CATEGORY_ALL }
+    }
+
+    fun addGoods(goods: StoreGoodsListItemUiModel) {
+        val currentList = _currentAlreadySelectList.value.orEmpty().toMutableList()
+        val index = currentList.indexOfFirst { it.goodsId == goods.goodsId }
         if (index >= 0) {
             val target = currentList[index]
-            target.selectedCount += 1
-            currentList[index] = target
+            currentList[index] = target.copy(selectedCount = target.selectedCount + 1)
         } else {
-            currentList.add(goods.withSelectedCount(1))
+            currentList.add(goods.toSelectedGoodsItemUiModel())
         }
-        _currentAlreadySelectList.value = currentList
-        recalculatePriceTotal(currentList)
+        updateSelectedGoods(currentList)
     }
 
-    fun increaseSelectedGoods(goods: Goods) {
-        val currentList = _currentAlreadySelectList.value?.toMutableList() ?: mutableListOf()
-        val index = currentList.indexOfFirst { it.id == goods.id }
+    fun increaseSelectedGoods(item: SelectedGoodsItemUiModel) {
+        val currentList = _currentAlreadySelectList.value.orEmpty().toMutableList()
+        val index = currentList.indexOfFirst { it.goodsId == item.goodsId }
         if (index < 0) return
         val target = currentList[index]
-        target.selectedCount += 1
-        currentList[index] = target
-        _currentAlreadySelectList.value = currentList
-        recalculatePriceTotal(currentList)
+        currentList[index] = target.copy(selectedCount = target.selectedCount + 1)
+        updateSelectedGoods(currentList)
     }
 
-    fun decreaseSelectedGoods(goods: Goods) {
-        val currentList = _currentAlreadySelectList.value?.toMutableList() ?: mutableListOf()
-        val index = currentList.indexOfFirst { it.id == goods.id }
+    fun decreaseSelectedGoods(item: SelectedGoodsItemUiModel) {
+        val currentList = _currentAlreadySelectList.value.orEmpty().toMutableList()
+        val index = currentList.indexOfFirst { it.goodsId == item.goodsId }
         if (index < 0) return
         val target = currentList[index]
         if (target.selectedCount > 1) {
-            target.selectedCount -= 1
-            currentList[index] = target
+            currentList[index] = target.copy(selectedCount = target.selectedCount - 1)
         } else {
             currentList.removeAt(index)
         }
-        _currentAlreadySelectList.value = currentList
-        recalculatePriceTotal(currentList)
+        updateSelectedGoods(currentList)
     }
 
     fun clearSelectedGoods() {
-        _currentAlreadySelectList.value = mutableListOf()
+        _currentAlreadySelectList.value = emptyList()
         _priceTotal.value = 0.0
+        _priceTotalText.value = "¥0.00"
     }
 
     fun setMySelectGoosView(isOpen: Boolean) {
@@ -238,35 +284,64 @@ class StoreViewModel @Inject constructor(
 
     private fun updateStoreDetails(store: Store?) {
         _storeNameText.value = store?.name.orEmpty()
-        _storeSaleCountText.value = store?.salesVolume?.takeIf { it > 0L }?.let { "已售：${it}+" }.orEmpty()
+        _storeSaleCountText.value = store?.salesVolume
+            ?.takeIf { it > 0L }
+            ?.let { "已售：${it}+" }
+            .orEmpty()
         _storeAddressText.value = store?.address.orEmpty()
-        _storeServiceText.value = store?.phone?.trim()?.takeIf { it.isNotEmpty() }?.let { "联系电话：$it" }.orEmpty()
+        _storeServiceText.value = store?.phone
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { "联系电话：$it" }
+            .orEmpty()
         _storeNoticeText.value = store?.tags
             ?.map { it.trim() }
             ?.filter { it.isNotBlank() }
             ?.takeIf { it.isNotEmpty() }
-            ?.let { "店铺标签：" + it.joinToString("、") }
+            ?.let { "店铺标签：${it.joinToString("、")}" }
             .orEmpty()
-        _storeDeliveryText.value = store?.let { buildDeliveryText(it) }.orEmpty()
-        _storeBusinessHoursText.value = store?.businessHours?.trim()?.takeIf { it.isNotEmpty() }?.let { "营业时间：$it" }.orEmpty()
+        _storeDeliveryText.value = store?.let(::buildDeliveryText).orEmpty()
+        _storeBusinessHoursText.value = store?.businessHours
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { "营业时间：$it" }
+            .orEmpty()
     }
 
     private fun buildDeliveryText(store: Store): String {
         val parts = mutableListOf<String>()
-        if (store.minOrderAmount > java.math.BigDecimal.ZERO) {
-            parts.add("起送 " + store.minOrderAmount.stripTrailingZeros().toPlainString())
+        if (store.minOrderAmount > BigDecimal.ZERO) {
+            parts.add("起送 ${store.minOrderAmount.stripTrailingZeros().toPlainString()} 元")
         }
-        if (store.deliveryFee > java.math.BigDecimal.ZERO) {
-            parts.add("配送费 " + store.deliveryFee.stripTrailingZeros().toPlainString())
+        if (store.deliveryFee > BigDecimal.ZERO) {
+            parts.add("配送费 ${store.deliveryFee.stripTrailingZeros().toPlainString()} 元")
         }
         return if (parts.isNotEmpty()) {
-            "配送信息：" + parts.joinToString("，")
+            "配送信息：${parts.joinToString("，")}"
         } else {
             ""
         }
     }
 
-    private fun recalculatePriceTotal(selectedList: List<Goods>) {
-        _priceTotal.value = selectedList.sumOf { it.price * it.selectedCount }
+    private fun updateSelectedGoods(selectedList: List<SelectedGoodsItemUiModel>) {
+        val totalPrice = roundToPriceScale(
+            selectedList.sumOf { it.price * it.selectedCount }
+        )
+        _currentAlreadySelectList.value = selectedList
+        _priceTotal.value = totalPrice
+        _priceTotalText.value = String.format(Locale.getDefault(), "¥%.2f", totalPrice)
+    }
+
+    private fun roundToPriceScale(value: Double): Double {
+        return BigDecimal.valueOf(value)
+            .setScale(2, RoundingMode.HALF_UP)
+            .toDouble()
+    }
+
+    private fun syncSelectedCategory() {
+        val availableCategories = storeCategories.value
+        if (selectedCategory.value !in availableCategories) {
+            selectedCategory.value = Store.CATEGORY_ALL
+        }
     }
 }

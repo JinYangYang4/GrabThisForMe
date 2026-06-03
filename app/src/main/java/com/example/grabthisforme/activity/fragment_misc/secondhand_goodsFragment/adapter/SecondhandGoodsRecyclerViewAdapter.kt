@@ -7,12 +7,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
+import com.example.grabthisforme.activity.fragment_misc.secondhand_goodsFragment.ui_model.SecondhandGoodsCardUiModel
 import com.example.grabthisforme.databinding.RvSecondhandGoodsItemBinding
-import com.example.grabthisforme.model.secondhandGoods.domain.SecondhandGoods
 
 class SecondhandGoodsRecyclerViewAdapter(
     private val clickListener: (goodsId: Long) -> Unit
-) : ListAdapter<SecondhandGoods, SecondhandGoodsRecyclerViewAdapter.ViewHolder>(
+) : ListAdapter<SecondhandGoodsCardUiModel, SecondhandGoodsRecyclerViewAdapter.ViewHolder>(
     SecondhandGoodsDiffItemCallback()
 ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -26,21 +26,24 @@ class SecondhandGoodsRecyclerViewAdapter(
     class ViewHolder(private val binding: RvSecondhandGoodsItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(secondhandGoods: SecondhandGoods, clickListener: (Long) -> Unit) {
-            binding.tvGoodsName.text = secondhandGoods.name
-            binding.tvGoodsPrice.text = "¥${secondhandGoods.price}"
-            binding.tvGoodsOriginalPrice.text = "¥${secondhandGoods.originalPrice}"
-            binding.tvGoodsQuality.text = secondhandGoods.quality
-            binding.tvGoodsSaleCount.text = "已售 ${secondhandGoods.soldCount}"
+        fun bind(item: SecondhandGoodsCardUiModel, clickListener: (Long) -> Unit) {
+            binding.tvGoodsName.text = item.goodsName
+            binding.tvGoodsPrice.text = item.priceText
+            binding.tvGoodsOriginalPrice.text = item.originalPriceText
+            binding.tvGoodsQuality.text = item.qualityText
+            binding.tvGoodsMessage.text = item.messageText
+            binding.tvGoodsTradeHint.text = item.tradeHintText
+            binding.tvGoodsUsedTime.text = item.usedTimeText
+            binding.tvGoodsSaleCount.text = item.saleCountText
 
             Glide.with(binding.root)
-                .load(secondhandGoods.pic.takeIf { it.isNotBlank() })
+                .load(item.imageUrl)
                 .placeholder(R.drawable.food_pic)
                 .error(R.drawable.food_pic)
                 .into(binding.ivGoodsPic)
 
             itemView.setOnClickListener {
-                clickListener(secondhandGoods.id)
+                clickListener(item.goodsId)
             }
         }
 
@@ -53,19 +56,13 @@ class SecondhandGoodsRecyclerViewAdapter(
         }
     }
 
-    class SecondhandGoodsDiffItemCallback : DiffUtil.ItemCallback<SecondhandGoods>() {
-        override fun areItemsTheSame(oldItem: SecondhandGoods, newItem: SecondhandGoods): Boolean {
-            return oldItem.id == newItem.id
+    class SecondhandGoodsDiffItemCallback : DiffUtil.ItemCallback<SecondhandGoodsCardUiModel>() {
+        override fun areItemsTheSame(oldItem: SecondhandGoodsCardUiModel, newItem: SecondhandGoodsCardUiModel): Boolean {
+            return oldItem.goodsId == newItem.goodsId
         }
 
-        override fun areContentsTheSame(oldItem: SecondhandGoods, newItem: SecondhandGoods): Boolean {
-            return oldItem.name == newItem.name &&
-                oldItem.price == newItem.price &&
-                oldItem.sale_number == newItem.sale_number &&
-                oldItem.originalPrice == newItem.originalPrice &&
-                oldItem.quality == newItem.quality &&
-                oldItem.pic == newItem.pic &&
-                oldItem.soldCount == newItem.soldCount
+        override fun areContentsTheSame(oldItem: SecondhandGoodsCardUiModel, newItem: SecondhandGoodsCardUiModel): Boolean {
+            return oldItem == newItem
         }
     }
 }

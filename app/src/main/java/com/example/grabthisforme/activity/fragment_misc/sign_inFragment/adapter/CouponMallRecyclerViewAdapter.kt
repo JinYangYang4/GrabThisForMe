@@ -19,20 +19,21 @@ class CouponMallRecyclerViewAdapter(
             val coupon = mallItem.coupon
 
             binding.tvCouponTitle.text = coupon.title
-            binding.tvCouponDenomination.text = "\u00a5${coupon.denomination.toInt()}"
+            binding.tvCouponDenomination.text = "¥${coupon.denomination.toInt()}"
             binding.tvCouponInfo.text = "${coupon.type} | ${coupon.desc}"
-            binding.tvNeedCoin.text = "\u9700${mallItem.needCoin}\u91d1\u5e01"
-            binding.tvHotTag.text = if (mallItem.isHot) "\u70ed\u95e8" else "\u63a8\u8350"
+            binding.tvNeedCoin.text = "需${mallItem.needCoin}金币"
+            binding.tvHotTag.text = if (mallItem.isHot) "热门" else "推荐"
 
             when (mallItem.mallStatus) {
                 CouponMallItem.MallCouponStatus.EXCHANGEABLE -> {
                     binding.btnExchange.isEnabled = true
-                    binding.btnExchange.text = "\u5151\u6362"
+                    binding.btnExchange.text = "兑换"
                     binding.btnExchange.alpha = 1f
                 }
+
                 CouponMallItem.MallCouponStatus.SOLD_OUT -> {
                     binding.btnExchange.isEnabled = false
-                    binding.btnExchange.text = "\u5df2\u552e\u7f44"
+                    binding.btnExchange.text = "已售罄"
                     binding.btnExchange.alpha = 0.45f
                 }
             }

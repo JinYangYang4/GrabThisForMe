@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
         <import type="android.view.View" />
@@ -13,23 +14,20 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg_wallet_screen">
+        android:background="@drawable/bg_create_goods_screen"
+        tools:ignore="MissingConstraints">
 
         <LinearLayout
-            android:id="@+id/ll_describe_container"
+            android:id="@+id/title_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_coupon_hero"
             android:orientation="vertical"
-            android:paddingStart="18dp"
-            android:paddingTop="38dp"
-            android:paddingEnd="18dp"
-            android:paddingBottom="24dp"
-            app:layout_constraintTop_toTopOf="parent">
+            android:paddingTop="36dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="42dp"
+                android:layout_marginHorizontal="16dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -41,187 +39,293 @@
                     android:padding="8dp"
                     android:src="@drawable/ic_back" />
 
-                <LinearLayout
+                <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:text="我的优惠券"
+                    android:textColor="@color/black"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="我的优惠券"
-                        android:textColor="#FFFFFF"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="下单前自动帮你找到更划算的选择"
-                        android:textColor="#FFE9D6"
-                        android:textSize="12sp" />
-                </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_drawer_top_pill"
+                    android:gravity="center"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:text="自动优选"
+                    android:textColor="#17382F"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/coupon_summary_card"
                 android:layout_width="match_parent"
-                android:layout_height="112dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="18dp"
-                android:background="@drawable/bg_glass_panel_22"
+                android:layout_marginBottom="5dp"
+                android:background="@drawable/bg_card_white_28"
+                android:elevation="2dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="16dp">
 
+                <ImageView
+                    android:layout_width="58dp"
+                    android:layout_height="58dp"
+                    android:background="@drawable/bg_chip_warm"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_coupon1" />
+
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
                     android:layout_weight="1"
-                    android:gravity="center_vertical"
                     android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="可用券包"
-                        android:textColor="#7D3B22"
-                        android:textSize="13sp"
+                        android:textColor="#142D26"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="下单前自动帮你挑出更划算的优惠选择"
+                        android:textColor="#587068"
+                        android:textSize="12sp" />
+
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="3 张"
-                        android:textColor="#351A10"
-                        android:textSize="28sp"
-                        android:textStyle="bold" />
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="26dp"
+                            android:background="@drawable/bg_chip_warm"
+                            android:gravity="center"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:text="3 张可用"
+                            android:textColor="#A85B1F"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="26dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_chip_mint"
+                            android:gravity="center"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:text="最高立减 ¥20"
+                            android:textColor="#1D6F5E"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:fillViewport="true"
+            android:overScrollMode="never"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/title_bar">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="24dp">
+
+                <LinearLayout
+                    android:id="@+id/coupon_filters_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="14dp"
+                    android:background="@drawable/bg_card_white_28"
+                    android:elevation="2dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:text="预计最高可省 ¥20"
-                        android:textColor="#8B5940"
+                        android:text="券包筛选"
+                        android:textColor="#172A2B"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="常用状态入口保留在顶部，方便快速查看可用券、即将过期和兑换渠道。"
+                        android:textColor="#6A7B7C"
                         android:textSize="12sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="42dp"
+                            android:layout_marginEnd="6dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_primary_pill_orange"
+                            android:gravity="center"
+                            android:text="可使用"
+                            android:textColor="#FFFFFF"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="42dp"
+                            android:layout_marginHorizontal="6dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_chip_warm"
+                            android:gravity="center"
+                            android:text="即将过期"
+                            android:textColor="#A85B1F"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="42dp"
+                            android:layout_marginStart="6dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_chip_mint"
+                            android:gravity="center"
+                            android:text="兑换商城"
+                            android:textColor="#1D6F5E"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
                 </LinearLayout>
 
-                <ImageView
-                    android:layout_width="82dp"
-                    android:layout_height="82dp"
-                    android:background="@drawable/bg_chip_warm"
-                    android:padding="18dp"
-                    android:src="@drawable/ic_coupon1" />
+                <LinearLayout
+                    android:id="@+id/coupon_list_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="14dp"
+                    android:layout_marginBottom="5dp"
+                    android:background="@drawable/bg_card_white_28"
+                    android:elevation="2dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="优惠券列表"
+                            android:textColor="#172A2B"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="26dp"
+                            android:background="@drawable/bg_chip_mint"
+                            android:gravity="center"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:text="自动匹配"
+                            android:textColor="#1D6F5E"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="点击优惠券可查看适用范围、有效期与使用说明。"
+                        android:textColor="#6A7B7C"
+                        android:textSize="12sp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_coupon_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:clipToPadding="false"
+                        android:nestedScrollingEnabled="false"
+                        android:paddingBottom="4dp"
+                        android:visibility="@{viewModel.emptyState ? View.GONE : View.VISIBLE}"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+                    <LinearLayout
+                        android:id="@+id/ll_empty_tip"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_order_list_surface"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="26dp"
+                        android:visibility="@{viewModel.emptyState ? View.VISIBLE : View.GONE}">
+
+                        <ImageView
+                            android:layout_width="72dp"
+                            android:layout_height="72dp"
+                            android:background="@drawable/bg_chip_warm"
+                            android:padding="16dp"
+                            android:src="@drawable/ic_coupon" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="暂无可用优惠券"
+                            android:textColor="#172A2B"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center"
+                            android:text="可以通过每日签到、活动任务或金币兑换获得更多优惠。"
+                            android:textColor="#6A7B7C"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/coupon_filter_card"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_marginStart="14dp"
-            android:layout_marginTop="-10dp"
-            android:layout_marginEnd="14dp"
-            android:background="@drawable/bg_soft_card_26"
-            android:elevation="7dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingHorizontal="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ll_describe_container">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="42dp"
-                android:layout_marginHorizontal="4dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_primary_pill_orange"
-                android:gravity="center"
-                android:text="可使用"
-                android:textColor="#FFFFFF"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="42dp"
-                android:layout_marginHorizontal="4dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_chip_warm"
-                android:gravity="center"
-                android:text="即将过期"
-                android:textColor="#A85B1F"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="42dp"
-                android:layout_marginHorizontal="4dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_chip_mint"
-                android:gravity="center"
-                android:text="换券商城"
-                android:textColor="#1D6F5E"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_coupon_list"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="12dp"
-            android:clipToPadding="false"
-            android:paddingHorizontal="12dp"
-            android:paddingBottom="18dp"
-            android:visibility="@{viewModel.emptyState ? View.GONE : View.VISIBLE}"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/coupon_filter_card" />
-
-        <LinearLayout
-            android:id="@+id/ll_empty_tip"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="28dp"
-            android:background="@drawable/bg_soft_card_26"
-            android:elevation="6dp"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="26dp"
-            android:visibility="@{viewModel.emptyState ? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/coupon_filter_card">
-
-            <ImageView
-                android:layout_width="82dp"
-                android:layout_height="82dp"
-                android:background="@drawable/bg_chip_warm"
-                android:padding="18dp"
-                android:src="@drawable/ic_coupon" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="暂无可用优惠券"
-                android:textColor="#172A2B"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:text="可以通过每日签到、活动任务或金币兑换获得更多优惠。"
-                android:textColor="#6A7B7C"
-                android:textSize="13sp" />
-        </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -52,8 +52,7 @@ data class GoodsUiEntity(
     @PrimaryKey val goodsId: Long,
     val pic: String = "",
     val tag: String = "",
-    val unit: String = "",
-    val selectedCount: Int = 0
+    val unit: String = ""
 )
 
 @Entity(

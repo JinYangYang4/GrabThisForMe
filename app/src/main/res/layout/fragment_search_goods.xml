@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.example.grabthisforme.activity.fragment_misc.searchFragment.viewModel.SearchViewModel" />
+            type="com.example.grabthisforme.activity.fragment_misc.search.viewmodel.SearchViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -75,29 +75,20 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <LinearLayout
+            <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/ll_search"
                 android:layout_width="wrap_content"
-                android:layout_height="44dp"
-                android:background="@drawable/bg_search_action_button"
-                android:gravity="center"
-                android:minWidth="72dp"
-                android:paddingHorizontal="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="搜索"
-                    android:textColor="@android:color/white"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                android:paddingStart="3dp"
+                android:paddingEnd="-10dp"
+                android:paddingVertical="30dp"/>
         </LinearLayout>
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/search_scroll_content"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="-20dp"
             android:clipToPadding="false"
             android:fillViewport="true"
             android:paddingBottom="20dp"

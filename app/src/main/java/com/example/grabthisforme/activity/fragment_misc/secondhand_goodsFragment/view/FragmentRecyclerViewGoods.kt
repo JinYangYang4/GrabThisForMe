@@ -8,13 +8,16 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.grabthisforme.activity.fragment_misc.secondhand_goodsFragment.adapter.ConditionRecyclerViewAdapter
 import com.example.grabthisforme.activity.fragment_misc.secondhand_goodsFragment.adapter.SecondhandGoodsRecyclerViewAdapter
+import com.example.grabthisforme.activity.fragment_misc.secondhand_goodsFragment.view.SecondHandGoodFragmentDirections
 import com.example.grabthisforme.activity.fragment_misc.secondhand_goodsFragment.viewModel.SecondHandsViewModel
 import com.example.grabthisforme.databinding.FragmentGoodsRvBinding
 import com.example.grabthisforme.model.goods.domain.Goods
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -50,6 +53,7 @@ class FragmentRecyclerViewGoods : Fragment() {
         binding.rvGoodsCondition.adapter = adapter
         binding.rvGoodsCondition.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        binding.rvGoodsCondition.isNestedScrollingEnabled = false
 
         viewModel.categoryList.observe(viewLifecycleOwner) { list ->
             adapter.submitList(ArrayList(list))
@@ -57,16 +61,27 @@ class FragmentRecyclerViewGoods : Fragment() {
     }
 
     private fun initRecyclerView() {
-        val adapter = SecondhandGoodsRecyclerViewAdapter {}
+        val adapter = SecondhandGoodsRecyclerViewAdapter { goodsId ->
+            val action = SecondHandGoodFragmentDirections
+                .actionSecondHandGoodFragmentToGoodsDetailFragment(goodsId)
+            findNavController().navigate(action)
+        }
         binding.RvOrder.adapter = adapter
         binding.RvOrder.itemAnimator = null
+        binding.RvOrder.isNestedScrollingEnabled = true
         binding.RvOrder.layoutManager =
             StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
         viewModel.filteredGoodsList.observe(viewLifecycleOwner) { goodsList ->
             adapter.submitList(goodsList)
+            binding.emptyState.visibility = if (goodsList.isEmpty()) View.VISIBLE else View.GONE
             binding.tv1.visibility = if (goodsList.isEmpty()) View.VISIBLE else View.GONE
         }
+    }
+
+    private fun dp2px(dp: Int): Int {
+        val density = resources.displayMetrics.density
+        return (dp * density + 0.5f).toInt()
     }
 
     private fun requireGoodsCategory(): Goods.GoodsCategory {

@@ -8,24 +8,22 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
+import com.example.grabthisforme.activity.LoginActivity.ui_model.SwitchAccountItemUiModel
 import com.example.grabthisforme.databinding.RvSwitchAccountItemBinding
-import com.example.grabthisforme.model.user.domain.User
 
 class SwitchAccountsRecyclerViewAdapter(
-    private val onItemClick: (User) -> Unit,
-    private val onIvCurrentClick: (User) -> Unit
-) : ListAdapter<User, SwitchAccountsRecyclerViewAdapter.UserViewHolder>(UserDiffCallback()) {
+    private val onItemClick: (SwitchAccountItemUiModel) -> Unit,
+    private val onIvCurrentClick: (SwitchAccountItemUiModel) -> Unit
+) : ListAdapter<SwitchAccountItemUiModel, SwitchAccountsRecyclerViewAdapter.UserViewHolder>(UserDiffCallback()) {
     class UserViewHolder(private val binding: RvSwitchAccountItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: User,onItemClick: (User) -> Unit,onIvCurrentClick: (User) -> Unit) {
-            val user = item
+        fun bind(item: SwitchAccountItemUiModel,onItemClick: (SwitchAccountItemUiModel) -> Unit,onIvCurrentClick: (SwitchAccountItemUiModel) -> Unit) {
             binding.apply {
-
-                tvStatus.text = user.name
-                tvAccount.text = user.id.toString()
-                if (user.headPic.isNotEmpty()) {
+                tvStatus.text = item.displayName
+                tvAccount.text = item.accountText
+                if (!item.avatarUrl.isNullOrEmpty()) {
                     Glide.with(ivAvatar.context)
-                        .load(user.headPic)
+                        .load(item.avatarUrl)
                         .circleCrop()
                         .into(ivAvatar)
                 } else {
@@ -33,10 +31,10 @@ class SwitchAccountsRecyclerViewAdapter(
                 }
                 ivCurrent.visibility = if (item.isCurrent) View.GONE else View.VISIBLE
                 root.setOnClickListener {
-                    onItemClick(user)
+                    onItemClick(item)
                 }
                 ivCurrent.setOnClickListener {
-                onIvCurrentClick(item)
+                    onIvCurrentClick(item)
                 }
             }
         }
@@ -52,12 +50,12 @@ class SwitchAccountsRecyclerViewAdapter(
         holder.bind(getItem(position),onItemClick,onIvCurrentClick)
     }
 
-    class UserDiffCallback : DiffUtil.ItemCallback<User>() {
-        override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
-            return oldItem.id == newItem.id
+    class UserDiffCallback : DiffUtil.ItemCallback<SwitchAccountItemUiModel>() {
+        override fun areItemsTheSame(oldItem: SwitchAccountItemUiModel, newItem: SwitchAccountItemUiModel): Boolean {
+            return oldItem.userId == newItem.userId
         }
-        override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
-            return oldItem.id == newItem.id && oldItem.name == newItem.name
+        override fun areContentsTheSame(oldItem: SwitchAccountItemUiModel, newItem: SwitchAccountItemUiModel): Boolean {
+            return oldItem == newItem
         }
     }
 

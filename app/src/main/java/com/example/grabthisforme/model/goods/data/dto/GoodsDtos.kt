@@ -17,8 +17,7 @@ data class GoodsPriceDto(
 data class GoodsUiDto(
     val pic: String = "",
     val tag: String = "",
-    val unit: String = "",
-    val selectedCount: Int = 0
+    val unit: String = ""
 )
 
 data class GoodsStateDto(

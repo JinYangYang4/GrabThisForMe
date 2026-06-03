@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.fragment_misc.storeFragment.viewModel.StoreViewModel
-import com.example.grabthisforme.activity.homeFragment.adapter.SearchHistoryRecyclerViewAdapter
+import com.example.grabthisforme.activity.fragment_misc.search.adapter.SearchHistoryRecyclerViewAdapter
 import com.example.grabthisforme.databinding.FragmentStoreSearchBinding
 import dagger.hilt.android.AndroidEntryPoint
 

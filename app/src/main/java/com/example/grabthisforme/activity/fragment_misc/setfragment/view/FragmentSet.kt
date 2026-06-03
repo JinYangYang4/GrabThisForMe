@@ -51,7 +51,7 @@ class FragmentSet : Fragment() {
         binding.itemSwitchAccount.setOnClickListener {
             Toast.makeText(
                 requireContext(),
-                "\u53ef\u6269\u5c55\u4e3a\u591a\u8d26\u53f7\u5207\u6362\u4e0e\u6821\u56ed\u8eab\u4efd\u7ba1\u7406",
+                "可扩展为多账号切换与校园身份管理",
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -59,7 +59,7 @@ class FragmentSet : Fragment() {
         binding.itemLogout.setOnClickListener {
             Toast.makeText(
                 requireContext(),
-                "\u5f53\u524d\u9875\u9762\u5df2\u9884\u7559\u9000\u767b\u5165\u5165\u53e3\uff0c\u53ef\u63a5\u7edf\u4e00\u767b\u51fa\u6d41\u7a0b",
+                "当前页面已预留退登入入口，可接统一登出流程",
                 Toast.LENGTH_SHORT
             ).show()
         }

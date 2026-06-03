@@ -13,6 +13,7 @@ import com.example.grabthisforme.activity.fragment_misc.my_store.adapter.MyStore
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.fragment_misc.my_store.viewmodel.MyStoreViewModel
 import com.example.grabthisforme.databinding.FragmentMyStoreBinding
+import com.example.grabthisforme.util.ViewAnimationUtils
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -38,11 +39,12 @@ class FragmentMyStore : Fragment() {
         initRecyclerView()
         initView()
         initObserve()
+        ViewAnimationUtils.animateStaggeredEntrance(binding.statsCard, binding.storeActionCard)
     }
 
     private fun initRecyclerView() {
         storeAdapter = MyStoreRecyclerViewAdapter {
-            val dir = FragmentMyStoreDirections.actionFragmentMyStoreToStoreOwnerFragment(it.id)
+            val dir = FragmentMyStoreDirections.actionFragmentMyStoreToStoreOwnerFragment(it.storeId)
             findNavController().navigate(dir)
         }
         binding.rvStoreList.apply {

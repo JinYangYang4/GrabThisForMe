@@ -1,24 +1,21 @@
 package com.example.grabthisforme.activity.informationFragment.adapter
 
-
-import com.example.grabthisforme.R
-import com.example.grabthisforme.databinding.RvMessageItemBinding
-
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-
 import androidx.recyclerview.widget.RecyclerView
-import com.example.grabthisforme.model.conversation.domain.Conversation
-
-import java.text.SimpleDateFormat
-import java.util.*
+import com.bumptech.glide.Glide
+import com.example.grabthisforme.R
+import com.example.grabthisforme.activity.informationFragment.ui_model.ConversationListItemUiModel
+import com.example.grabthisforme.databinding.RvMessageItemBinding
 
 class ConversationRecyclerViewAdapter(
-    private val clickListener: (conversationId: String) -> Unit
-) : ListAdapter<Conversation, ConversationRecyclerViewAdapter.ViewHolder>(
+    private val clickListener: (conversationId: String) -> Unit,
+    private val longClickListener: (anchor: View, item: ConversationListItemUiModel) -> Unit
+) : ListAdapter<ConversationListItemUiModel, ConversationRecyclerViewAdapter.ViewHolder>(
     ViewHolder.MessageDiffCallback()
 ) {
 
@@ -27,8 +24,7 @@ class ConversationRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val conversation = getItem(position)
-        holder.bind(conversation, clickListener)
+        holder.bind(getItem(position), clickListener, longClickListener)
     }
 
     class ViewHolder(val binding: RvMessageItemBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -41,45 +37,52 @@ class ConversationRecyclerViewAdapter(
             }
         }
 
-        fun bind(conversation: Conversation, clickListener: (String) -> Unit) {
-            // 绑定聊天的用户数据
-            when (val peer = conversation.conversationPeer) {
-                is Conversation.ConversationPeer.Single -> {
-                    binding.tvName.text = peer.user?.name
-                    binding.ivAvatar.setImageResource(R.drawable.ic_back_charactor2)
-                }
-                is Conversation.ConversationPeer.Group -> {
-                    binding.tvName.text = "Group Chat"
-                    binding.ivAvatar.setImageResource(R.drawable.ic_back_charactor2)
-                }
+        fun bind(
+            item: ConversationListItemUiModel,
+            clickListener: (String) -> Unit,
+            longClickListener: (anchor: View, item: ConversationListItemUiModel) -> Unit
+        ) {
+            binding.tvName.text = item.title
+            binding.tvLastMsg.text = item.lastMessageText
+            binding.tvTime.text = item.timeText
+
+            if (item.showUnreadBadge) {
+                binding.unreadBadge.visibility = View.VISIBLE
+                binding.unreadBadge.text = item.unreadCount.coerceAtMost(99).toString()
+            } else {
+                binding.unreadBadge.visibility = View.GONE
             }
 
+            Glide.with(binding.root.context)
+                .load(item.avatarUrl)
+                .placeholder(R.drawable.ic_back_charactor2)
+                .error(R.drawable.ic_back_charactor2)
+                .into(binding.ivAvatar)
 
-            binding.tvLastMsg.text = conversation.lastMessage.content
-            binding.tvTime.text = formatTimestampToDateTime(conversation.lastTime)
-
-            // 点击事件：点击跳转到聊天界面
             binding.root.setOnClickListener {
-                clickListener(conversation.conversationId)
+                clickListener(item.conversationId)
+            }
+            binding.root.setOnLongClickListener { anchor ->
+                longClickListener(anchor, item)
+                true
             }
         }
 
-        class MessageDiffCallback : DiffUtil.ItemCallback<Conversation>() {
-            override fun areItemsTheSame(oldItem: Conversation, newItem: Conversation): Boolean {
+        class MessageDiffCallback : DiffUtil.ItemCallback<ConversationListItemUiModel>() {
+            override fun areItemsTheSame(
+                oldItem: ConversationListItemUiModel,
+                newItem: ConversationListItemUiModel
+            ): Boolean {
                 return oldItem.conversationId == newItem.conversationId
             }
 
             @SuppressLint("DiffUtilEquals")
-            override fun areContentsTheSame(oldItem: Conversation, newItem: Conversation): Boolean {
+            override fun areContentsTheSame(
+                oldItem: ConversationListItemUiModel,
+                newItem: ConversationListItemUiModel
+            ): Boolean {
                 return oldItem == newItem
             }
-        }
-
-        private fun formatTimestampToDateTime(timestamp: Long): String {
-            val timeInMillis = if (timestamp.toString().length == 10) timestamp * 1000 else timestamp
-            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-            val date = Date(timeInMillis)
-            return sdf.format(date)
         }
     }
 }

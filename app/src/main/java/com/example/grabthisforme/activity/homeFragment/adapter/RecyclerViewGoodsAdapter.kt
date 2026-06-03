@@ -11,10 +11,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.databinding.RvGoodsItemBinding
-import com.example.grabthisforme.model.goods.domain.Goods
+import com.example.grabthisforme.activity.homeFragment.ui_model.HomeStorePreviewItemUiModel
 
 class RecyclerViewGoodsAdapter(
-    private val clickListener: (goodsId: Long) -> Unit) : ListAdapter<Goods, RecyclerViewGoodsAdapter.ViewHolder>(
+    private val clickListener: (goodsId: Long) -> Unit) : ListAdapter<HomeStorePreviewItemUiModel, RecyclerViewGoodsAdapter.ViewHolder>(
     GoodsDiffItemCallback()) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -39,39 +39,41 @@ class RecyclerViewGoodsAdapter(
                 return ViewHolder(binding)
             }
         }
-        fun bind(goods : Goods,clickListener: (Long) -> Unit){
-            if (goods.id == -1L){
+        fun bind(goods : HomeStorePreviewItemUiModel,clickListener: (Long) -> Unit){
+            if (goods.isMoreEntry){
                 binding.llTintIntoStore.visibility = View.VISIBLE
                 binding.llGoods.visibility = View.GONE
             }else{
                 binding.llTintIntoStore.visibility = View.GONE
                 binding.llGoods.visibility = View.VISIBLE
             }
-            binding.goodsPrice.text = goods.price.toString()
-            binding.goodsMessage.text = goods.name
+            binding.goodsPrice.text = goods.priceText
+            binding.goodsMessage.text = goods.title
             Glide.with(binding.root.context)
-                .load(goods.pic)
+                .load(goods.imageUrl)
                 .error(R.drawable.food_pic)
                 .placeholder(R.drawable.food_pic)
                 .into(binding.ivGoodsPic)
+            binding.root.setOnClickListener {
+                goods.goodsId?.let(clickListener)
+            }
         }
 
     }
-    class GoodsDiffItemCallback: DiffUtil.ItemCallback<Goods>(){
+    class GoodsDiffItemCallback: DiffUtil.ItemCallback<HomeStorePreviewItemUiModel>(){
         override fun areItemsTheSame(
-            oldItem: Goods,
-            newItem: Goods
+            oldItem: HomeStorePreviewItemUiModel,
+            newItem: HomeStorePreviewItemUiModel
         ): Boolean {
-            return oldItem == newItem
+            return oldItem.goodsId == newItem.goodsId && oldItem.isMoreEntry == newItem.isMoreEntry
         }
         override fun areContentsTheSame(
-            oldItem: Goods,
-            newItem: Goods
+            oldItem: HomeStorePreviewItemUiModel,
+            newItem: HomeStorePreviewItemUiModel
         ): Boolean {
-            return oldItem.id  == newItem.id
+            return oldItem == newItem
         }
 
     }
 
 }
-

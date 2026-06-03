@@ -63,7 +63,7 @@ internal object UserSampleData {
                         email = "test_${UUID.randomUUID().toString().substring(0, 6)}@example.com",
                     gender = (0..1).random(),
                     isVip = Math.random() > 0.5,
-                    signature = "virtual user signature",
+                    signature = "虚拟用户签名",
                     likeCount = (100..999).random().toLong(),
                     fanCount = (50..500).random().toLong(),
                     followCount = (20..300).random().toLong()

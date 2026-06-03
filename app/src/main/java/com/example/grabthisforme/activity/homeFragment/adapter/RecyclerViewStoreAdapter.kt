@@ -8,18 +8,34 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
+import com.example.grabthisforme.activity.homeFragment.ui_model.HomeStoreCardUiModel
 import com.example.grabthisforme.databinding.RvStoreItemBinding
-import com.example.grabthisforme.model.goods.domain.Goods
-import com.example.grabthisforme.model.store.domain.Store
 
 class RecyclerViewStoreAdapter(
-    private var onStoreClickListener: ((Store) -> Unit)? = null,
-) : ListAdapter<Store, RecyclerViewStoreAdapter.StoreViewHolder>(StoreDiffCallback()) {
+    private val clickListener: (storeId: Long) -> Unit
+) : ListAdapter<HomeStoreCardUiModel, RecyclerViewStoreAdapter.ViewHolder>(
+    ViewHolder.StoreDiffItemCallback()
+) {
 
-    inner class StoreViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+        ViewHolder.inflateFrom(parent)
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(getItem(position), clickListener)
+    }
+
+    class ViewHolder(
         private val binding: RvStoreItemBinding
     ) : RecyclerView.ViewHolder(binding.root) {
         private lateinit var goodsAdapter: RecyclerViewGoodsAdapter
+
+        companion object {
+            fun inflateFrom(parent: ViewGroup): ViewHolder {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val binding = RvStoreItemBinding.inflate(layoutInflater, parent, false)
+                return ViewHolder(binding)
+            }
+        }
 
         init {
             binding.rvGoods.apply {
@@ -29,57 +45,43 @@ class RecyclerViewStoreAdapter(
             }
         }
 
-        fun bind(store: Store) {
-            binding.tvStore.text = store.name.ifBlank { "校园店铺" }
-            binding.tvSaleNumber.text = "已售 ${store.salesVolume}"
-            binding.tvDistance.text = "约 1km"
+        fun bind(item: HomeStoreCardUiModel, clickListener: (Long) -> Unit) {
+            binding.tvStore.text = item.storeName
+            binding.tvSaleNumber.text = item.salesText
+            binding.tvDistance.text = item.distanceText
 
             goodsAdapter = RecyclerViewGoodsAdapter {}
             binding.rvGoods.adapter = goodsAdapter
-
-            var sourceGoods = if (store.goodsAll.isNotEmpty()) store.goodsAll else Goods.get20RepeatGoods()
-            if (sourceGoods.size > 15) {
-                sourceGoods = sourceGoods.take(14)
-            }
-            val goodsMutableList = sourceGoods.toMutableList()
-            goodsMutableList.add(Goods(-1L))
-            goodsAdapter.submitList(goodsMutableList)
+            goodsAdapter.submitList(item.previewGoods)
 
             itemView.setOnClickListener {
-                onStoreClickListener?.invoke(store)
+                clickListener.invoke(item.storeId)
             }
             itemView.alpha = 0f
             itemView.translationY = 18f
             itemView.animate().alpha(1f).translationY(0f).setDuration(260L).start()
 
             Glide.with(binding.root.context)
-                .load(store.pic)
+                .load(item.storeImageUrl)
                 .error(R.drawable.ic_store)
                 .placeholder(R.drawable.ic_store)
                 .into(binding.ivStore)
         }
-    }
 
-    class StoreDiffCallback : DiffUtil.ItemCallback<Store>() {
-        override fun areItemsTheSame(oldItem: Store, newItem: Store): Boolean {
-            return oldItem.id == newItem.id
+        class StoreDiffItemCallback : DiffUtil.ItemCallback<HomeStoreCardUiModel>() {
+            override fun areItemsTheSame(
+                oldItem: HomeStoreCardUiModel,
+                newItem: HomeStoreCardUiModel
+            ): Boolean {
+                return oldItem.storeId == newItem.storeId
+            }
+
+            override fun areContentsTheSame(
+                oldItem: HomeStoreCardUiModel,
+                newItem: HomeStoreCardUiModel
+            ): Boolean {
+                return oldItem == newItem
+            }
         }
-
-        override fun areContentsTheSame(oldItem: Store, newItem: Store): Boolean {
-            return oldItem == newItem
-        }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoreViewHolder {
-        val binding = RvStoreItemBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
-        return StoreViewHolder(binding)
-    }
-
-    override fun onBindViewHolder(holder: StoreViewHolder, position: Int) {
-        holder.bind(getItem(position))
     }
 }

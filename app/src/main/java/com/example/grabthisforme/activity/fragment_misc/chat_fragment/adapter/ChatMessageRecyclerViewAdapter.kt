@@ -1,83 +1,110 @@
 package com.example.grabthisforme.activity.fragment_misc.chat_fragment.adapter
 
-
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bigkoo.pickerview.view.WheelTime.dateFormat
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
+import com.example.grabthisforme.activity.fragment_misc.chat_fragment.ui_model.MessageUiModel
 import com.example.grabthisforme.databinding.RvChatMessageItemBinding
-import com.example.grabthisforme.model.messageContent.domain.MessageContent
-import java.util.Date
+import com.example.grabthisforme.model.message.domain.Message
 
-typealias OnImageClick = (MessageContent) -> Unit
-class ChatMessageRecyclerViewAdapter(private val clickListener : (MessageContent) -> Unit,private val onImageClick: OnImageClick) : ListAdapter<MessageContent, ChatMessageRecyclerViewAdapter.ViewHolder>(MessageDiffCallback()) {
-    inner class ViewHolder(private val binding: RvChatMessageItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(message: MessageContent,clickListener: (MessageContent) -> Unit) {
+typealias OnImageClick = (MessageUiModel) -> Unit
+typealias OnPeerAvatarClick = (Long) -> Unit
+
+class ChatMessageRecyclerViewAdapter(
+    private val clickListener: (MessageUiModel) -> Unit,
+    private val onImageClick: OnImageClick,
+    private val onPeerAvatarClick: OnPeerAvatarClick
+) : ListAdapter<MessageUiModel, ChatMessageRecyclerViewAdapter.ViewHolder>(MessageDiffCallback()) {
+
+    inner class ViewHolder(private val binding: RvChatMessageItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(message: MessageUiModel, clickListener: (MessageUiModel) -> Unit) {
             if (message.isMine) {
-                if (message.type == MessageContent.MessageType.IMAGE){
-                    binding.ivSendImage.visibility = View.VISIBLE
-                    binding.tvSendContent.visibility = View.GONE
-                    val context = binding.root.context
-                    Glide.with(context)
-                        .load(message.mediaUrl)
-                        .placeholder(R.drawable.ic_back_charactor2)
-                        .error(R.drawable.ic_back_charactor2)
-                        .into(binding.ivSendImage)
-                    binding.ivSendImage.setOnClickListener {
-                        message.mediaUrl?.let {
-                            onImageClick.invoke(message)
-                        }
-                    }
-                }else{
-                    binding.ivSendImage.visibility = View.GONE
-                    binding.tvSendContent.visibility = View.VISIBLE
-                    binding.tvSendContent.text = message.content ?: ""
-                }
-                binding.llSendMessage.visibility = View.VISIBLE
-                binding.llReceiveMessage.visibility = View.GONE
+                bindMineMessage(message)
             } else {
-                if (message.type == MessageContent.MessageType.IMAGE){
-                    binding.ivReceiveImage.visibility = View.VISIBLE
-                    binding.tvReceiveContent.visibility = View.GONE
-                    val context = binding.root.context
-                    Glide.with(context)
-                        .load(message.mediaUrl)
-                        .placeholder(R.drawable.ic_back_charactor2)
-                        .error(R.drawable.ic_back_charactor2)
-                        .into(binding.ivReceiveImage)
-                    binding.ivReceiveImage.setOnClickListener {
-                        message.mediaUrl?.let {
-                            onImageClick.invoke(message)
-                        }
-                    }
-                }else{
-                    binding.ivReceiveImage.visibility = View.GONE
-                    binding.tvReceiveContent.visibility = View.VISIBLE
-                    binding.tvReceiveContent.text = message.content ?: ""
-                }
-                binding.llReceiveMessage.visibility = View.VISIBLE
-                binding.llSendMessage.visibility = View.GONE
+                bindPeerMessage(message)
             }
-            if (message.need_show_time){
+
+            if (message.showTime) {
                 binding.llTime.visibility = View.VISIBLE
-                val timeStr = dateFormat.format(Date(message.timestamp))
-                binding.tvTime.text = timeStr
-                Log.d("test11", "bind: $timeStr")
-            }else{
+                binding.tvTime.text = message.timeText
+            } else {
                 binding.llTime.visibility = View.GONE
-                Log.d("test11", "bind:")
             }
+
             binding.root.setOnClickListener {
                 clickListener.invoke(message)
             }
         }
 
+        private fun bindMineMessage(message: MessageUiModel) {
+            Glide.with(binding.root.context)
+                .load(message.senderAvatarUrl)
+                .placeholder(R.drawable.ic_back_charactor2)
+                .error(R.drawable.ic_back_charactor2)
+                .into(binding.ivSendAvatar)
+
+            if (message.type == Message.MessageType.IMAGE) {
+                binding.ivSendImage.visibility = View.VISIBLE
+                binding.tvSendContent.visibility = View.GONE
+                Glide.with(binding.root.context)
+                    .load(message.mediaUrl)
+                    .placeholder(R.drawable.ic_back_charactor2)
+                    .error(R.drawable.ic_back_charactor2)
+                    .into(binding.ivSendImage)
+                binding.ivSendImage.setOnClickListener {
+                    if (!message.mediaUrl.isNullOrBlank()) {
+                        onImageClick.invoke(message)
+                    }
+                }
+            } else {
+                binding.ivSendImage.visibility = View.GONE
+                binding.tvSendContent.visibility = View.VISIBLE
+                binding.tvSendContent.text = message.content.orEmpty()
+                binding.ivSendImage.setOnClickListener(null)
+            }
+            binding.llSendMessage.visibility = View.VISIBLE
+            binding.llReceiveMessage.visibility = View.GONE
+        }
+
+        private fun bindPeerMessage(message: MessageUiModel) {
+            Glide.with(binding.root.context)
+                .load(message.senderAvatarUrl)
+                .placeholder(R.drawable.ic_back_charactor2)
+                .error(R.drawable.ic_back_charactor2)
+                .into(binding.ivReceiveAvatar)
+            binding.ivReceiveAvatar.setOnClickListener {
+                onPeerAvatarClick.invoke(message.senderId)
+            }
+
+            if (message.type == Message.MessageType.IMAGE) {
+                binding.ivReceiveImage.visibility = View.VISIBLE
+                binding.tvReceiveContent.visibility = View.GONE
+                Glide.with(binding.root.context)
+                    .load(message.mediaUrl)
+                    .placeholder(R.drawable.ic_back_charactor2)
+                    .error(R.drawable.ic_back_charactor2)
+                    .into(binding.ivReceiveImage)
+                binding.ivReceiveImage.setOnClickListener {
+                    if (!message.mediaUrl.isNullOrBlank()) {
+                        onImageClick.invoke(message)
+                    }
+                }
+            } else {
+                binding.ivReceiveImage.visibility = View.GONE
+                binding.tvReceiveContent.visibility = View.VISIBLE
+                binding.tvReceiveContent.text = message.content.orEmpty()
+                binding.ivReceiveImage.setOnClickListener(null)
+            }
+            binding.llReceiveMessage.visibility = View.VISIBLE
+            binding.llSendMessage.visibility = View.GONE
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -90,14 +117,15 @@ class ChatMessageRecyclerViewAdapter(private val clickListener : (MessageContent
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position),clickListener)
+        holder.bind(getItem(position), clickListener)
     }
-    class MessageDiffCallback : DiffUtil.ItemCallback<MessageContent>() {
-        override fun areItemsTheSame(oldItem: MessageContent, newItem: MessageContent): Boolean {
+
+    class MessageDiffCallback : DiffUtil.ItemCallback<MessageUiModel>() {
+        override fun areItemsTheSame(oldItem: MessageUiModel, newItem: MessageUiModel): Boolean {
             return oldItem.messageId == newItem.messageId
         }
 
-        override fun areContentsTheSame(oldItem: MessageContent, newItem: MessageContent): Boolean {
+        override fun areContentsTheSame(oldItem: MessageUiModel, newItem: MessageUiModel): Boolean {
             return oldItem == newItem
         }
     }

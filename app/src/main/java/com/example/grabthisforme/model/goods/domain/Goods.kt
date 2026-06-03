@@ -13,7 +13,7 @@ open class Goods(
     val storeId: Long get() = baseInfo.storeId
     val name: String get() = baseInfo.name
     val message: String get() = baseInfo.message
-    val category: Goods.GoodsCategory? get() = baseInfo.category
+    val category: GoodsCategory? get() = baseInfo.category
     val price: Double get() = priceInfo.price
     val discountPrice: Double get() = priceInfo.discountPrice
     val discountTag: String get() = priceInfo.discountTag
@@ -27,11 +27,6 @@ open class Goods(
     val isHot: Boolean get() = stateInfo.isHot
     val purchaseStatus: Int get() = stateInfo.purchaseStatus
     val soldCount: Long get() = stateInfo.soldCount
-    var selectedCount: Int
-        get() = uiInfo.selectedCount
-        set(value) {
-            uiInfo = uiInfo.copy(selectedCount = value)
-        }
 
     constructor(
         id: Long,
@@ -50,8 +45,7 @@ open class Goods(
         isHot: Boolean = false,
         purchaseStatus: Int = GoodsStateInfo.PURCHASE_STATUS_NO_PURCHASE,
         soldCount: Long = 0L,
-        unit: String = "",
-        selectedCount: Int = 0
+        unit: String = ""
     ) : this(
         baseInfo = GoodsBaseInfo(
             id = id,
@@ -68,8 +62,7 @@ open class Goods(
         uiInfo = GoodsUiInfo(
             pic = pic,
             tag = tag,
-            unit = unit,
-            selectedCount = selectedCount
+            unit = unit
         ),
         stateInfo = GoodsStateInfo(
             saleNumber = sale_number,
@@ -83,29 +76,6 @@ open class Goods(
 
     fun getLocationInfo(): String {
         return "${name.ifBlank { "商品" }}：$message"
-    }
-
-    fun withSelectedCount(selectedCount: Int): Goods {
-        return Goods(
-            id = id,
-            storeId = storeId,
-            name = name,
-            message = message,
-            price = price,
-            sale_number = saleNumber,
-            pic = pic,
-            category = category,
-            discountPrice = discountPrice,
-            discountTag = discountTag,
-            tag = tag,
-            stock = stock,
-            isSoldOut = isSoldOut,
-            isHot = isHot,
-            purchaseStatus = purchaseStatus,
-            soldCount = soldCount,
-            unit = unit,
-            selectedCount = selectedCount
-        )
     }
 
     companion object {

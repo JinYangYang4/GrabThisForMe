@@ -1,46 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
         <import type="android.view.View" />
+
         <variable
             name="viewModel"
-            type="com.example.grabthisforme.activity.fragment_misc.searchCommunityFragment.viewModle.SearchCommunityViewModel" />
+            type="com.example.grabthisforme.activity.fragment_misc.search.community.viewmodel.SearchCommunityViewModel" />
     </data>
-    <LinearLayout
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/gray_light"
-        android:orientation="vertical">
+        android:background="@drawable/bg_search_screen">
+
         <LinearLayout
+            android:id="@+id/search_header"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:layout_marginTop="30dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp">
-            <ImageView
-                android:id="@+id/iv_back"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_back"
-                android:layout_marginEnd="10dp"/>
+            android:paddingStart="16dp"
+            android:paddingTop="22dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <FrameLayout
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_search_icon_button">
+
+                <ImageView
+                    android:id="@+id/iv_back"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_back" />
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="36dp"
-                android:layout_marginEnd="10dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_chat_massage"
+                android:background="@drawable/bg_search_input_shell"
                 android:gravity="center_vertical"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp">
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp">
 
                 <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_search"
-                    android:layout_marginEnd="8dp"/>
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginEnd="8dp"
+                    android:alpha="0.55"
+                    android:src="@drawable/ic_search" />
 
                 <EditText
                     android:id="@+id/et_search"
@@ -48,177 +65,306 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@null"
-                    android:hint="搜索话题"
-                    android:textColor="@android:color/black"
-                    android:textColorHint="@color/gray_mid"
+                    android:hint="搜你关心的校园话题"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:singleLine="true"
                     android:text="@{viewModel.searchInput}"
-                    android:textSize="13sp"
-                    android:singleLine="true"/>
-
+                    android:textColor="@android:color/black"
+                    android:textColorHint="#8A7E74"
+                    android:textSize="14sp" />
             </LinearLayout>
 
-            <LinearLayout
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/ll_search"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/ll_search"
-                android:paddingVertical = "4dp"
-                android:paddingHorizontal="10dp"
-                android:background="@drawable/bg_rounded_white_radius_small"
-                android:backgroundTint="@color/green_light">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:layout_margin="3dp"
-                    android:text="搜索"
-                    android:textColor="@color/white_fff8"/>
-            </LinearLayout>
+                android:paddingStart="3dp"
+                android:paddingEnd="-10dp"
+                android:paddingVertical="30dp" />
         </LinearLayout>
+
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:fillViewport="true"
+            android:layout_marginTop="-20dp"
+            android:paddingBottom="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/search_header">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <LinearLayout
+                android:orientation="vertical"
+                android:paddingTop="8dp">
+
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_round_stripe_green"
-                    android:backgroundTint="@color/white_fff8"
-                    android:orientation="vertical"
-                    android:layout_margin="10dp"
-                    android:padding="10dp"
-                    android:gravity="center"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginHorizontal="16dp"
+                    app:cardBackgroundColor="#FDFBF8"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#DBE7DE"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical">
+                        android:orientation="vertical"
+                        android:paddingStart="16dp"
+                        android:paddingTop="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="18dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="历史记录"
-                            android:textColor="@android:color/black"
-                            android:textSize="13sp"
-                            android:textStyle="bold"/>
-
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"/>
                         <LinearLayout
-                            android:id="@+id/ll_delete"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:visibility="@{viewModel.deleteMode ? View.VISIBLE : View.GONE}"
                             android:gravity="center_vertical">
-                            <TextView
+
+                            <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:id="@+id/tv_delete_all"
-                                android:text="删除全部"
-                                android:textSize="10sp"
-                                android:layout_marginHorizontal="5dp"/>
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="最近搜索"
+                                    android:textColor="@android:color/black"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="3dp"
+                                    android:text="保留最近常搜话题，回到社区时更容易接上讨论"
+                                    android:textColor="#8A7E74"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+
                             <View
-                                android:layout_width="1dp"
-                                android:layout_height="12dp"
-                                android:background="@color/black"/>
-                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1" />
+
+                            <LinearLayout
+                                android:id="@+id/ll_delete"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:id="@+id/tv_complete"
-                                android:text="完成"
-                                android:textSize="10sp"
-                                android:layout_marginHorizontal="5dp"/>
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:visibility="@{viewModel.deleteMode ? View.VISIBLE : View.GONE}">
+
+                                <TextView
+                                    android:id="@+id/tv_delete_all"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="全部删除"
+                                    android:textColor="#6B635D"
+                                    android:textSize="12sp" />
+
+                                <View
+                                    android:layout_width="1dp"
+                                    android:layout_height="12dp"
+                                    android:layout_marginHorizontal="8dp"
+                                    android:background="#CABFB6" />
+
+                                <TextView
+                                    android:id="@+id/tv_complete"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="完成"
+                                    android:textColor="#4B9164"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <ImageView
+                                android:id="@+id/iv_clear"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:alpha="0.65"
+                                android:src="@drawable/ic_delete"
+                                android:visibility="@{!viewModel.historyEmpty &amp;&amp; !viewModel.deleteMode ? View.VISIBLE : View.GONE}" />
                         </LinearLayout>
 
-                        <ImageView
-                            android:id="@+id/iv_clear"
-                            android:layout_width="13dp"
-                            android:layout_height="13dp"
-                            android:visibility="@{!viewModel.historyEmpty &amp;&amp; !viewModel.deleteMode ? View.VISIBLE : View.GONE}"
-                            android:src="@drawable/ic_delete" />
-                    </LinearLayout>
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:background="@color/gray_translucent_dark" />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="14dp"
+                            android:background="#EAE2DB" />
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_history"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:visibility="@{viewModel.historyEmpty ? View.GONE : View.VISIBLE}"
-                        android:layout_marginTop="8dp" />
-                    <TextView
-                        android:id="@+id/tv_not_history"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="暂无"
-                        android:visibility="@{viewModel.historyEmpty ? View.VISIBLE : View.GONE}" />
-                </LinearLayout>
-                <LinearLayout
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_history"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:visibility="@{viewModel.historyEmpty ? View.GONE : View.VISIBLE}" />
+
+                        <TextView
+                            android:id="@+id/tv_not_history"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="18dp"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="10dp"
+                            android:text="还没有话题搜索记录，先去翻翻校园里大家在聊什么"
+                            android:textColor="#8A7E74"
+                            android:textSize="13sp"
+                            android:visibility="@{viewModel.historyEmpty ? View.VISIBLE : View.GONE}" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="22dp"
+                    android:text="社区灵感"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="6dp"
+                    android:text="看看最近活跃的话题，再决定你想加入哪段讨论"
+                    android:textColor="#8A7E74"
+                    android:textSize="13sp" />
+
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_round_stripe_green"
-                    android:backgroundTint="@color/white_fff8"
-                    android:orientation="vertical"
-                    android:layout_margin="10dp"
-                    android:padding="10dp"
-                    android:gravity="center"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="14dp"
+                    app:cardBackgroundColor="#FDFBF8"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#DBE7DE"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical">
+                        android:orientation="vertical"
+                        android:paddingStart="16dp"
+                        android:paddingTop="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="18dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="推荐搜索"
+                                    android:textColor="@android:color/black"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="3dp"
+                                    android:text="精选更容易展开讨论的关键词"
+                                    android:textColor="#8A7E74"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1" />
+
+                            <ImageView
+                                android:id="@+id/iv_refresh"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_marginEnd="16dp"
+                                android:alpha="0.7"
+                                android:src="@drawable/ic_refresh" />
+
+                            <ImageView
+                                android:id="@+id/iv_inner"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:alpha="0.7"
+                                android:src="@drawable/ic_show" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="14dp"
+                            android:background="#EAE2DB" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_recomment"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:visibility="@{viewModel.recommendVisible ? View.VISIBLE : View.GONE}" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="14dp"
+                    app:cardBackgroundColor="#FDFBF8"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#DBE7DE"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingStart="16dp"
+                        android:paddingTop="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="16dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="推荐搜索"
+                            android:text="AI 话题助手"
                             android:textColor="@android:color/black"
-                            android:textSize="13sp"
-                            android:textStyle="bold"/>
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
 
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"/>
-                        <ImageView
-                            android:id="@+id/iv_refresh"
-                            android:layout_width="13dp"
-                            android:layout_height="13dp"
-                            android:src="@drawable/ic_refresh"
-                            android:layout_marginEnd="20dp"/>
-                        <ImageView
-                            android:id="@+id/iv_inner"
-                            android:layout_width="13dp"
-                            android:layout_height="13dp"
-                            android:src="@drawable/ic_show" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:text="没想好怎么搜时，让 AI 先帮你补全思路"
+                            android:textColor="#8A7E74"
+                            android:textSize="12sp" />
+
+                        <androidx.compose.ui.platform.ComposeView
+                            android:id="@+id/ll_intent_to_ai"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp" />
                     </LinearLayout>
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:background="@color/gray_translucent_dark" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_recomment"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:visibility="@{viewModel.recommendVisible ? View.VISIBLE : View.GONE}"
-                        android:layout_marginTop="8dp" />
-                </LinearLayout>
-                <androidx.compose.ui.platform.ComposeView
-                    android:id="@+id/ll_intent_to_ai"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

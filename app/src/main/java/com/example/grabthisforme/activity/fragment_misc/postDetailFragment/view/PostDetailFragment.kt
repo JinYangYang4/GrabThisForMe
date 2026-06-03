@@ -15,17 +15,18 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.communityFragment.custom.MaxLinesGridLayoutManager
 import com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.PhotoPreviewDialog
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.adapter.CommentRecyclerViewAdapter
+import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.ui_model.PostDetailHeaderUiModel
+import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.ui_model.PostDetailStatsUiModel
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.viewModel.PostDetailViewModel
 import com.example.grabthisforme.activity.fragment_misc.post_topic.adapter.ImagesRecyclerviewAdapter
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentPostDetailBinding
-import com.google.android.material.appbar.AppBarLayout
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -38,8 +39,9 @@ class PostDetailFragment : Fragment() {
 
     private var theCommentPosition: Int = -1
     private var theParentCommentId: Long = -1
+
     private lateinit var commentAdapter: CommentRecyclerViewAdapter
-    private lateinit var postImagesAdapter: ImagesRecyclerviewAdapter
+    private lateinit var imagesAdapter: ImagesRecyclerviewAdapter
 
     enum class InputActionType {
         POST_COMMENT,
@@ -62,12 +64,11 @@ class PostDetailFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
 
-        initView()
-        initRecyclerViewComment()
+        initRecyclerViews()
         initInput()
         initObserve()
         initClickListeners()
-        initAppBarOffsetListener()
+        initScrollListener()
 
         ViewCompat.setOnApplyWindowInsetsListener(requireView()) { _, insets ->
             val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
@@ -90,29 +91,24 @@ class PostDetailFragment : Fragment() {
             }
         )
     }
+    
 
-    private fun initView() {
-        postImagesAdapter = ImagesRecyclerviewAdapter { position ->
-            val imageUris = viewModel.postImageList.value
-                .orEmpty()
-                .map { it.trim() }
-                .filter { it.isNotEmpty() }
+    private fun initRecyclerViews() {
+        // 图片
+        imagesAdapter = ImagesRecyclerviewAdapter { position ->
+            val imageUris = viewModel.postHeaderUiModel.value?.imageUrls.orEmpty()
             if (imageUris.isEmpty()) return@ImagesRecyclerviewAdapter
             val initialIndex = position.coerceIn(0, imageUris.lastIndex)
             PhotoPreviewDialog
                 .newInstance(imageUris, initialIndex)
                 .show(childFragmentManager, "PhotoPreviewDialog")
         }
-        binding.rvPostImages.apply {
-            adapter = postImagesAdapter
-            layoutManager = MaxLinesGridLayoutManager(requireContext(), 3, 4)
-            isNestedScrollingEnabled = false
+        binding.rvImagesGrid.apply {
+            layoutManager = MaxLinesGridLayoutManager(context, 3, 4)
+            adapter = imagesAdapter
         }
-        binding.tvSend.isEnabled = false
-        binding.tvSend.alpha = 0.5f
-    }
 
-    private fun initRecyclerViewComment() {
+        // 评论
         commentAdapter = CommentRecyclerViewAdapter(
             onItemClick = { _, position, commentId ->
                 theCommentPosition = position
@@ -121,12 +117,7 @@ class PostDetailFragment : Fragment() {
                 viewModel.setInputVisible(true)
                 showKeyboard(binding.etMessageInput)
             },
-            scrollListener = object : CommentRecyclerViewAdapter.OnCommentScrollListener {
-                override fun onCommentCollapse(position: Int) {
-                    binding.rvComments.smoothScrollToPosition(position)
-                }
-            },
-            onReplyItemClick = { reply, position, commentId ->
+            onReplyItemClick = { _, position, commentId ->
                 theCommentPosition = position
                 theParentCommentId = commentId
                 inputActionType = InputActionType.REPLY_COMMENT
@@ -136,45 +127,21 @@ class PostDetailFragment : Fragment() {
                 showKeyboard(binding.etMessageInput)
             }
         )
-        binding.rvComments.adapter = commentAdapter
-        binding.rvComments.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        commentAdapter.submitList(viewModel.commentList.value)
+        binding.rvComments.apply {
+            adapter = commentAdapter
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        }
     }
+
 
     private fun initInput() {
         binding.etMessageInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 viewModel.updateInputText(s?.toString().orEmpty())
             }
-
             override fun afterTextChanged(s: Editable?) = Unit
         })
-    }
-
-    private fun initAppBarOffsetListener() {
-        binding.appBar.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { _, verticalOffset ->
-            val offsetAbs = kotlin.math.abs(verticalOffset)
-            val avatarAreaHeight = dp2px(60)
-            val isAvatarCovered = offsetAbs >= avatarAreaHeight
-            val alpha = kotlin.math.min(
-                kotlin.math.abs(verticalOffset.toFloat() - dp2px(60).toFloat()) / dp2px(60),
-                1f
-            )
-            viewModel.setHeaderCovered(isAvatarCovered)
-            if (isAvatarCovered) {
-                binding.llHead.alpha = alpha
-            } else {
-                binding.tvPageTitle.alpha = alpha
-            }
-        })
-    }
-
-    private fun dp2px(dp: Int): Int {
-        val density = requireContext().resources.displayMetrics.density
-        return (dp * density + 0.5f).toInt()
     }
 
     private fun initClickListeners() {
@@ -197,7 +164,7 @@ class PostDetailFragment : Fragment() {
                 if (inputActionType == InputActionType.REPLY_COMMENT) {
                     commentAdapter.expandComment(theParentCommentId)
                 } else {
-                    scrollCommentsToTop()
+                    scrollToComments()
                 }
                 binding.etMessageInput.clearFocus()
                 hideKeyboard()
@@ -210,60 +177,91 @@ class PostDetailFragment : Fragment() {
             val shareBottomSheet = PostShareBottomSheetDialogFragment.newInstance()
             shareBottomSheet.show(childFragmentManager, "PostShareBottomSheet")
         }
+
+        binding.tvSend.isEnabled = false
+        binding.tvSend.alpha = 0.5f
     }
 
-    private fun scrollCommentsToTop() {
-        lifecycleScope.launch {
-            delay(100)
-            val layoutManager = binding.rvComments.layoutManager as LinearLayoutManager
-            val smoothScroller = object : LinearSmoothScroller(requireContext()) {
-                override fun getVerticalSnapPreference(): Int {
-                    return SNAP_TO_START
-                }
-            }
-            smoothScroller.targetPosition = 0
-            layoutManager.startSmoothScroll(smoothScroller)
+
+
+    private fun initScrollListener() {
+        binding.nsvContent.setOnScrollChangeListener { _, _, _, _, scrollY ->
+            val threshold = dp2px(60)
+            val isCovered = scrollY >= threshold
+            viewModel.setHeaderCovered(isCovered)
+
+            // 统计栏滚出顶部时，显示吸顶副本
+            val statsTopInScroll = binding.llStats.top - scrollY
+            val shouldPin = statsTopInScroll <= 0
+            binding.llPinnedStats.visibility = if (shouldPin) View.VISIBLE else View.GONE
         }
     }
+
+    private fun scrollToComments() {
+        binding.nsvContent.postDelayed({
+            val targetY = binding.llStats.top
+            binding.nsvContent.smoothScrollTo(0, targetY)
+        }, 100)
+    }
+
 
     private fun initObserve() {
         viewModel.commentList.observe(viewLifecycleOwner) { list ->
             commentAdapter.submitList(list)
-            binding.tvCommentCount.text = "评论 ${viewModel.commentCount.value ?: list.size}"
         }
-        viewModel.commentCount.observe(viewLifecycleOwner) { count ->
-            binding.tvCommentCount.text = "评论 $count"
+
+        viewModel.postHeaderUiModel.observe(viewLifecycleOwner) { header ->
+            renderPostHeader(header)
         }
+        viewModel.postStatsUiModel.observe(viewLifecycleOwner) { stats ->
+            renderPostStats(stats)
+        }
+
         viewModel.canSend.observe(viewLifecycleOwner) { enabled ->
             binding.tvSend.isEnabled = enabled
             binding.tvSend.alpha = if (enabled) 1f else 0.5f
         }
+
         viewModel.loveIconRes.observe(viewLifecycleOwner) { isLove ->
-            if (isLove) {
-                binding.ivLove.setImageResource(R.drawable.ic_love_selected)
-            } else {
-                binding.ivLove.setImageResource(R.drawable.ic_unselected)
-            }
+            binding.ivLove.setImageResource(
+                if (isLove) R.drawable.ic_love_selected else R.drawable.ic_unselected
+            )
         }
-        viewModel.postAvatarUrl.observe(viewLifecycleOwner) { avatarUrl ->
-            Glide.with(this)
-                .load(avatarUrl)
-                .placeholder(R.drawable.cat)
-                .error(R.drawable.cat)
-                .into(binding.ivPostAvatar)
-            Glide.with(this)
-                .load(avatarUrl)
-                .placeholder(R.drawable.cat)
-                .error(R.drawable.cat)
-                .into(binding.ivTopAvatar)
+    }
+
+    private fun renderPostHeader(header: PostDetailHeaderUiModel) {
+        binding.tvTopUsername.text = header.authorName
+        binding.tvPostUsername.text = header.authorName
+        binding.tvPostTime.text = header.timeText
+        binding.tvPostContent.text = header.contentText
+
+        Glide.with(this)
+            .load(header.authorAvatarUrl)
+            .placeholder(R.drawable.cat)
+            .error(R.drawable.cat)
+            .into(binding.ivPostAvatar)
+        Glide.with(this)
+            .load(header.authorAvatarUrl)
+            .placeholder(R.drawable.cat)
+            .error(R.drawable.cat)
+            .into(binding.ivTopAvatar)
+
+        val hasImages = header.imageUrls.isNotEmpty()
+        binding.flImagesContainer.visibility = if (hasImages) View.VISIBLE else View.GONE
+        if (hasImages) {
+            val hiddenCount = (header.imageUrls.size - MAX_IMAGE_COUNT).coerceAtLeast(0)
+            imagesAdapter.submitImages(header.imageUrls.take(MAX_IMAGE_COUNT), hiddenCount)
+        } else {
+            imagesAdapter.submitImages(emptyList(), 0)
         }
-        viewModel.postImageList.observe(viewLifecycleOwner) { images ->
-            val visibleImages = images.take(MAX_IMAGE_COUNT)
-            val hiddenCount = images.size - visibleImages.size
-            binding.rvPostImages.visibility =
-                if (visibleImages.isEmpty()) View.GONE else View.VISIBLE
-            postImagesAdapter.submitImages(visibleImages, hiddenCount)
-        }
+    }
+
+    private fun renderPostStats(stats: PostDetailStatsUiModel) {
+        binding.tvCommentCount.text = stats.commentText
+        binding.tvLikeCountTop.text = stats.likeText
+        binding.tvPinnedCommentCount.text = stats.commentText
+        binding.tvPinnedLikeCount.text = stats.likeText
+        binding.tvLoveCount.text = stats.likeCount.toString()
     }
 
     private fun showKeyboard(view: View) {
@@ -278,6 +276,12 @@ class PostDetailFragment : Fragment() {
             requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
     }
+
+    private fun dp2px(dp: Int): Int {
+        val density = requireContext().resources.displayMetrics.density
+        return (dp * density + 0.5f).toInt()
+    }
+
 
     override fun onStop() {
         super.onStop()

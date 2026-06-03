@@ -1,6 +1,6 @@
 package com.example.grabthisforme.activity.fragment_misc.postDetailFragment.adapter
 
-import android.util.Log
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,13 +16,12 @@ import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.ui.st
 import com.example.grabthisforme.databinding.RvCommentItemBinding
 
 private const val REPLY_PAGE_SIZE = 3
-private const val DEFAULT_USER_NAME = "Anonymous"
-private const val DEFAULT_COMMENT_CONTENT = "No comment content"
-private const val DEFAULT_TIME_TEXT = "10 min ago"
+private const val DEFAULT_USER_NAME = "匿名"
+private const val DEFAULT_COMMENT_CONTENT = "暂无评论内容"
+private const val DEFAULT_TIME_TEXT = "10分钟前"
 
 class CommentRecyclerViewAdapter(
     private val onItemClick: ((Comment, Int, Long) -> Unit)? = null,
-    private val scrollListener: OnCommentScrollListener? = null,
     private val onReplyItemClick: ((Reply, Int, Long) -> Unit)? = null
 ) : ListAdapter<Comment, CommentRecyclerViewAdapter.CommentListViewHolder>(DiffCallback) {
 
@@ -32,10 +31,6 @@ class CommentRecyclerViewAdapter(
         commentUiStateMap.getOrPut(commentId) {
             CommentUiState(commentId = commentId)
         }.expandAddReply()
-    }
-
-    interface OnCommentScrollListener {
-        fun onCommentCollapse(position: Int)
     }
 
     inner class CommentListViewHolder(private val binding: RvCommentItemBinding) :
@@ -142,7 +137,7 @@ class CommentRecyclerViewAdapter(
                 binding.tvCollapseExtraReply.visibility = View.GONE
                 binding.tvLoadMoreReply.visibility = View.GONE
                 binding.tvToggleReply.visibility = View.VISIBLE
-                binding.tvToggleReply.text = "Expand replies($totalReplyCount)"
+                binding.tvToggleReply.text = "展开回复($totalReplyCount)"
             }
         }
 
@@ -150,9 +145,6 @@ class CommentRecyclerViewAdapter(
             val state = getOrCreateCommentUiState(comment)
             if (state.isExpanded) {
                 state.collapse()
-                binding.root.post {
-                    scrollListener?.onCommentCollapse(currentPosition)
-                }
             } else {
                 state.expand(currentReplies.size, REPLY_PAGE_SIZE)
             }
@@ -169,9 +161,6 @@ class CommentRecyclerViewAdapter(
             val state = getOrCreateCommentUiState(comment)
             state.collapse()
             refreshReplyUI(state)
-            binding.root.post {
-                scrollListener?.onCommentCollapse(currentPosition)
-            }
         }
 
         private fun hideAllReplyViews() {

@@ -1,86 +1,294 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white_fff8">
+        android:background="@drawable/bg_search_screen">
+
         <LinearLayout
+            android:id="@+id/ll_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/cl_search"
-            android:background = "@drawable/bg_arc_gradient_green_vertical"    />
-
-
-        <!-- TabLayout -->
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tl_goods_category"
-            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:background="@android:color/transparent"
-            app:tabMode="scrollable"
-            app:tabGravity="start"
-            app:tabTextColor="@color/gray_700"
-            app:tabSelectedTextColor="@color/black"
-            app:tabIndicatorColor="@color/green_primary"
-            app:tabRippleColor="@android:color/transparent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:gravity="center_vertical"
+            android:minHeight="64dp"
+            android:paddingStart="16dp"
+            android:paddingTop="24dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="8dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent">
 
-        <!-- 搜索框 -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_search"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:padding="4dp"
-            android:background="@drawable/bg_rounded_white_outline"
+            <FrameLayout
+                android:id="@+id/fl_back"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/bg_search_icon_button"
+                android:clickable="true"
+                android:focusable="true">
 
-            app:layout_constraintTop_toBottomOf="@id/tl_goods_category"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+                <ImageView
+                    android:id="@+id/iv_back"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_back" />
+            </FrameLayout>
 
-            <ImageView
-                android:id="@+id/iv_search"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:src="@drawable/ic_search"
-                android:scaleType="centerCrop"
-                android:alpha="0.5"
-
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-
-            <TextView
-                android:id="@+id/tv_search"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="7dp"
-                android:text="搜索"
-                android:textSize="16sp"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-                app:layout_constraintStart_toEndOf="@id/iv_search"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="校园二手"
+                    android:textColor="@android:color/black"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="更适合学生群体的闲置转卖，先逛热卖分类再搜具体商品"
+                    android:textColor="#7D7268"
+                    android:textSize="12sp" />
+            </LinearLayout>
 
-        <!-- ViewPager2 -->
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/vp_goods_content"
+            <FrameLayout
+                android:id="@+id/fl_search_entry"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:id="@+id/tv_inspiration_marketplace"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center|end"
+                    android:background="@drawable/bg_drawer_status_chip"
+                    android:gravity="center"
+                    android:text="灵感市场"
+                    android:textColor="#1E6B55"
+                    android:padding="6dp"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+
+
+                <FrameLayout
+                    android:id="@+id/fl_collapsed_search_icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center|end"
+                    android:alpha="0"
+                    android:background="@drawable/bg_search_icon_button"
+                    android:visibility="visible">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_search" />
+                </FrameLayout>
+            </FrameLayout>
+        </LinearLayout>
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="0dp"
             android:layout_height="0dp"
 
-            app:layout_constraintTop_toBottomOf="@id/cl_search"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@id/ll_toolbar">
 
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/app_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:elevation="0dp">
+
+                <LinearLayout
+                    android:id="@+id/header_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_tip"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="16dp"
+                        app:cardBackgroundColor="#FFF8F1"
+                        app:cardCornerRadius="28dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="#F0DCC8"
+                        app:strokeWidth="1dp">
+
+                        <LinearLayout
+                            android:id="@+id/ll_tip"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="18dp"
+                            android:paddingTop="16dp"
+                            android:paddingEnd="18dp"
+                            android:paddingBottom="16dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="今日灵感"
+                                    android:textColor="#A16432"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:text="宿舍数码、低频家电、考试书和运动装备通常最受欢迎"
+                                    android:textColor="#503528"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="10dp"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="26dp"
+                                        android:background="@drawable/bg_chip_warm"
+                                        android:gravity="center"
+                                        android:paddingHorizontal="10dp"
+                                        android:text="学生常淘"
+                                        android:textColor="#A85B1F"
+                                        android:textSize="11sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="26dp"
+                                        android:layout_marginStart="8dp"
+                                        android:background="@drawable/bg_chip_mint"
+                                        android:gravity="center"
+                                        android:paddingHorizontal="10dp"
+                                        android:text="可小刀更友好"
+                                        android:textColor="#1D6F5E"
+                                        android:textSize="11sp"
+                                        android:textStyle="bold" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <ImageView
+                                android:layout_width="64dp"
+                                android:layout_height="64dp"
+                                android:background="@drawable/bg_chip_warm"
+                                android:contentDescription="@null"
+                                android:padding="14dp"
+                                android:src="@drawable/ic_goods" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <LinearLayout
+                        android:id="@+id/cl_search"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="14dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/bg_search_input_shell"
+                        android:gravity="center_vertical"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp">
+
+                        <ImageView
+                            android:id="@+id/iv_search"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_marginEnd="8dp"
+                            android:alpha="0.55"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_search" />
+
+                        <TextView
+                            android:id="@+id/tv_search"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="搜你想捡漏的校园好物"
+                            android:textColor="#8A7E74"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="28dp"
+                            android:background="@drawable/bg_primary_pill_green"
+                            android:gravity="center"
+                            android:paddingHorizontal="12dp"
+                            android:text="去搜索"
+                            android:textColor="@android:color/white"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="14dp" />
+                </LinearLayout>
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tl_goods_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@android:color/transparent"
+                    app:tabGravity="start"
+                    app:tabIndicatorColor="@android:color/transparent"
+                    app:tabIndicatorHeight="0dp"
+                    app:tabMode="scrollable"
+                    app:tabPaddingStart="3dp"
+                    app:tabPaddingEnd="3dp"
+                    app:tabRippleColor="@android:color/transparent"
+                    app:tabSelectedTextColor="@android:color/black"
+                    app:tabTextColor="#6F665E" />
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/vp_goods_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

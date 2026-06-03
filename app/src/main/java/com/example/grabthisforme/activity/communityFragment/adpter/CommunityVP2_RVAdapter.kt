@@ -11,19 +11,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.communityFragment.custom.MaxLinesGridLayoutManager
+import com.example.grabthisforme.activity.communityFragment.ui_model.PostCardUiModel
 import com.example.grabthisforme.activity.fragment_misc.post_topic.adapter.ImagesRecyclerviewAdapter
 import com.example.grabthisforme.databinding.PostRvItemBinding
-import com.example.grabthisforme.model.post.domain.Post
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 
 class CommunityVP2_RVAdapter(
     private val clickListener:(taskId : String) -> Unit,
-    private val onAvatarClick: (Post) -> Unit = {},
-    private val onPostImageClick: (Post, Int) -> Unit = { _, _ -> }
-) : ListAdapter<Post,
+    private val onAvatarClick: (PostCardUiModel) -> Unit = {},
+    private val onPostImageClick: (PostCardUiModel, Int) -> Unit = { _, _ -> }
+) : ListAdapter<PostCardUiModel,
         CommunityVP2_RVAdapter.ViewHolder>(
     ViewHolder.TaskDiffItemCallback()){
     override fun onCreateViewHolder(
@@ -39,8 +36,8 @@ class CommunityVP2_RVAdapter(
         holder.bind(post, clickListener, onAvatarClick, onPostImageClick)
     }
     class ViewHolder(val binding: PostRvItemBinding) : RecyclerView.ViewHolder(binding.root){
-        private var currentPost: Post? = null
-        private var currentPostImageClick: ((Post, Int) -> Unit)? = null
+        private var currentPost: PostCardUiModel? = null
+        private var currentPostImageClick: ((PostCardUiModel, Int) -> Unit)? = null
         private val imagesAdapter = ImagesRecyclerviewAdapter { position ->
             currentPost?.let { post ->
                 currentPostImageClick?.invoke(post, position)
@@ -66,19 +63,22 @@ class CommunityVP2_RVAdapter(
 
         }
         fun bind(
-            post: Post,
+            post: PostCardUiModel,
             clickListener: (String) -> Unit,
-            onAvatarClick: (Post) -> Unit,
-            onPostImageClick: (Post, Int) -> Unit
+            onAvatarClick: (PostCardUiModel) -> Unit,
+            onPostImageClick: (PostCardUiModel, Int) -> Unit
         ) {
             currentPost = post
             currentPostImageClick = onPostImageClick
-            binding.sendTime.text = formatTimestampToDateTime(post.createTime.toLong())
-            binding.contents.text = post.content
+            binding.sendTime.text = post.timeText
+            binding.contents.text = post.contentText
             binding.senderName.text = post.authorName
-            val images = post.images.filter { it.isNotBlank() }
-            val visibleImages = images.take(MAX_IMAGE_COUNT)
-            val hiddenCount = images.size - visibleImages.size
+            binding.labels.text = post.tagText
+            binding.tvCommentCount.text = "评论"
+            binding.tvLikeCount.text = "点赞"
+
+            val visibleImages = post.imageUrls.take(MAX_IMAGE_COUNT)
+            val hiddenCount = post.imageUrls.size - visibleImages.size
 
             if (visibleImages.isEmpty()) {
                 binding.rvPostImages.visibility = View.GONE
@@ -101,28 +101,23 @@ class CommunityVP2_RVAdapter(
             }
         }
 
-        class TaskDiffItemCallback : DiffUtil.ItemCallback<Post>(){
+        class TaskDiffItemCallback : DiffUtil.ItemCallback<PostCardUiModel>(){
             override fun areItemsTheSame(
-                oldItem: Post,
-                newItem: Post
+                oldItem: PostCardUiModel,
+                newItem: PostCardUiModel
             ): Boolean {
                 return oldItem.postId == newItem.postId
             }
 
             @SuppressLint("DiffUtilEquals")
             override fun areContentsTheSame(
-                oldItem: Post,
-                newItem: Post
+                oldItem: PostCardUiModel,
+                newItem: PostCardUiModel
             ): Boolean {
                 return oldItem == newItem
             }
         }
-        fun formatTimestampToDateTime(timestamp: Long): String {
-            val timeInMillis = if (timestamp.toString().length == 10) timestamp * 1000 else timestamp
-            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-            val date = Date(timeInMillis)
-            return sdf.format(date)
-        }
+
     }
 
 }

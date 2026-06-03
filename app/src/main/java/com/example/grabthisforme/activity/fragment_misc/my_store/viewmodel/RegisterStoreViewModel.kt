@@ -86,7 +86,7 @@ class RegisterStoreViewModel @Inject constructor(
             "$startTimeText - $endTimeText"
         }
         val tags = tagsText
-            .split(Regex("[,;\\uFF0C\\uFF1B\\u3001]"))
+            .split(Regex("[,;，；、]"))
             .map { it.trim() }
             .filter { it.isNotBlank() }
 

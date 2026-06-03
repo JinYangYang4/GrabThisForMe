@@ -14,9 +14,9 @@ data class SignCalendarDay(
                     isSigned = day <= 5,
                     isToday = day == 6,
                     reward = when {
-                        day <= 5 -> "${10 + day % 5}\u91d1\u5e01"
-                        day == 6 -> "\u4f18\u60e0\u5238"
-                        else -> "${10 + day % 6}\u91d1\u5e01"
+                        day <= 5 -> "${10 + day % 5}金币"
+                        day == 6 -> "优惠券"
+                        else -> "${10 + day % 6}金币"
                     }
                 )
             }

@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.grabthisforme.activity.mainactivity.view.OrderMessageBottomSheetFragment
 import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewOrderAdapter
+import com.example.grabthisforme.activity.homeFragment.ui_model.toOrderListItemUiModel
 import com.example.grabthisforme.activity.homeFragment.viewModel.FragmentHomeViewModel
 import com.example.grabthisforme.databinding.FragmentTaskBinding
 import com.example.grabthisforme.model.order.data.mock.OrderMockData
@@ -48,7 +49,7 @@ class FragmentHomeViewPager2 : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             homeViewModel.currentTaskOrders.collectLatest { orderList ->
                 if (orderList.isEmpty()) {
-                    taskAdapter.submitList(OrderMockData.getOrderList())
+                    taskAdapter.submitList(OrderMockData.getOrderList().map { it.toOrderListItemUiModel() })
                 } else {
                     taskAdapter.submitList(orderList)
                 }
@@ -75,8 +76,8 @@ class FragmentHomeViewPager2 : Fragment() {
     }
     @SuppressLint("ClickableViewAccessibility")
     private fun initRecyclerView() {
-        taskAdapter = RecyclerViewOrderAdapter(){taskId ->
-            val orderBottomSheet = OrderMessageBottomSheetFragment.newInstance(taskId.toString())
+        taskAdapter = RecyclerViewOrderAdapter(){orderId ->
+            val orderBottomSheet = OrderMessageBottomSheetFragment.newInstance(orderId)
             orderBottomSheet.show(childFragmentManager, "OrderMessageBottomSheet")
         }
 

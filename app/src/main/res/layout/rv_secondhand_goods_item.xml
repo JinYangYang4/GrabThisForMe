@@ -3,99 +3,162 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/white"
-        android:layout_margin="4dp"
-        android:padding="8dp">
+        app:cardBackgroundColor="#FDFBF8"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="0dp"
+        android:layout_margin="1dp"
+        app:strokeColor="#DBE7DE"
+        app:strokeWidth="1dp">
 
-        <androidx.cardview.widget.CardView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="2dp"
-            android:layout_marginBottom="8dp">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/iv_goods_pic"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="120dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/food_pic"
-                android:background="@color/gray_mid_light"/>
-        </androidx.cardview.widget.CardView>
+                android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/tv_goods_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="99新 iPhone 14 128G 蓝色 无磕碰 配件齐全"
-            android:textSize="13sp"
-            android:textColor="#333333"
-            android:maxLines="2"
-            android:ellipsize="end"
-            android:layout_marginBottom="4dp"/>
+                <ImageView
+                    android:id="@+id/iv_goods_pic"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:adjustViewBounds="true"
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="4dp">
+                    android:clipToOutline="true"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/food_pic" />
+
+                <TextView
+                    android:id="@+id/tv_goods_quality"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:layout_gravity="top|start"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/bg_rounded_white_radius_small"
+                    android:backgroundTint="@color/green_light"
+                    android:gravity="center"
+                    android:paddingHorizontal="10dp"
+                    android:text="99新"
+                    android:textColor="@android:color/white"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_goods_trade_hint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="26dp"
+                    android:layout_gravity="bottom|start"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/bg_glass_panel_soft"
+                    android:gravity="center"
+                    android:paddingHorizontal="10dp"
+                    android:text="支持小刀"
+                    android:textColor="#29443D"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
 
             <TextView
-                android:id="@+id/tv_goods_price"
-                android:layout_width="wrap_content"
+                android:id="@+id/tv_goods_name"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="¥4599"
-                android:textSize="15sp"
-                android:textColor="@color/orange_primary"
-                android:textStyle="bold"/>
+                android:layout_marginTop="10dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:layout_marginHorizontal="10dp"
+                android:text="99新 iPhone 14 128G 蓝色 无磕碰 配件齐全"
+                android:textColor="#1F2D28"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tv_goods_original_price"
-                android:layout_width="wrap_content"
+                android:id="@+id/tv_goods_message"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="¥5999"
-                android:textSize="11sp"
-                android:textColor="#999999"
-                android:layout_marginLeft="4dp" />
+                android:layout_marginTop="6dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:layout_marginHorizontal="10dp"
+                android:text="个人闲置，功能正常，支持面交验货。"
+                android:textColor="#7E756C"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_goods_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="¥4599"
+                    android:textColor="#D66B35"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_goods_original_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="¥5999"
+                    android:textColor="#A29A91"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_goods_used_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="26dp"
+                    android:background="@drawable/bg_chip_mint"
+                    android:gravity="center"
+                    android:paddingHorizontal="10dp"
+                    android:text="使用 3个月"
+                    android:textColor="#1D6F5E"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_goods_sale_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="26dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_chip_warm"
+                    android:gravity="center"
+                    android:paddingHorizontal="10dp"
+                    android:text="已售 0"
+                    android:textColor="#A85B1F"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:alpha="0.45"
+                    android:src="@drawable/ic_more" />
+            </LinearLayout>
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:id="@+id/tv_goods_quality"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="99新"
-                android:textSize="11sp"
-                android:textColor="#666666"
-                android:background="@color/gray_mid_light"
-                android:paddingHorizontal="4dp"
-                android:paddingVertical="1dp"
-                android:radius="2dp"/>
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <TextView
-                android:id="@+id/tv_goods_sale_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="已售 0"
-                android:textSize="11sp"
-                android:textColor="#999999"/>
-        </LinearLayout>
-
-    </LinearLayout>
-
+    </com.google.android.material.card.MaterialCardView>
 </layout>

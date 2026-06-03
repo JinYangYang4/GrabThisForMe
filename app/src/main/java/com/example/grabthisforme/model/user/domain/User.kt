@@ -12,6 +12,7 @@ data class User(
     val id: Long get() = account.userId
     val accountName: String get() = account.accountName
     val isCurrent: Boolean get() = account.isCurrent
+    val isLoginAccount: Boolean get() = account.isLoginAccount
     val name: String get() = profile.displayName
     val headPic: String get() = profile.avatarUrl
     val phone: String? get() = profile.phone
@@ -41,6 +42,7 @@ data class User(
         isCurrent: Boolean = false,
         accountName: String = name,
         passwordHash: String = "",
+        isLoginAccount: Boolean = true,
         lastLoginTime: Long? = null,
         setting: UserSetting? = null,
         likeCount: Long = 0L,
@@ -56,6 +58,7 @@ data class User(
             accountName = accountName,
             passwordHash = passwordHash,
             isCurrent = isCurrent,
+            isLoginAccount = isLoginAccount,
             createTime = createTime,
             lastLoginTime = lastLoginTime
         ),

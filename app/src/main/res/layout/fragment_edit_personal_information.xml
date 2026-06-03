@@ -48,7 +48,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp"
-                android:background="@drawable/bg_set_group_card"
+                android:background="@drawable/bg_card_white_28"
                 android:elevation="2dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -93,7 +93,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="26dp"
                         android:layout_marginTop="8dp"
-                        android:background="@drawable/bg_set_status_chip"
+                        android:background="@drawable/bg_chip_mint"
                         android:gravity="center"
                         android:paddingStart="10dp"
                         android:paddingEnd="10dp"
@@ -127,7 +127,7 @@
                     android:layout_marginHorizontal="16dp"
                     android:elevation="2dp"
                     android:layout_marginTop="5dp"
-                    android:background="@drawable/bg_set_group_card"
+                    android:background="@drawable/bg_card_white_28"
                     android:orientation="vertical"
                     android:padding="16dp">
 
@@ -248,7 +248,7 @@
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginTop="12dp"
                     android:elevation="2dp"
-                    android:background="@drawable/bg_set_group_card"
+                    android:background="@drawable/bg_card_white_28"
                     android:orientation="vertical"
                     android:padding="16dp">
 
@@ -285,7 +285,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:layout_weight="1"
-                            android:hint="昵称"
+                            android:hint="昵称（与账号名一致）"
                             app:boxBackgroundColor="#F6FBFA"
                             app:boxBackgroundMode="outline"
                             app:boxCornerRadiusBottomEnd="18dp"
@@ -297,15 +297,17 @@
                             app:boxStrokeWidthFocused="2dp"
                             app:endIconMode="clear_text"
                             app:hintTextColor="#7A8E8E"
-                            app:placeholderText="请输入昵称">
+                            app:placeholderText="与账号名保持一致">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/et_display_name"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:enabled="false"
+                                android:focusable="false"
                                 android:minHeight="52dp"
                                 android:paddingVertical="8dp"
-                                android:textColor="#172A2B"
+                                android:textColor="#8A9A9A"
                                 android:textSize="15sp"
                                 tools:text="张三" />
                         </com.google.android.material.textfield.TextInputLayout>

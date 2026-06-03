@@ -28,7 +28,7 @@
             android:id="@+id/iv_drag_handle"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:contentDescription="drag_handle"
+            android:contentDescription="拖拽手柄"
             android:src="@drawable/ic_more"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -38,7 +38,9 @@ description: 用于本项目 Android 构建验证、单元测试、设备测试�
 推荐在 PowerShell 中先设置：
 
 ```powershell
-$env:JAVA_HOME='C:\Users\YaoShi16Pro\AppData\Local\JetBrains\IdeaIC2025.1\tmp\patch-update\jre'
+if (-not $env:JAVA_HOME) { $env:JAVA_HOME = [System.Environment]::GetEnvironmentVariable('JAVA_HOME', 'User') }
+if (-not $env:JAVA_HOME) { $env:JAVA_HOME = [System.Environment]::GetEnvironmentVariable('JAVA_HOME', 'Machine') }
+if (-not $env:JAVA_HOME) { throw 'JAVA_HOME is not set. Please configure the local JAVA_HOME environment variable first.' }
 $env:PATH="$env:JAVA_HOME\bin;$env:PATH"
 $env:GRADLE_USER_HOME='D:\projects\GrabThisForMe\xin\GrabThisForMe\.gradle-user-home-local'
 ```
@@ -66,7 +68,9 @@ $env:GRADLE_USER_HOME='D:\projects\GrabThisForMe\xin\GrabThisForMe\.gradle-user-
 执行命令：
 
 ```powershell
-$env:JAVA_HOME='C:\Users\YaoShi16Pro\AppData\Local\JetBrains\IdeaIC2025.1\tmp\patch-update\jre'
+if (-not $env:JAVA_HOME) { $env:JAVA_HOME = [System.Environment]::GetEnvironmentVariable('JAVA_HOME', 'User') }
+if (-not $env:JAVA_HOME) { $env:JAVA_HOME = [System.Environment]::GetEnvironmentVariable('JAVA_HOME', 'Machine') }
+if (-not $env:JAVA_HOME) { throw 'JAVA_HOME is not set. Please configure the local JAVA_HOME environment variable first.' }
 $env:PATH="$env:JAVA_HOME\bin;$env:PATH"
 $env:GRADLE_USER_HOME='D:\projects\GrabThisForMe\xin\GrabThisForMe\.gradle-user-home-local'
 .\gradlew.bat --no-daemon --console=plain :app:compileDebugKotlin
@@ -91,7 +95,9 @@ $env:GRADLE_USER_HOME='D:\projects\GrabThisForMe\xin\GrabThisForMe\.gradle-user-
 执行命令：
 
 ```powershell
-$env:JAVA_HOME='C:\Users\YaoShi16Pro\AppData\Local\JetBrains\IdeaIC2025.1\tmp\patch-update\jre'
+if (-not $env:JAVA_HOME) { $env:JAVA_HOME = [System.Environment]::GetEnvironmentVariable('JAVA_HOME', 'User') }
+if (-not $env:JAVA_HOME) { $env:JAVA_HOME = [System.Environment]::GetEnvironmentVariable('JAVA_HOME', 'Machine') }
+if (-not $env:JAVA_HOME) { throw 'JAVA_HOME is not set. Please configure the local JAVA_HOME environment variable first.' }
 $env:PATH="$env:JAVA_HOME\bin;$env:PATH"
 $env:GRADLE_USER_HOME='D:\projects\GrabThisForMe\xin\GrabThisForMe\.gradle-user-home-local'
 .\gradlew.bat --no-daemon --console=plain :app:testDebugUnitTest
@@ -116,7 +122,9 @@ $env:GRADLE_USER_HOME='D:\projects\GrabThisForMe\xin\GrabThisForMe\.gradle-user-
 标准命令：
 
 ```powershell
-$env:JAVA_HOME='C:\Users\YaoShi16Pro\AppData\Local\JetBrains\IdeaIC2025.1\tmp\patch-update\jre'
+if (-not $env:JAVA_HOME) { $env:JAVA_HOME = [System.Environment]::GetEnvironmentVariable('JAVA_HOME', 'User') }
+if (-not $env:JAVA_HOME) { $env:JAVA_HOME = [System.Environment]::GetEnvironmentVariable('JAVA_HOME', 'Machine') }
+if (-not $env:JAVA_HOME) { throw 'JAVA_HOME is not set. Please configure the local JAVA_HOME environment variable first.' }
 $env:PATH="$env:JAVA_HOME\bin;$env:PATH"
 $env:GRADLE_USER_HOME='D:\projects\GrabThisForMe\xin\GrabThisForMe\.gradle-user-home-local'
 .\gradlew.bat --no-daemon --console=plain :app:connectedDebugAndroidTest

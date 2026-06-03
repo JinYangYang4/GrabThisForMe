@@ -3,11 +3,12 @@ package com.example.grabthisforme.activity.homeFragment.view
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewConfiguration
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.AnimationSet
@@ -117,13 +118,21 @@ class FragmentHome : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     fun initRecyclerViewTask(){
+        val touchSlop = ViewConfiguration.get(requireContext()).scaledTouchSlop
+        val taskLayoutManager = object : LinearLayoutManager(requireContext()) {
+            override fun canScrollVertically(): Boolean {
+                return !homeViewModel.GetRvTaskIsOpen()
+            }
+        }
 
-        adapter1 = RecyclerViewTaskAdapter() { taskId ->
-            val orderBottomSheet = OrderMessageBottomSheetFragment.newInstance(taskId.toString())
+        adapter1 = RecyclerViewTaskAdapter() { orderId ->
+            if (childFragmentManager.findFragmentByTag("OrderMessageBottomSheet") != null) return@RecyclerViewTaskAdapter
+            val orderBottomSheet = OrderMessageBottomSheetFragment.newInstance(orderId)
             orderBottomSheet.show(childFragmentManager, "OrderMessageBottomSheet")
         }
         binding.rvTask.adapter = adapter1
-        binding.rvTask.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvTask.layoutManager = taskLayoutManager
+        binding.rvTask.isNestedScrollingEnabled = false
 
         viewLifecycleOwner.lifecycleScope.launch {
             homeViewModel.currentTaskOrders.collectLatest { orderList ->
@@ -162,17 +171,69 @@ class FragmentHome : Fragment() {
             }else{
                 binding.ivDropdown.setImageResource(R.drawable.ic_dropdown)
             }
+            binding.rvTask.requestLayout()
         }
+        binding.rvTask.addOnItemTouchListener(object : RecyclerView.SimpleOnItemTouchListener() {
+            private var downY = 0f
+            private var handedOffToParent = false
+
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                if (homeViewModel.GetRvTaskIsOpen()) {
+                    rv.parent?.requestDisallowInterceptTouchEvent(false)
+                    return false
+                }
+
+                when (e.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        downY = e.y
+                        handedOffToParent = false
+                        rv.parent?.requestDisallowInterceptTouchEvent(true)
+                    }
+
+                    MotionEvent.ACTION_MOVE -> {
+                        if (handedOffToParent) {
+                            rv.parent?.requestDisallowInterceptTouchEvent(false)
+                            return false
+                        }
+
+                        val deltaY = e.y - downY
+                        if (kotlin.math.abs(deltaY) < touchSlop) {
+                            return false
+                        }
+
+                        val pullingDownAtTop = deltaY > 0 && !rv.canScrollVertically(-1)
+                        val pushingUpAtBottom = deltaY < 0 && !rv.canScrollVertically(1)
+
+                        if (pullingDownAtTop || pushingUpAtBottom) {
+                            handedOffToParent = true
+                            rv.stopScroll()
+                            rv.parent?.requestDisallowInterceptTouchEvent(false)
+                            return false
+                        }
+
+                        rv.parent?.requestDisallowInterceptTouchEvent(true)
+                    }
+
+                    MotionEvent.ACTION_UP,
+                    MotionEvent.ACTION_CANCEL -> {
+                        handedOffToParent = false
+                        rv.parent?.requestDisallowInterceptTouchEvent(false)
+                    }
+                }
+                return false
+            }
+        })
+
         binding.rvTask.post {
             homeViewModel.setRvTaskHeight(binding.rvTask.height)
         }
 
     }
     fun initRecyclerViewStore() {
-        adapter2 = RecyclerViewStoreAdapter(onStoreClickListener = { store ->
-            val dir =BlankFragmentDirections.actionBlankFragmentToStoreFragment(store.id)
+        adapter2 = RecyclerViewStoreAdapter { storeId ->
+            val dir =BlankFragmentDirections.actionBlankFragmentToStoreFragment(storeId)
             (requireActivity() as MainActivity).NewNavController_navgite(dir)
-        })
+        }
 
         binding.rvSomeGoods.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL,false)
@@ -180,8 +241,8 @@ class FragmentHome : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            homeViewModel.allStores.collectLatest { storeList ->
-                adapter2.submitList(storeList)
+            homeViewModel.homeStoreCards.collectLatest { storeCards ->
+                adapter2.submitList(storeCards)
             }
         }
     }
@@ -286,6 +347,7 @@ class FragmentHome : Fragment() {
         }
         heightAnimator.start()
         homeViewModel.MakeRvTaskIsOpenTure()
+        binding.rvTask.stopScroll()
     }
     /**
      * 完整计算：item高度 + item上下margin + 分割线 + rvpadding
@@ -325,7 +387,8 @@ class FragmentHome : Fragment() {
         return totalContentHeight +  rvPaddingVertical
     }
     private fun closeRvTaskAnimation(){
-        val heightAnimator = ValueAnimator.ofInt(1500,homeViewModel.getRvTaskHeight()).apply {
+        val currentHeight = binding.rvTask.height
+        val heightAnimator = ValueAnimator.ofInt(currentHeight,homeViewModel.getRvTaskHeight()).apply {
             duration = 300
             addUpdateListener { anim ->
                 val height = anim.animatedValue as Int

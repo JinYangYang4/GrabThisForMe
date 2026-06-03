@@ -5,8 +5,6 @@ import com.example.grabthisforme.model.secondhandGoods.domain.SecondhandTradeInf
 
 data class SecondhandTradeDto(
     val saleUserId: Long? = null,
-    val saleUserName: String = "",
-    val saleUserAvatar: String = "",
     val originalPrice: Double = 0.0,
     val quality: String = "",
     val usedTime: String? = null,

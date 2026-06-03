@@ -3,6 +3,8 @@ package com.example.grabthisforme.activity.fragment_misc.setfragment.view
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,7 +32,6 @@ class EditPersonalInformationFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: EditPersonalInformationViewModel by viewModels()
     private var keyboardScrollHelper: KeyboardScrollHelper? = null
-    private var isFormInitialized = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,12 +67,22 @@ class EditPersonalInformationFragment : Fragment() {
         binding.ivHeadPic.setOnClickListener {
             showPhotoSelector()
         }
+        // 昵称与账号名保持一致，不可编辑，随账号名联动
+        binding.etDisplayName.isEnabled = false
+        binding.etDisplayName.isFocusable = false
+        binding.etAccountName.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                binding.etDisplayName.setText(s?.toString().orEmpty())
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
         binding.btnSaveUserInfo.setOnClickListener {
             clearInputFocus()
 
             viewModel.saveUserInfo(
                 accountName = binding.etAccountName.text?.toString().orEmpty(),
-                displayName = binding.etDisplayName.text?.toString().orEmpty(),
                 phone = binding.etPhone.text?.toString().orEmpty(),
                 email = binding.etEmail.text?.toString().orEmpty(),
                 signature = binding.etSignature.text?.toString().orEmpty(),
@@ -90,16 +101,12 @@ class EditPersonalInformationFragment : Fragment() {
     private fun observeState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.formState.collectLatest { state ->
-                if (!isFormInitialized) {
-                    binding.etUserId.setText(state.userId.toString())
-                    binding.etAccountName.setText(state.accountName)
-                    binding.etDisplayName.setText(state.displayName)
-                    binding.etPhone.setText(state.phone)
-                    binding.etEmail.setText(state.email)
-                    binding.etSignature.setText(state.signature)
-                    setSelectedGender(state.gender)
-                    isFormInitialized = true
-                }
+                binding.etUserId.setText(state.userId.toString())
+                binding.etAccountName.setText(state.accountName)
+                binding.etPhone.setText(state.phone)
+                binding.etEmail.setText(state.email)
+                binding.etSignature.setText(state.signature)
+                setSelectedGender(state.gender)
                 renderAvatar(state.avatarUrl)
             }
         }

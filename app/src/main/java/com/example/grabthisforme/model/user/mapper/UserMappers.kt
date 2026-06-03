@@ -1,42 +1,13 @@
 package com.example.grabthisforme.model.user.mapper
 
 import com.example.grabthisforme.model.user.data.entity.UserAccountEntity
+import com.example.grabthisforme.model.user.data.entity.UserBasicBundleEntity
 import com.example.grabthisforme.model.user.data.entity.UserBundleEntity
-import com.example.grabthisforme.model.user.data.entity.UserLikeEntity
 import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
 import com.example.grabthisforme.model.user.data.entity.UserStatisticsEntity
 import com.example.grabthisforme.model.user.domain.User
 import com.example.grabthisforme.model.user.domain.UserAccount
 import com.example.grabthisforme.model.user.domain.UserProfile
-import org.json.JSONArray
-
-private fun List<String>.toJsonArrayString(): String {
-    return JSONArray(this).toString()
-}
-
-private fun List<Long>.toLongJsonArrayString(): String {
-    val array = JSONArray()
-    forEach { array.put(it) }
-    return array.toString()
-}
-
-private fun String.toStringList(): List<String> {
-    if (isBlank()) return emptyList()
-    return runCatching {
-        val array = JSONArray(this)
-        List(array.length()) { index -> array.optString(index) }
-            .filter { it.isNotBlank() }
-    }.getOrDefault(emptyList())
-}
-
-private fun String.toLongList(): List<Long> {
-    if (isBlank()) return emptyList()
-    return runCatching {
-        val array = JSONArray(this)
-        List(array.length()) { index -> array.optLong(index) }
-            .filter { it > 0L }
-    }.getOrDefault(emptyList())
-}
 
 fun User.toAccountEntity(): UserAccountEntity {
     return UserAccountEntity(
@@ -44,6 +15,7 @@ fun User.toAccountEntity(): UserAccountEntity {
         accountName = accountName,
         passwordHash = account.passwordHash,
         isCurrent = isCurrent,
+        isLoginAccount = account.isLoginAccount,
         createTime = createTime,
         lastLoginTime = account.lastLoginTime
     )
@@ -67,24 +39,25 @@ fun User.toStatisticsEntity(): UserStatisticsEntity {
         userId = id,
         likeCount = likeCount,
         fanCount = fanCount,
-        followCount = followCount,
-        selfPostsJson = selfPosts.toJsonArrayString()
-    )
-}
-
-fun User.toLikeEntity(): UserLikeEntity {
-    return UserLikeEntity(
-        userId = id,
-        likedPostIdsJson = likedPostIds.toJsonArrayString(),
-        likedStoreIdsJson = likedStoreIds.toLongJsonArrayString(),
-        likedGoodsIdsJson = likedGoodsIds.toLongJsonArrayString()
+        followCount = followCount
     )
 }
 
 fun UserBundleEntity.toDomain(): User {
     val profileEntity = profile
     val statisticsEntity = statistics
-    val likeEntity = likes
+    val selfPostIds = userPosts
+        .sortedByDescending { it.postId }
+        .map { it.postId }
+    val likedPostIds = likedPosts
+        .sortedByDescending { it.likedAt }
+        .map { it.postId }
+    val likedStoreIds = likedStores
+        .sortedByDescending { it.likedAt }
+        .map { it.storeId }
+    val likedGoodsIds = likedGoods
+        .sortedByDescending { it.likedAt }
+        .map { it.goodsId }
     return User(
         id = account.userId,
         name = profileEntity?.displayName ?: account.accountName,
@@ -98,21 +71,25 @@ fun UserBundleEntity.toDomain(): User {
         isCurrent = account.isCurrent,
         accountName = account.accountName,
         passwordHash = account.passwordHash,
+        isLoginAccount = account.isLoginAccount,
         lastLoginTime = account.lastLoginTime,
         likeCount = statisticsEntity?.likeCount ?: 0L,
         fanCount = statisticsEntity?.fanCount ?: 0L,
         followCount = statisticsEntity?.followCount ?: 0L,
-        selfPosts = statisticsEntity?.selfPostsJson?.toStringList().orEmpty(),
-        likedPostIds = likeEntity?.likedPostIdsJson?.toStringList().orEmpty(),
-        likedStoreIds = likeEntity?.likedStoreIdsJson?.toLongList().orEmpty(),
-        likedGoodsIds = likeEntity?.likedGoodsIdsJson?.toLongList().orEmpty()
+        selfPosts = selfPostIds,
+        likedPostIds = likedPostIds,
+        likedStoreIds = likedStoreIds,
+        likedGoodsIds = likedGoodsIds
     )
+}
+
+fun UserBasicBundleEntity.toDomain(): User {
+    return account.toDomain(profile, statistics)
 }
 
 fun UserAccountEntity.toDomain(
     profile: UserProfileEntity? = null,
-    statistics: UserStatisticsEntity? = null,
-    likes: UserLikeEntity? = null
+    statistics: UserStatisticsEntity? = null
 ): User {
     return User(
         id = userId,
@@ -127,14 +104,10 @@ fun UserAccountEntity.toDomain(
         isCurrent = isCurrent,
         accountName = accountName,
         passwordHash = passwordHash,
+        isLoginAccount = isLoginAccount,
         lastLoginTime = lastLoginTime,
         likeCount = statistics?.likeCount ?: 0L,
         fanCount = statistics?.fanCount ?: 0L,
-        followCount = statistics?.followCount ?: 0L,
-        selfPosts = statistics?.selfPostsJson?.toStringList().orEmpty(),
-        likedPostIds = likes?.likedPostIdsJson?.toStringList().orEmpty(),
-        likedStoreIds = likes?.likedStoreIdsJson?.toLongList().orEmpty(),
-        likedGoodsIds = likes?.likedGoodsIdsJson?.toLongList().orEmpty()
+        followCount = statistics?.followCount ?: 0L
     )
 }
-

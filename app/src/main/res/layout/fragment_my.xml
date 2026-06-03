@@ -20,20 +20,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_my_hero">
-
             <!-- 头像 -->
-            <ImageView
-                android:id="@+id/iv_head_pic"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="52dp"
-                android:background="@drawable/bg_circle"
-                android:clipToOutline="true"
-                android:scaleType="centerCrop"
-                android:src="@drawable/cat"
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@id/fl_head_pic"
+                android:background="@drawable/bg_info_avatar_ring"
+                android:padding="2dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="52dp">
+
+                <!-- 头像 -->
+                <ImageView
+                    android:id="@+id/iv_head_pic"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:background="@drawable/bg_circle"
+                    android:clipToOutline="true"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/cat"
+                     />
+            </FrameLayout>
 
             <!-- 编辑资料标签 -->
             <TextView
@@ -65,8 +74,8 @@
                 android:textSize="22sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/tv_user_id"
-                app:layout_constraintStart_toEndOf="@+id/iv_head_pic"
-                app:layout_constraintTop_toTopOf="@+id/iv_head_pic"
+                app:layout_constraintStart_toEndOf="@+id/fl_head_pic"
+                app:layout_constraintTop_toTopOf="@+id/fl_head_pic"
                 app:layout_constraintVertical_chainStyle="packed" />
 
             <!-- 用户ID -->
@@ -78,7 +87,7 @@
                 android:text='@{sharedViewModel.currentUser != null ? `ID: ` + String.valueOf(sharedViewModel.currentUser.id) : `ID: `}'
                 android:textColor="#FFE0CC"
                 android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="@+id/iv_head_pic"
+                app:layout_constraintBottom_toBottomOf="@+id/fl_head_pic"
                 app:layout_constraintStart_toStartOf="@+id/tv_user_name"
                 app:layout_constraintTop_toBottomOf="@+id/tv_user_name" />
 
@@ -97,7 +106,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/tv_edit"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/iv_head_pic"
+                app:layout_constraintTop_toBottomOf="@id/fl_head_pic"
                 android:paddingBottom="40dp"/>
             <View
                 android:layout_width="match_parent"

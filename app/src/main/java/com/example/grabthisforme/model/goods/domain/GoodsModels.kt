@@ -15,17 +15,16 @@ data class GoodsPriceInfo(
 )
 
 data class GoodsUiInfo(
-    val pic: String = "",         // 商品图片链接
-    val tag: String = "",        // 商品标签（热销/新品/爆款）
-    val unit: String = "",       // 单位（件/瓶/盒/斤）
-    val selectedCount: Int = 0  // 购物车选中的数量
+    val pic: String = "",
+    val tag: String = "",
+    val unit: String = ""
 )
 
 data class GoodsStateInfo(
-    val saleNumber: Long = 0,      // 销量
-    val stock: Int = 0,            // 库存数量
-    val isSoldOut: Boolean = false,// 是否售罄
-    val isHot: Boolean = false,     // 是否热销商品
+    val saleNumber: Long = 0,
+    val stock: Int = 0,
+    val isSoldOut: Boolean = false,
+    val isHot: Boolean = false,
     val purchaseStatus: Int = PURCHASE_STATUS_NO_PURCHASE,
     val soldCount: Long = 0L
 ) {

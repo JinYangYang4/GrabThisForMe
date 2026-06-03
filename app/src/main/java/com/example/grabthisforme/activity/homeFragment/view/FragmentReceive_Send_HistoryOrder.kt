@@ -57,8 +57,8 @@ class FragmentReceive_Send_HistoryOrder : Fragment() {
     }
 
     private fun initRecyclerView() {
-        orderAdapter = RecyclerViewOrderAdapter(userId = null) { taskId ->
-            val orderBottomSheet = OrderMessageBottomSheetFragment.newInstance(taskId.toString())
+        orderAdapter = RecyclerViewOrderAdapter { orderId ->
+            val orderBottomSheet = OrderMessageBottomSheetFragment.newInstance(orderId)
             orderBottomSheet.show(childFragmentManager, "OrderMessageBottomSheet")
         }
 
@@ -73,10 +73,10 @@ class FragmentReceive_Send_HistoryOrder : Fragment() {
 
     private fun initEmptyState() {
         binding.tvEmptyHint.text = when (page) {
-            OrderRepository.PAGE_PENDING_RECEIVE -> "\u6682\u65e0\u5f85\u6536\u8d27\u8ba2\u5355"
-            OrderRepository.PAGE_MY_SEND -> "\u6682\u65e0\u5f85\u9001\u8d27\u8ba2\u5355"
-            OrderRepository.PAGE_HISTORY -> "\u6682\u65e0\u5386\u53f2\u8ba2\u5355"
-            else -> "\u6682\u65e0\u8ba2\u5355"
+            OrderRepository.PAGE_PENDING_RECEIVE -> "暂无待收货订单"
+            OrderRepository.PAGE_MY_SEND -> "暂无待送货订单"
+            OrderRepository.PAGE_HISTORY -> "暂无历史订单"
+            else -> "暂无订单"
         }
     }
 

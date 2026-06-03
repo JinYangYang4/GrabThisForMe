@@ -6,6 +6,10 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import com.example.grabthisforme.model.relation.data.entity.UserLikedGoodsEntity
+import com.example.grabthisforme.model.relation.data.entity.UserLikedPostEntity
+import com.example.grabthisforme.model.relation.data.entity.UserLikedStoreEntity
+import com.example.grabthisforme.model.relation.data.entity.UserPostEntity
 import com.example.grabthisforme.model.user.domain.UserProfile
 
 @Entity(tableName = "user_account")
@@ -14,6 +18,7 @@ data class UserAccountEntity(
     val accountName: String,
     val passwordHash: String = "",
     val isCurrent: Boolean = false,
+    val isLoginAccount: Boolean = true,
     val createTime: Long = System.currentTimeMillis(),
     val lastLoginTime: Long? = null
 )
@@ -57,27 +62,21 @@ data class UserStatisticsEntity(
     @PrimaryKey val userId: Long,
     val likeCount: Long = 0L,
     val fanCount: Long = 0L,
-    val followCount: Long = 0L,
-    val selfPostsJson: String = "[]"
+    val followCount: Long = 0L
 )
 
-@Entity(
-    tableName = "user_like",
-    foreignKeys = [
-        ForeignKey(
-            entity = UserAccountEntity::class,
-            parentColumns = ["userId"],
-            childColumns = ["userId"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ],
-    indices = [Index(value = ["userId"], unique = true)]
-)
-data class UserLikeEntity(
-    @PrimaryKey val userId: Long,
-    val likedPostIdsJson: String = "[]",
-    val likedStoreIdsJson: String = "[]",
-    val likedGoodsIdsJson: String = "[]"
+data class UserBasicBundleEntity(
+    @Embedded val account: UserAccountEntity,
+    @Relation(
+        parentColumn = "userId",
+        entityColumn = "userId"
+    )
+    val profile: UserProfileEntity?,
+    @Relation(
+        parentColumn = "userId",
+        entityColumn = "userId"
+    )
+    val statistics: UserStatisticsEntity?
 )
 
 data class UserBundleEntity(
@@ -96,5 +95,20 @@ data class UserBundleEntity(
         parentColumn = "userId",
         entityColumn = "userId"
     )
-    val likes: UserLikeEntity?
+    val userPosts: List<UserPostEntity> = emptyList(),
+    @Relation(
+        parentColumn = "userId",
+        entityColumn = "userId"
+    )
+    val likedPosts: List<UserLikedPostEntity> = emptyList(),
+    @Relation(
+        parentColumn = "userId",
+        entityColumn = "userId"
+    )
+    val likedStores: List<UserLikedStoreEntity> = emptyList(),
+    @Relation(
+        parentColumn = "userId",
+        entityColumn = "userId"
+    )
+    val likedGoods: List<UserLikedGoodsEntity> = emptyList()
 )

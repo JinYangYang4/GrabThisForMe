@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.grabthisforme.activity.informationFragment.view.FragmentConversation
-import com.example.grabthisforme.activity.informationFragment.view.FragmentFriend
+import com.example.grabthisforme.activity.informationFragment.view.FragmentContacts
 
 
 class InformationPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
@@ -16,7 +16,7 @@ class InformationPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragmen
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> FragmentConversation()
-            1 -> FragmentFriend()
+            1 -> FragmentContacts()
             else -> FragmentConversation()
         }
     }

@@ -1,7 +1,7 @@
 package com.example.grabthisforme.model.goods.mapper
 
-import com.example.grabthisforme.model.goods.data.dto.GoodsDto
 import com.example.grabthisforme.model.goods.data.dto.GoodsBaseDto
+import com.example.grabthisforme.model.goods.data.dto.GoodsDto
 import com.example.grabthisforme.model.goods.data.dto.GoodsPriceDto
 import com.example.grabthisforme.model.goods.data.dto.GoodsStateDto
 import com.example.grabthisforme.model.goods.data.dto.GoodsUiDto
@@ -44,8 +44,7 @@ fun Goods.toUiEntity(): GoodsUiEntity {
         goodsId = id,
         pic = pic,
         tag = tag,
-        unit = unit,
-        selectedCount = selectedCount
+        unit = unit
     )
 }
 
@@ -82,29 +81,18 @@ fun GoodsBundleEntity.toDomain(): Goods {
         isHot = state?.isHot ?: false,
         purchaseStatus = state?.purchaseStatus ?: GoodsStateInfo.PURCHASE_STATUS_NO_PURCHASE,
         soldCount = state?.soldCount ?: 0L,
-        unit = ui?.unit.orEmpty(),
-        selectedCount = ui?.selectedCount ?: 0
+        unit = ui?.unit.orEmpty()
     )
 }
 
-fun GoodsBundleEntity.toDomainSecondhandOrNull(): SecondhandGoods? {
+fun GoodsBundleEntity.toDomainSecondhandOrNull(saleUser: User? = null): SecondhandGoods? {
     val tradeEntity = trade ?: return null
     val category = base.categoryKey?.let { key ->
         Goods.GoodsCategory.entries.firstOrNull { it.name == key }
     } ?: Goods.GoodsCategory.CLOTHING
 
-    val seller = if (tradeEntity.saleUserId != null || tradeEntity.saleUserName.isNotBlank() || tradeEntity.saleUserAvatar.isNotBlank()) {
-        User(
-            id = tradeEntity.saleUserId ?: 0L,
-            name = tradeEntity.saleUserName.ifBlank { "匿名用户" },
-            headPic = tradeEntity.saleUserAvatar
-        )
-    } else {
-        null
-    }
-
     return SecondhandGoods(
-        saleUser = seller,
+        saleUser = saleUser,
         id = base.goodsId,
         name = base.name,
         message = base.message,
@@ -146,8 +134,7 @@ fun GoodsUiDto.toDomainInfo(): GoodsUiInfo {
     return GoodsUiInfo(
         pic = pic,
         tag = tag,
-        unit = unit,
-        selectedCount = selectedCount
+        unit = unit
     )
 }
 
@@ -188,8 +175,7 @@ fun Goods.toDto(): GoodsDto {
         ui = GoodsUiDto(
             pic = pic,
             tag = tag,
-            unit = unit,
-            selectedCount = selectedCount
+            unit = unit
         ),
         state = GoodsStateDto(
             saleNumber = sale_number,
@@ -213,8 +199,6 @@ fun Goods.toSecondhandTradeEntity(
     return SecondhandTradeEntity(
         goodsId = id,
         saleUserId = saleUser?.id,
-        saleUserName = saleUser?.name.orEmpty(),
-        saleUserAvatar = saleUser?.headPic.orEmpty(),
         originalPrice = originalPrice,
         quality = quality,
         usedTime = usedTime,

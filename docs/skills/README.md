@@ -1,48 +1,103 @@
-# 项目 Skills 目录
+# Project Skills Directory
 
-## 作用
+## Purpose
 
-`docs/skills/` 用来存放当前项目内可复用的技能文档，约束 UI、交互、结构、构建和验证方式，方便不同智能体在同一个仓库内快速检索并复用已有规则。
+`docs/skills/` stores reusable project rules and working patterns for UI, data, platform, and architectural decisions.
 
-这里的 skill 属于项目文档，不依赖 `.codex`，也不绑定某一个特定工具。
+These documents are project-local guidance.
+They are meant to help both humans and AI quickly understand:
+- what conventions already exist
+- what pattern should be reused first
+- when a more specific skill should be opened
 
-## 目录约定
+## Must Read First
 
-- 一个 skill 对应一个独立文件夹。
-- 每个 skill 文件夹内必须包含一个 `SKILL.md`。
-- 上层 `README.md` 负责做分类说明、检索引导和优先级说明。
-- 文件夹名优先使用英文，便于 `Codex`、`Claude`、`Gemini`、`Cursor` 等工具检索。
+Before adding new pages, new tables, or changing important data/UI behavior, read:
 
-## 当前分层
+1. `docs/skills/README.md`
+2. the relevant category README
+3. the concrete skill document for the current task
 
-- `ui/`：界面、交互、视觉规范（含 `layouts/` 通用布局容器规范、`forms/` 表单页、`settings/` 设置页等）。
-- `domain/`：业务规则、领域建模预留目录。
-- `data/`：数据结构、存储、接口映射预留目录。
-- `platform/`：构建、测试、工具链、工程规范。
+For data and schema work, also read:
+- `docs/skills/data/database-table-catalog.md`
 
-## 检索原则
+## Directory Rules
 
-- 先看上层分类说明，再进入具体 skill。
-- 多个页面共用一套模式时，优先使用通用 skill，不要先写页面专属 skill。
-- 只有当某个页面存在明显独有的结构、资源或交互时，才单独拆出页面专属 skill。
-- 构建、编译、测试、Gradle 环境问题优先到 `platform/` 下检索。
+- One skill topic should live in one independent folder.
+- Each skill folder must contain `SKILL.md`.
+- Parent `README.md` files are responsible for classification, lookup guidance, and priority rules.
+- Folder names should prefer English keywords for reliable search by AI tools and developers.
 
-## 跨智能体约定
+## Current Categories
 
-- 目录名使用英文检索词。
-- `SKILL.md` 正文可以使用中文，但建议在标题、描述或正文中保留少量英文关键词。
-- 父级 `README.md` 需要明确说明“先用哪个 skill、什么情况下再用更窄的 skill”。
+- `ui/`
+  Purpose: interface, interaction, layout, and visual rules.
 
-## 当前重点
+- `data/`
+  Purpose: schema design, data chain, repository structure, UI-model decomposition, and table catalog.
 
-当前已建立的布局容器 skill 位于：
+- `platform/`
+  Purpose: build, test, toolchain, and engineering environment rules.
 
-- `ui/layouts/nested-scroll-view-layout/`：NestedScrollView 通用布局约束规范（直接子 View 约束、padding/margin 转换规则）。
+## Lookup Principle
 
-当前已建立的信息填写页相关 skill 位于：
+- Read the parent category README before opening a specific skill.
+- Reuse general skills before creating or following page-specific rules.
+- Only create or depend on a page-specific skill when the page has clearly unique structure or interaction.
+- For build, compile, test, Gradle, and environment issues, check `platform/` first.
 
-- `ui/forms/create-information-form-pages-ui/`：通用创建 / 发布 / 信息填写页规范。
+## Autonomous Improvement Rule
 
-当前已建立的平台通用 skill 位于：
+AI is allowed to proactively choose a more robust, clearer, or better-structured implementation when the current request or current code reveals a clearly better path.
 
-- `platform/android-build-and-test/`：Android 项目的编译验证、单元测试、设备测试与环境约束说明。
+This is allowed only when all of the following remain true:
+- the business goal requested by the user does not change
+- the user-visible intent is still satisfied
+- the project structure and existing conventions are respected
+- the change reduces risk, duplication, coupling, schema ambiguity, or maintenance cost
+- the relevant docs are updated if the decision changes a reusable pattern or schema rule
+
+Typical allowed examples:
+- move a display-only field from a large domain model into a page `UiModel`
+- place user-specific display state in a user-state table instead of a pure relation table
+- use a relation table that already exists instead of adding a redundant new table
+- switch from a destructive parent-table write pattern to a safer upsert strategy
+- normalize a data chain when the current implementation obviously mixes unrelated responsibilities
+
+Typical disallowed examples without explicit user confirmation:
+- changing product behavior or business semantics
+- replacing an established UI style with a different design direction
+- introducing a large new abstraction that the repo does not need
+- rewriting unrelated modules just because a cleaner architecture is possible
+
+When using a better autonomous approach, AI should:
+- keep the change scoped to the task
+- preserve compatibility where reasonable
+- explain the decision briefly in the final result
+- update project docs if the decision becomes a reusable rule
+
+## Cross-Agent Convention
+
+- Folder names should use English lookup terms.
+- `SKILL.md` content may use Chinese, but should keep enough stable keywords for search.
+- Parent `README.md` files should clearly say which skill to read first and when to move to a narrower skill.
+
+## Current Important Entries
+
+### Data
+- `docs/skills/data/database-table-catalog.md`
+  Purpose: single source of truth for Room tables and schema lookup.
+
+- `docs/skills/data/table-and-domain-model-guidelines/`
+  Purpose: primary guidance for new tables, entity splits, and domain-model boundaries.
+
+### UI
+- `docs/skills/ui/layouts/nested-scroll-view-layout/`
+  Purpose: common `NestedScrollView` layout constraints and composition rules.
+
+- `docs/skills/ui/forms/create-information-form-pages-ui/`
+  Purpose: common create/publish/information-entry page patterns.
+
+### Platform
+- `docs/skills/platform/android-build-and-test/`
+  Purpose: Android compile, verification, test, and environment guidance.

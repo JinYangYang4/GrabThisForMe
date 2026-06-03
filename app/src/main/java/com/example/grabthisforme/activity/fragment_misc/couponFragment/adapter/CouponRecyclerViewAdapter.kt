@@ -16,11 +16,11 @@ class CouponRecyclerViewAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(coupon: Coupon) {
-            binding.tvCouponDenomination.text = "\u00a5${coupon.denomination.toInt()}"
+            binding.tvCouponDenomination.text = "¥${coupon.denomination.toInt()}"
             binding.tvCouponTitle.text = coupon.title
             binding.tvCouponType.text = coupon.type
             binding.tvCouponExpire.text = if (coupon.expireTime.isNotEmpty()) {
-                "\u6709\u6548\u671f\u81f3\uff1a${coupon.expireTime}"
+                "有效期至：${coupon.expireTime}"
             } else {
                 coupon.desc
             }

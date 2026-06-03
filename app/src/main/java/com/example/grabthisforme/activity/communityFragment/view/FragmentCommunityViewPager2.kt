@@ -62,9 +62,7 @@ class FragmentCommunityViewPager2 : Fragment(){
                 (requireActivity() as MainActivity).NewNavController_navgite(dir)
             },
             onPostImageClick = { post, clickedPosition ->
-                val imageUris = post.images
-                    .map { it.trim() }
-                    .filter { it.isNotEmpty() }
+                val imageUris = post.imageUrls
                 if (imageUris.isEmpty()) return@CommunityVP2_RVAdapter
                 val initialIndex = clickedPosition.coerceIn(0, imageUris.lastIndex)
                 PhotoPreviewDialog

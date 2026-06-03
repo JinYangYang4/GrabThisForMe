@@ -684,7 +684,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:padding="10dp"
-                    android:background="@drawable/bg_chat_massage"
+                    android:background="@drawable/bg_chat_message"
                     android:backgroundTint="@color/orange_primary"
                     android:orientation="horizontal">
                     <TextView

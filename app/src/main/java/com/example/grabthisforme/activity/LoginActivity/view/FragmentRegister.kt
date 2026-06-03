@@ -99,15 +99,8 @@ class FragmentRegister : Fragment() {
 
         viewModel.insertUser(newUser)
         clearInputFocus()
-
-
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            Toast.makeText(context, "用户创建成功：$userName", Toast.LENGTH_SHORT).show()
-        } else {
-            Looper.prepare()
-            Toast.makeText(context, "用户创建成功：$userName", Toast.LENGTH_SHORT).show()
-            Looper.loop()
-        }
+        Toast.makeText(context, "用户创建成功：$userName", Toast.LENGTH_SHORT).show()
+        requireFragmentManager().popBackStack()
     }
     private fun showInputError(textInputLayout: TextInputLayout, errorMsg: String) {
         textInputLayout.error = errorMsg

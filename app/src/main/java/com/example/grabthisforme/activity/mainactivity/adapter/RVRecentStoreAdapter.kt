@@ -7,11 +7,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
+import com.example.grabthisforme.activity.mainactivity.ui_model.RecentStoreItemUiModel
 import com.example.grabthisforme.databinding.RvRecentlyUserItemBinding
-import com.example.grabthisforme.model.store.domain.Store
 
-
-class RVRecentStoreAdapter(val clickListener : (StoreId : Long) -> Unit) : ListAdapter<Store, RVRecentStoreAdapter.ViewHolder>(
+class RVRecentStoreAdapter(val clickListener : (storeId : Long) -> Unit) : ListAdapter<RecentStoreItemUiModel, RVRecentStoreAdapter.ViewHolder>(
     DiffItemCallback()
 ) {
     override fun onCreateViewHolder(
@@ -37,32 +36,32 @@ class RVRecentStoreAdapter(val clickListener : (StoreId : Long) -> Unit) : ListA
                 return ViewHolder(binding)
             }
         }
-        fun bind(store : Store,clickListener: (Long) -> Unit){
+        fun bind(store : RecentStoreItemUiModel,clickListener: (Long) -> Unit){
             binding.tvName.text = store.name
-            binding.tvBadge.text = store.type.ifBlank { "店铺" }
+            binding.tvBadge.text = store.badgeText
             Glide.with(binding.ivHeadPic)
-                .load(store.pic)
+                .load(store.imageUrl)
                 .placeholder(R.drawable.ic_store)
                 .error(R.drawable.ic_store)
                 .into(binding.ivHeadPic)
             binding.root.setOnClickListener {
-                clickListener(store.id)
+                clickListener(store.storeId)
             }
         }
     }
-    class DiffItemCallback : DiffUtil.ItemCallback<Store>() {
+    class DiffItemCallback : DiffUtil.ItemCallback<RecentStoreItemUiModel>() {
         override fun areContentsTheSame(
-            oldItem: Store,
-            newItem: Store
+            oldItem: RecentStoreItemUiModel,
+            newItem: RecentStoreItemUiModel
         ): Boolean {
             return oldItem == newItem
         }
 
         override fun areItemsTheSame(
-            oldItem: Store,
-            newItem: Store
+            oldItem: RecentStoreItemUiModel,
+            newItem: RecentStoreItemUiModel
         ): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.storeId == newItem.storeId
         }
     }
 }

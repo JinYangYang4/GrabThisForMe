@@ -3,7 +3,6 @@ package com.example.grabthisforme.model.secondhandGoods.mapper
 import com.example.grabthisforme.model.goods.data.dto.GoodsDto
 import com.example.grabthisforme.model.goods.mapper.toDomain
 import com.example.grabthisforme.model.goods.mapper.toDto
-import com.example.grabthisforme.model.goods.mapper.toSecondhandTradeEntity
 import com.example.grabthisforme.model.secondhandGoods.data.dto.SecondhandGoodsDto
 import com.example.grabthisforme.model.secondhandGoods.data.dto.SecondhandTradeDto
 import com.example.grabthisforme.model.secondhandGoods.data.entity.SecondhandTradeEntity
@@ -11,19 +10,19 @@ import com.example.grabthisforme.model.secondhandGoods.domain.SecondhandGoods
 import com.example.grabthisforme.model.secondhandGoods.domain.SecondhandTradeInfo
 import com.example.grabthisforme.model.user.domain.User
 
-fun SecondhandTradeDto.toDomainInfo(): SecondhandTradeInfo {
-    val seller = if (saleUserId != null || saleUserName.isNotBlank() || saleUserAvatar.isNotBlank()) {
+private fun buildSaleUserOrNull(saleUserId: Long?): User? {
+    return saleUserId?.let { userId ->
         User(
-            id = saleUserId ?: 0L,
-            name = saleUserName.ifBlank { "匿名用户" },
-            headPic = saleUserAvatar
+            id = userId,
+            name = "",
+            headPic = ""
         )
-    } else {
-        null
     }
+}
 
+fun SecondhandTradeDto.toDomainInfo(): SecondhandTradeInfo {
     return SecondhandTradeInfo(
-        saleUser = seller,
+        saleUser = buildSaleUserOrNull(saleUserId),
         originalPrice = originalPrice,
         quality = quality,
         usedTime = usedTime,
@@ -35,8 +34,6 @@ fun SecondhandTradeDto.toDomainInfo(): SecondhandTradeInfo {
 fun SecondhandTradeInfo.toDto(): SecondhandTradeDto {
     return SecondhandTradeDto(
         saleUserId = saleUser?.id,
-        saleUserName = saleUser?.name.orEmpty(),
-        saleUserAvatar = saleUser?.headPic.orEmpty(),
         originalPrice = originalPrice,
         quality = quality,
         usedTime = usedTime,
@@ -49,8 +46,6 @@ fun SecondhandTradeInfo.toEntity(goodsId: Long): SecondhandTradeEntity {
     return SecondhandTradeEntity(
         goodsId = goodsId,
         saleUserId = saleUser?.id,
-        saleUserName = saleUser?.name.orEmpty(),
-        saleUserAvatar = saleUser?.headPic.orEmpty(),
         originalPrice = originalPrice,
         quality = quality,
         usedTime = usedTime,
@@ -60,18 +55,8 @@ fun SecondhandTradeInfo.toEntity(goodsId: Long): SecondhandTradeEntity {
 }
 
 fun SecondhandTradeEntity.toDomainInfo(): SecondhandTradeInfo {
-    val seller = if (saleUserId != null || saleUserName.isNotBlank() || saleUserAvatar.isNotBlank()) {
-        User(
-            id = saleUserId ?: 0L,
-            name = saleUserName.ifBlank { "匿名用户" },
-            headPic = saleUserAvatar
-        )
-    } else {
-        null
-    }
-
     return SecondhandTradeInfo(
-        saleUser = seller,
+        saleUser = buildSaleUserOrNull(saleUserId),
         originalPrice = originalPrice,
         quality = quality,
         usedTime = usedTime,

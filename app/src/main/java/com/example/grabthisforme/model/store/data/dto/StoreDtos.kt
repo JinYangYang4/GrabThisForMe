@@ -31,7 +31,7 @@ data class StoreStatisticsDto(
     val salesVolume: Long = 0
 )
 
-data class StoreGoodsGroupDto(
+data class StoreGoodsCategoryDto(
     val category: String = "",
     val goods: List<GoodsDto> = emptyList()
 )
@@ -40,7 +40,5 @@ data class StoreDto(
     val identity: StoreIdentityDto,
     val location: StoreLocationDto = StoreLocationDto(),
     val commercialInfo: StoreCommercialInfoDto = StoreCommercialInfoDto(),
-    val statistics: StoreStatisticsDto = StoreStatisticsDto(),
-    val goodsGroups: List<StoreGoodsGroupDto>? = null,
-    val goodsAll: List<GoodsDto>? = null
+    val statistics: StoreStatisticsDto = StoreStatisticsDto()
 )

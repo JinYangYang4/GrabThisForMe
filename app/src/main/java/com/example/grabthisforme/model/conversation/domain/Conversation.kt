@@ -1,15 +1,15 @@
-package com.example.grabthisforme.model.conversation.domain
+﻿package com.example.grabthisforme.model.conversation.domain
 
-import com.example.grabthisforme.model.messageContent.domain.MessageContent
+import com.example.grabthisforme.model.message.domain.Message
 import com.example.grabthisforme.model.user.domain.User
 import java.util.UUID
 
 data class Conversation(
     val conversationId: String,
     val type: ConversationType = ConversationType.SINGLE,
+    val targetId: Long? = null,
     val conversationPeer: ConversationPeer = ConversationPeer.Single(user = null),
-    val unreadCount: Int,
-    val lastMessage: MessageContent,
+    val lastMessage: Message,
     val lastTime: Long
 ) {
     enum class ConversationType {
@@ -17,7 +17,7 @@ data class Conversation(
         GROUP
     }
 
-    sealed class ConversationPeer {  //密封类
+    sealed class ConversationPeer {
         data class Single(val user: User?) : ConversationPeer()
         data class Group(val users: List<User>) : ConversationPeer()
     }
@@ -38,8 +38,8 @@ data class Conversation(
                     Conversation(
                         conversationId = UUID.randomUUID().toString(),
                         type = ConversationType.SINGLE,
+                        targetId = user.id,
                         conversationPeer = ConversationPeer.Single(user),
-                        unreadCount = (0..10).random(),
                         lastMessage = messages.last(),
                         lastTime = System.currentTimeMillis() - (index * 1000L * 60L)
                     )
@@ -53,20 +53,19 @@ data class Conversation(
             user: User,
             messageCount: Int,
             currentUserId: Long
-        ): List<MessageContent> {
-            val messages = mutableListOf<MessageContent>()
+        ): List<Message> {
+            val messages = mutableListOf<Message>()
 
             for (index in 0 until messageCount) {
                 val senderId = if (index % 2 == 0) currentUserId else user.id
                 messages.add(
-                    MessageContent(
+                    Message(
                         messageId = UUID.randomUUID().toString(),
                         senderId = senderId,
-                        type = MessageContent.MessageType.TEXT,
+                        type = Message.MessageType.TEXT,
                         content = "Mock message ${index + 1} from ${user.name}",
                         timestamp = System.currentTimeMillis() - (index * 1000L * 60L),
-                        isMine = senderId == currentUserId,
-                        status = MessageContent.MessageStatus.READ
+                        status = Message.MessageStatus.READ
                     )
                 )
             }

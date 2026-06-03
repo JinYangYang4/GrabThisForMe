@@ -12,14 +12,14 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.grabthisforme.R
-import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.fragment_misc.storeFragment.adapter.AlreadySelectGoodsRecyclerViewAdapter
 import com.example.grabthisforme.activity.fragment_misc.storeFragment.adapter.StoreGoodsRecyclerViewAdapter
 import com.example.grabthisforme.activity.fragment_misc.storeFragment.adpter.StoreCategoryRecyclerViewAdapter
 import com.example.grabthisforme.activity.fragment_misc.storeFragment.viewModel.StoreViewModel
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentStoreBinding
 import com.example.grabthisforme.extension.setMaxVisibleItems
-import com.example.grabthisforme.model.goods.domain.Goods
+import com.example.grabthisforme.model.store.domain.Store
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -29,14 +29,14 @@ class StoreFragment : Fragment() {
 
     private var _binding: FragmentStoreBinding? = null
     private val binding get() = _binding!!
-    private val storeViewModel : StoreViewModel by activityViewModels()
-    private lateinit var goodsAdapter : StoreGoodsRecyclerViewAdapter
-    private lateinit var alreadySelectAdapter : AlreadySelectGoodsRecyclerViewAdapter
+    private val storeViewModel: StoreViewModel by activityViewModels()
+    private lateinit var goodsAdapter: StoreGoodsRecyclerViewAdapter
+    private lateinit var alreadySelectAdapter: AlreadySelectGoodsRecyclerViewAdapter
 
     private lateinit var categoryAdapter: StoreCategoryRecyclerViewAdapter
     private var currentStoreId: Long? = null
 
-    private val args : StoreFragmentArgs by navArgs()
+    private val args: StoreFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,7 +58,7 @@ class StoreFragment : Fragment() {
         showGoods()
         initObserve()
         observeStoreDetails()
-        initCLickListener()
+        initClickListener()
         handleBackPressed()
     }
 
@@ -70,7 +70,9 @@ class StoreFragment : Fragment() {
         storeViewModel.storeNoticeText.observe(viewLifecycleOwner) { binding.tvNoticeContent.text = it }
         storeViewModel.storeDeliveryText.observe(viewLifecycleOwner) { binding.tvDelivery.text = it }
         storeViewModel.storeBusinessHoursText.observe(viewLifecycleOwner) { binding.tvBusinessHours.text = it }
+        storeViewModel.priceTotalText.observe(viewLifecycleOwner) { binding.tvPriceTotal.text = it }
     }
+
     private fun handleBackPressed() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : androidx.activity.OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -84,7 +86,8 @@ class StoreFragment : Fragment() {
             }
         })
     }
-    private fun initCLickListener(){
+
+    private fun initClickListener() {
         binding.llStore.setOnClickListener {
             storeViewModel.setShowStorePage(true)
         }
@@ -111,8 +114,9 @@ class StoreFragment : Fragment() {
             storeViewModel.clearSelectedGoods()
         }
     }
-    private fun initObserve(){
-        storeViewModel.isOpenMySelectGoosView.observe(viewLifecycleOwner){isOpen ->
+
+    private fun initObserve() {
+        storeViewModel.isOpenMySelectGoosView.observe(viewLifecycleOwner) { isOpen ->
             showGoodsMenu(isOpen)
         }
         viewLifecycleOwner.lifecycleScope.launch {
@@ -124,10 +128,12 @@ class StoreFragment : Fragment() {
                             currentStoreId = storeId
                             storeViewModel.clearSelectedGoods()
                         }
-                        val categories = store?.category?.ifEmpty { null }
-                        if (!categories.isNullOrEmpty()) {
-                            categoryAdapter.setCategoryList(categories)
-                        }
+                    }
+                }
+                launch {
+                    storeViewModel.storeCategories.collectLatest { categories ->
+                        categoryAdapter.setCategoryList(categories)
+                        categoryAdapter.setSelectedCategory(storeViewModel.currentSelectedCategory.value)
                     }
                 }
                 launch {
@@ -138,45 +144,48 @@ class StoreFragment : Fragment() {
             }
         }
         storeViewModel.currentAlreadySelectList.observe(viewLifecycleOwner) { selectedList ->
-            if(selectedList.size == 0){
+            if (selectedList.isEmpty()) {
                 storeViewModel.setMySelectGoosView(false)
             }
-            alreadySelectAdapter.submitList(selectedList.toList())
+            alreadySelectAdapter.submitList(selectedList)
             binding.rvAlreadySelect.post {
                 binding.rvAlreadySelect.setMaxVisibleItems(4)
             }
         }
     }
-    private fun showGoods(){
+
+    private fun showGoods() {
         storeViewModel.setShowStorePage(false)
     }
+
     private fun initGoodsRecyclerView() {
         goodsAdapter = StoreGoodsRecyclerViewAdapter(
             onAddClick = { goods ->
-                 storeViewModel.addGoods(goods)
+                storeViewModel.addGoods(goods)
             },
-            onItemClick = { goods ->
-            }
+            onItemClick = { }
         )
         binding.rvGoods.apply {
-            layoutManager =LinearLayoutManager(context)
+            layoutManager = LinearLayoutManager(context)
             adapter = goodsAdapter
             itemAnimator = null
             setHasFixedSize(true)
         }
     }
+
     private fun initCategoryRecyclerView() {
-        categoryAdapter = StoreCategoryRecyclerViewAdapter { category, position ->
+        categoryAdapter = StoreCategoryRecyclerViewAdapter { _, position ->
             categoryAdapter.updateSelectedPosition(position)
+            storeViewModel.selectCategory(categoryAdapter.getItem(position))
         }
         binding.rvCategory.layoutManager = LinearLayoutManager(context)
         binding.rvCategory.adapter = categoryAdapter
         binding.rvCategory.itemAnimator = null
-        val categoryList = listOf(
-            "全部", "零食饮料", "生鲜果蔬", "粮油调味", "日用百货", "休闲食品"
+        categoryAdapter.setCategoryList(
+            listOf(Store.CATEGORY_ALL, Store.CATEGORY_UNCLASSIFIED)
         )
-        categoryAdapter.setCategoryList(categoryList)
     }
+
     private fun showGoodsMenu(show: Boolean) {
         if (show) {
             binding.llAlreadySelectGoods.alpha = 0f
@@ -195,7 +204,6 @@ class StoreFragment : Fragment() {
                     }
                     .start()
             }
-
         } else {
             binding.llAlreadySelectGoods.animate()
                 .translationY(binding.llAlreadySelectGoods.height.toFloat())
@@ -210,13 +218,12 @@ class StoreFragment : Fragment() {
 
     private fun initAlreadySelectRecyclerView() {
         alreadySelectAdapter = AlreadySelectGoodsRecyclerViewAdapter(
-            onItemClick = { goods ->
+            onItemClick = { },
+            onMinusClick = { item ->
+                storeViewModel.decreaseSelectedGoods(item)
             },
-            onMinusClick = { goods ->
-                storeViewModel.decreaseSelectedGoods(goods)
-            },
-            onPlusClick = { goods ->
-                storeViewModel.increaseSelectedGoods(goods)
+            onPlusClick = { item ->
+                storeViewModel.increaseSelectedGoods(item)
             }
         )
 
@@ -227,8 +234,9 @@ class StoreFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        (requireActivity()as MainActivity).innerBottomBar()
+        (requireActivity() as MainActivity).innerBottomBar()
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

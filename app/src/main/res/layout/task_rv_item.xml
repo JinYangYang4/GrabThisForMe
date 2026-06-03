@@ -95,7 +95,7 @@
                     android:id="@+id/goods_img"
                     android:layout_width="74dp"
                     android:layout_height="74dp"
-                    android:background="@drawable/bg_home_banner_card"
+                    android:background="@drawable/bg_card_white_24"
                     android:clipToOutline="true"
                     android:contentDescription="@null"
                     android:scaleType="centerCrop"
