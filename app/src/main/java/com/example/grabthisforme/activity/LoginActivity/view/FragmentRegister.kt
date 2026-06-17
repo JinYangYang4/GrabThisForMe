@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,19 +14,23 @@ import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import com.example.grabthisforme.activity.LoginActivity.viewmodel.SwitchAccountsViewModel
+import androidx.lifecycle.lifecycleScope
 import com.example.grabthisforme.databinding.FragmentRegisterBinding
-import com.example.grabthisforme.model.user.domain.User
+import com.example.grabthisforme.model.network.AuthTokenDataStore
+import com.example.grabthisforme.model.auth.data.repository.AuthRepository
 import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.UUID
+import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class FragmentRegister : Fragment() {
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: SwitchAccountsViewModel by activityViewModels()
+    @Inject
+    lateinit var authRepository: AuthRepository
+    @Inject
+    lateinit var authTokenDataStore: AuthTokenDataStore
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -89,18 +94,25 @@ class FragmentRegister : Fragment() {
             else -> true
         }
         if (!isInputValid) return
-        val userId = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE
-        val newUser = User(
-            name = userName,
-            id = userId,
-            passwordHash = password,
-            headPic = ""
-        )
+        lifecycleScope.launch {
+            val result = authRepository.register(
+                accountName = userName,
+                password = password,
+                displayName = userName
+            )
+            clearInputFocus()
+            if (result.isSuccess) {
+                Toast.makeText(context, "用户创建成功：$userName", Toast.LENGTH_SHORT).show()
 
-        viewModel.insertUser(newUser)
-        clearInputFocus()
-        Toast.makeText(context, "用户创建成功：$userName", Toast.LENGTH_SHORT).show()
-        requireFragmentManager().popBackStack()
+                requireFragmentManager().popBackStack()
+            } else {
+                Toast.makeText(
+                    context,
+                    result.exceptionOrNull()?.message ?: "注册失败",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
     private fun showInputError(textInputLayout: TextInputLayout, errorMsg: String) {
         textInputLayout.error = errorMsg

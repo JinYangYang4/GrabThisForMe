@@ -1,15 +1,14 @@
 package com.example.grabthisforme.model.user.data.repository
 
-import com.example.grabthisforme.model.relation.data.dao.UserRelationDao
-import com.example.grabthisforme.model.relation.data.entity.UserLikedGoodsEntity
-import com.example.grabthisforme.model.relation.data.entity.UserLikedStoreEntity
-import com.example.grabthisforme.model.user.data.dao.UserDao
+import com.example.grabthisforme.model.goods.data.network.dto.GoodsDto
+import com.example.grabthisforme.model.post.data.network.dto.PostDto
+import com.example.grabthisforme.model.store.data.network.dto.StoreDto
 import com.example.grabthisforme.model.user.domain.User
 import com.example.grabthisforme.model.user.domain.UserStatistics
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -22,13 +21,13 @@ import javax.inject.Singleton
 
 @Singleton
 @OptIn(ExperimentalCoroutinesApi::class)
-class UserRepository@Inject constructor(
-    private val userDao: UserDao,
-    private val userRelationDao: UserRelationDao
+class UserRepository @Inject constructor(
+    private val localRepository: UserLocalRepository,
+    private val remoteRepository: UserRemoteRepository
 ) {
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    val currentUser: StateFlow<User?> = userDao.getCurrentUser()
+    val currentUser: StateFlow<User?> = localRepository.currentUser
         .stateIn(
             scope = repositoryScope,
             started = SharingStarted.Eagerly,
@@ -43,7 +42,7 @@ class UserRepository@Inject constructor(
             initialValue = null
         )
 
-    val allLoginUsers: StateFlow<List<User>> = userDao.getAllLoginUsers()
+    val allLoginUsers: StateFlow<List<User>> = localRepository.allLoginUsers
         .stateIn(
             scope = repositoryScope,
             started = SharingStarted.Eagerly,
@@ -51,24 +50,23 @@ class UserRepository@Inject constructor(
         )
 
     suspend fun upsertUser(user: User) {
-        userDao.saveUser(user)
+        localRepository.saveUser(user)
+    }
+
+    suspend fun upsertUsers(users: List<User>) {
+        localRepository.saveUsers(users)
     }
 
     suspend fun upsertAndSetCurrent(user: User) {
-        userDao.loginAndSetCurrent(user)
+        localRepository.setCurrentUser(user)
+    }
+
+    suspend fun logoutCurrentUser() {
+        localRepository.logoutCurrentUser()
     }
 
     suspend fun updateCurrentUserStatistics(transform: (UserStatistics) -> UserStatistics): User? {
-        val user = currentUser.value ?: return null
-        val updatedStatistics = transform(user.statistics)
-        val updatedUser = user.withStatistics(
-            likeCount = updatedStatistics.likeCount,
-            fanCount = updatedStatistics.fanCount,
-            followCount = updatedStatistics.followCount,
-            selfPosts = updatedStatistics.selfPosts
-        )
-        userDao.saveUser(updatedUser)
-        return updatedUser
+        return localRepository.updateCurrentUserStatistics(transform)
     }
 
     fun isStoreLiked(storeId: Long): Flow<Boolean> {
@@ -76,7 +74,7 @@ class UserRepository@Inject constructor(
             if (userId == null || storeId <= 0L) {
                 flowOf(false)
             } else {
-                userRelationDao.isStoreLikedFlow(userId, storeId)
+                localRepository.isStoreLikedFlow(userId, storeId)
             }
         }
     }
@@ -84,19 +82,7 @@ class UserRepository@Inject constructor(
     suspend fun setStoreLiked(storeId: Long, liked: Boolean): Boolean {
         val userId = currentUserId.value ?: return false
         if (storeId <= 0L) return false
-        val currentlyLiked = userRelationDao.isStoreLiked(userId, storeId)
-        if (currentlyLiked == liked) return liked
-        if (liked) {
-            userRelationDao.insertLikedStore(
-                UserLikedStoreEntity(
-                    userId = userId,
-                    storeId = storeId
-                )
-            )
-        } else {
-            userRelationDao.deleteLikedStore(userId, storeId)
-        }
-        return liked
+        return localRepository.setStoreLiked(userId, storeId, liked)
     }
 
     fun isGoodsLiked(goodsId: Long): Flow<Boolean> {
@@ -104,7 +90,7 @@ class UserRepository@Inject constructor(
             if (userId == null || goodsId <= 0L) {
                 flowOf(false)
             } else {
-                userRelationDao.isGoodsLikedFlow(userId, goodsId)
+                localRepository.isGoodsLikedFlow(userId, goodsId)
             }
         }
     }
@@ -112,18 +98,34 @@ class UserRepository@Inject constructor(
     suspend fun setGoodsLiked(goodsId: Long, liked: Boolean): Boolean {
         val userId = currentUserId.value ?: return false
         if (goodsId <= 0L) return false
-        val currentlyLiked = userRelationDao.isGoodsLiked(userId, goodsId)
-        if (currentlyLiked == liked) return liked
-        if (liked) {
-            userRelationDao.insertLikedGoods(
-                UserLikedGoodsEntity(
-                    userId = userId,
-                    goodsId = goodsId
-                )
-            )
-        } else {
-            userRelationDao.deleteLikedGoods(userId, goodsId)
-        }
-        return liked
+        return localRepository.setGoodsLiked(userId, goodsId, liked)
+    }
+
+    suspend fun getUserPosts(userId: Long): Result<List<PostDto>> {
+        return remoteRepository.getUserPosts(userId)
+            .recoverCatching {
+                emptyList()
+            }
+    }
+
+    suspend fun getLikedPosts(userId: Long): Result<List<PostDto>> {
+        return remoteRepository.getLikedPosts(userId)
+            .recoverCatching {
+                emptyList()
+            }
+    }
+
+    suspend fun getLikedStores(userId: Long): Result<List<StoreDto>> {
+        return remoteRepository.getLikedStores(userId)
+            .recoverCatching {
+                emptyList()
+            }
+    }
+
+    suspend fun getLikedGoods(userId: Long): Result<List<GoodsDto>> {
+        return remoteRepository.getLikedGoods(userId)
+            .recoverCatching {
+                emptyList()
+            }
     }
 }

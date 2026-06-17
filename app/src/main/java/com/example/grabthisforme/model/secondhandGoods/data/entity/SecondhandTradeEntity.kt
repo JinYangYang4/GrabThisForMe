@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.example.grabthisforme.model.goods.data.entity.GoodsBaseEntity
+import com.example.grabthisforme.model.goods.data.local.entity.GoodsBaseEntity
 import com.example.grabthisforme.model.secondhandGoods.domain.SecondhandTradeInfo
 
 @Entity(

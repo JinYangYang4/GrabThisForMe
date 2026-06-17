@@ -1,6 +1,6 @@
 package com.example.grabthisforme.activity.informationFragment.ui_model
 
-import com.example.grabthisforme.model.conversation.data.entity.ConversationUserStateEntity
+import com.example.grabthisforme.model.conversation.data.local.entity.ConversationUserStateEntity
 import com.example.grabthisforme.model.conversation.domain.Conversation
 import com.example.grabthisforme.model.message.domain.Message
 import java.text.SimpleDateFormat

@@ -19,6 +19,7 @@ import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.LoginActivity.viewmodel.SwitchAccountsViewModel
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentLoginBinding
+import com.example.grabthisforme.model.auth.data.repository.AuthRepository
 import com.example.grabthisforme.model.user.data.repository.UserRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -31,6 +32,9 @@ class FragmentLogin : Fragment() {
 
     @Inject
     lateinit var userRepository: UserRepository
+
+    @Inject
+    lateinit var authRepository: AuthRepository
 
     private val viewModel: SwitchAccountsViewModel by activityViewModels()
     val bottomSheet = SwitchAccountsBottomSheetDialogFragment.newInstance()
@@ -108,27 +112,25 @@ class FragmentLogin : Fragment() {
             return
         }
 
-        val userId = userIdText.toLongOrNull()
-        if (userId == null) {
-            Toast.makeText(requireContext(), "账号ID格式不正确", Toast.LENGTH_SHORT).show()
-            return
-        }
-
         if (password.isNullOrEmpty()) {
             Toast.makeText(requireContext(), "请输入密码", Toast.LENGTH_SHORT).show()
             return
         }
 
         lifecycleScope.launch {
-            val allUsers = userRepository.allLoginUsers.value
-            val matchedUser = allUsers.find { it.id == userId }
-
-            if (matchedUser != null) {
-                userRepository.upsertAndSetCurrent(matchedUser)
+            val result = authRepository.login(
+                identifier = userIdText,
+                password = password
+            )
+            if (result.isSuccess) {
                 Toast.makeText(requireContext(), "登录成功", Toast.LENGTH_SHORT).show()
                 navigateToMainActivity()
             } else {
-                Toast.makeText(requireContext(), "账号不存在或密码错误", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    result.exceptionOrNull()?.message ?: "登录失败",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

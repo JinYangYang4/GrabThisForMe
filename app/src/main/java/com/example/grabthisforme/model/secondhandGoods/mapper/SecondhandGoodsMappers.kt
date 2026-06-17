@@ -1,6 +1,6 @@
 package com.example.grabthisforme.model.secondhandGoods.mapper
 
-import com.example.grabthisforme.model.goods.data.dto.GoodsDto
+import com.example.grabthisforme.model.goods.data.network.dto.GoodsDto
 import com.example.grabthisforme.model.goods.mapper.toDomain
 import com.example.grabthisforme.model.goods.mapper.toDto
 import com.example.grabthisforme.model.secondhandGoods.data.dto.SecondhandGoodsDto

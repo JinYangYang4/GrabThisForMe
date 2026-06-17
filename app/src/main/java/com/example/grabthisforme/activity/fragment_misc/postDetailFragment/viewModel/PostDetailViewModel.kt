@@ -16,9 +16,9 @@ import com.example.grabthisforme.model.post.domain.Post
 import com.example.grabthisforme.model.user.data.repository.UserRepository
 import com.example.grabthisforme.model.user.domain.User
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class PostDetailViewModel @Inject constructor(
@@ -120,20 +120,34 @@ class PostDetailViewModel @Inject constructor(
     fun submitReply(
         commentPosition: Int,
         parentCommentId: Long,
-        beCommenter: User? = null
+        beCommenterId: Long,
+        parentReplyId: Long? = null
     ): Boolean {
         val message = _inputText.value.orEmpty().trim()
         if (postId.isBlank() || message.isEmpty()) return false
 
+        val replyTarget = resolveReplyTarget(
+            commentPosition = commentPosition,
+            parentCommentId = parentCommentId,
+            beCommenterId = beCommenterId,
+            parentReplyId = parentReplyId
+        ) ?: return false
+
         val reply = createReply(
             parentCommentId = parentCommentId,
             message = message,
-            beCommenter = beCommenter
+            beCommenter = replyTarget.beCommenter,
+            parentReplyId = replyTarget.parentReplyId
         )
         addReplyLocal(commentPosition, reply)
         clearInputText()
         viewModelScope.launch {
-            postRepository.addReply(postId, parentCommentId, reply)
+            postRepository.addReply(
+                postId = postId,
+                parentCommentId = parentCommentId,
+                reply = reply,
+                beCommenterId = replyTarget.beCommenterId
+            )
         }
         return true
     }
@@ -154,6 +168,37 @@ class PostDetailViewModel @Inject constructor(
             parentCommentId = parentCommentId,
             parentReplyId = parentReplyId
         )
+    }
+
+    private fun resolveReplyTarget(
+        commentPosition: Int,
+        parentCommentId: Long,
+        beCommenterId: Long,
+        parentReplyId: Long?
+    ): ReplyTarget? {
+        if (beCommenterId <= 0L) return null
+
+        val targetComment = _commentList.value.orEmpty().getOrNull(commentPosition) ?: return null
+        if (targetComment.id != parentCommentId) return null
+
+        return if (parentReplyId == null) {
+            val targetUser = targetComment.commenter ?: return null
+            if (targetUser.id != beCommenterId) return null
+            ReplyTarget(
+                beCommenterId = beCommenterId,
+                beCommenter = targetUser,
+                parentReplyId = null
+            )
+        } else {
+            val targetReply = targetComment.replies.firstOrNull { it.id == parentReplyId } ?: return null
+            val targetUser = targetReply.commenter ?: return null
+            if (targetUser.id != beCommenterId) return null
+            ReplyTarget(
+                beCommenterId = beCommenterId,
+                beCommenter = targetUser,
+                parentReplyId = parentReplyId
+            )
+        }
     }
 
     private fun observePost() {
@@ -235,4 +280,10 @@ class PostDetailViewModel @Inject constructor(
             commentCount = commentCount ?: current.commentCount
         )
     }
+
+    private data class ReplyTarget(
+        val beCommenterId: Long,
+        val beCommenter: User,
+        val parentReplyId: Long?
+    )
 }

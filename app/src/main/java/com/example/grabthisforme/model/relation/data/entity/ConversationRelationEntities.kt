@@ -3,8 +3,8 @@ package com.example.grabthisforme.model.relation.data.entity
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import com.example.grabthisforme.model.conversation.data.entity.ConversationEntity
-import com.example.grabthisforme.model.user.data.entity.UserAccountEntity
+import com.example.grabthisforme.model.conversation.data.local.entity.ConversationEntity
+import com.example.grabthisforme.model.user.data.local.entity.UserAccountEntity
 
 @Entity(
     tableName = "conversation_participant",

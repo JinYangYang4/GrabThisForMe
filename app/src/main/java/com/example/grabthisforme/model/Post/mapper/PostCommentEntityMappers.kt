@@ -2,8 +2,8 @@ package com.example.grabthisforme.model.post.mapper
 
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Comment
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Reply
-import com.example.grabthisforme.model.post.data.entity.PostCommentEntity
-import com.example.grabthisforme.model.post.data.entity.PostReplyEntity
+import com.example.grabthisforme.model.post.data.local.entity.PostCommentEntity
+import com.example.grabthisforme.model.post.data.local.entity.PostReplyEntity
 import com.example.grabthisforme.model.user.domain.User
 import org.json.JSONArray
 

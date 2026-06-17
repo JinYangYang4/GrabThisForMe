@@ -8,11 +8,12 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.viewmodel.OrderMessageViewModel
 import com.example.grabthisforme.databinding.FragmentOrderMessageBottomMessageBinding
 import com.example.grabthisforme.model.goods.data.repository.GoodsRepository
-import com.example.grabthisforme.model.order.data.mock.OrderMockData
+import com.example.grabthisforme.model.order.data.repository.OrderRepository
 import com.example.grabthisforme.model.order.domain.Order
 import com.example.grabthisforme.model.order.domain.OrderStatusInfo
 import com.example.grabthisforme.model.user.domain.User
@@ -25,6 +26,8 @@ import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 import kotlin.math.max
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class OrderMessageBottomSheetFragment : BottomSheetDialogFragment() {
@@ -35,6 +38,9 @@ class OrderMessageBottomSheetFragment : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var goodsRepository: GoodsRepository
+
+    @Inject
+    lateinit var orderRepository: OrderRepository
 
     companion object {
         private const val ARG_ORDER_DATA = "order_data"
@@ -59,12 +65,14 @@ class OrderMessageBottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        order = getOrderById(arguments?.getString(ARG_ORDER_DATA).orEmpty())
-        initView()
+        viewLifecycleOwner.lifecycleScope.launch {
+            order = getOrderById(arguments?.getString(ARG_ORDER_DATA).orEmpty())
+            initView()
+        }
     }
 
-    private fun getOrderById(orderId: String): Order {
-        return OrderMockData.getOrderById(orderId) ?: Order(
+    private suspend fun getOrderById(orderId: String): Order {
+        return orderRepository.getOrder(orderId).firstOrNull() ?: Order(
             sender = User.getVirtualUser(),
             orderId = orderId,
             buyer = User.getVirtualUser(),

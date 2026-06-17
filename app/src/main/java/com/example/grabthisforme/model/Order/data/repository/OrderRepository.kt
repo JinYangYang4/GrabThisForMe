@@ -1,98 +1,44 @@
 package com.example.grabthisforme.model.order.data.repository
 
-import com.example.grabthisforme.model.order.data.dao.OrderDao
 import com.example.grabthisforme.model.order.domain.Order
-import com.example.grabthisforme.model.order.domain.OrderStatusInfo
-import com.example.grabthisforme.model.user.data.repository.UserRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class OrderRepository @Inject constructor(
-    private val orderDao: OrderDao,
-    private val userRepository: UserRepository
+    private val localRepository: OrderLocalRepository,
+    private val remoteRepository: OrderRemoteRepository
 ) {
     companion object {
-        const val PAGE_PENDING_RECEIVE = 0
-        const val PAGE_MY_SEND = 1
-        const val PAGE_HISTORY = 2
+        const val PAGE_PENDING_RECEIVE = OrderLocalRepository.PAGE_PENDING_RECEIVE
+        const val PAGE_MY_SEND = OrderLocalRepository.PAGE_MY_SEND
+        const val PAGE_HISTORY = OrderLocalRepository.PAGE_HISTORY
     }
 
-    private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
-    private val sourceOrders: StateFlow<List<Order>> = orderDao.getAllOrders()
-        .stateIn(
-            scope = repositoryScope,
-            started = SharingStarted.Eagerly,
-            initialValue = emptyList()
-        )
-
-    private val annotatedOrders: StateFlow<List<Order>> = combine(
-        sourceOrders,
-        userRepository.currentUserId
-    ) { orders, currentUserId ->
-        orders.withBuyerSelf(currentUserId)
-    }.stateIn(
-        scope = repositoryScope,
-        started = SharingStarted.Eagerly,
-        initialValue = emptyList()
-    )
-
-    val allOrderList: StateFlow<List<Order>> = annotatedOrders
-
-    val currentOrderList: StateFlow<List<Order>> = combine(
-        annotatedOrders,
-        userRepository.currentUserId
-    ) { orders, currentUserId ->
-        orders.filter { it.isCurrentTaskOrder(currentUserId) }
-    }.stateIn(
-        scope = repositoryScope,
-        started = SharingStarted.Eagerly,
-        initialValue = emptyList()
-    )
-
-    val mySendOrderList: StateFlow<List<Order>> = combine(
-        annotatedOrders,
-        userRepository.currentUserId
-    ) { orders, currentUserId ->
-        if (currentUserId == null) {
-            emptyList()
-        } else {
-            orders.filter { it.sender?.id == currentUserId }
-        }
-    }.stateIn(
-        scope = repositoryScope,
-        started = SharingStarted.Eagerly,
-        initialValue = emptyList()
-    )
-
-    val historyOrderList: StateFlow<List<Order>> = annotatedOrders
+    val allOrderList: StateFlow<List<Order>> = localRepository.allOrderList
+    val currentOrderList: StateFlow<List<Order>> = localRepository.currentOrderList
+    val mySendOrderList: StateFlow<List<Order>> = localRepository.mySendOrderList
+    val historyOrderList: StateFlow<List<Order>> = localRepository.historyOrderList
 
     fun ordersByPage(page: Int): StateFlow<List<Order>> {
-        return when (page) {
-            PAGE_PENDING_RECEIVE -> currentOrderList
-            PAGE_MY_SEND -> mySendOrderList
-            PAGE_HISTORY -> historyOrderList
-            else -> allOrderList
-        }
+        return localRepository.ordersByPage(page)
     }
 
-    private fun Order.isCurrentTaskOrder(currentUserId: Long?): Boolean {
-        return (orderStatus == OrderStatusInfo.STATUS_PENDING_RECEIPT ||
-            orderStatus == OrderStatusInfo.STATUS_PENDING_DELIVERY) &&
-                (sender?.id == currentUserId || isBuyerSelf)
+    fun getOrder(orderId: String): Flow<Order?> {
+        return localRepository.getOrder(orderId)
     }
 
-    private fun List<Order>.withBuyerSelf(currentUserId: Long?): List<Order> {
-        return map { order ->
-            order.copy(isBuyerSelf = order.buyer.id == currentUserId)
-        }
+    suspend fun saveOrder(order: Order) {
+        localRepository.saveOrder(order)
+    }
+
+    suspend fun saveOrders(orders: List<Order>) {
+        localRepository.saveOrders(orders)
+    }
+
+    suspend fun deleteOrderById(orderId: String) {
+        localRepository.deleteOrderById(orderId)
     }
 }

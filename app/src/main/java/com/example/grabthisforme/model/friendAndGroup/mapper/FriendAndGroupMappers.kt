@@ -2,9 +2,9 @@ package com.example.grabthisforme.model.friendAndGroup.mapper
 
 import com.example.grabthisforme.model.friendAndGroup.Friend
 import com.example.grabthisforme.model.friendAndGroup.Group
-import com.example.grabthisforme.model.friendAndGroup.data.entity.ChatGroupEntity
-import com.example.grabthisforme.model.friendAndGroup.data.entity.UserFriendRelationEntity
-import com.example.grabthisforme.model.friendAndGroup.data.entity.UserGroupRelationEntity
+import com.example.grabthisforme.model.friendAndGroup.data.local.entity.ChatGroupEntity
+import com.example.grabthisforme.model.friendAndGroup.data.local.entity.UserFriendRelationEntity
+import com.example.grabthisforme.model.friendAndGroup.data.local.entity.UserGroupRelationEntity
 import com.example.grabthisforme.model.user.domain.User
 
 fun UserFriendRelationEntity.toDomain(friendUser: User): Friend {

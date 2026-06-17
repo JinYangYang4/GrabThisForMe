@@ -1,6 +1,6 @@
 package com.example.grabthisforme.model.order.data.mock
 
-import com.example.grabthisforme.model.order.data.dto.OrderDto
+import com.example.grabthisforme.model.order.data.network.dto.OrderDto
 import com.example.grabthisforme.model.order.domain.Order
 import com.example.grabthisforme.model.order.mapper.toDomain
 

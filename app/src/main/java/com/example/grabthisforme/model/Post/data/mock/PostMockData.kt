@@ -1,6 +1,6 @@
 package com.example.grabthisforme.model.post.data.mock
 
-import com.example.grabthisforme.model.post.data.dto.PostDto
+import com.example.grabthisforme.model.post.data.network.dto.PostDto
 import com.example.grabthisforme.model.post.domain.Post
 import com.example.grabthisforme.model.post.mapper.toDomain
 import com.example.grabthisforme.model.user.domain.User

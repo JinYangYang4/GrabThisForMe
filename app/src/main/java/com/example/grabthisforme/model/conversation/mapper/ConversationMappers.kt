@@ -1,8 +1,8 @@
 package com.example.grabthisforme.model.conversation.mapper
 
-import com.example.grabthisforme.model.conversation.data.dto.ConversationDto
-import com.example.grabthisforme.model.conversation.data.entity.ConversationBundleEntity
-import com.example.grabthisforme.model.conversation.data.entity.ConversationEntity
+import com.example.grabthisforme.model.conversation.data.local.entity.ConversationBundleEntity
+import com.example.grabthisforme.model.conversation.data.local.entity.ConversationEntity
+import com.example.grabthisforme.model.conversation.data.network.dto.ConversationDto
 import com.example.grabthisforme.model.conversation.domain.Conversation
 import com.example.grabthisforme.model.message.domain.Message
 import com.example.grabthisforme.model.message.mapper.toDomain

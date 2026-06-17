@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.grabthisforme.activity.LoginActivity.ui_model.SwitchAccountItemUiModel
 import com.example.grabthisforme.activity.LoginActivity.ui_model.toSwitchAccountItemUiModel
-import com.example.grabthisforme.model.user.data.dao.UserDao
+import com.example.grabthisforme.model.user.data.local.dao.UserDao
 import com.example.grabthisforme.model.user.data.repository.UserRepository
 import com.example.grabthisforme.model.user.domain.User
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -1,15 +1,15 @@
 package com.example.grabthisforme.model.goods.mapper
 
-import com.example.grabthisforme.model.goods.data.dto.GoodsBaseDto
-import com.example.grabthisforme.model.goods.data.dto.GoodsDto
-import com.example.grabthisforme.model.goods.data.dto.GoodsPriceDto
-import com.example.grabthisforme.model.goods.data.dto.GoodsStateDto
-import com.example.grabthisforme.model.goods.data.dto.GoodsUiDto
-import com.example.grabthisforme.model.goods.data.entity.GoodsBaseEntity
-import com.example.grabthisforme.model.goods.data.entity.GoodsBundleEntity
-import com.example.grabthisforme.model.goods.data.entity.GoodsPriceEntity
-import com.example.grabthisforme.model.goods.data.entity.GoodsStateEntity
-import com.example.grabthisforme.model.goods.data.entity.GoodsUiEntity
+import com.example.grabthisforme.model.goods.data.local.entity.GoodsBaseEntity
+import com.example.grabthisforme.model.goods.data.local.entity.GoodsBundleEntity
+import com.example.grabthisforme.model.goods.data.local.entity.GoodsPriceEntity
+import com.example.grabthisforme.model.goods.data.local.entity.GoodsStateEntity
+import com.example.grabthisforme.model.goods.data.local.entity.GoodsUiEntity
+import com.example.grabthisforme.model.goods.data.network.dto.GoodsBaseDto
+import com.example.grabthisforme.model.goods.data.network.dto.GoodsDto
+import com.example.grabthisforme.model.goods.data.network.dto.GoodsPriceDto
+import com.example.grabthisforme.model.goods.data.network.dto.GoodsStateDto
+import com.example.grabthisforme.model.goods.data.network.dto.GoodsUiDto
 import com.example.grabthisforme.model.goods.domain.Goods
 import com.example.grabthisforme.model.goods.domain.GoodsBaseInfo
 import com.example.grabthisforme.model.goods.domain.GoodsPriceInfo

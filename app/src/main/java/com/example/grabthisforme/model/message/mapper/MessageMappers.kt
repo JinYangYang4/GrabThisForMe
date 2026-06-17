@@ -1,7 +1,7 @@
 package com.example.grabthisforme.model.message.mapper
 
-import com.example.grabthisforme.model.message.data.dto.MessageDto
-import com.example.grabthisforme.model.message.data.entity.MessageEntity
+import com.example.grabthisforme.model.message.data.local.entity.MessageEntity
+import com.example.grabthisforme.model.message.data.network.dto.MessageDto
 import com.example.grabthisforme.model.message.domain.Message
 
 private fun String.toMessageType(): Message.MessageType {

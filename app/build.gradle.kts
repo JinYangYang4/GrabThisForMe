@@ -51,6 +51,13 @@ kotlin {
     }
 }
 
+configurations.configureEach {
+    resolutionStrategy.force(
+        "com.squareup.okio:okio:3.4.0",
+        "com.squareup.okio:okio-jvm:3.4.0"
+    )
+}
+
 dependencies {
     val nav_version = "2.7.1"
     val compose_version = "1.9.5"
@@ -72,6 +79,10 @@ dependencies {
     implementation("androidx.room:room-runtime:${room_version}")
     implementation("androidx.room:room-ktx:${room_version}")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("androidx.navigation:navigation-fragment-ktx:${navVersion}")
     implementation("androidx.navigation:navigation-ui-ktx:${navVersion}")
     implementation("androidx.navigation:navigation-compose:${navVersion}")

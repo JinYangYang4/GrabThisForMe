@@ -3,10 +3,10 @@ package com.example.grabthisforme.model.relation.data.entity
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import com.example.grabthisforme.model.goods.data.entity.GoodsBaseEntity
-import com.example.grabthisforme.model.post.data.entity.PostEntity
-import com.example.grabthisforme.model.store.data.entity.StoreEntity
-import com.example.grabthisforme.model.user.data.entity.UserAccountEntity
+import com.example.grabthisforme.model.goods.data.local.entity.GoodsBaseEntity
+import com.example.grabthisforme.model.post.data.local.entity.PostEntity
+import com.example.grabthisforme.model.store.data.local.entity.StoreEntity
+import com.example.grabthisforme.model.user.data.local.entity.UserAccountEntity
 
 @Entity(
     tableName = "user_post",

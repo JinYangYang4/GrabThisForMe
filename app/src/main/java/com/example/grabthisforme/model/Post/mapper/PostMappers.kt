@@ -1,15 +1,22 @@
 package com.example.grabthisforme.model.post.mapper
 
-import com.example.grabthisforme.model.post.data.dto.PostDto
-import com.example.grabthisforme.model.post.data.entity.PostEntity
-import com.example.grabthisforme.model.post.data.entity.PostStatsEntity
-import com.example.grabthisforme.model.post.data.entity.PostWithAuthorEntity
+import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Comment
+import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Reply
+import com.example.grabthisforme.model.post.data.local.entity.PostEntity
+import com.example.grabthisforme.model.post.data.local.entity.PostStatsEntity
+import com.example.grabthisforme.model.post.data.local.entity.PostWithAuthorEntity
+import com.example.grabthisforme.model.post.data.network.dto.PostDetailDto
+import com.example.grabthisforme.model.post.data.network.dto.PostCommentDto
+import com.example.grabthisforme.model.post.data.network.dto.PostDto
+import com.example.grabthisforme.model.post.data.network.dto.PostReplyDto
 import com.example.grabthisforme.model.post.domain.Post
 import com.example.grabthisforme.model.post.domain.PostAuthor
 import com.example.grabthisforme.model.post.domain.PostStats
 import com.example.grabthisforme.model.relation.data.entity.UserPostEntity
-import com.example.grabthisforme.model.user.data.entity.UserAccountEntity
-import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
+import com.example.grabthisforme.model.user.data.local.entity.UserAccountEntity
+import com.example.grabthisforme.model.user.data.local.entity.UserProfileEntity
+import com.example.grabthisforme.model.user.data.network.dto.UserDto
+import com.example.grabthisforme.model.user.mapper.toDomain
 import org.json.JSONArray
 
 private const val DEFAULT_AUTHOR_NAME = "anonymous"
@@ -40,6 +47,46 @@ fun PostDto.toDomain(): Post {
         ),
         likeCount = likeCount,
         commentCount = commentCount
+    )
+}
+
+fun PostDetailDto.toDomain(): Post {
+    return Post(
+        postId = postId,
+        content = content,
+        images = images,
+        createTime = createTime,
+        author = PostAuthor(
+            authorId = author.id,
+            authorName = author.name ?: author.accountName.orEmpty(),
+            authorAvatarUrl = author.headPic.orEmpty()
+        ),
+        likeCount = likeCount,
+        commentCount = commentCount
+    )
+}
+
+fun PostCommentDto.toDomain(): Comment {
+    return Comment(
+        id = commentId,
+        time = time,
+        message = message,
+        imageUrls = imageUrls,
+        commenter = commenter.toDomain(),
+        replies = emptyList()
+    )
+}
+
+fun PostReplyDto.toDomain(): Reply {
+    return Reply(
+        id = replyId,
+        time = time,
+        message = message,
+        commenter = commenter.toDomain(),
+        beCommenter = beCommenter.toDomain(),
+        imageUrls = imageUrls,
+        parentCommentId = parentCommentId,
+        parentReplyId = parentReplyId
     )
 }
 

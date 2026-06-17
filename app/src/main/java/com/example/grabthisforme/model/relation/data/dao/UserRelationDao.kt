@@ -22,6 +22,9 @@ interface UserRelationDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertLikedPost(entity: UserLikedPostEntity)
 
+    @Query("SELECT * FROM user_liked_post WHERE userId = :userId ORDER BY likedAt DESC")
+    suspend fun getLikedPostsByUserId(userId: Long): List<UserLikedPostEntity>
+
     @Query("DELETE FROM user_liked_post WHERE userId = :userId AND postId = :postId")
     suspend fun deleteLikedPost(userId: Long, postId: String)
 
@@ -33,6 +36,9 @@ interface UserRelationDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertLikedStore(entity: UserLikedStoreEntity)
+
+    @Query("SELECT * FROM user_liked_store WHERE userId = :userId ORDER BY likedAt DESC")
+    suspend fun getLikedStoresByUserId(userId: Long): List<UserLikedStoreEntity>
 
     @Query("DELETE FROM user_liked_store WHERE userId = :userId AND storeId = :storeId")
     suspend fun deleteLikedStore(userId: Long, storeId: Long)
@@ -46,6 +52,9 @@ interface UserRelationDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertLikedGoods(entity: UserLikedGoodsEntity)
 
+    @Query("SELECT * FROM user_liked_goods WHERE userId = :userId ORDER BY likedAt DESC")
+    suspend fun getLikedGoodsByUserId(userId: Long): List<UserLikedGoodsEntity>
+
     @Query("DELETE FROM user_liked_goods WHERE userId = :userId AND goodsId = :goodsId")
     suspend fun deleteLikedGoods(userId: Long, goodsId: Long)
 
@@ -54,4 +63,7 @@ interface UserRelationDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM user_liked_goods WHERE userId = :userId AND goodsId = :goodsId)")
     suspend fun isGoodsLiked(userId: Long, goodsId: Long): Boolean
+
+    @Query("SELECT * FROM user_post WHERE userId = :userId ORDER BY postId DESC")
+    suspend fun getUserPostsByUserId(userId: Long): List<UserPostEntity>
 }

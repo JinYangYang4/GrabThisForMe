@@ -1,11 +1,11 @@
 package com.example.grabthisforme.model.store.mapper
 
-import com.example.grabthisforme.model.store.data.dto.StoreCommercialInfoDto
-import com.example.grabthisforme.model.store.data.dto.StoreDto
-import com.example.grabthisforme.model.store.data.dto.StoreIdentityDto
-import com.example.grabthisforme.model.store.data.dto.StoreLocationDto
-import com.example.grabthisforme.model.store.data.dto.StoreStatisticsDto
-import com.example.grabthisforme.model.store.data.entity.StoreEntity
+import com.example.grabthisforme.model.store.data.local.entity.StoreEntity
+import com.example.grabthisforme.model.store.data.network.dto.StoreCommercialInfoDto
+import com.example.grabthisforme.model.store.data.network.dto.StoreDto
+import com.example.grabthisforme.model.store.data.network.dto.StoreIdentityDto
+import com.example.grabthisforme.model.store.data.network.dto.StoreLocationDto
+import com.example.grabthisforme.model.store.data.network.dto.StoreStatisticsDto
 import com.example.grabthisforme.model.store.domain.Store
 import com.example.grabthisforme.model.store.domain.StoreCommercialInfo
 import com.example.grabthisforme.model.store.domain.StoreIdentity

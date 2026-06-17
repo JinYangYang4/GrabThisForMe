@@ -1,8 +1,8 @@
 package com.example.grabthisforme.model.order.mapper
 
 import com.example.grabthisforme.model.goods.domain.Goods
-import com.example.grabthisforme.model.order.data.dto.OrderDto
-import com.example.grabthisforme.model.order.data.entity.OrderEntity
+import com.example.grabthisforme.model.order.data.local.entity.OrderEntity
+import com.example.grabthisforme.model.order.data.network.dto.OrderDto
 import com.example.grabthisforme.model.order.domain.Order
 import com.example.grabthisforme.model.order.domain.OrderGoodsInfo
 import com.example.grabthisforme.model.order.domain.OrderIdentity

@@ -1,10 +1,12 @@
 package com.example.grabthisforme.model.user.mapper
 
-import com.example.grabthisforme.model.user.data.entity.UserAccountEntity
-import com.example.grabthisforme.model.user.data.entity.UserBasicBundleEntity
-import com.example.grabthisforme.model.user.data.entity.UserBundleEntity
-import com.example.grabthisforme.model.user.data.entity.UserProfileEntity
-import com.example.grabthisforme.model.user.data.entity.UserStatisticsEntity
+import com.example.grabthisforme.model.user.data.local.entity.UserAccountEntity
+import com.example.grabthisforme.model.user.data.local.entity.UserBasicBundleEntity
+import com.example.grabthisforme.model.user.data.local.entity.UserBundleEntity
+import com.example.grabthisforme.model.user.data.local.entity.UserProfileEntity
+import com.example.grabthisforme.model.user.data.local.entity.UserStatisticsEntity
+import com.example.grabthisforme.model.user.data.network.dto.UserDto
+import com.example.grabthisforme.model.user.data.network.dto.UserStatisticsDto
 import com.example.grabthisforme.model.user.domain.User
 import com.example.grabthisforme.model.user.domain.UserAccount
 import com.example.grabthisforme.model.user.domain.UserProfile
@@ -40,6 +42,52 @@ fun User.toStatisticsEntity(): UserStatisticsEntity {
         likeCount = likeCount,
         fanCount = fanCount,
         followCount = followCount
+    )
+}
+
+fun UserDto.toDomain(passwordHash: String = ""): User {
+    return User(
+        id = id,
+        name = name ?: accountName ?: id.toString(),
+        headPic = headPic.orEmpty(),
+        phone = phone,
+        email = email,
+        gender = gender ?: UserProfile.GENDER_UNKNOWN,
+        createTime = createTime ?: System.currentTimeMillis(),
+        isVip = isVip ?: false,
+        signature = signature,
+        accountName = accountName ?: id.toString(),
+        passwordHash = passwordHash,
+        isLoginAccount = true,
+        lastLoginTime = lastLoginTime,
+        likeCount = statistics?.likeCount ?: 0L,
+        fanCount = statistics?.fanCount ?: 0L,
+        followCount = statistics?.followCount ?: 0L,
+        selfPosts = emptyList(),
+        likedPostIds = emptyList(),
+        likedStoreIds = emptyList(),
+        likedGoodsIds = emptyList()
+    )
+}
+
+fun User.toDto(): UserDto {
+    return UserDto(
+        id = id,
+        accountName = accountName,
+        name = name,
+        headPic = headPic,
+        phone = phone,
+        email = email,
+        gender = gender,
+        isVip = isVip,
+        signature = signature,
+        createTime = createTime,
+        lastLoginTime = account.lastLoginTime,
+        statistics = UserStatisticsDto(
+            likeCount = likeCount,
+            fanCount = fanCount,
+            followCount = followCount
+        )
     )
 }
 

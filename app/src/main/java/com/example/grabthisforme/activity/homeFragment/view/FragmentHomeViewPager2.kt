@@ -14,7 +14,6 @@ import com.example.grabthisforme.activity.homeFragment.adapter.RecyclerViewOrder
 import com.example.grabthisforme.activity.homeFragment.ui_model.toOrderListItemUiModel
 import com.example.grabthisforme.activity.homeFragment.viewModel.FragmentHomeViewModel
 import com.example.grabthisforme.databinding.FragmentTaskBinding
-import com.example.grabthisforme.model.order.data.mock.OrderMockData
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -48,11 +47,7 @@ class FragmentHomeViewPager2 : Fragment() {
     fun loadAllTask() {
         viewLifecycleOwner.lifecycleScope.launch {
             homeViewModel.currentTaskOrders.collectLatest { orderList ->
-                if (orderList.isEmpty()) {
-                    taskAdapter.submitList(OrderMockData.getOrderList().map { it.toOrderListItemUiModel() })
-                } else {
-                    taskAdapter.submitList(orderList)
-                }
+                taskAdapter.submitList(orderList)
             }
         }
     }

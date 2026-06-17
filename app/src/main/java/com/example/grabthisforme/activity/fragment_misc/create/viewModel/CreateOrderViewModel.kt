@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.grabthisforme.model.goods.domain.Goods
-import com.example.grabthisforme.model.order.data.dao.OrderDao
+import com.example.grabthisforme.model.order.data.repository.OrderRepository
 import com.example.grabthisforme.model.order.domain.Order
 import com.example.grabthisforme.model.order.domain.OrderStatusInfo
 import com.example.grabthisforme.model.user.data.repository.UserRepository
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateOrderViewModel @Inject constructor(
-    private val orderDao: OrderDao,
+    private val orderRepository: OrderRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
     private val _buyGoodsMode = MutableLiveData(true)
@@ -181,7 +181,7 @@ class CreateOrderViewModel @Inject constructor(
                     orderStatus = OrderStatusInfo.STATUS_PENDING_RECEIPT,
                     isAccepted = false
                 )
-                orderDao.saveOrder(order)
+                orderRepository.saveOrder(order)
             }.onSuccess {
                 _createResult.postValue(
                     CreateOrderResult(
