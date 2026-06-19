@@ -101,3 +101,6 @@ When using a better autonomous approach, AI should:
 ### Platform
 - `docs/skills/platform/android-build-and-test/`
   Purpose: Android compile, verification, test, and environment guidance.
+
+- `docs/skills/platform/frontend-backend-handoff/`
+  Purpose: frontend/backend project paths, backend compile location, sandbox escalation expectations, and handoff notes for new AI conversations.

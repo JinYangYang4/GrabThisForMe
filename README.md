@@ -1,257 +1,255 @@
-# GrabThisForMe
+# GrabThisForMe 前端项目
 
-GrabThisForMe 是一个面向校园生活场景的 Android Kotlin 原型项目，覆盖跑腿订单、校园社区、商品商城、二手交易、聊天消息、好友/聊群、搜索和个人中心等流程。项目当前重点是功能闭环验证、Room 本地数据链路完善、领域模型拆分和页面体验优化，部分页面仍处于 mock 数据向 Repository/Room 迁移的阶段。
+## 项目简介
 
-## 项目概览
+GrabThisForMe 是一个面向校园生活场景的 Android Kotlin 项目，覆盖跑腿订单、校园社区、商品商城、二手交易、聊天消息、好友与群组、搜索和个人中心等功能。
 
-主要功能模块：
+当前项目重点在于：
 
-- 首页：跑腿入口、接单/发单场景、常用入口、店铺和用户相关展示。
-- 订单：创建订单、订单列表、订单详情、历史订单。
-- 社区：帖子流、发布帖子、帖子详情、评论、回复、点赞和分享入口。
-- 商城：商品列表、商品详情、店铺页、店铺搜索、店主后台、商品创建和商品分类。
-- 二手：二手商品列表、分类浏览、二手商品详情和交易信息。
-- 消息：会话列表、聊天页、图片选择、拍照、好友列表、聊群、用户详情和聊群详情。
-- 搜索：商品、社区、联系人/聊群/会话、店铺等多场景搜索。
-- 用户：登录、注册、找回密码、账号切换、个人信息、设置、收藏、喜欢。
+- 逐步从原型页面迁移到更稳定的数据链路
+- 统一 `view / viewModel / data / domain / mapper` 分层
+- 用 Room、Repository、DataStore 承接本地数据
+- 为后续前后端联调逐步接入 Retrofit 与远程仓库
+
+## 项目位置
+
+前端项目目录：
+
+```text
+D:\projects\GrabThisForMe\xin\GrabThisForMe
+```
+
+后端项目目录：
+
+```text
+D:\projects\GrabThisForMe\GrabThisForMe-Backend\GrabThisForMe
+```
+
+如果任务涉及后端代码、联调或接口修改，除了当前前端仓库外，还需要同时查看后端项目。
+
+## 主要功能模块
+
+- 首页：跑腿入口、接单/发单场景、常用入口、店铺和用户展示
+- 订单：创建订单、订单列表、订单详情、历史订单
+- 社区：帖子流、发帖、帖子详情、评论、回复、点赞、分享
+- 商城：商品列表、商品详情、店铺页、店铺搜索、店主管理
+- 二手：二手商品列表、分类浏览、商品详情、交易信息
+- 消息：会话列表、聊天页面、图片选择、拍照、好友、群组
+- 搜索：商品、社区、联系人、群组、店铺等多场景搜索
+- 用户：登录、注册、找回密码、账号切换、个人信息、设置
 
 ## 技术栈
 
 - 语言：Kotlin
 - UI：XML Layout、DataBinding、RecyclerView、ConstraintLayout、Material Components
 - 局部新 UI：Jetpack Compose
-- 架构：渐进式 MVVM，按 `view / viewModel / data / domain / mapper` 分层推进
+- 架构：渐进式 MVVM
 - 导航：Jetpack Navigation、Safe Args、多 NavHostFragment
 - 依赖注入：Hilt
 - 本地数据库：Room
 - 本地偏好：DataStore Preferences
+- 网络：Retrofit、OkHttp（逐步接入中）
 - 图片加载：Glide
 - 图片查看：PhotoView
-- 图表：MPAndroidChart
-- 弹窗选择器：Android-PickerView
-- 布局辅助：FlexboxLayout
-- Compose 液态玻璃效果：`io.github.kyant0:backdrop`
 
-当前主要版本：
+当前关键版本：
 
 - `compileSdk = 36`
 - `targetSdk = 36`
 - `minSdk = 24`
-- Gradle Wrapper：`8.13`
-- Kotlin：`2.3.10`
-- Hilt：`2.57.2`
-- Room：`2.8.4`
-- Navigation：`2.7.x`
-- Backdrop：`1.0.6`
-- Java / Kotlin JVM Target：`11`
+- Gradle Wrapper `8.13`
+- Java / Kotlin JVM Target `11`
 
-## 快速运行
+## 当前架构约定
 
-Windows：
+项目整体按模块组织在 `app/src/main/java/com/example/grabthisforme/model/` 下。
 
-```powershell
-.\gradlew.bat assembleDebug
-.\gradlew.bat :app:compileDebugKotlin
-.\gradlew.bat :app:kaptDebugKotlin
+每个业务模块优先采用以下结构：
+
+```text
+model/<module>/
+├─ data/
+│  ├─ local/
+│  │  ├─ dao/
+│  │  └─ entity/
+│  ├─ network/
+│  │  ├─ api/
+│  │  └─ dto/
+│  └─ repository/
+├─ domain/
+└─ mapper/
 ```
 
-macOS / Linux：
+Repository 层约定：
 
-```bash
-./gradlew assembleDebug
-./gradlew :app:compileDebugKotlin
-./gradlew :app:kaptDebugKotlin
-```
+- `LocalRepository`：只负责本地数据源
+- `RemoteRepository`：只负责网络数据源
+- `Repository`：统一对上提供业务入口，优先远程，失败再回退本地
 
-建议使用 Android Studio 打开项目。当前项目使用 Room、Hilt、DataBinding 和 Safe Args，修改数据库实体、DAO、依赖注入或导航参数后，优先运行 `:app:kaptDebugKotlin` 或 `:app:compileDebugKotlin` 做快速校验。
+页面层约定：
+
+- `Fragment / Activity` 负责页面绑定、事件分发、列表初始化
+- `ViewModel` 负责页面状态、输入校验、业务调用
+- `ui_model` 只承接页面真正需要展示的字段
+
+## 当前数据链路重点
+
+### 用户与认证
+
+- 登录、注册等请求已经按 `network/auth` 方向接入
+- 登录后端会返回 token
+- 客户端后续请求需要通过请求头携带 `Authorization: Bearer <token>`
+
+### 评论与回复
+
+近期帖子详情评论/回复链路已经朝以下方向调整：
+
+- 显示时优先使用网络返回 DTO 转成 domain 直接展示
+- 本地数据库只作为缓存和兜底，不作为首要显示来源
+- 回复分页从 `offset` 改为 `beforeTime` 游标方式
+- 回复展开策略：
+  - 第一次展开显示 3 条
+  - 第二次显示到 5 条
+  - 之后每次再增加 7 条
+- 网络侧固定按 `8` 条补货
+
+如果继续修改帖子评论、回复、缓存或分页逻辑，建议先查看：
+
+- `docs/skills/data/dto-backend-remote-repository-flow/SKILL.md`
+- `docs/skills/data/repository-data-chain/SKILL.md`
+- `docs/skills/platform/frontend-backend-handoff/SKILL.md`
 
 ## 目录结构
 
-主要源码路径：
+主要源码目录：
 
 ```text
 app/src/main/java/com/example/grabthisforme/
-├── activity/      Activity、Fragment、页面 Adapter、页面 ViewModel
-├── di/            Hilt 依赖注入模块
-├── extension/     Kotlin 扩展方法
-├── model/         Room、Repository、领域模型、Mapper
-├── ui/            通用 UI、Compose 组件、自定义 View
-└── util/          工具类
+├─ activity/     Activity、Fragment、页面 Adapter、页面 ViewModel
+├─ di/           Hilt 模块
+├─ extension/    Kotlin 扩展
+├─ model/        数据层、领域层、Mapper
+├─ ui/           通用 UI 组件、自定义 View、Compose 组件
+└─ util/         工具类
 ```
 
-主要资源路径：
+主要资源目录：
 
 ```text
 app/src/main/res/
-├── layout/        XML 页面和 RecyclerView item
-├── navigation/    Navigation 图
-├── drawable/      图标、背景、shape
-├── values/        颜色、字符串、主题
-└── xml/           FileProvider、备份配置
+├─ layout/
+├─ navigation/
+├─ drawable/
+├─ values/
+└─ xml/
 ```
 
-当前导航图：
+## 快速编译
 
-- `nav_graph.xml`：主 Tab 级页面。
-- `nav_graph_home.xml`：首页内部子导航。
-- `nav_graph_login.xml`：登录注册流程。
-- `nav_new.xml`：零散业务页面，如聊天、详情、店铺、设置等。
+推荐在 PowerShell 中执行：
 
-## 架构约定
+```powershell
+$env:JAVA_HOME='D:\Application\java\jdk-21.0.11'
+$env:PATH="$env:JAVA_HOME\bin;$env:PATH"
+$env:GRADLE_USER_HOME='D:\projects\GrabThisForMe\xin\GrabThisForMe\.gradle-user-home-local'
+.\gradlew.bat --no-daemon --console=plain :app:compileDebugKotlin
+```
 
-项目整体采用渐进式 MVVM：
+其他常用命令：
 
-- `Fragment / Activity` 负责页面绑定、点击事件、RecyclerView 初始化和系统交互。
-- `ViewModel` 负责页面状态、输入校验、UI 事件转业务请求。
-- `Repository` 负责屏蔽数据来源，当前主要连接 Room，也保留部分 mock fallback。
-- `Dao / Entity` 负责 Room 持久化。
-- `domain` 放业务模型，`mapper` 负责 Entity、DTO、Domain 之间转换。
-- 页面或 Adapter 如果只需要领域模型的一部分字段，应优先创建 `ui_model`，不要直接消费过大的领域模型。
+```powershell
+.\gradlew.bat --no-daemon --console=plain :app:kaptDebugKotlin
+.\gradlew.bat --no-daemon --console=plain assembleDebug
+```
 
-新增功能时优先沿用当前模块结构。例如 `model/goods`、`model/store`、`model/conversation` 已经具备 `data / domain / mapper / repository` 等结构，不要在页面层直接操作 Room。
+说明：
 
-## 数据层
+- 修改 Kotlin、XML、DataBinding、导航参数后，优先跑 `:app:compileDebugKotlin`
+- 修改 Room、Hilt、注解处理相关内容后，必要时再跑 `:app:kaptDebugKotlin`
+
+## 数据库说明
 
 Room 数据库入口：
 
 - `app/src/main/java/com/example/grabthisforme/model/AppDataBase/AppDatabase.kt`
-- 数据库名：`grab_this_for_me_core_db`
-- 当前版本：`34`
-- 当前迁移策略：`fallbackToDestructiveMigration()`
 
 Hilt 数据库注入入口：
 
 - `app/src/main/java/com/example/grabthisforme/di/DatabaseModule.kt`
 
-已注册的主要 DAO：
+当前数据库特征：
 
-- `SearchDao`
-- `UserDao`
-- `GoodsDao`
-- `MessageDao`
-- `ConversationDao`
-- `ConversationUserStateDao`
-- `ConversationRelationDao`
-- `OrderDao`
-- `PostDao`
-- `PostStatsDao`
-- `UserRelationDao`
-- `StoreRelationDao`
-- `StoreDao`
-- `FriendAndGroupDao`
+- 数据库名：`grab_this_for_me_core_db`
+- 当前版本请以代码中的 `AppDatabase` 为准
+- 目前仍使用 `fallbackToDestructiveMigration()`，开发期升级 schema 可能清库
 
 完整表说明维护在：
 
 - `docs/skills/data/database-table-catalog.md`
 
-建表、拆表、领域模型和 UI 模型规范维护在：
+## 与后端联调
 
-- `docs/skills/data/README.md`
-- `docs/skills/data/table-and-domain-model-guidelines/SKILL.md`
-- `docs/skills/data/page-ui-model-decomposition/SKILL.md`
-- `docs/skills/data/room-normalize-relations/SKILL.md`
+后端默认端口是：
 
-## 核心模型模块
+```text
+http://localhost:8080
+```
 
-`model/` 下的主要模块：
+常见接口路径示例：
 
-- `user`：用户账号、资料、统计、当前登录用户、用户偏好。
-- `Post`：社区帖子、评论、回复、帖子统计。
-- `Order`：跑腿订单。
-- `goods`：商品基础信息、价格、UI 状态、库存状态。
-- `store`：店铺信息。
-- `relation`：用户点赞关系、店铺商品分类关系、会话参与者关系。
-- `secondhandGoods`：二手商品和交易信息。
-- `conversation`：会话基础信息和当前用户会话状态。
-- `message`：聊天消息内容。
-- `friendAndGroup`：好友关系、聊群、用户与聊群关系。
+- 登录/注册：`/api/auth/...`
+- 帖子：`/api/posts/...`
+- 店铺：`/api/stores/...`
+- 用户：`/api/users/...`
 
-历史目录中存在大小写混用，例如 `Post`、`Order` 目录首字母大写。新增代码时优先保持当前模块已有 package 风格，并参考同模块现有写法。
+如果接口返回：
 
-## 会话、未读和隐藏规则
+```json
+{
+  "code": 40101,
+  "message": "Missing bearer token"
+}
+```
 
-当前会话模型采用“会话共用，用户状态独立”的设计：
+说明当前请求没有携带 token，需要在请求头中加入：
 
-- `conversation` 表保存会话本身，例如 `conversationId`、会话类型、目标 id、最后消息和最后时间。
-- `conversation_participant` 表保存会话与参与用户的关系，用于判断某个用户是否参与该会话。
-- `conversation_user_state` 表保存每个用户自己的会话状态，主键是 `(conversationId, userId)`。
-- `unreadCount` 是每个用户独立的未读数量。
-- `isHidden` 是每个用户独立的隐藏状态。
+```http
+Authorization: Bearer <token>
+```
 
-当前规则：
+## 当前文档入口
 
-- 发送消息后，更新 `conversation.lastMessageId` 和 `lastTime`。
-- 发送消息后，只给非发送者的参与用户 `unreadCount + 1`。
-- 如果用户主动在隐藏会话中发送消息，则该用户的 `isHidden` 会恢复为 `false`。
-- 如果用户收到新未读消息，则该用户的 `isHidden` 会恢复为 `false`。
-- 打开聊天页或长按会话选择“标记为已读”时，只把当前用户的 `unreadCount` 清零，不会自动重新隐藏会话。
-- 会话列表只显示当前用户参与且 `isHidden = false` 的会话。
+建议先读：
 
-相关入口：
+1. `docs/skills/README.md`
+2. 对应分类下的 `README` 或具体 `SKILL.md`
 
-- `model/conversation/data/entity/ConversationEntity.kt`
-- `model/conversation/data/dao/ConversationUserStateDao.kt`
-- `model/conversation/data/repository/ConversationRepository.kt`
-- `model/message/data/repository/MessageRepository.kt`
-- `activity/informationFragment/view/FragmentConversation.kt`
-- `ui/menu/BubbleArrowMenuView.kt`
-- `ui/menu/BubbleArrowMenuPopup.kt`
+重点文档：
 
-## UI 与组件
+- `docs/skills/data/database-table-catalog.md`
+- `docs/skills/data/dto-backend-remote-repository-flow/SKILL.md`
+- `docs/skills/data/repository-data-chain/SKILL.md`
+- `docs/skills/platform/android-build-and-test/SKILL.md`
+- `docs/skills/platform/frontend-backend-handoff/SKILL.md`
 
-通用 UI 组件放在 `app/src/main/java/com/example/grabthisforme/ui/`：
+## 新协作者阅读建议
 
-- `ui/liquidglass`：液态玻璃按钮、底部 Tab、弹窗和交互辅助。
-- `ui/goods`：商品/二手商品页面可复用的分类和筛选组件。
-- `ui/menu`：通用菜单类自定义 View，例如会话长按气泡菜单。
+如果要理解或修改某个功能，推荐按这个顺序阅读：
 
-页面样式规范和布局技能文档维护在：
+1. 先看对应 `Fragment / Activity`
+2. 再看对应 `ViewModel`
+3. 再看对应 `Repository`
+4. 最后看 `Dao / Entity / DTO / Mapper / Domain`
 
-- `docs/skills/ui/README.md`
-- `docs/skills/ui/layouts/nested-scroll-view-layout/SKILL.md`
-- `docs/skills/ui/forms/create-information-form-pages-ui/SKILL.md`
-- `docs/skills/ui/settings/settings-page-pattern/SKILL.md`
+例如：
 
-## 关键入口文件
-
-- Application：`app/src/main/java/com/example/grabthisforme/activity/myApp/MyApp.kt`
-- 主 Activity：`app/src/main/java/com/example/grabthisforme/activity/mainactivity/view/MainActivity.kt`
-- 登录 Activity：`app/src/main/java/com/example/grabthisforme/activity/LoginActivity/view/LoginActivity.kt`
-- Hilt 数据库模块：`app/src/main/java/com/example/grabthisforme/di/DatabaseModule.kt`
-- Room 数据库：`app/src/main/java/com/example/grabthisforme/model/AppDataBase/AppDatabase.kt`
-- Manifest：`app/src/main/AndroidManifest.xml`
-
-## 权限
-
-当前声明权限：
-
-- `READ_MEDIA_IMAGES`：Android 13+ 图片读取。
-- `CAMERA`：聊天、发布等场景拍照。
-- `READ_EXTERNAL_STORAGE / WRITE_EXTERNAL_STORAGE`：兼容旧版本 Android。
-- `FileProvider`：拍照图片 URI 安全共享。
-
-## 给 AI 和新协作者的阅读建议
-
-如果要理解或修改某个功能，建议按这个顺序阅读：
-
-1. 先看对应 `Fragment / Activity`，确认 UI 事件和 ViewModel 绑定。
-2. 再看对应 `ViewModel`，确认页面状态和业务入口。
-3. 接着看 `Repository`，确认数据来自 Room、DataStore 还是 mock。
-4. 最后看 `Dao / Entity / Mapper`，确认数据库结构和转换逻辑。
-
-常见路径示例：
-
-- 聊天会话：`FragmentConversation -> InformationViewModel -> ConversationRepository -> ConversationDao / ConversationUserStateDao`
-- 聊天消息：`FragmentChat -> FragmentChatViewModel -> MessageRepository -> MessageDao`
-- 商品数据：`GoodsRepository -> GoodsDao -> Goods*Entity`
-- 店铺数据：`StoreFragment / StoreViewModel -> StoreRepository -> StoreDao`
-- 社区帖子：`PostDetailFragment -> PostDetailViewModel -> PostRepository -> PostDao / PostStatsDao`
-- 用户/好友/聊群：`UserRepository / FriendAndGroupRepository / ContactDirectoryRepository -> UserDao / FriendAndGroupDao`
+- 帖子详情：`PostDetailFragment -> PostDetailViewModel -> PostRepository`
+- 聊天会话：`FragmentConversation -> InformationViewModel -> ConversationRepository`
+- 用户认证：登录页面 -> 对应 ViewModel -> `auth` / `user` 相关 Repository
 
 ## 当前注意事项
 
-- 项目仍处于原型阶段，部分页面仍有 mock 数据或 UI 层临时数据。
-- 数据库使用 `fallbackToDestructiveMigration()`，开发期升级 schema 会清库。
-- Gradle 中 Navigation、Glide、MPAndroidChart 等依赖存在重复声明，当前不影响编译，但后续可以整理。
-- 新增表、删除表、修改字段、调整表语义后，需要同步更新 `docs/skills/data/database-table-catalog.md`。
-- 新增页面或 Adapter 时，如果只展示领域模型的一部分信息，优先创建 `ui_model`。
+- 项目仍处于持续重构阶段，部分页面仍混有 mock 或过渡数据链路
+- 旧模块目录中存在大小写混用，例如 `Post`、`Order`，新增代码时优先保持当前模块既有风格
+- 如果新增或调整表结构，需要同步更新 `docs/skills/data/database-table-catalog.md`
+- 如果修改前后端联调流程、编译环境、交接规则，需要同步更新 `docs/skills/platform/` 下文档
