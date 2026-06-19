@@ -35,7 +35,7 @@ interface PostApi{
         @Path("postId") postId: String,
         @Path("commentId") commentId: Long,
         @Query("limit") limit: Int,
-        @Query("offset") offset: Int
+        @Query("beforeTime") beforeTime: Long
     ): ApiResponse<PageResponseDto<PostReplyDto>>
 
     @POST("api/posts")

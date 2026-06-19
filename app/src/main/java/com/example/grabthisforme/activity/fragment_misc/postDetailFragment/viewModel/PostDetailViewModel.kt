@@ -26,6 +26,10 @@ class PostDetailViewModel @Inject constructor(
     private val userRepository: UserRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+    companion object {
+        private const val REPLY_FETCH_LIMIT = 8
+    }
+
     private val postId: String = savedStateHandle.get<String>("postId").orEmpty()
 
     private val _commentList = MutableLiveData<List<Comment>>(emptyList())
@@ -57,7 +61,7 @@ class PostDetailViewModel @Inject constructor(
 
     private val fallbackUser = User(
         id = 1L,
-        name = "User1",
+        name = "匿名用户",
         headPic = ""
     )
 
@@ -101,18 +105,23 @@ class PostDetailViewModel @Inject constructor(
         val message = _inputText.value.orEmpty().trim()
         if (postId.isBlank() || message.isEmpty()) return false
 
-        val comment = Comment(
+        val pendingComment = Comment(
             id = System.currentTimeMillis(),
             time = System.currentTimeMillis(),
             message = message,
             imageUrls = emptyList(),
             commenter = userRepository.currentUser.value ?: fallbackUser,
-            replies = emptyList()
+            replies = emptyList(),
+            replyCount = 0
         )
-        addCommentLocal(comment)
+        addCommentLocal(pendingComment)
         clearInputText()
+
         viewModelScope.launch {
-            postRepository.addComment(postId, comment)
+            postRepository.addComment(postId, pendingComment)
+                .onSuccess { remoteComment ->
+                    replaceComment(pendingComment.id, remoteComment)
+                }
         }
         return true
     }
@@ -133,23 +142,61 @@ class PostDetailViewModel @Inject constructor(
             parentReplyId = parentReplyId
         ) ?: return false
 
-        val reply = createReply(
+        val pendingReply = createReply(
             parentCommentId = parentCommentId,
             message = message,
             beCommenter = replyTarget.beCommenter,
             parentReplyId = replyTarget.parentReplyId
         )
-        addReplyLocal(commentPosition, reply)
+        addReplyLocal(commentPosition, pendingReply)
         clearInputText()
+
         viewModelScope.launch {
             postRepository.addReply(
                 postId = postId,
                 parentCommentId = parentCommentId,
-                reply = reply,
+                reply = pendingReply,
                 beCommenterId = replyTarget.beCommenterId
-            )
+            ).onSuccess { remoteReply ->
+                replaceReply(parentCommentId, pendingReply.id, remoteReply)
+            }
         }
         return true
+    }
+
+    fun loadReplies(commentId: Long, targetVisibleCount: Int) {
+        if (postId.isBlank() || commentId <= 0L) return
+
+        viewModelScope.launch {
+            var currentComment = _commentList.value.orEmpty().firstOrNull { it.id == commentId } ?: return@launch
+            while (currentComment.replies.size < targetVisibleCount ||
+                currentComment.replies.size - targetVisibleCount < REPLY_FETCH_LIMIT
+            ) {
+                val orderedReplies = currentComment.replies.sortedByDescending { it.time }
+                val beforeTime = if (orderedReplies.isEmpty()) {
+                    System.currentTimeMillis()
+                } else {
+                    orderedReplies.last().time
+                }
+
+                val replies = postRepository.getReplyPage(
+                    postId = postId,
+                    commentId = commentId,
+                    limit = REPLY_FETCH_LIMIT,
+                    beforeTime = beforeTime
+                )
+                if (replies.isEmpty()) {
+                    break
+                }
+
+                appendCommentReplies(commentId, replies)
+                currentComment = _commentList.value.orEmpty().firstOrNull { it.id == commentId } ?: break
+
+                if (replies.size < REPLY_FETCH_LIMIT) {
+                    break
+                }
+            }
+        }
     }
 
     fun createReply(
@@ -232,16 +279,60 @@ class PostDetailViewModel @Inject constructor(
         updatePostStats(commentCount = updatedList.size)
     }
 
+    private fun replaceComment(oldCommentId: Long, newComment: Comment) {
+        val updatedList = _commentList.value.orEmpty().map { comment ->
+            if (comment.id == oldCommentId) newComment else comment
+        }
+        _commentList.value = updatedList
+        updatePostStats(commentCount = updatedList.size)
+    }
+
     private fun addReplyLocal(commentPosition: Int, reply: Reply) {
         val currentList = _commentList.value.orEmpty()
         if (commentPosition !in currentList.indices) return
 
         val targetComment = currentList[commentPosition]
+        val updatedReplies = listOf(reply) + targetComment.replies
         val updatedComment = targetComment.copy(
-            replies = listOf(reply) + targetComment.replies
+            replies = updatedReplies,
+            replyCount = maxOf(targetComment.replyCount, updatedReplies.size)
         )
         val updatedList = currentList.toMutableList()
         updatedList[commentPosition] = updatedComment
+        _commentList.value = updatedList
+    }
+
+    private fun replaceReply(parentCommentId: Long, oldReplyId: Long, newReply: Reply) {
+        val updatedList = _commentList.value.orEmpty().map { comment ->
+            if (comment.id != parentCommentId) {
+                comment
+            } else {
+                val updatedReplies = comment.replies.map { reply ->
+                    if (reply.id == oldReplyId) newReply else reply
+                }
+                comment.copy(
+                    replies = updatedReplies,
+                    replyCount = maxOf(comment.replyCount, updatedReplies.size)
+                )
+            }
+        }
+        _commentList.value = updatedList
+    }
+
+    private fun appendCommentReplies(commentId: Long, replies: List<Reply>) {
+        val updatedList = _commentList.value.orEmpty().map { comment ->
+            if (comment.id != commentId) {
+                comment
+            } else {
+                val mergedReplies = (comment.replies + replies)
+                    .distinctBy { it.id }
+                    .sortedByDescending { it.time }
+                comment.copy(
+                    replies = mergedReplies,
+                    replyCount = maxOf(comment.replyCount, mergedReplies.size)
+                )
+            }
+        }
         _commentList.value = updatedList
     }
 

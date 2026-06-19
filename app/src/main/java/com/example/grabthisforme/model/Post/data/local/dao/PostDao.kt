@@ -25,6 +25,18 @@ interface PostDao {
     @Query("SELECT * FROM post_cache ORDER BY createTime DESC")
     fun observeAllPostEntities(): Flow<List<PostEntity>>
 
+    @Query(
+        """
+        DELETE FROM post_cache
+        WHERE postId NOT IN (
+            SELECT postId FROM post_cache
+            ORDER BY createTime DESC
+            LIMIT :limit
+        )
+        """
+    )
+    suspend fun trimPosts(limit: Int)
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAuthorAccountIfAbsent(account: UserAccountEntity)
 
@@ -48,6 +60,9 @@ interface PostDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertReplies(entities: List<PostReplyEntity>)
+
+    @Query("SELECT * FROM post_comment WHERE postId = :postId ORDER BY time DESC")
+    suspend fun getCommentEntitiesForMerge(postId: String): List<PostCommentEntity>
 
     @Query("SELECT * FROM post_cache WHERE postId = :postId LIMIT 1")
     suspend fun getPostEntity(postId: String): PostEntity?
@@ -138,11 +153,45 @@ interface PostDao {
     @Query("SELECT * FROM post_comment WHERE postId = :postId ORDER BY time DESC")
     suspend fun getCommentEntities(postId: String): List<PostCommentEntity>
 
+    @Query(
+        """
+        DELETE FROM post_comment
+        WHERE postId = :postId
+          AND commentId NOT IN (
+              SELECT commentId FROM post_comment
+              WHERE postId = :postId
+              ORDER BY time DESC
+              LIMIT :limit
+          )
+        """
+    )
+    suspend fun trimCommentsByPostId(postId: String, limit: Int)
+
     @Query("SELECT * FROM post_comment WHERE postId = :postId ORDER BY time DESC LIMIT :limit OFFSET :offset")
     suspend fun getCommentEntitiesPage(postId: String, limit: Int, offset: Int): List<PostCommentEntity>
 
     @Query("SELECT * FROM post_reply WHERE postId = :postId AND parentCommentId IN (:commentIds) ORDER BY time ASC")
     suspend fun getReplyEntitiesByCommentIds(postId: String, commentIds: List<Long>): List<PostReplyEntity>
+
+    @Query("SELECT * FROM post_reply WHERE parentCommentId = :commentId ORDER BY time DESC")
+    suspend fun getReplyEntitiesByCommentId(commentId: Long): List<PostReplyEntity>
+
+    @Query("SELECT COUNT(1) FROM post_comment WHERE commentId = :commentId")
+    suspend fun countCommentById(commentId: Long): Int
+
+    @Query(
+        """
+        DELETE FROM post_reply
+        WHERE parentCommentId = :commentId
+          AND replyId NOT IN (
+              SELECT replyId FROM post_reply
+              WHERE parentCommentId = :commentId
+              ORDER BY time DESC
+              LIMIT :limit
+          )
+        """
+    )
+    suspend fun trimRepliesByCommentId(commentId: Long, limit: Int)
 
     @Query("DELETE FROM post_reply WHERE postId = :postId")
     suspend fun deleteRepliesByPostId(postId: String)
@@ -163,5 +212,37 @@ interface PostDao {
         deleteCommentsByPostId(postId)
         upsertComments(comments)
         upsertReplies(replies)
+    }
+
+    @Transaction
+    suspend fun mergeCachedComments(
+        postId: String,
+        incomingComments: List<PostCommentEntity>,
+        limit: Int
+    ) {
+        val mergedComments = (getCommentEntitiesForMerge(postId) + incomingComments)
+            .distinctBy { it.commentId }
+            .sortedWith(compareByDescending<PostCommentEntity> { it.time }.thenByDescending { it.commentId })
+            .take(limit)
+
+        upsertComments(mergedComments)
+        trimCommentsByPostId(postId, limit)
+    }
+
+    @Transaction
+    suspend fun mergeCachedReplies(
+        commentId: Long,
+        incomingReplies: List<PostReplyEntity>,
+        limit: Int
+    ) {
+        if (countCommentById(commentId) <= 0) return
+
+        val mergedReplies = (getReplyEntitiesByCommentId(commentId) + incomingReplies)
+            .distinctBy { it.replyId }
+            .sortedWith(compareByDescending<PostReplyEntity> { it.time }.thenByDescending { it.replyId })
+            .take(limit)
+
+        upsertReplies(mergedReplies)
+        trimRepliesByCommentId(commentId, limit)
     }
 }

@@ -45,7 +45,8 @@ fun PostCommentEntity.toDomain(replies: List<Reply> = emptyList()): Comment {
         message = message,
         imageUrls = imageUrlsJson.toStringList(),
         commenter = buildUser(commenterId, commenterName, commenterAvatarUrl),
-        replies = replies
+        replies = replies,
+        replyCount = replies.size
     )
 }
 

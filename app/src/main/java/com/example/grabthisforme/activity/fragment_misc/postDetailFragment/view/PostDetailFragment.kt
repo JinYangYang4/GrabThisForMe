@@ -124,6 +124,9 @@ class PostDetailFragment : Fragment() {
                 binding.etMessageInput.setText("")
                 viewModel.updateInputText("")
                 showKeyboard(binding.etMessageInput)
+            },
+            onLoadMoreReply = { comment, _, visibleReplyCount ->
+                viewModel.loadReplies(comment.id, visibleReplyCount)
             }
         )
         binding.rvComments.apply {

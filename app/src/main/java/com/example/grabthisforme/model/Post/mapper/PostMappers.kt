@@ -19,7 +19,7 @@ import com.example.grabthisforme.model.user.data.network.dto.UserDto
 import com.example.grabthisforme.model.user.mapper.toDomain
 import org.json.JSONArray
 
-private const val DEFAULT_AUTHOR_NAME = "anonymous"
+private const val DEFAULT_AUTHOR_NAME = "匿名用户"
 
 private fun List<String>.toImagesJson(): String {
     return JSONArray(this).toString()
@@ -73,7 +73,8 @@ fun PostCommentDto.toDomain(): Comment {
         message = message,
         imageUrls = imageUrls,
         commenter = commenter.toDomain(),
-        replies = emptyList()
+        replies = emptyList(),
+        replyCount = replyCount
     )
 }
 

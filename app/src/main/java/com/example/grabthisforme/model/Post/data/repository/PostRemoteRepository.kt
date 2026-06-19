@@ -46,7 +46,7 @@ class PostRemoteRepository @Inject constructor(
         postId: String,
         commentId: Long,
         limit: Int,
-        offset: Int
+        beforeTime: Long
     ): Result<List<Reply>> {
         return runCatching {
             requireSuccessfulData(
@@ -54,7 +54,7 @@ class PostRemoteRepository @Inject constructor(
                     postId = postId,
                     commentId = commentId,
                     limit = limit,
-                    offset = offset
+                    beforeTime = beforeTime
                 )
             ).items.map { it.toDomain() }
         }

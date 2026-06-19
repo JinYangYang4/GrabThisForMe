@@ -4,6 +4,8 @@ import android.util.Log
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Comment
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Reply
 import com.example.grabthisforme.model.post.domain.Post
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -11,8 +13,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class PostRepository @Inject constructor(
@@ -46,6 +46,9 @@ class PostRepository @Inject constructor(
             .onSuccess { remotePost ->
                 localRepository.savePost(remotePost)
             }
+            .onFailure {
+                Log.e("com.example.grabthisforme.model.post.data.repository.getPost", "e:${it.message}")
+            }
         emitAll(localRepository.getPost(postId))
     }
 
@@ -54,9 +57,10 @@ class PostRepository @Inject constructor(
     suspend fun getCommentListOnce(postId: String): List<Comment> {
         return remoteRepository.getComments(postId, limit = 20, offset = 0)
             .onSuccess { comments ->
-                comments.forEach { comment ->
-                    localRepository.addComment(postId, comment)
-                }
+                localRepository.cacheComments(postId, comments)
+            }
+            .onFailure {
+                Log.e("com.example.grabthisforme.model.post.data.repository.getCommentListOnce", "e:${it.message}")
             }
             .getOrElse {
                 localRepository.getCommentListOnce(postId)
@@ -65,6 +69,11 @@ class PostRepository @Inject constructor(
 
     suspend fun getCommentPage(postId: String, limit: Int = 50, offset: Int = 0): List<Comment> {
         return remoteRepository.getComments(postId, limit, offset)
+            .onSuccess { comments ->
+                if (offset == 0) {
+                    localRepository.cacheComments(postId, comments)
+                }
+            }
             .getOrElse {
                 localRepository.getCommentPage(postId, limit, offset)
             }
@@ -74,10 +83,17 @@ class PostRepository @Inject constructor(
         postId: String,
         commentId: Long,
         limit: Int = 50,
-        offset: Int = 0
+        beforeTime: Long
     ): List<Reply> {
-        return remoteRepository.getReplies(postId, commentId, limit, offset)
-            .getOrElse { emptyList() }
+        return remoteRepository.getReplies(postId, commentId, limit, beforeTime)
+            .onSuccess { replies ->
+                localRepository.cacheReplies(postId, commentId, replies)
+                Log.d("test11", "getReplyPage: ${replies.size}")
+            }
+            .getOrElse {
+                Log.d("test11", "getReplyPage: ${it.message}")
+                localRepository.getReplyPage(commentId, limit)
+            }
     }
 
     fun isPostLiked(postId: String): Flow<Boolean> = localRepository.isPostLiked(postId)
@@ -86,12 +102,11 @@ class PostRepository @Inject constructor(
     suspend fun savePosts(posts: List<Post>) = localRepository.savePosts(posts)
     suspend fun deletePost(postId: String) = localRepository.deletePost(postId)
 
-    suspend fun addComment(postId: String, comment: Comment): List<Comment> {
-        remoteRepository.addComment(postId, comment.message, comment.imageUrls)
+    suspend fun addComment(postId: String, comment: Comment): Result<Comment> {
+        return remoteRepository.addComment(postId, comment.message, comment.imageUrls)
             .onSuccess { remoteComment ->
                 localRepository.addComment(postId, remoteComment)
             }
-        return localRepository.getCommentListOnce(postId)
     }
 
     suspend fun addReply(
@@ -99,8 +114,8 @@ class PostRepository @Inject constructor(
         parentCommentId: Long,
         reply: Reply,
         beCommenterId: Long
-    ): List<Comment> {
-        remoteRepository.addReply(
+    ): Result<Reply> {
+        return remoteRepository.addReply(
             postId = postId,
             parentCommentId = parentCommentId,
             parentReplyId = reply.parentReplyId,
@@ -108,33 +123,8 @@ class PostRepository @Inject constructor(
             imageUrls = reply.imageUrls,
             beCommenterId = beCommenterId
         ).onSuccess { remoteReply ->
-            val paramsLog = buildString {
-                appendLine("=====addReply请求参数=====")
-                appendLine("postId: $postId")
-                appendLine("parentCommentId: $parentCommentId")
-                appendLine("parentReplyId: ${reply.parentReplyId}")
-                appendLine("message: ${reply.message}")
-                appendLine("imageUrls: ${reply.imageUrls}")
-                appendLine("beCommenterId: $beCommenterId")
-                appendLine("=========================")
-            }
-            Log.e("test11", paramsLog)
             localRepository.addReply(postId, parentCommentId, remoteReply)
-        }.onFailure { err ->
-            // 打印请求入参所有字段
-            val paramsLog = buildString {
-                appendLine("=====addReply请求参数=====")
-                appendLine("postId: $postId")
-                appendLine("parentCommentId: $parentCommentId")
-                appendLine("parentReplyId: ${reply.parentReplyId}")
-                appendLine("message: ${reply.message}")
-                appendLine("imageUrls: ${reply.imageUrls}")
-                appendLine("beCommenterId: $beCommenterId")
-                appendLine("=========================")
-            }
-            Log.e("test11", paramsLog, err)
         }
-            return localRepository.getCommentListOnce(postId)
     }
 
     suspend fun setPostLiked(postId: String, liked: Boolean): Boolean {

@@ -21,6 +21,8 @@ import com.example.grabthisforme.model.post.mapper.toUserPostEntity
 import com.example.grabthisforme.model.relation.data.dao.UserRelationDao
 import com.example.grabthisforme.model.relation.data.entity.UserLikedPostEntity
 import com.example.grabthisforme.model.user.data.repository.UserRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -35,8 +37,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Singleton
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 @Singleton
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -46,7 +48,15 @@ class PostLocalRepository @Inject constructor(
     private val userRelationDao: UserRelationDao,
     private val userRepository: UserRepository
 ) {
+    companion object {
+        private const val MAX_CACHED_POSTS = 10
+        private const val MAX_CACHED_COMMENTS_PER_POST = 30
+        private const val MAX_CACHED_REPLIES_PER_COMMENT = 5
+    }
+
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val commentCacheMutex = Mutex()
+    private val replyCacheMutex = Mutex()
 
     private val sourcePosts: StateFlow<List<Post>> = observePostList(postDao.getAllPostWithAuthorsFlow())
         .stateIn(
@@ -85,17 +95,12 @@ class PostLocalRepository @Inject constructor(
         repositoryScope.launch {
             val cachedPosts = postDao.observeAllPostEntities().first()
             if (cachedPosts.isEmpty()) {
-                val mockPosts = PostMockData.getPostList()
+                val mockPosts = PostMockData.getPostList().take(MAX_CACHED_POSTS)
                 savePosts(mockPosts)
                 mockPosts.forEach { post ->
                     val mockComments = PostCommentMockData.buildCommentList(post.commentCount)
-                    postDao.replacePostComments(
-                        postId = post.postId,
-                        comments = mockComments.map { it.toEntity(post.postId) },
-                        replies = mockComments.flatMap { comment ->
-                            comment.replies.map { it.toEntity(post.postId) }
-                        }
-                    )
+                        .take(MAX_CACHED_COMMENTS_PER_POST)
+                    cacheComments(post.postId, mockComments)
                 }
             }
         }
@@ -107,14 +112,17 @@ class PostLocalRepository @Inject constructor(
         postDao.upsert(post.toEntity())
         postStatsDao.upsert(post.toStatsEntity())
         userRelationDao.upsertUserPost(post.toUserPostEntity())
+        postDao.trimPosts(MAX_CACHED_POSTS)
     }
 
     suspend fun savePosts(posts: List<Post>) {
-        postDao.insertAuthorAccountsIfAbsent(posts.map { it.toAuthorAccountEntity() })
-        postDao.insertAuthorProfilesIfAbsent(posts.map { it.toAuthorProfileEntity() })
-        postDao.upsertAll(posts.map { it.toEntity() })
-        postStatsDao.upsertAll(posts.map { it.toStatsEntity() })
-        userRelationDao.upsertUserPosts(posts.map { it.toUserPostEntity() })
+        val limitedPosts = posts.sortedByDescending { it.createTime }.take(MAX_CACHED_POSTS)
+        postDao.insertAuthorAccountsIfAbsent(limitedPosts.map { it.toAuthorAccountEntity() })
+        postDao.insertAuthorProfilesIfAbsent(limitedPosts.map { it.toAuthorProfileEntity() })
+        postDao.upsertAll(limitedPosts.map { it.toEntity() })
+        postStatsDao.upsertAll(limitedPosts.map { it.toStatsEntity() })
+        userRelationDao.upsertUserPosts(limitedPosts.map { it.toUserPostEntity() })
+        postDao.trimPosts(MAX_CACHED_POSTS)
     }
 
     fun getPost(postId: String): Flow<Post?> {
@@ -145,6 +153,12 @@ class PostLocalRepository @Inject constructor(
         )
     }
 
+    suspend fun getReplyPage(commentId: Long, limit: Int = MAX_CACHED_REPLIES_PER_COMMENT): List<Reply> {
+        return postDao.getReplyEntitiesByCommentId(commentId)
+            .take(limit.coerceAtLeast(1))
+            .map { it.toDomain() }
+    }
+
     fun isPostLiked(postId: String): Flow<Boolean> {
         return userRepository.currentUserId.flatMapLatest { currentUserId ->
             if (currentUserId == null || postId.isBlank()) {
@@ -160,14 +174,49 @@ class PostLocalRepository @Inject constructor(
     }
 
     suspend fun addComment(postId: String, comment: Comment): List<Comment> {
-        postDao.upsertComment(comment.toEntity(postId))
-        syncCommentCount(postId)
-        return getStoredComments(postId)
+        return commentCacheMutex.withLock {
+            postDao.mergeCachedComments(
+                postId = postId,
+                incomingComments = listOf(comment.toEntity(postId)),
+                limit = MAX_CACHED_COMMENTS_PER_POST
+            )
+            syncCommentCount(postId)
+            getStoredComments(postId)
+        }
     }
 
     suspend fun addReply(postId: String, parentCommentId: Long, reply: Reply): List<Comment> {
-        postDao.upsertReply(reply.copy(parentCommentId = parentCommentId).toEntity(postId))
-        return getStoredComments(postId)
+        return replyCacheMutex.withLock {
+            postDao.mergeCachedReplies(
+                commentId = parentCommentId,
+                incomingReplies = listOf(reply.copy(parentCommentId = parentCommentId).toEntity(postId)),
+                limit = MAX_CACHED_REPLIES_PER_COMMENT
+            )
+            getStoredComments(postId)
+        }
+    }
+
+    suspend fun cacheComments(postId: String, comments: List<Comment>) {
+        commentCacheMutex.withLock {
+            postDao.mergeCachedComments(
+                postId = postId,
+                incomingComments = comments.map { it.toEntity(postId) },
+                limit = MAX_CACHED_COMMENTS_PER_POST
+            )
+            syncCommentCount(postId)
+        }
+    }
+
+    suspend fun cacheReplies(postId: String, commentId: Long, replies: List<Reply>) {
+        replyCacheMutex.withLock {
+            postDao.mergeCachedReplies(
+                commentId = commentId,
+                incomingReplies = replies.map { reply ->
+                    reply.copy(parentCommentId = commentId).toEntity(postId)
+                },
+                limit = MAX_CACHED_REPLIES_PER_COMMENT
+            )
+        }
     }
 
     suspend fun setPostLiked(postId: String, liked: Boolean): Boolean {
@@ -207,7 +256,7 @@ class PostLocalRepository @Inject constructor(
             createTime = now,
             author = PostAuthor(
                 authorId = currentUser?.id ?: now,
-                authorName = currentUser?.name.orEmpty().ifBlank { "娓稿" },
+                authorName = currentUser?.name.orEmpty().ifBlank { "匿名用户" },
                 authorAvatarUrl = currentUser?.headPic.orEmpty()
             ),
             likeCount = 0,
@@ -247,7 +296,11 @@ class PostLocalRepository @Inject constructor(
             .groupBy { it.parentCommentId }
 
         return commentEntities.map { comment ->
-            comment.toDomain(repliesByCommentId[comment.commentId].orEmpty())
+            val replies = repliesByCommentId[comment.commentId]
+                .orEmpty()
+                .sortedByDescending { it.time }
+                .take(MAX_CACHED_REPLIES_PER_COMMENT)
+            comment.toDomain(replies)
         }
     }
 

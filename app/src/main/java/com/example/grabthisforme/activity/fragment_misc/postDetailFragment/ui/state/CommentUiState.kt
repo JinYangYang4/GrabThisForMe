@@ -4,28 +4,42 @@ data class CommentUiState(
     val commentId: Long,
     var isExpanded: Boolean = false,
     var visibleReplyCount: Int = 0,
-    var hasMoreReply: Boolean = false
+    var hasMoreReply: Boolean = false,
+    var expandStage: Int = 0
 ) {
-    fun expand(totalReplyCount: Int, pageSize: Int) {
+    fun expand(totalReplyCount: Int, targetCount: Int) {
         isExpanded = true
-        visibleReplyCount = totalReplyCount.coerceAtMost(pageSize) //限制不超过最大值pageSize
+        visibleReplyCount = totalReplyCount.coerceAtMost(targetCount)
         hasMoreReply = visibleReplyCount < totalReplyCount
+        if (expandStage == 0) {
+            expandStage = 1
+        }
     }
 
     fun expandAddReply() {
         isExpanded = true
-        visibleReplyCount = visibleReplyCount + 1
+        visibleReplyCount += 1
     }
 
-    fun loadMore(totalReplyCount: Int, pageSize: Int) {
+    fun loadMore(totalReplyCount: Int, increment: Int) {
         isExpanded = true
-        visibleReplyCount = (visibleReplyCount + pageSize).coerceAtMost(totalReplyCount)
+        visibleReplyCount = (visibleReplyCount + increment).coerceAtMost(totalReplyCount)
         hasMoreReply = visibleReplyCount < totalReplyCount
+        expandStage += 1
+    }
+
+    fun nextLoadTargetCount(): Int {
+        return when (expandStage) {
+            0 -> visibleReplyCount + 3
+            1 -> visibleReplyCount + 5
+            else -> visibleReplyCount + 7
+        }
     }
 
     fun collapse() {
         isExpanded = false
         visibleReplyCount = 0
         hasMoreReply = false
+        expandStage = 0
     }
 }
