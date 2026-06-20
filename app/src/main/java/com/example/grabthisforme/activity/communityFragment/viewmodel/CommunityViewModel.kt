@@ -7,8 +7,8 @@ import com.example.grabthisforme.activity.communityFragment.ui_model.PostCardUiM
 import com.example.grabthisforme.activity.communityFragment.ui_model.toPostCardUiModel
 import com.example.grabthisforme.model.post.data.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import kotlinx.coroutines.flow.map
 
 @HiltViewModel
 class CommunityViewModel @Inject constructor(

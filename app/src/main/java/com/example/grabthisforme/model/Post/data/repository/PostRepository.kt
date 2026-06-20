@@ -10,8 +10,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @Singleton
@@ -20,8 +22,9 @@ class PostRepository @Inject constructor(
     private val remoteRepository: PostRemoteRepository
 ) {
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val _allPostList = MutableStateFlow<List<Post>>(emptyList())
 
-    val allPostList = localRepository.allPostList
+    val allPostList = _allPostList.asStateFlow()
     val myPostList = localRepository.myPostList
     val likedPostList = localRepository.likedPostList
 
@@ -35,9 +38,15 @@ class PostRepository @Inject constructor(
         return remoteRepository.listPosts()
             .onSuccess { remotePosts ->
                 localRepository.savePosts(remotePosts)
+                _allPostList.value = remotePosts.sortedByDescending { it.createTime }
+                Log.d("test11", "refreshPosts: ${remotePosts.size}")
             }
             .getOrElse {
-                localRepository.allPostList.value
+                localRepository.allPostList.value.also { localPosts ->
+                    _allPostList.value = localPosts
+                    Log.d("test11", "refreshPosts: ${it.message}")
+                }
+
             }
     }
 
@@ -96,9 +105,20 @@ class PostRepository @Inject constructor(
 
     fun isPostLiked(postId: String): Flow<Boolean> = localRepository.isPostLiked(postId)
 
-    suspend fun savePost(post: Post) = localRepository.savePost(post)
-    suspend fun savePosts(posts: List<Post>) = localRepository.savePosts(posts)
-    suspend fun deletePost(postId: String) = localRepository.deletePost(postId)
+    suspend fun savePost(post: Post) {
+        localRepository.savePost(post)
+        upsertAllPostList(post)
+    }
+
+    suspend fun savePosts(posts: List<Post>) {
+        localRepository.savePosts(posts)
+        _allPostList.value = posts.sortedByDescending { it.createTime }
+    }
+
+    suspend fun deletePost(postId: String) {
+        localRepository.deletePost(postId)
+        _allPostList.value = _allPostList.value.filterNot { it.postId == postId }
+    }
 
     suspend fun addComment(postId: String, comment: Comment): Result<Comment> {
         return remoteRepository.addComment(postId, comment.message, comment.imageUrls)
@@ -129,9 +149,12 @@ class PostRepository @Inject constructor(
         return remoteRepository.setPostLiked(postId, liked)
             .onSuccess {
                 localRepository.setPostLiked(postId, liked)
+                updateAllPostListLikeState(postId, liked)
             }
             .getOrElse {
-                localRepository.setPostLiked(postId, liked)
+                localRepository.setPostLiked(postId, liked).also {
+                    updateAllPostListLikeState(postId, liked)
+                }
             }
     }
 
@@ -139,9 +162,38 @@ class PostRepository @Inject constructor(
         return remoteRepository.createPost(content, images)
             .onSuccess { remotePost ->
                 localRepository.savePost(remotePost)
+                upsertAllPostList(remotePost)
             }
             .getOrElse {
-                localRepository.publishPost(content, images)
+                localRepository.publishPost(content, images).also { localPost ->
+                    upsertAllPostList(localPost)
+                }
             }
+    }
+
+    private fun upsertAllPostList(post: Post) {
+        _allPostList.value = (_allPostList.value + post)
+            .distinctBy { it.postId }
+            .sortedByDescending { it.createTime }
+    }
+
+    private fun updateAllPostListLikeState(postId: String, liked: Boolean) {
+        _allPostList.value = _allPostList.value.map { post ->
+            if (post.postId != postId) {
+                post
+            } else {
+                val updatedLikeCount = if (liked) {
+                    post.likeCount + 1
+                } else {
+                    (post.likeCount - 1).coerceAtLeast(0)
+                }
+                Post(
+                    identity = post.identity,
+                    contentInfo = post.contentInfo,
+                    authorInfo = post.authorInfo,
+                    statsInfo = post.statsInfo.copy(likeCount = updatedLikeCount)
+                )
+            }
+        }
     }
 }
