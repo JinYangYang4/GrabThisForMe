@@ -73,13 +73,20 @@ class PostRemoteRepository @Inject constructor(
         }
     }
 
-    suspend fun createPost(content: String, images: List<String>): Result<Post> {
+    suspend fun createPost(
+        content: String,
+        images: List<String>,
+        categoryKey: String,
+        customTags: List<String>
+    ): Result<Post> {
         return runCatching {
             requireSuccessfulData(
                 postApi.createPost(
                     CreatePostRequest(
                         content = content,
-                        images = images
+                        images = images,
+                        categoryKey = categoryKey,
+                        customTags = customTags
                     )
                 )
             ).toDomain()

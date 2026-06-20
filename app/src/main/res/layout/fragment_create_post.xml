@@ -78,7 +78,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
-                android:text="写清楚你真正想说的话。"
+                android:text="把你真正想说的话写清楚。"
                 android:textColor="#FFFDF8"
                 android:textSize="30sp"
                 android:textStyle="bold" />
@@ -89,7 +89,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="30dp"
                 android:maxLines="2"
-                android:text="这个页面不强调配图，重点是正文表达。把经过、观点和细节写完整，帖子会更容易被认真回应。"
+                android:text="先选一个大分类，再补上正文和图片。表达越具体，别人越容易快速看懂并认真回应。"
                 android:textColor="#FFF4EC"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -115,6 +115,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
+                    android:layout_marginTop="10dp"
                     android:background="@drawable/bg_create_goods_card"
                     android:elevation="6dp"
                     android:orientation="vertical"
@@ -135,7 +136,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="先把内容写出来，再决定要不要配图。真实、具体、有信息量的表达，会比空泛的句子更有价值。"
+                        android:text="先把内容写出来，再决定要不要配图。真实、具体、有信息量的表达，比空泛的句子更有价值。"
                         android:textColor="#6A7B7C"
                         android:textSize="13sp" />
 
@@ -181,7 +182,7 @@
                             android:gravity="center"
                             android:paddingStart="12dp"
                             android:paddingEnd="12dp"
-                            android:text='@{String.valueOf(viewModel.contentLength) + ` 字`}'
+                            android:text='@{String.valueOf(viewModel.contentLength) + " 字"}'
                             android:textColor="#9A623E"
                             android:textSize="12sp"
                             android:textStyle="bold" />
@@ -219,7 +220,7 @@
                                 android:gravity="top"
                                 android:inputType="textMultiLine"
                                 android:maxLines="100"
-                                android:minHeight="220dp"
+                                android:minHeight="300dp"
                                 android:paddingTop="16dp"
                                 android:paddingBottom="16dp"
                                 android:textColor="#172A2B"
@@ -237,6 +238,7 @@
                         android:textColor="#8D7F77"
                         android:textSize="13sp" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -324,6 +326,165 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="14dp"
                         android:visibility="gone" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_create_goods_card"
+                    android:elevation="6dp"
+                    android:orientation="vertical"
+                    android:paddingStart="20dp"
+                    android:paddingTop="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingBottom="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="帖子分类"
+                        android:textColor="#172A2B"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="先用固定大分类把帖子归位，再按需要补充少量自定义标签，后面接后端筛选和推荐会更稳。"
+                        android:textColor="#6A7B7C"
+                        android:textSize="13sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:background="@drawable/bg_create_post_editor_surface"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="14dp"
+                        android:paddingTop="12dp"
+                        android:paddingEnd="14dp"
+                        android:paddingBottom="12dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="分类状态"
+                                android:textColor="#9A623E"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tv_tag_summary"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="@{viewModel.tagSummaryText}"
+                                android:textColor="#6A7B7C"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_create_goods_banner_badge"
+                            android:gravity="center"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:text="必选 1 类"
+                            android:textColor="#9A623E"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/cg_post_category"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:chipSpacingHorizontal="10dp"
+                        app:chipSpacingVertical="10dp"
+                        app:singleLine="false"
+                        app:singleSelection="true" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/til_custom_tag"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="补充自定义标签（最多 3 个）"
+                            app:boxBackgroundColor="#FFFDFC"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusBottomEnd="20dp"
+                            app:boxCornerRadiusBottomStart="20dp"
+                            app:boxCornerRadiusTopEnd="20dp"
+                            app:boxCornerRadiusTopStart="20dp"
+                            app:boxStrokeColor="#E7D7CB">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/et_custom_tag"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@null"
+                                android:imeOptions="actionDone"
+                                android:maxLength="10"
+                                android:maxLines="1"
+                                android:paddingTop="14dp"
+                                android:paddingBottom="14dp"
+                                android:textColor="#172A2B"
+                                android:textSize="15sp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <ImageView
+                            android:id="@+id/iv_add_custom_tag"
+                            android:layout_width="34dp"
+                            android:layout_height="34dp"
+                            android:layout_marginStart="10dp"
+                            android:background="@drawable/bg_create_goods_field_icon"
+                            android:clickable="true"
+                            android:contentDescription="添加标签"
+                            android:focusable="true"
+                            android:foreground="?attr/selectableItemBackgroundBorderless"
+                            android:padding="7dp"
+                            android:src="@drawable/ic_add" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_tag_empty"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:text="还没有自定义标签，留空也可以。"
+                        android:textColor="#8D7F77"
+                        android:textSize="13sp" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/cg_custom_tags"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        app:chipSpacingHorizontal="8dp"
+                        app:chipSpacingVertical="8dp"
+                        app:chipStrokeWidth="0dp"
+                        app:chipCornerRadius="14dp"
+                        app:singleLine="false" />
                 </LinearLayout>
 
                 <LinearLayout

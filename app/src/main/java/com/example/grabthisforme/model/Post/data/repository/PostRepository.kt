@@ -158,14 +158,19 @@ class PostRepository @Inject constructor(
             }
     }
 
-    suspend fun publishPost(content: String, images: List<String> = emptyList()): Post {
-        return remoteRepository.createPost(content, images)
+    suspend fun publishPost(
+        content: String,
+        images: List<String> = emptyList(),
+        categoryKey: String = "",
+        customTags: List<String> = emptyList()
+    ): Post {
+        return remoteRepository.createPost(content, images, categoryKey, customTags)
             .onSuccess { remotePost ->
                 localRepository.savePost(remotePost)
                 upsertAllPostList(remotePost)
             }
             .getOrElse {
-                localRepository.publishPost(content, images).also { localPost ->
+                localRepository.publishPost(content, images, categoryKey, customTags).also { localPost ->
                     upsertAllPostList(localPost)
                 }
             }

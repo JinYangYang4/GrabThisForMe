@@ -5,8 +5,8 @@ import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domai
 import com.example.grabthisforme.model.post.data.local.entity.PostEntity
 import com.example.grabthisforme.model.post.data.local.entity.PostStatsEntity
 import com.example.grabthisforme.model.post.data.local.entity.PostWithAuthorEntity
-import com.example.grabthisforme.model.post.data.network.dto.PostDetailDto
 import com.example.grabthisforme.model.post.data.network.dto.PostCommentDto
+import com.example.grabthisforme.model.post.data.network.dto.PostDetailDto
 import com.example.grabthisforme.model.post.data.network.dto.PostDto
 import com.example.grabthisforme.model.post.data.network.dto.PostReplyDto
 import com.example.grabthisforme.model.post.domain.Post
@@ -15,17 +15,16 @@ import com.example.grabthisforme.model.post.domain.PostStats
 import com.example.grabthisforme.model.relation.data.entity.UserPostEntity
 import com.example.grabthisforme.model.user.data.local.entity.UserAccountEntity
 import com.example.grabthisforme.model.user.data.local.entity.UserProfileEntity
-import com.example.grabthisforme.model.user.data.network.dto.UserDto
 import com.example.grabthisforme.model.user.mapper.toDomain
 import org.json.JSONArray
 
 private const val DEFAULT_AUTHOR_NAME = "匿名用户"
 
-private fun List<String>.toImagesJson(): String {
+private fun List<String>.toJson(): String {
     return JSONArray(this).toString()
 }
 
-private fun String.toImagesList(): List<String> {
+private fun String.toStringList(): List<String> {
     if (isBlank()) return emptyList()
     return runCatching {
         val array = JSONArray(this)
@@ -39,6 +38,8 @@ fun PostDto.toDomain(): Post {
         postId = postId,
         content = content,
         images = images,
+        categoryKey = categoryKey,
+        customTags = customTags,
         createTime = createTime,
         author = PostAuthor(
             authorId = authorId,
@@ -55,6 +56,8 @@ fun PostDetailDto.toDomain(): Post {
         postId = postId,
         content = content,
         images = images,
+        categoryKey = categoryKey,
+        customTags = customTags,
         createTime = createTime,
         author = PostAuthor(
             authorId = author.id,
@@ -95,7 +98,9 @@ fun PostEntity.toDomain(): Post {
     return Post(
         postId = postId,
         content = content,
-        images = imagesJson.toImagesList(),
+        images = imagesJson.toStringList(),
+        categoryKey = categoryKey,
+        customTags = customTagsJson.toStringList(),
         createTime = createTime,
         author = PostAuthor(
             authorId = 0L,
@@ -111,7 +116,9 @@ fun PostWithAuthorEntity.toDomain(stats: PostStats = PostStats()): Post {
     return Post(
         postId = postId,
         content = content,
-        images = imagesJson.toImagesList(),
+        images = imagesJson.toStringList(),
+        categoryKey = categoryKey,
+        customTags = customTagsJson.toStringList(),
         createTime = createTime,
         author = PostAuthor(
             authorId = authorId,
@@ -129,6 +136,8 @@ fun Post.toDto(): PostDto {
         content = content,
         images = images,
         createTime = createTime,
+        categoryKey = categoryKey,
+        customTags = customTags,
         authorId = author.authorId,
         authorName = author.authorName,
         authorAvatarUrl = author.authorAvatarUrl,
@@ -141,7 +150,9 @@ fun Post.toEntity(): PostEntity {
     return PostEntity(
         postId = postId,
         content = content,
-        imagesJson = images.toImagesJson(),
+        imagesJson = images.toJson(),
+        categoryKey = categoryKey,
+        customTagsJson = customTags.toJson(),
         createTime = createTime
     )
 }

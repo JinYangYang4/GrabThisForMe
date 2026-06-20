@@ -9,6 +9,8 @@ data class Post(
     val postId: String get() = identity.postId
     val content: String get() = contentInfo.text
     val images: List<String> get() = contentInfo.images
+    val categoryKey: String get() = contentInfo.categoryKey
+    val customTags: List<String> get() = contentInfo.customTags
     val createTime: Long get() = identity.createTime
     val author: PostAuthor get() = authorInfo
     val authorId: Long get() = authorInfo.authorId
@@ -21,6 +23,8 @@ data class Post(
         postId: String,
         content: String,
         images: List<String> = emptyList(),
+        categoryKey: String = "",
+        customTags: List<String> = emptyList(),
         createTime: Long,
         author: PostAuthor,
         likeCount: Int,
@@ -32,7 +36,9 @@ data class Post(
         ),
         contentInfo = PostContent(
             text = content,
-            images = images
+            images = images,
+            categoryKey = categoryKey,
+            customTags = customTags
         ),
         authorInfo = PostAuthor(
             authorId = author.authorId,
@@ -49,6 +55,8 @@ data class Post(
         postId: String,
         content: String,
         images: List<String> = emptyList(),
+        categoryKey: String = "",
+        customTags: List<String> = emptyList(),
         createTime: Long,
         authorId: Long,
         authorName: String = "",
@@ -62,7 +70,9 @@ data class Post(
         ),
         contentInfo = PostContent(
             text = content,
-            images = images
+            images = images,
+            categoryKey = categoryKey,
+            customTags = customTags
         ),
         authorInfo = PostAuthor(
             authorId = authorId,

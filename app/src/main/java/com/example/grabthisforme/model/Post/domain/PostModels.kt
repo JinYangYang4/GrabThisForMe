@@ -7,7 +7,9 @@ data class PostIdentity(
 
 data class PostContent(
     val text: String,
-    val images: List<String> = emptyList()
+    val images: List<String> = emptyList(),
+    val categoryKey: String = "",
+    val customTags: List<String> = emptyList()
 )
 
 data class PostAuthor(

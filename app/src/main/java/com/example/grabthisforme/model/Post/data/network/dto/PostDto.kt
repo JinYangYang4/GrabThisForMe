@@ -7,6 +7,8 @@ data class PostDto(
     val content: String,
     val images: List<String> = emptyList(),
     val createTime: Long,
+    val categoryKey: String = "",
+    val customTags: List<String> = emptyList(),
     val authorId: Long = 0L,
     val authorName: String = "",
     val authorAvatarUrl: String = "",
@@ -19,6 +21,8 @@ data class PostDetailDto(
     val content: String,
     val images: List<String> = emptyList(),
     val createTime: Long,
+    val categoryKey: String = "",
+    val customTags: List<String> = emptyList(),
     val author: UserDto,
     val likeCount: Int = 0,
     val commentCount: Int = 0,
@@ -47,7 +51,9 @@ data class PostReplyDto(
 
 data class CreatePostRequest(
     val content: String,
-    val images: List<String> = emptyList()
+    val images: List<String> = emptyList(),
+    val categoryKey: String,
+    val customTags: List<String> = emptyList()
 )
 
 data class SetPostLikedRequest(

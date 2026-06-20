@@ -15,9 +15,7 @@ data class PostCardUiModel(
     val imageUrls: List<String>
 )
 
-fun Post.toPostCardUiModel(
-    tagText: String = "乐于助人"
-): PostCardUiModel {
+fun Post.toPostCardUiModel(): PostCardUiModel {
     val cleanImages = images
         .map { it.trim() }
         .filter { it.isNotEmpty() }
@@ -27,10 +25,37 @@ fun Post.toPostCardUiModel(
         authorName = authorName.ifBlank { "匿名用户" },
         authorAvatarUrl = authorAvatarUrl,
         timeText = formatPostCardTime(createTime),
-        tagText = tagText,
+        tagText = buildTagText(),
         contentText = content,
         imageUrls = cleanImages
     )
+}
+
+private fun Post.buildTagText(): String {
+    val categoryLabel = categoryKey.toCategoryLabel()
+    val tags = customTags.filter { it.isNotBlank() }
+    return buildList {
+        if (categoryLabel.isNotBlank()) add(categoryLabel)
+        addAll(tags.take(2))
+    }.joinToString(" · ").ifBlank { "校园话题" }
+}
+
+private fun String.toCategoryLabel(): String {
+    return when (this) {
+        "FUNNY" -> "搞笑"
+        "GOSSIP" -> "吐槽"
+        "SHARE" -> "分享"
+        "FRESH" -> "新鲜"
+        "SECOND_HAND" -> "二手"
+        "MAKE_FRIENDS" -> "交友"
+        "GAME" -> "游戏"
+        "LOST_FOUND" -> "失物"
+        "CLUB" -> "社团"
+        "FOOD" -> "美食"
+        "WARNING" -> "避雷"
+        "QUESTION" -> "疑问"
+        else -> ""
+    }
 }
 
 private fun formatPostCardTime(timestamp: Long): String {

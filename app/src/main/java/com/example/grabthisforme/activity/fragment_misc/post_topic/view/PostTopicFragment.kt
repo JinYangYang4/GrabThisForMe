@@ -4,25 +4,29 @@ import android.content.Context
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.BottomSheetDialogPhoto
 import com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.PhotoPreviewDialog
 import com.example.grabthisforme.activity.fragment_misc.post_topic.adapter.ImagesRecyclerviewAdapter
+import com.example.grabthisforme.activity.fragment_misc.post_topic.viewmodel.PostCategory
 import com.example.grabthisforme.activity.fragment_misc.post_topic.viewmodel.PostTopicActionType
 import com.example.grabthisforme.activity.fragment_misc.post_topic.viewmodel.PostTopicViewModel
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentCreatePostBinding
 import com.example.grabthisforme.util.KeyboardScrollHelper
+import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -53,11 +57,11 @@ class PostTopicFragment : Fragment() {
             scrollView = binding.nestedScrollView,
             density = resources.displayMetrics.density,
             onImeHidden = { if (_binding != null) clearInputFocus() },
-            focusRectProvider = { view ->
-                if (view === binding.itPostContent) {
+            focusRectProvider = { targetView ->
+                if (targetView === binding.itPostContent) {
                     buildCursorRect(binding.itPostContent)
                 } else {
-                    android.graphics.Rect().also { view.getDrawingRect(it) }
+                    Rect().also { targetView.getDrawingRect(it) }
                 }
             }
         ).also { it.setup() }
@@ -65,6 +69,7 @@ class PostTopicFragment : Fragment() {
 
     private fun initView() {
         initImagesRV()
+        initCategoryChips()
         binding.ivBack.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
@@ -86,6 +91,20 @@ class PostTopicFragment : Fragment() {
         binding.btnPublishPost.setOnClickListener {
             clearInputFocus()
             viewModel.publishPost()
+        }
+        binding.ivAddCustomTag.setOnClickListener {
+            submitCustomTag()
+        }
+        binding.etCustomTag.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                submitCustomTag()
+                true
+            } else {
+                false
+            }
+        }
+        binding.etCustomTag.doAfterTextChanged {
+            binding.tilCustomTag.error = null
         }
         binding.itPostContent.doAfterTextChanged { editable ->
             viewModel.updateContent(editable?.toString().orEmpty())
@@ -113,6 +132,32 @@ class PostTopicFragment : Fragment() {
         }
         binding.root.setOnClickListener {
             clearInputFocus()
+        }
+    }
+
+    private fun initCategoryChips() {
+        binding.cgPostCategory.removeAllViews()
+        viewModel.categories().forEach { category ->
+            val chip = createCategoryChip(category)
+            binding.cgPostCategory.addView(chip)
+        }
+    }
+
+    private fun createCategoryChip(category: PostCategory): Chip {
+        return Chip(requireContext()).apply {
+            text = category.label
+            isCheckable = true
+            isClickable = true
+            setTextColor(ContextCompat.getColorStateList(context, R.color.text_secondary))
+            chipBackgroundColor = ContextCompat.getColorStateList(context, R.color.white_fff8)
+            checkedIcon = null
+            chipStrokeWidth = resources.displayMetrics.density
+            chipStrokeColor = ContextCompat.getColorStateList(context, R.color.green_primary)
+            setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    viewModel.updateCategory(category)
+                }
+            }
         }
     }
 
@@ -159,6 +204,51 @@ class PostTopicFragment : Fragment() {
                 binding.itPostContent.setSelection(content.length)
             }
         }
+
+        viewModel.selectedCategory.observe(viewLifecycleOwner) { selected ->
+            for (index in 0 until binding.cgPostCategory.childCount) {
+                val child = binding.cgPostCategory.getChildAt(index) as? Chip ?: continue
+                val category = viewModel.categories().getOrNull(index) ?: continue
+                child.isChecked = category == selected
+            }
+        }
+
+        viewModel.customTags.observe(viewLifecycleOwner) { tags ->
+            binding.tvTagEmpty.visibility = if (tags.isEmpty()) View.VISIBLE else View.GONE
+            renderCustomTags(tags)
+        }
+    }
+
+    private fun renderCustomTags(tags: List<String>) {
+        binding.cgCustomTags.removeAllViews()
+        tags.forEach { tag ->
+            binding.cgCustomTags.addView(
+                Chip(requireContext()).apply {
+                    text = tag
+                    chipCornerRadius = 30f
+                    chipStrokeWidth = 0f
+                    isCloseIconVisible = true
+                    isCheckable = false
+
+                    chipBackgroundColor = ContextCompat.getColorStateList(context, R.color.orange_light)
+                    setTextColor(ContextCompat.getColor(context, R.color.orange_dark))
+                    closeIconTint = ContextCompat.getColorStateList(context, R.color.orange_dark)
+                    setOnCloseIconClickListener {
+                        viewModel.removeCustomTag(tag)
+                    }
+                }
+            )
+        }
+    }
+
+    private fun submitCustomTag() {
+        val input = binding.etCustomTag.text?.toString().orEmpty()
+        if (input.isBlank()) {
+            binding.tilCustomTag.error = "先输入一个标签"
+            return
+        }
+        viewModel.addCustomTag(input)
+        binding.etCustomTag.setText("")
     }
 
     private fun showPhotoSelector() {

@@ -15,6 +15,8 @@ data class PostEntity(
     @PrimaryKey val postId: String,
     val content: String = "",
     val imagesJson: String = "[]",
+    val categoryKey: String = "",
+    val customTagsJson: String = "[]",
     val createTime: Long = 0L
 )
 
@@ -42,6 +44,8 @@ data class PostWithAuthorEntity(
     val postId: String,
     val content: String = "",
     val imagesJson: String = "[]",
+    val categoryKey: String = "",
+    val customTagsJson: String = "[]",
     val createTime: Long = 0L,
     val authorId: Long = 0L,
     val authorName: String = "",

@@ -243,7 +243,12 @@ class PostLocalRepository @Inject constructor(
         return liked
     }
 
-    suspend fun publishPost(content: String, images: List<String> = emptyList()): Post {
+    suspend fun publishPost(
+        content: String,
+        images: List<String> = emptyList(),
+        categoryKey: String = "",
+        customTags: List<String> = emptyList()
+    ): Post {
         val trimmedContent = content.trim()
         require(trimmedContent.isNotBlank()) { "Post content cannot be blank." }
 
@@ -253,6 +258,8 @@ class PostLocalRepository @Inject constructor(
             postId = "POST_$now",
             content = trimmedContent,
             images = images.filter { it.isNotBlank() },
+            categoryKey = categoryKey,
+            customTags = customTags.filter { it.isNotBlank() },
             createTime = now,
             author = PostAuthor(
                 authorId = currentUser?.id ?: now,
