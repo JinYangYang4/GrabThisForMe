@@ -1,5 +1,6 @@
 package com.example.grabthisforme.activity.fragment_misc.postDetailFragment.viewModel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -27,6 +28,7 @@ class PostDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     companion object {
+        private const val COMMENT_FETCH_LIMIT = 20
         private const val REPLY_FETCH_LIMIT = 8
     }
 
@@ -58,6 +60,9 @@ class PostDetailViewModel @Inject constructor(
 
     private val _canSend = MutableLiveData(false)
     val canSend: LiveData<Boolean> get() = _canSend
+
+    private var isLoadingComments = false
+    private var commentPagingExhausted = false
 
     private val fallbackUser = User(
         id = 1L,
@@ -185,16 +190,48 @@ class PostDetailViewModel @Inject constructor(
                     limit = REPLY_FETCH_LIMIT,
                     beforeTime = beforeTime
                 )
-                if (replies.isEmpty()) {
+                if (replies.items.isEmpty()) {
                     break
                 }
 
-                appendCommentReplies(commentId, replies)
+                appendCommentReplies(commentId, replies.items)
                 currentComment = _commentList.value.orEmpty().firstOrNull { it.id == commentId } ?: break
 
-                if (replies.size < REPLY_FETCH_LIMIT) {
+                if (!replies.hasMore) {
                     break
                 }
+            }
+        }
+    }
+
+    fun loadMoreComments() {
+        if (postId.isBlank() || isLoadingComments || commentPagingExhausted) return
+
+        viewModelScope.launch {
+            isLoadingComments = true
+            try {
+                val currentComments = _commentList.value.orEmpty()
+                val beforeTime = currentComments.lastOrNull()?.time?.minus(1L)
+                    ?: (System.currentTimeMillis() + 1L)
+                val comments = postRepository.getCommentPage(
+                    postId = postId,
+                    limit = COMMENT_FETCH_LIMIT,
+                    beforeTime = beforeTime
+                )
+                Log.d("test11", "loadMoreComments: ${comments.items.size}")
+
+                val previousSize = currentComments.size
+                if (comments.items.isNotEmpty()) {
+                    appendComments(comments.items)
+                }
+                val mergedSize = _commentList.value.orEmpty().size
+                val addedCount = mergedSize - previousSize
+
+                if (!comments.hasMore || addedCount <= 0) {
+                    commentPagingExhausted = true
+                }
+            } finally {
+                isLoadingComments = false
             }
         }
     }
@@ -257,11 +294,8 @@ class PostDetailViewModel @Inject constructor(
     }
 
     private fun loadInitialComments() {
-        viewModelScope.launch {
-            val comments = postRepository.getCommentListOnce(postId)
-            _commentList.value = comments
-            updatePostStats(commentCount = comments.size)
-        }
+        commentPagingExhausted = false
+        loadMoreComments()
     }
 
     private fun observeLikeState() {
@@ -276,7 +310,7 @@ class PostDetailViewModel @Inject constructor(
     private fun addCommentLocal(comment: Comment) {
         val updatedList = listOf(comment) + _commentList.value.orEmpty()
         _commentList.value = updatedList
-        updatePostStats(commentCount = updatedList.size)
+        updatePostStats(commentCount = maxOf(updatedList.size, (_postStatsUiModel.value?.commentCount ?: 0) + 1))
     }
 
     private fun replaceComment(oldCommentId: Long, newComment: Comment) {
@@ -284,7 +318,6 @@ class PostDetailViewModel @Inject constructor(
             if (comment.id == oldCommentId) newComment else comment
         }
         _commentList.value = updatedList
-        updatePostStats(commentCount = updatedList.size)
     }
 
     private fun addReplyLocal(commentPosition: Int, reply: Reply) {
@@ -336,20 +369,23 @@ class PostDetailViewModel @Inject constructor(
         _commentList.value = updatedList
     }
 
+    private fun appendComments(comments: List<Comment>) {
+        val mergedComments = (_commentList.value.orEmpty() + comments)
+            .distinctBy { it.id }
+            .sortedByDescending { it.time }
+        _commentList.value = mergedComments
+        updatePostStats(commentCount = maxOf(mergedComments.size, _postStatsUiModel.value?.commentCount ?: 0))
+    }
+
     private fun renderPost(post: Post?) {
         if (post == null) {
             showMissingPostState()
             return
         }
         _postHeaderUiModel.value = post.toPostDetailHeaderUiModel()
-        val commentCount = if (_commentList.value.isNullOrEmpty()) {
-            post.commentCount
-        } else {
-            _postStatsUiModel.value?.commentCount ?: _commentList.value?.size ?: post.commentCount
-        }
         _postStatsUiModel.value = buildPostDetailStatsUiModel(
             likeCount = post.likeCount,
-            commentCount = commentCount
+            commentCount = maxOf(post.commentCount, _postStatsUiModel.value?.commentCount ?: 0)
         )
     }
 

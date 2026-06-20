@@ -167,8 +167,15 @@ interface PostDao {
     )
     suspend fun trimCommentsByPostId(postId: String, limit: Int)
 
-    @Query("SELECT * FROM post_comment WHERE postId = :postId ORDER BY time DESC LIMIT :limit OFFSET :offset")
-    suspend fun getCommentEntitiesPage(postId: String, limit: Int, offset: Int): List<PostCommentEntity>
+    @Query(
+        """
+        SELECT * FROM post_comment
+        WHERE postId = :postId AND time < :beforeTime
+        ORDER BY time DESC
+        LIMIT :limit
+        """
+    )
+    suspend fun getCommentEntitiesPage(postId: String, limit: Int, beforeTime: Long): List<PostCommentEntity>
 
     @Query("SELECT * FROM post_reply WHERE postId = :postId AND parentCommentId IN (:commentIds) ORDER BY time ASC")
     suspend fun getReplyEntitiesByCommentIds(postId: String, commentIds: List<Long>): List<PostReplyEntity>

@@ -27,7 +27,7 @@ interface PostApi{
     suspend fun getComments(
         @Path("postId") postId: String,
         @Query("limit") limit: Int,
-        @Query("offset") offset: Int
+        @Query("beforeTime") beforeTime: Long
     ): ApiResponse<PageResponseDto<PostCommentDto>>
 
     @GET("api/posts/{postId}/comments/{commentId}/replies")

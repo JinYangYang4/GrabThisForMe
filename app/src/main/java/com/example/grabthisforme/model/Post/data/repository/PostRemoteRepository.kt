@@ -18,6 +18,11 @@ class PostRemoteRepository @Inject constructor(
     private val postApi: PostApi
 ) {
 
+    data class CursorPage<T>(
+        val items: List<T>,
+        val hasMore: Boolean
+    )
+
     suspend fun listPosts(): Result<List<Post>> {
         return runCatching {
             requireSuccessfulData(postApi.listPosts()).map { it.toDomain() }
@@ -30,15 +35,19 @@ class PostRemoteRepository @Inject constructor(
         }
     }
 
-    suspend fun getComments(postId: String, limit: Int, offset: Int): Result<List<Comment>> {
+    suspend fun getComments(postId: String, limit: Int, beforeTime: Long): Result<CursorPage<Comment>> {
         return runCatching {
-            requireSuccessfulData(
+            val page = requireSuccessfulData(
                 postApi.getComments(
                     postId = postId,
                     limit = limit,
-                    offset = offset
+                    beforeTime = beforeTime
                 )
-            ).items.map { it.toDomain() }
+            )
+            CursorPage(
+                items = page.items.map { it.toDomain() },
+                hasMore = page.hasMore
+            )
         }
     }
 
@@ -47,16 +56,20 @@ class PostRemoteRepository @Inject constructor(
         commentId: Long,
         limit: Int,
         beforeTime: Long
-    ): Result<List<Reply>> {
+    ): Result<CursorPage<Reply>> {
         return runCatching {
-            requireSuccessfulData(
+            val page = requireSuccessfulData(
                 postApi.getReplies(
                     postId = postId,
                     commentId = commentId,
                     limit = limit,
                     beforeTime = beforeTime
                 )
-            ).items.map { it.toDomain() }
+            )
+            CursorPage(
+                items = page.items.map { it.toDomain() },
+                hasMore = page.hasMore
+            )
         }
     }
 

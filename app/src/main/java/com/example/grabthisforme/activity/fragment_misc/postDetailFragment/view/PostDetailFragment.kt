@@ -199,6 +199,7 @@ class PostDetailFragment : Fragment() {
             val statsTopInScroll = binding.llStats.top - scrollY
             val shouldPin = statsTopInScroll <= 0
             binding.llPinnedStats.visibility = if (shouldPin) View.VISIBLE else View.GONE
+            maybeLoadMoreComments()
         }
     }
 
@@ -211,7 +212,11 @@ class PostDetailFragment : Fragment() {
 
     private fun initObserve() {
         viewModel.commentList.observe(viewLifecycleOwner) { list ->
-            commentAdapter.submitList(list)
+            commentAdapter.submitList(list) {
+                binding.nsvContent.post {
+                    maybeLoadMoreComments()
+                }
+            }
         }
 
         viewModel.postHeaderUiModel.observe(viewLifecycleOwner) { header ->
@@ -291,6 +296,14 @@ class PostDetailFragment : Fragment() {
     private fun dp2px(dp: Int): Int {
         val density = requireContext().resources.displayMetrics.density
         return (dp * density + 0.5f).toInt()
+    }
+
+    private fun maybeLoadMoreComments() {
+        val contentView = binding.nsvContent.getChildAt(0) ?: return
+        val remainingHeight = contentView.bottom - (binding.nsvContent.height + binding.nsvContent.scrollY)
+        if (remainingHeight <= dp2px(120)) {
+            viewModel.loadMoreComments()
+        }
     }
 
     override fun onStop() {

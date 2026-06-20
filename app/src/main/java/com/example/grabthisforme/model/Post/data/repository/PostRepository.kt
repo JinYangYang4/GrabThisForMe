@@ -54,28 +54,23 @@ class PostRepository @Inject constructor(
 
     fun getCommentList(postId: String): Flow<List<Comment>> = localRepository.getCommentList(postId)
 
-    suspend fun getCommentListOnce(postId: String): List<Comment> {
-        return remoteRepository.getComments(postId, limit = 20, offset = 0)
-            .onSuccess { comments ->
-                localRepository.cacheComments(postId, comments)
+    suspend fun getCommentPage(
+        postId: String,
+        limit: Int = 50,
+        beforeTime: Long
+    ): PostRemoteRepository.CursorPage<Comment> {
+        return remoteRepository.getComments(postId, limit, beforeTime)
+            .onSuccess { page ->
+                localRepository.cacheComments(postId, page.items)
             }
             .onFailure {
-                Log.e("com.example.grabthisforme.model.post.data.repository.getCommentListOnce", "e:${it.message}")
+                Log.e("com.example.grabthisforme.model.post.data.repository.getCommentPage", "e:${it.message}")
             }
             .getOrElse {
-                localRepository.getCommentListOnce(postId)
-            }
-    }
-
-    suspend fun getCommentPage(postId: String, limit: Int = 50, offset: Int = 0): List<Comment> {
-        return remoteRepository.getComments(postId, limit, offset)
-            .onSuccess { comments ->
-                if (offset == 0) {
-                    localRepository.cacheComments(postId, comments)
-                }
-            }
-            .getOrElse {
-                localRepository.getCommentPage(postId, limit, offset)
+                PostRemoteRepository.CursorPage(
+                    items = localRepository.getCommentPage(postId, limit, beforeTime),
+                    hasMore = false
+                )
             }
     }
 
@@ -84,15 +79,18 @@ class PostRepository @Inject constructor(
         commentId: Long,
         limit: Int = 50,
         beforeTime: Long
-    ): List<Reply> {
+    ): PostRemoteRepository.CursorPage<Reply> {
         return remoteRepository.getReplies(postId, commentId, limit, beforeTime)
-            .onSuccess { replies ->
-                localRepository.cacheReplies(postId, commentId, replies)
-                Log.d("test11", "getReplyPage: ${replies.size}")
+            .onSuccess { page ->
+                localRepository.cacheReplies(postId, commentId, page.items)
+                Log.d("test11", "getReplyPage: ${page.items.size}")
             }
             .getOrElse {
                 Log.d("test11", "getReplyPage: ${it.message}")
-                localRepository.getReplyPage(commentId, limit)
+                PostRemoteRepository.CursorPage(
+                    items = localRepository.getReplyPage(commentId, limit),
+                    hasMore = false
+                )
             }
     }
 

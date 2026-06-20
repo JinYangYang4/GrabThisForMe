@@ -140,16 +140,16 @@ class PostLocalRepository @Inject constructor(
         }
     }
 
-    suspend fun getCommentListOnce(postId: String): List<Comment> {
-        return getStoredComments(postId)
-    }
-
-    suspend fun getCommentPage(postId: String, limit: Int = 50, offset: Int = 0): List<Comment> {
+    suspend fun getCommentPage(postId: String, limit: Int = 50, beforeTime: Long): List<Comment> {
         val safeLimit = limit.coerceAtLeast(1)
-        val safeOffset = offset.coerceAtLeast(0)
+        val safeBeforeTime = if (beforeTime <= 0L) {
+            System.currentTimeMillis() + 1L
+        } else {
+            beforeTime
+        }
         return assembleComments(
             postId = postId,
-            commentEntities = postDao.getCommentEntitiesPage(postId, safeLimit, safeOffset)
+            commentEntities = postDao.getCommentEntitiesPage(postId, safeLimit, safeBeforeTime)
         )
     }
 

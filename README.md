@@ -48,7 +48,7 @@ D:\projects\GrabThisForMe\GrabThisForMe-Backend\GrabThisForMe
 - 依赖注入：Hilt
 - 本地数据库：Room
 - 本地偏好：DataStore Preferences
-- 网络：Retrofit、OkHttp（逐步接入中）
+- 网络：Retrofit、OkHttp
 - 图片加载：Glide
 - 图片查看：PhotoView
 
@@ -106,12 +106,13 @@ Repository 层约定：
 
 - 显示时优先使用网络返回 DTO 转成 domain 直接展示
 - 本地数据库只作为缓存和兜底，不作为首要显示来源
-- 回复分页从 `offset` 改为 `beforeTime` 游标方式
+- 评论和回复分页都使用 `beforeTime` 游标方式
 - 回复展开策略：
   - 第一次展开显示 3 条
   - 第二次显示到 5 条
   - 之后每次再增加 7 条
-- 网络侧固定按 `8` 条补货
+- 评论列表在帖子详情页按游标分页继续加载
+- 分页停止优先依据后端 `hasMore`，前端同时保留去重兜底
 
 如果继续修改帖子评论、回复、缓存或分页逻辑，建议先查看：
 
@@ -161,11 +162,6 @@ $env:GRADLE_USER_HOME='D:\projects\GrabThisForMe\xin\GrabThisForMe\.gradle-user-
 .\gradlew.bat --no-daemon --console=plain :app:kaptDebugKotlin
 .\gradlew.bat --no-daemon --console=plain assembleDebug
 ```
-
-说明：
-
-- 修改 Kotlin、XML、DataBinding、导航参数后，优先跑 `:app:compileDebugKotlin`
-- 修改 Room、Hilt、注解处理相关内容后，必要时再跑 `:app:kaptDebugKotlin`
 
 ## 数据库说明
 
