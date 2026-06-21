@@ -1,37 +1,36 @@
 package com.example.grabthisforme.activity.communityFragment.view
 
 import android.os.Bundle
-import android.util.Log
-import android.widget.TextView
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.activity.viewModels
+import android.widget.TextView
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
-import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.communityFragment.adpter.CommunityPagerAdapter
+import com.example.grabthisforme.activity.communityFragment.model.CommunityTabs
+import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
 import com.example.grabthisforme.databinding.FragmentCommunityBinding
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class FragmentCommunity : Fragment() {
-    private  var _binding : FragmentCommunityBinding? = null
+    private var _binding: FragmentCommunityBinding? = null
     private val binding get() = _binding!!
-    private val sharedViewModel : MainViewModel by activityViewModels()
+    private val sharedViewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentCommunityBinding.inflate(inflater,container,false)
+    ): View {
+        _binding = FragmentCommunityBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -39,12 +38,13 @@ class FragmentCommunity : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initVP2()
         val targetView = view.findViewById<ImageView>(R.id.iv_Add)
-        iv_Add_init(targetView.id)
+        initAddMenu(targetView.id)
         initClickListener()
         initObserve()
     }
-    fun initObserve(){
-        sharedViewModel.currentUser.observe(viewLifecycleOwner){user ->
+
+    private fun initObserve() {
+        sharedViewModel.currentUser.observe(viewLifecycleOwner) { user ->
             Glide.with(this)
                 .load(user?.headPic)
                 .placeholder(R.drawable.cat)
@@ -52,17 +52,11 @@ class FragmentCommunity : Fragment() {
                 .into(binding.ivAvatar)
         }
     }
-    fun initVP2(){
+
+    private fun initVP2() {
         val adapter = CommunityPagerAdapter(this)
         binding.viewpager2.adapter = adapter
-        val titles = listOf(
-            "最新",
-            "附近",
-            "搞笑",
-            "吐槽",
-            "分享",
-            "新鲜"
-        )
+        val titles = CommunityTabs.items.map { it.title }
         TabLayoutMediator(binding.tabLayout, binding.viewpager2) { tab, position ->
             val customView = LayoutInflater.from(requireContext())
                 .inflate(R.layout.tab_pill_item, binding.tabLayout, false)
@@ -74,12 +68,12 @@ class FragmentCommunity : Fragment() {
         val tabCount = binding.tabLayout.tabCount
         binding.viewpager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                // 当前正在被滑出的 Tab 索引
                 val currentTab = binding.tabLayout.getTabAt(position)
-                // 下一个将被滑入的 Tab 索引（如果没有下一页则忽略）
-                val nextTab = if (position + 1 < tabCount) binding.tabLayout.getTabAt(position + 1) else null
-
-                // 获取自定义视图中的 TextView
+                val nextTab = if (position + 1 < tabCount) {
+                    binding.tabLayout.getTabAt(position + 1)
+                } else {
+                    null
+                }
                 val currentTextView = currentTab?.customView?.findViewById<TextView>(R.id.tab_text)
                 val nextTextView = nextTab?.customView?.findViewById<TextView>(R.id.tab_text)
                 currentTextView?.background?.alpha = ((1 - positionOffset) * 255).toInt()
@@ -87,30 +81,36 @@ class FragmentCommunity : Fragment() {
             }
 
             override fun onPageSelected(position: Int) {
-                // 滑动结束后，确保选中 Tab 的透明度归位（防止浮点误差）
                 for (i in 0 until tabCount) {
                     val tab = binding.tabLayout.getTabAt(i)
                     val textView = tab?.customView?.findViewById<TextView>(R.id.tab_text)
                     textView?.background?.alpha = if (i == position) 255 else 0
                 }
             }
-
-            override fun onPageScrollStateChanged(state: Int) {}
         })
     }
-    fun initClickListener(){
+
+    private fun initClickListener() {
         binding.llSearch.setOnClickListener {
-            Log.d("test11", "iv_Add_init: ")
-            (requireActivity() as MainActivity).intentToMiscFragment(R.id.action_blankFragment_to_searchCommunityFragment)
+            (requireActivity() as MainActivity)
+                .intentToMiscFragment(R.id.action_blankFragment_to_searchCommunityFragment)
         }
         binding.ivAvatar.setOnClickListener {
             sharedViewModel.drawerOpenStateToOpen()
         }
     }
-    fun iv_Add_init(targetView : Int){
-        binding.ivAdd.setOnClickListener {view ->
+
+    private fun initAddMenu(targetView: Int) {
+        binding.ivAdd.setOnClickListener {
             val menuDialog = CommunityLeftBottomMenuDialog.newInstance(targetView)
-            fragmentManager?.let { menuDialog.show(it, "left_bottom_menu") }
+            parentFragmentManager.let { manager ->
+                menuDialog.show(manager, "left_bottom_menu")
+            }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

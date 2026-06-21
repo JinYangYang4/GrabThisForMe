@@ -4,20 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.grabthisforme.R
+import androidx.recyclerview.widget.RecyclerView
 import com.example.grabthisforme.activity.communityFragment.adpter.CommunityVP2_RVAdapter
-import com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.PhotoPreviewDialog
+import com.example.grabthisforme.activity.communityFragment.model.CommunityFeedArgs
 import com.example.grabthisforme.activity.communityFragment.viewmodel.CommunityViewModel
+import com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.PhotoPreviewDialog
 import com.example.grabthisforme.activity.fragment_misc.default_entry.view.BlankFragmentDirections
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentCommunityViewpager2Binding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class FragmentCommunityViewPager2 : Fragment(){
+class FragmentCommunityViewPager2 : Fragment() {
     private var _binding: FragmentCommunityViewpager2Binding? = null
     private val binding get() = _binding!!
 
@@ -25,19 +27,15 @@ class FragmentCommunityViewPager2 : Fragment(){
     private lateinit var adapter: CommunityVP2_RVAdapter
 
     companion object {
-        private const val KEY_TYPE = "task_type"
-
-        fun newInstance(type: Int): FragmentCommunityViewPager2 {
+        fun newInstance(title: String, mode: String, categoryKey: String?): FragmentCommunityViewPager2 {
             return FragmentCommunityViewPager2().apply {
                 arguments = Bundle().apply {
-                    putInt(KEY_TYPE, type)
+                    putString(CommunityFeedArgs.TITLE, title)
+                    putString(CommunityFeedArgs.MODE, mode)
+                    putString(CommunityFeedArgs.CATEGORY_KEY, categoryKey)
                 }
             }
         }
-    }
-
-    private val taskType: Int by lazy {
-        arguments?.getInt(KEY_TYPE) ?: 0
     }
 
     override fun onCreateView(
@@ -53,8 +51,8 @@ class FragmentCommunityViewPager2 : Fragment(){
         super.onViewCreated(view, savedInstanceState)
         initRV()
         initObserve()
-
     }
+
     private fun initRV() {
         adapter = CommunityVP2_RVAdapter(
             clickListener = { postId ->
@@ -72,14 +70,34 @@ class FragmentCommunityViewPager2 : Fragment(){
         )
         binding.rvTask.adapter = adapter
         binding.rvTask.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvTask.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy <= 0) return
+                val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
+                val lastVisible = layoutManager.findLastVisibleItemPosition()
+                if (lastVisible >= adapter.itemCount - 4) {
+                    viewModel.loadMore()
+                }
+            }
+        })
     }
 
     private fun initObserve() {
         viewModel.postList.observe(viewLifecycleOwner) { posts ->
             adapter.submitList(posts)
         }
+        viewModel.emptyMessage.observe(viewLifecycleOwner) { message ->
+            binding.tvEmptyHint.text = message
+        }
+        viewModel.emptyVisible.observe(viewLifecycleOwner) { visible ->
+            binding.tvEmptyHint.isVisible = visible
+            binding.rvTask.isVisible = !visible
+        }
+        viewModel.initialLoading.observe(viewLifecycleOwner) { loading ->
+            binding.progressBar.isVisible = loading
+        }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

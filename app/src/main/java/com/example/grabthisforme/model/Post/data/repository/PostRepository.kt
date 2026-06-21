@@ -35,19 +35,45 @@ class PostRepository @Inject constructor(
     }
 
     suspend fun refreshPosts(): List<Post> {
-        return remoteRepository.listPosts()
-            .onSuccess { remotePosts ->
-                localRepository.savePosts(remotePosts)
-                _allPostList.value = remotePosts.sortedByDescending { it.createTime }
-                Log.d("test11", "refreshPosts: ${remotePosts.size}")
+        val result = remoteRepository.listPosts(
+            limit = DEFAULT_POST_PAGE_SIZE,
+            beforeTime = System.currentTimeMillis() + 1L,
+            categoryKey = null
+        )
+        result.onSuccess { page ->
+                localRepository.savePosts(page.items)
+                _allPostList.value = page.items.sortedByDescending { it.createTime }
+                Log.d("test11", "refreshPosts: ${page.items.size}")
             }
-            .getOrElse {
-                localRepository.allPostList.value.also { localPosts ->
-                    _allPostList.value = localPosts
-                    Log.d("test11", "refreshPosts: ${it.message}")
-                }
+        return result.getOrElse {
+            val localPosts = localRepository.allPostList.value
+            _allPostList.value = localPosts
+            Log.d("test11", "refreshPosts: ${it.message}")
+            PostRemoteRepository.CursorPage(
+                items = localPosts,
+                hasMore = false
+            )
+        }.items
+    }
 
-            }
+    suspend fun getPostPage(
+        limit: Int = DEFAULT_POST_PAGE_SIZE,
+        beforeTime: Long,
+        categoryKey: String? = null
+    ): PostRemoteRepository.CursorPage<Post> {
+        return remoteRepository.listPosts(
+            limit = limit,
+            beforeTime = beforeTime,
+            categoryKey = categoryKey?.takeIf { it.isNotBlank() }
+        ).onSuccess { page ->
+            page.items.forEach { localRepository.savePost(it) }
+        }.getOrElse {
+            buildLocalPostPage(
+                limit = limit,
+                beforeTime = beforeTime,
+                categoryKey = categoryKey
+            )
+        }
     }
 
     fun getPost(postId: String): Flow<Post?> = flow {
@@ -200,5 +226,33 @@ class PostRepository @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun buildLocalPostPage(
+        limit: Int,
+        beforeTime: Long,
+        categoryKey: String?
+    ): PostRemoteRepository.CursorPage<Post> {
+        val normalizedLimit = limit.coerceAtLeast(1)
+        val safeBeforeTime = if (beforeTime <= 0L) {
+            System.currentTimeMillis() + 1L
+        } else {
+            beforeTime
+        }
+        val filtered = localRepository.allPostList.value
+            .asSequence()
+            .filter { it.createTime < safeBeforeTime }
+            .filter { categoryKey.isNullOrBlank() || it.categoryKey == categoryKey }
+            .sortedByDescending { it.createTime }
+            .toList()
+        val items = filtered.take(normalizedLimit)
+        return PostRemoteRepository.CursorPage(
+            items = items,
+            hasMore = filtered.size > normalizedLimit
+        )
+    }
+
+    companion object {
+        private const val DEFAULT_POST_PAGE_SIZE = 20
     }
 }

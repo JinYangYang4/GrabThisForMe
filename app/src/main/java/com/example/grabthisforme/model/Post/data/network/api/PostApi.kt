@@ -18,7 +18,11 @@ import retrofit2.http.Query
 
 interface PostApi{
     @GET("api/posts")
-    suspend fun listPosts(): ApiResponse<List<PostDto>>
+    suspend fun listPosts(
+        @Query("limit") limit: Int,
+        @Query("beforeTime") beforeTime: Long,
+        @Query("categoryKey") categoryKey: String? = null
+    ): ApiResponse<PageResponseDto<PostDto>>
 
     @GET("api/posts/{postId}")
     suspend fun getPost(@Path("postId")postId : String): ApiResponse<PostDetailDto>

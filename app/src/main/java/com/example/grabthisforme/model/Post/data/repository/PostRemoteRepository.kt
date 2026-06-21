@@ -23,9 +23,23 @@ class PostRemoteRepository @Inject constructor(
         val hasMore: Boolean
     )
 
-    suspend fun listPosts(): Result<List<Post>> {
+    suspend fun listPosts(
+        limit: Int,
+        beforeTime: Long,
+        categoryKey: String? = null
+    ): Result<CursorPage<Post>> {
         return runCatching {
-            requireSuccessfulData(postApi.listPosts()).map { it.toDomain() }
+            val page = requireSuccessfulData(
+                postApi.listPosts(
+                    limit = limit,
+                    beforeTime = beforeTime,
+                    categoryKey = categoryKey
+                )
+            )
+            CursorPage(
+                items = page.items.map { it.toDomain() },
+                hasMore = page.hasMore
+            )
         }
     }
 
