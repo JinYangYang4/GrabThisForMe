@@ -65,6 +65,7 @@ dependencies {
     val room_version = "2.8.4"
     val hilt_version = "2.57.2"
     val backdrop_version = "1.0.6"
+    val amap_location_version = "11.1.200"
     // Hilt
     implementation("com.google.dagger:hilt-android:$hilt_version")
     kapt ("com.google.dagger:hilt-android-compiler:$hilt_version")
@@ -83,6 +84,9 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    implementation("com.amap.api:location:$amap_location_version")
+
     implementation("androidx.navigation:navigation-fragment-ktx:${navVersion}")
     implementation("androidx.navigation:navigation-ui-ktx:${navVersion}")
     implementation("androidx.navigation:navigation-compose:${navVersion}")

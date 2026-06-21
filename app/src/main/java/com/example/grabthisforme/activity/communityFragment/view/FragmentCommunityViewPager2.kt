@@ -1,9 +1,13 @@
 package com.example.grabthisforme.activity.communityFragment.view
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -11,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.grabthisforme.activity.communityFragment.adpter.CommunityVP2_RVAdapter
 import com.example.grabthisforme.activity.communityFragment.model.CommunityFeedArgs
+import com.example.grabthisforme.activity.communityFragment.model.CommunityTabMode
 import com.example.grabthisforme.activity.communityFragment.viewmodel.CommunityViewModel
 import com.example.grabthisforme.activity.fragment_misc.chat_fragment.view.PhotoPreviewDialog
 import com.example.grabthisforme.activity.fragment_misc.default_entry.view.BlankFragmentDirections
@@ -20,13 +25,12 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class FragmentCommunityViewPager2 : Fragment() {
-    private var _binding: FragmentCommunityViewpager2Binding? = null
-    private val binding get() = _binding!!
-
-    private val viewModel: CommunityViewModel by viewModels()
-    private lateinit var adapter: CommunityVP2_RVAdapter
-
     companion object {
+        private val LOCATION_PERMISSIONS = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+
         fun newInstance(title: String, mode: String, categoryKey: String?): FragmentCommunityViewPager2 {
             return FragmentCommunityViewPager2().apply {
                 arguments = Bundle().apply {
@@ -35,6 +39,30 @@ class FragmentCommunityViewPager2 : Fragment() {
                     putString(CommunityFeedArgs.CATEGORY_KEY, categoryKey)
                 }
             }
+        }
+    }
+
+    private var _binding: FragmentCommunityViewpager2Binding? = null
+    private val binding get() = _binding!!
+
+    private val viewModel: CommunityViewModel by viewModels()
+    private lateinit var adapter: CommunityVP2_RVAdapter
+
+    private val tabMode: CommunityTabMode by lazy(LazyThreadSafetyMode.NONE) {
+        arguments?.getString(CommunityFeedArgs.MODE)
+            ?.let(CommunityTabMode::valueOf)
+            ?: CommunityTabMode.LATEST
+    }
+
+    private val locationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { grants ->
+        val granted = grants[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+            grants[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (granted) {
+            viewModel.loadNearbyFeed()
+        } else {
+            viewModel.onNearbyPermissionDenied()
         }
     }
 
@@ -51,6 +79,10 @@ class FragmentCommunityViewPager2 : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initRV()
         initObserve()
+        initNearbyRetry()
+        if (tabMode == CommunityTabMode.NEARBY) {
+            ensureLocationPermissionAndLoad()
+        }
     }
 
     private fun initRV() {
@@ -96,6 +128,29 @@ class FragmentCommunityViewPager2 : Fragment() {
         }
         viewModel.initialLoading.observe(viewLifecycleOwner) { loading ->
             binding.progressBar.isVisible = loading
+        }
+    }
+
+    private fun initNearbyRetry() {
+        binding.tvEmptyHint.setOnClickListener {
+            if (tabMode == CommunityTabMode.NEARBY) {
+                ensureLocationPermissionAndLoad()
+            }
+        }
+    }
+
+    private fun ensureLocationPermissionAndLoad() {
+        if (hasLocationPermission()) {
+            viewModel.loadNearbyFeed()
+            return
+        }
+        locationPermissionLauncher.launch(LOCATION_PERMISSIONS)
+    }
+
+    private fun hasLocationPermission(): Boolean {
+        val context = context ?: return false
+        return LOCATION_PERMISSIONS.any { permission ->
+            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
         }
     }
 

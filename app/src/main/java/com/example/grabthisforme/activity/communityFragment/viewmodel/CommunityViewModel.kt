@@ -7,9 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.grabthisforme.activity.communityFragment.model.CommunityFeedArgs
 import com.example.grabthisforme.activity.communityFragment.model.CommunityTabMode
-import com.example.grabthisforme.activity.communityFragment.model.CommunityTabs
 import com.example.grabthisforme.activity.communityFragment.ui_model.PostCardUiModel
 import com.example.grabthisforme.activity.communityFragment.ui_model.toPostCardUiModel
+import com.example.grabthisforme.model.location.data.AmapLocationProvider
+import com.example.grabthisforme.model.location.domain.AppLocation
 import com.example.grabthisforme.model.post.data.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -18,8 +19,10 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class CommunityViewModel @Inject constructor(
     private val postRepository: PostRepository,
+    private val amapLocationProvider: AmapLocationProvider,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
     private val tabTitle: String = savedStateHandle[CommunityFeedArgs.TITLE] ?: "最新"
     private val tabMode: CommunityTabMode =
         savedStateHandle.get<String>(CommunityFeedArgs.MODE)
@@ -42,6 +45,7 @@ class CommunityViewModel @Inject constructor(
     private var hasMore = true
     private var isLoading = false
     private var nextBeforeTime = System.currentTimeMillis() + 1L
+    private var lastNearbyLocation: AppLocation? = null
 
     init {
         loadInitial()
@@ -52,10 +56,44 @@ class CommunityViewModel @Inject constructor(
         requestPage(reset = false)
     }
 
+    fun loadNearbyFeed() {
+        if (tabMode != CommunityTabMode.NEARBY || isLoading) return
+        isLoading = true
+        _initialLoading.value = true
+        _emptyVisible.value = false
+        viewModelScope.launch {
+            amapLocationProvider.getCurrentLocation()
+                .onSuccess { location ->
+                    lastNearbyLocation = location
+                    _postList.value = emptyList()
+                    _emptyMessage.value = buildNearbyReadyMessage(location)
+                    _emptyVisible.value = true
+                    hasMore = false
+                }
+                .onFailure { error ->
+                    _postList.value = emptyList()
+                    _emptyMessage.value = error.message ?: "定位失败，请稍后重试"
+                    _emptyVisible.value = true
+                    hasMore = false
+                }
+            _initialLoading.value = false
+            isLoading = false
+        }
+    }
+
+    fun onNearbyPermissionDenied() {
+        if (tabMode != CommunityTabMode.NEARBY) return
+        _postList.value = emptyList()
+        _emptyMessage.value = "请开启定位权限后再查看附近帖子"
+        _emptyVisible.value = true
+        _initialLoading.value = false
+        hasMore = false
+    }
+
     private fun loadInitial() {
-        if (tabMode == CommunityTabMode.NEARBY || categoryKey == CommunityTabs.NEARBY_PLACEHOLDER_KEY) {
+        if (tabMode == CommunityTabMode.NEARBY) {
             _postList.value = emptyList()
-            _emptyMessage.value = "附近功能建议在接入发帖地址后开放，当前暂不展示附近帖子。"
+            _emptyMessage.value = "附近页需要先获取定位权限"
             _emptyVisible.value = true
             _initialLoading.value = false
             hasMore = false
@@ -81,19 +119,16 @@ class CommunityViewModel @Inject constructor(
             val newItems = page.items
                 .sortedByDescending { it.createTime }
                 .map { it.toPostCardUiModel() }
-            val currentItems = if (reset) {
-                emptyList()
-            } else {
-                _postList.value.orEmpty()
-            }
-            val mergedItems = (currentItems + newItems)
-                .distinctBy { it.postId }
+            val currentItems = if (reset) emptyList() else _postList.value.orEmpty()
+            val mergedItems = (currentItems + newItems).distinctBy { it.postId }
             _postList.value = mergedItems
+
             val lastCreateTime = page.items.lastOrNull()?.createTime
             if (lastCreateTime != null) {
                 nextBeforeTime = lastCreateTime - 1L
             }
             hasMore = page.hasMore && newItems.isNotEmpty()
+
             if (mergedItems.isEmpty()) {
                 _emptyMessage.value = buildEmptyMessage()
                 _emptyVisible.value = true
@@ -107,10 +142,15 @@ class CommunityViewModel @Inject constructor(
 
     private fun buildEmptyMessage(): String {
         return when (tabMode) {
-            CommunityTabMode.LATEST -> "还没有可显示的帖子。"
-            CommunityTabMode.NEARBY -> "附近功能在接入发帖地址后开放，当前暂不展示附近帖子。"
-            CommunityTabMode.CATEGORY -> "当前没有“$tabTitle”分类的帖子。"
+            CommunityTabMode.LATEST -> "还没有可显示的帖子"
+            CommunityTabMode.NEARBY -> "附近帖子暂不可用"
+            CommunityTabMode.CATEGORY -> "当前没有“$tabTitle”分类的帖子"
         }
+    }
+
+    private fun buildNearbyReadyMessage(location: AppLocation): String {
+        val targetArea = location.displayText
+        return "已获取你在“$targetArea”的位置。\n附近帖子还需要后端接入帖子坐标存储与距离筛选后才能展示。"
     }
 
     companion object {
