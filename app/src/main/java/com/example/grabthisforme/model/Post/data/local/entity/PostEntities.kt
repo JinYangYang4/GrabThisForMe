@@ -17,7 +17,14 @@ data class PostEntity(
     val imagesJson: String = "[]",
     val categoryKey: String = "",
     val customTagsJson: String = "[]",
-    val createTime: Long = 0L
+    val createTime: Long = 0L,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val country: String = "",
+    val province: String = "",
+    val city: String = "",
+    val district: String = "",
+    val locationLabel: String = ""
 )
 
 @Entity(
@@ -47,6 +54,13 @@ data class PostWithAuthorEntity(
     val categoryKey: String = "",
     val customTagsJson: String = "[]",
     val createTime: Long = 0L,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val country: String = "",
+    val province: String = "",
+    val city: String = "",
+    val district: String = "",
+    val locationLabel: String = "",
     val authorId: Long = 0L,
     val authorName: String = "",
     val authorAvatarUrl: String = ""

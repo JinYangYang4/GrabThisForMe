@@ -9,7 +9,8 @@ data class Comment(
     val imageUrls: List<String> = emptyList(),
     val commenter: User? = null,
     val replies: List<Reply> = emptyList(),
-    val replyCount: Int = replies.size
+    val replyCount: Int = replies.size,
+    val commenterProvince: String = ""
 ) {
     val hasReplies: Boolean get() = replyCount > 0 || replies.isNotEmpty()
 }

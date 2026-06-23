@@ -9,7 +9,14 @@ data class PostContent(
     val text: String,
     val images: List<String> = emptyList(),
     val categoryKey: String = "",
-    val customTags: List<String> = emptyList()
+    val customTags: List<String> = emptyList(),
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val country: String = "",
+    val province: String = "",
+    val city: String = "",
+    val district: String = "",
+    val locationLabel: String = ""
 )
 
 data class PostAuthor(

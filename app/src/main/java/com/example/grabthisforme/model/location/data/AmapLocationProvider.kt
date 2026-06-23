@@ -87,6 +87,8 @@ class AmapLocationProvider @Inject constructor(
             AppLocation(
                 latitude = latitude,
                 longitude = longitude,
+                country = country.orEmpty(),
+                province = province.orEmpty(),
                 city = city.orEmpty(),
                 district = district.orEmpty(),
                 address = address.orEmpty(),

@@ -242,6 +242,8 @@ class PostDetailFragment : Fragment() {
         binding.tvTopUsername.text = header.authorName
         binding.tvPostUsername.text = header.authorName
         binding.tvPostTime.text = header.timeText
+        binding.tvPostLocation.text = header.locationText
+        binding.tvPostLocation.visibility = if (header.locationText.isBlank()) View.GONE else View.VISIBLE
         binding.tvPostContent.text = header.contentText
 
         Glide.with(this)

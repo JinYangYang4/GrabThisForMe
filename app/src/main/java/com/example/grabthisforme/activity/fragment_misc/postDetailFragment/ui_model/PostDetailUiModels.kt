@@ -9,6 +9,7 @@ data class PostDetailHeaderUiModel(
     val authorName: String = "",
     val authorAvatarUrl: String = "",
     val timeText: String = "",
+    val locationText: String = "",
     val contentText: String = "",
     val imageUrls: List<String> = emptyList()
 )
@@ -25,6 +26,7 @@ fun Post.toPostDetailHeaderUiModel(): PostDetailHeaderUiModel {
         authorName = authorName.ifBlank { "匿名" },
         authorAvatarUrl = authorAvatarUrl,
         timeText = formatPostDetailTime(createTime),
+        locationText = buildLocationText(),
         contentText = content,
         imageUrls = images.map { it.trim() }.filter { it.isNotEmpty() }
     )
@@ -49,6 +51,19 @@ fun buildPostDetailStatsUiModel(
         likeText = buildPostDetailCountText("点赞", likeCount),
         commentText = buildPostDetailCountText("评论", commentCount)
     )
+}
+
+private fun Post.buildLocationText(): String {
+    return locationLabel.ifBlank {
+        if (country.isNotBlank() && !country.contains("中国") && !country.equals("China", ignoreCase = true)) {
+            country
+        } else {
+            listOf(province, city, district)
+                .filter { it.isNotBlank() }
+                .distinct()
+                .joinToString(" ")
+        }
+    }
 }
 
 private fun formatPostDetailTime(createTime: Long): String {

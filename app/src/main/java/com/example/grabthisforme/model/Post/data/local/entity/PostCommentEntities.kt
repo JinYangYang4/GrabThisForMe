@@ -28,7 +28,8 @@ data class PostCommentEntity(
     val imageUrlsJson: String = "[]",
     val commenterId: Long = 0L,
     val commenterName: String = "",
-    val commenterAvatarUrl: String = ""
+    val commenterAvatarUrl: String = "",
+    val commenterProvince: String = ""
 )
 
 @Entity(

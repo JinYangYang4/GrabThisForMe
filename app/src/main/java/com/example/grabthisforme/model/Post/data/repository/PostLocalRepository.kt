@@ -247,7 +247,14 @@ class PostLocalRepository @Inject constructor(
         content: String,
         images: List<String> = emptyList(),
         categoryKey: String = "",
-        customTags: List<String> = emptyList()
+        customTags: List<String> = emptyList(),
+        latitude: Double? = null,
+        longitude: Double? = null,
+        country: String = "",
+        province: String = "",
+        city: String = "",
+        district: String = "",
+        locationLabel: String = ""
     ): Post {
         val trimmedContent = content.trim()
         require(trimmedContent.isNotBlank()) { "Post content cannot be blank." }
@@ -267,7 +274,14 @@ class PostLocalRepository @Inject constructor(
                 authorAvatarUrl = currentUser?.headPic.orEmpty()
             ),
             likeCount = 0,
-            commentCount = 0
+            commentCount = 0,
+            latitude = latitude,
+            longitude = longitude,
+            country = country,
+            province = province,
+            city = city,
+            district = district,
+            locationLabel = locationLabel
         )
         savePost(post)
         return post

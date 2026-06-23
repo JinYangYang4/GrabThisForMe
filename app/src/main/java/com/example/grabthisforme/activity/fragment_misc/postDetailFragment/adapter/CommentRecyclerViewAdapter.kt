@@ -91,6 +91,9 @@ class CommentRecyclerViewAdapter(
                 .into(binding.ivCommentAvatar)
             binding.rvCommentReplies.adapter = replyAdapter
             binding.tvCommentUsername.text = comment.commenter?.name ?: DEFAULT_USER_NAME
+            binding.tvCommentProvince.text = comment.commenterProvince
+            binding.tvCommentProvince.visibility =
+                if (comment.commenterProvince.isBlank()) View.GONE else View.VISIBLE
             binding.tvCommentContent.text = comment.message ?: DEFAULT_COMMENT_CONTENT
             binding.tvCommentTime.text = formatTimeLeft(comment.time)
             refreshReplyUI(state)

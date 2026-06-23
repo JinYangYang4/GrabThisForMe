@@ -1174,7 +1174,7 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <com.google.android.material.button.MaterialButton
+                <LinearLayout
                     android:id="@+id/btn_create_order"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
@@ -1183,12 +1183,20 @@
                     android:layout_marginBottom="20dp"
                     android:background="@drawable/bg_create_order_button"
                     android:enabled="true"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="创建订单"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:clipToOutline="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="创建订单"
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>

@@ -116,20 +116,29 @@
                     android:textSize="11sp" />
             </LinearLayout>
 
-            <com.google.android.material.button.MaterialButton
+            <LinearLayout
                 android:id="@+id/tvAction"
                 android:layout_width="wrap_content"
                 android:layout_height="34dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
                 android:minWidth="0dp"
                 android:minHeight="0dp"
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
-                android:textAllCaps="false"
-                android:textSize="12sp"
+                android:clickable="true"
+                android:focusable="true"
+                android:clipToOutline="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center"
                 android:visibility="gone"
-                app:cornerRadius="17dp" />
+                android:background="@drawable/bg_search_soft_chip">
+
+                <TextView
+                    android:id="@+id/tvActionText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvConnected"

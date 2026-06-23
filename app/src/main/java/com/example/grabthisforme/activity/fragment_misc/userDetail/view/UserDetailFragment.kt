@@ -73,8 +73,8 @@ class UserDetailFragment : Fragment() {
             binding.tvCampusHint.text = uiModel.campusHint
             binding.tvActivityHint.text = uiModel.activityHint
             binding.tvGroupSummary.text = uiModel.groupSummary
-            binding.btnPrimaryAction.text = uiModel.primaryActionText
-            binding.btnSecondaryAction.text = uiModel.secondaryActionText
+            binding.tvPrimaryAction.text = uiModel.primaryActionText
+            binding.tvSecondaryAction.text = uiModel.secondaryActionText
         }
         viewModel.commonGroups.observe(viewLifecycleOwner) { groups ->
             commonGroupAdapter.submitList(groups)

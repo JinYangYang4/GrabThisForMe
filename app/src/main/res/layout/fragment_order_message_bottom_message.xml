@@ -448,19 +448,28 @@
                         android:textColor="#796E65"
                         android:textSize="12sp" />
 
-                    <com.google.android.material.button.MaterialButton
+                    <LinearLayout
                         android:id="@+id/btn_primary"
                         android:layout_width="wrap_content"
                         android:layout_height="46dp"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
                         android:minWidth="96dp"
-                        android:text="知道了"
-                        android:textAllCaps="false"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        app:backgroundTint="@color/green_primary"
-                        app:cornerRadius="23dp" />
+                        android:background="@drawable/bg_action_solid_green_rounded"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:clipToOutline="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:gravity="center"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="了解"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>

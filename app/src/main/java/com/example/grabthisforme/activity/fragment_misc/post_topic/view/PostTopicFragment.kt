@@ -92,6 +92,12 @@ class PostTopicFragment : Fragment() {
             clearInputFocus()
             viewModel.publishPost()
         }
+        binding.tvPublishLocation.setOnClickListener {
+            viewModel.refreshPublishLocation()
+        }
+        binding.switchIsLocation.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.setLocationEnabled(isChecked)
+        }
         binding.ivAddCustomTag.setOnClickListener {
             submitCustomTag()
         }
@@ -216,6 +222,12 @@ class PostTopicFragment : Fragment() {
         viewModel.customTags.observe(viewLifecycleOwner) { tags ->
             binding.tvTagEmpty.visibility = if (tags.isEmpty()) View.VISIBLE else View.GONE
             renderCustomTags(tags)
+        }
+
+        viewModel.locationEnabled.observe(viewLifecycleOwner) { enabled ->
+            if (binding.switchIsLocation.isChecked != enabled) {
+                binding.switchIsLocation.isChecked = enabled
+            }
         }
     }
 

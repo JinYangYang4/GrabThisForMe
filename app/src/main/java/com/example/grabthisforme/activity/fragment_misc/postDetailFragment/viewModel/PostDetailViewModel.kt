@@ -12,6 +12,7 @@ import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.ui_mo
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.ui_model.PostDetailStatsUiModel
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.ui_model.buildPostDetailStatsUiModel
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.ui_model.toPostDetailHeaderUiModel
+import com.example.grabthisforme.model.location.data.AmapLocationProvider
 import com.example.grabthisforme.model.post.data.repository.PostRepository
 import com.example.grabthisforme.model.post.domain.Post
 import com.example.grabthisforme.model.user.data.repository.UserRepository
@@ -25,6 +26,7 @@ import kotlinx.coroutines.launch
 class PostDetailViewModel @Inject constructor(
     private val postRepository: PostRepository,
     private val userRepository: UserRepository,
+    private val amapLocationProvider: AmapLocationProvider,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     companion object {
@@ -63,6 +65,7 @@ class PostDetailViewModel @Inject constructor(
 
     private var isLoadingComments = false
     private var commentPagingExhausted = false
+    private var cachedCommentProvince: String = ""
 
     private val fallbackUser = User(
         id = 1L,
@@ -77,6 +80,7 @@ class PostDetailViewModel @Inject constructor(
             observePost()
             loadInitialComments()
             observeLikeState()
+            preloadCommentProvince()
         }
     }
 
@@ -117,7 +121,8 @@ class PostDetailViewModel @Inject constructor(
             imageUrls = emptyList(),
             commenter = userRepository.currentUser.value ?: fallbackUser,
             replies = emptyList(),
-            replyCount = 0
+            replyCount = 0,
+            commenterProvince = cachedCommentProvince
         )
         addCommentLocal(pendingComment)
         clearInputText()
@@ -304,6 +309,15 @@ class PostDetailViewModel @Inject constructor(
                 _addLike.value = liked
                 _loveIconRes.value = liked
             }
+        }
+    }
+
+    private fun preloadCommentProvince() {
+        viewModelScope.launch {
+            amapLocationProvider.getCurrentLocation()
+                .onSuccess { location ->
+                    cachedCommentProvince = location.provinceDisplayText
+                }
         }
     }
 

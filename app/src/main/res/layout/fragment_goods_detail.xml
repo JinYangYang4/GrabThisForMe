@@ -508,20 +508,26 @@
                 android:layout_height="0dp"
                 android:layout_weight="1" />
 
-            <com.google.android.material.button.MaterialButton
+            <LinearLayout
                 android:id="@+id/btn_buy_now"
-                style="@style/Widget.Material3.Button"
                 android:layout_width="112dp"
                 android:layout_height="42dp"
                 android:layout_marginStart="10dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:text="立即下单"
-                android:textColor="@android:color/white"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                app:backgroundTint="#1F7A62"
-                app:cornerRadius="21dp" />
+                android:background="@drawable/bg_action_solid_green_rounded"
+                android:clickable="true"
+                android:focusable="true"
+                android:clipToOutline="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="立即下单"
+                    android:textColor="@android:color/white"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

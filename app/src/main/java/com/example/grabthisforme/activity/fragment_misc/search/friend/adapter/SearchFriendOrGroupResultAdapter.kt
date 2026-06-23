@@ -78,14 +78,12 @@ class SearchFriendOrGroupResultAdapter(
             }
 
             if (!item.actionText.isNullOrBlank()) {
-                binding.tvAction.text = item.actionText
-                binding.tvAction.backgroundTintList = ColorStateList.valueOf(
-                    ContextCompat.getColor(
-                        context,
-                        if (item.isFriend) R.color.green_dark else R.color.orange_dark
-                    )
+                binding.tvActionText.text = item.actionText
+                binding.tvAction.background = ContextCompat.getDrawable(
+                    context,
+                    if (item.isFriend) R.drawable.bg_primary_pill_green else R.drawable.bg_primary_pill_orange
                 )
-                binding.tvAction.setTextColor(ContextCompat.getColor(context, android.R.color.white))
+                binding.tvActionText.setTextColor(ContextCompat.getColor(context, android.R.color.white))
             }
 
             binding.root.setOnClickListener {

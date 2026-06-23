@@ -47,7 +47,14 @@ fun PostDto.toDomain(): Post {
             authorAvatarUrl = authorAvatarUrl
         ),
         likeCount = likeCount,
-        commentCount = commentCount
+        commentCount = commentCount,
+        latitude = latitude,
+        longitude = longitude,
+        country = country,
+        province = province,
+        city = city,
+        district = district,
+        locationLabel = locationLabel
     )
 }
 
@@ -65,7 +72,14 @@ fun PostDetailDto.toDomain(): Post {
             authorAvatarUrl = author.headPic.orEmpty()
         ),
         likeCount = likeCount,
-        commentCount = commentCount
+        commentCount = commentCount,
+        latitude = latitude,
+        longitude = longitude,
+        country = country,
+        province = province,
+        city = city,
+        district = district,
+        locationLabel = locationLabel
     )
 }
 
@@ -77,7 +91,8 @@ fun PostCommentDto.toDomain(): Comment {
         imageUrls = imageUrls,
         commenter = commenter.toDomain(),
         replies = emptyList(),
-        replyCount = replyCount
+        replyCount = replyCount,
+        commenterProvince = commenterProvince
     )
 }
 
@@ -108,7 +123,14 @@ fun PostEntity.toDomain(): Post {
             authorAvatarUrl = ""
         ),
         likeCount = 0,
-        commentCount = 0
+        commentCount = 0,
+        latitude = latitude,
+        longitude = longitude,
+        country = country,
+        province = province,
+        city = city,
+        district = district,
+        locationLabel = locationLabel
     )
 }
 
@@ -126,7 +148,14 @@ fun PostWithAuthorEntity.toDomain(stats: PostStats = PostStats()): Post {
             authorAvatarUrl = authorAvatarUrl
         ),
         likeCount = stats.likeCount,
-        commentCount = stats.commentCount
+        commentCount = stats.commentCount,
+        latitude = latitude,
+        longitude = longitude,
+        country = country,
+        province = province,
+        city = city,
+        district = district,
+        locationLabel = locationLabel
     )
 }
 
@@ -142,7 +171,14 @@ fun Post.toDto(): PostDto {
         authorName = author.authorName,
         authorAvatarUrl = author.authorAvatarUrl,
         likeCount = likeCount,
-        commentCount = commentCount
+        commentCount = commentCount,
+        latitude = latitude,
+        longitude = longitude,
+        country = country,
+        province = province,
+        city = city,
+        district = district,
+        locationLabel = locationLabel
     )
 }
 
@@ -153,7 +189,14 @@ fun Post.toEntity(): PostEntity {
         imagesJson = images.toJson(),
         categoryKey = categoryKey,
         customTagsJson = customTags.toJson(),
-        createTime = createTime
+        createTime = createTime,
+        latitude = latitude,
+        longitude = longitude,
+        country = country,
+        province = province,
+        city = city,
+        district = district,
+        locationLabel = locationLabel
     )
 }
 

@@ -91,7 +91,14 @@ class PostRemoteRepository @Inject constructor(
         content: String,
         images: List<String>,
         categoryKey: String,
-        customTags: List<String>
+        customTags: List<String>,
+        latitude: Double?,
+        longitude: Double?,
+        country: String,
+        province: String,
+        city: String,
+        district: String,
+        locationLabel: String
     ): Result<Post> {
         return runCatching {
             requireSuccessfulData(
@@ -100,7 +107,14 @@ class PostRemoteRepository @Inject constructor(
                         content = content,
                         images = images,
                         categoryKey = categoryKey,
-                        customTags = customTags
+                        customTags = customTags,
+                        latitude = latitude,
+                        longitude = longitude,
+                        country = country,
+                        province = province,
+                        city = city,
+                        district = district,
+                        locationLabel = locationLabel
                     )
                 )
             ).toDomain()
@@ -118,14 +132,20 @@ class PostRemoteRepository @Inject constructor(
         }
     }
 
-    suspend fun addComment(postId: String, message: String?, imageUrls: List<String>): Result<Comment> {
+    suspend fun addComment(
+        postId: String,
+        message: String?,
+        imageUrls: List<String>,
+        commenterProvince: String
+    ): Result<Comment> {
         return runCatching {
             requireSuccessfulData(
                 postApi.addComment(
                     postId = postId,
                     request = CreateCommentRequest(
                         message = message,
-                        imageUrls = imageUrls
+                        imageUrls = imageUrls,
+                        commenterProvince = commenterProvince
                     )
                 )
             ).toDomain()

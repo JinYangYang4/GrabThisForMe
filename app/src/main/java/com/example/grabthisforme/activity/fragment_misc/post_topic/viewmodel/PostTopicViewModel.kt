@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.grabthisforme.model.location.data.AmapLocationProvider
+import com.example.grabthisforme.model.location.domain.AppLocation
 import com.example.grabthisforme.model.post.data.repository.PostRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -11,7 +13,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class PostTopicViewModel @Inject constructor(
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository,
+    private val amapLocationProvider: AmapLocationProvider
 ) : ViewModel() {
     private val _contentText = MutableLiveData("")
     val contentText: LiveData<String> get() = _contentText
@@ -40,16 +43,55 @@ class PostTopicViewModel @Inject constructor(
     private val _tagSummaryText = MutableLiveData("大分类：吐槽 · 自定义标签 0/3")
     val tagSummaryText: LiveData<String> get() = _tagSummaryText
 
+    private val _publishLocationText = MutableLiveData("正在获取发布位置…")
+    val publishLocationText: LiveData<String> get() = _publishLocationText
+
+    private val _locationEnabled = MutableLiveData(true)
+    val locationEnabled: LiveData<Boolean> get() = _locationEnabled
+
     private val _actionResult = MutableLiveData<PostTopicActionResult>()
     val actionResult: LiveData<PostTopicActionResult> get() = _actionResult
 
     private var draftState = PostDraftState()
+    private var latestLocation: AppLocation? = null
 
     init {
         restoreDraft()
+        refreshPublishLocation()
     }
 
     fun categories(): List<PostCategory> = PostCategory.entries
+
+    fun setLocationEnabled(enabled: Boolean) {
+        _locationEnabled.value = enabled
+        _publishLocationText.value = if (enabled) {
+            latestLocation?.locationLabel ?: "正在获取发布位置…"
+        } else {
+            "未知"
+        }
+    }
+
+    fun refreshPublishLocation() {
+        if (_locationEnabled.value == false) {
+            _publishLocationText.value = "未知"
+            return
+        }
+        _publishLocationText.value = "正在获取发布位置…"
+        viewModelScope.launch {
+            amapLocationProvider.getCurrentLocation()
+                .onSuccess { location ->
+                    latestLocation = location.toRoundedLocation()
+                    _publishLocationText.value = latestLocation?.locationLabel ?: "当前位置"
+                }
+                .onFailure {
+                    _publishLocationText.value = "未获取到位置，仍可不带位置发布"
+                }
+        }
+    }
+
+    fun currentProvinceForComment(): String {
+        return latestLocation?.provinceDisplayText.orEmpty()
+    }
 
     fun updateContent(content: String) {
         _contentText.value = content
@@ -132,20 +174,35 @@ class PostTopicViewModel @Inject constructor(
             return
         }
 
+        val useLocation = _locationEnabled.value != false
+        val location = latestLocation.takeIf { useLocation }
         viewModelScope.launch {
             runCatching {
                 postRepository.publishPost(
                     content = content,
                     images = images,
                     categoryKey = category.key,
-                    customTags = customTags
+                    customTags = customTags,
+                    latitude = location?.latitude,
+                    longitude = location?.longitude,
+                    country = location?.country.orEmpty(),
+                    province = location?.province.orEmpty(),
+                    city = location?.city.orEmpty(),
+                    district = location?.district.orEmpty(),
+                    locationLabel = if (useLocation) {
+                        location?.locationLabel.orEmpty()
+                    } else {
+                        "未知"
+                    }
                 )
             }.onSuccess {
                 draftState = PostDraftState(category = category)
                 _contentText.value = ""
                 _selectedImages.value = emptyList()
                 _customTags.value = emptyList()
+                _locationEnabled.value = true
                 refreshEditorState()
+                refreshPublishLocation()
                 _actionResult.value = PostTopicActionResult(
                     success = true,
                     message = "帖子发布成功",
@@ -203,6 +260,14 @@ class PostTopicViewModel @Inject constructor(
             images = images,
             category = category,
             customTags = tags
+        )
+    }
+
+    private fun AppLocation.toRoundedLocation(): AppLocation {
+        fun Double.roundCoordinate(): Double = String.format("%.5f", this).toDouble()
+        return copy(
+            latitude = latitude.roundCoordinate(),
+            longitude = longitude.roundCoordinate()
         )
     }
 

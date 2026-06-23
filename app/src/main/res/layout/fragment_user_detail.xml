@@ -329,36 +329,48 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-            <com.google.android.material.button.MaterialButton
+            <LinearLayout
                 android:id="@+id/btnPrimaryAction"
                 android:layout_width="0dp"
                 android:layout_height="46dp"
                 android:layout_weight="1"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:textColor="#A85B1F"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                app:backgroundTint="#FFF1E2"
-                app:strokeColor="#F2C08E"
-                app:strokeWidth="1dp"
-                app:cornerRadius="23dp" />
+                android:background="@drawable/bg_action_outline_warm"
+                android:clickable="true"
+                android:focusable="true"
+                android:clipToOutline="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center">
 
-            <com.google.android.material.button.MaterialButton
+                <TextView
+                    android:id="@+id/tvPrimaryAction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#A85B1F"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/btnSecondaryAction"
                 android:layout_width="0dp"
                 android:layout_height="46dp"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:textColor="#1E6B55"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                app:backgroundTint="#EAF7F1"
-                app:strokeColor="#A8D6C3"
-                app:strokeWidth="1dp"
-                app:cornerRadius="23dp" />
+                android:background="@drawable/bg_action_outline_mint"
+                android:clickable="true"
+                android:focusable="true"
+                android:clipToOutline="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tvSecondaryAction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#1E6B55"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -11,9 +11,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @Singleton
@@ -41,10 +41,10 @@ class PostRepository @Inject constructor(
             categoryKey = null
         )
         result.onSuccess { page ->
-                localRepository.savePosts(page.items)
-                _allPostList.value = page.items.sortedByDescending { it.createTime }
-                Log.d("test11", "refreshPosts: ${page.items.size}")
-            }
+            localRepository.savePosts(page.items)
+            _allPostList.value = page.items.sortedByDescending { it.createTime }
+            Log.d("test11", "refreshPosts: ${page.items.size}")
+        }
         return result.getOrElse {
             val localPosts = localRepository.allPostList.value
             _allPostList.value = localPosts
@@ -147,10 +147,14 @@ class PostRepository @Inject constructor(
     }
 
     suspend fun addComment(postId: String, comment: Comment): Result<Comment> {
-        return remoteRepository.addComment(postId, comment.message, comment.imageUrls)
-            .onSuccess { remoteComment ->
-                localRepository.addComment(postId, remoteComment)
-            }
+        return remoteRepository.addComment(
+            postId = postId,
+            message = comment.message,
+            imageUrls = comment.imageUrls,
+            commenterProvince = comment.commenterProvince
+        ).onSuccess { remoteComment ->
+            localRepository.addComment(postId, remoteComment)
+        }
     }
 
     suspend fun addReply(
@@ -188,18 +192,47 @@ class PostRepository @Inject constructor(
         content: String,
         images: List<String> = emptyList(),
         categoryKey: String = "",
-        customTags: List<String> = emptyList()
+        customTags: List<String> = emptyList(),
+        latitude: Double? = null,
+        longitude: Double? = null,
+        country: String = "",
+        province: String = "",
+        city: String = "",
+        district: String = "",
+        locationLabel: String = ""
     ): Post {
-        return remoteRepository.createPost(content, images, categoryKey, customTags)
-            .onSuccess { remotePost ->
-                localRepository.savePost(remotePost)
-                upsertAllPostList(remotePost)
+        return remoteRepository.createPost(
+            content = content,
+            images = images,
+            categoryKey = categoryKey,
+            customTags = customTags,
+            latitude = latitude,
+            longitude = longitude,
+            country = country,
+            province = province,
+            city = city,
+            district = district,
+            locationLabel = locationLabel
+        ).onSuccess { remotePost ->
+            localRepository.savePost(remotePost)
+            upsertAllPostList(remotePost)
+        }.getOrElse {
+            localRepository.publishPost(
+                content = content,
+                images = images,
+                categoryKey = categoryKey,
+                customTags = customTags,
+                latitude = latitude,
+                longitude = longitude,
+                country = country,
+                province = province,
+                city = city,
+                district = district,
+                locationLabel = locationLabel
+            ).also { localPost ->
+                upsertAllPostList(localPost)
             }
-            .getOrElse {
-                localRepository.publishPost(content, images, categoryKey, customTags).also { localPost ->
-                    upsertAllPostList(localPost)
-                }
-            }
+        }
     }
 
     private fun upsertAllPostList(post: Post) {

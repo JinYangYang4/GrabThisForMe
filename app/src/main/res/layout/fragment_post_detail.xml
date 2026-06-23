@@ -152,6 +152,17 @@
                             android:textColor="#999999"
                             android:textSize="12sp"
                             tools:text="10分钟前" />
+
+                        <TextView
+                            android:id="@+id/tv_post_location"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="#999999"
+                            android:textSize="12sp"
+                            android:visibility="gone"
+                            tools:text="广东 广州 天河"
+                            tools:visibility="visible" />
                     </LinearLayout>
                 </LinearLayout>
 

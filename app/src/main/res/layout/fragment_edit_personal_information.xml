@@ -550,15 +550,25 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="14dp">
 
-                    <Button
+                    <LinearLayout
                         android:id="@+id/btn_save_user_info"
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
                         android:background="@drawable/bg_primary_pill_green"
-                        android:text="保存修改"
-                        android:textColor="@color/white"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:clipToOutline="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="保存更改"
+                            android:textColor="@color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
                 </LinearLayout>
 
             </LinearLayout>

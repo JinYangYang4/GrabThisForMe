@@ -16,7 +16,8 @@ fun Comment.toEntity(postId: String): PostCommentEntity {
         imageUrlsJson = imageUrls.toJsonArrayString(),
         commenterId = commenter?.id ?: 0L,
         commenterName = commenter?.name.orEmpty(),
-        commenterAvatarUrl = commenter?.headPic.orEmpty()
+        commenterAvatarUrl = commenter?.headPic.orEmpty(),
+        commenterProvince = commenterProvince
     )
 }
 
@@ -46,7 +47,8 @@ fun PostCommentEntity.toDomain(replies: List<Reply> = emptyList()): Comment {
         imageUrls = imageUrlsJson.toStringList(),
         commenter = buildUser(commenterId, commenterName, commenterAvatarUrl),
         replies = replies,
-        replyCount = replies.size
+        replyCount = replies.size,
+        commenterProvince = commenterProvince
     )
 }
 

@@ -12,7 +12,8 @@ data class PostCardUiModel(
     val timeText: String,
     val tagText: String,
     val contentText: String,
-    val imageUrls: List<String>
+    val imageUrls: List<String>,
+    val locationText: String
 )
 
 fun Post.toPostCardUiModel(): PostCardUiModel {
@@ -27,7 +28,8 @@ fun Post.toPostCardUiModel(): PostCardUiModel {
         timeText = formatPostCardTime(createTime),
         tagText = buildTagText(),
         contentText = content,
-        imageUrls = cleanImages
+        imageUrls = cleanImages,
+        locationText = buildLocationText()
     )
 }
 
@@ -38,6 +40,19 @@ private fun Post.buildTagText(): String {
         if (categoryLabel.isNotBlank()) add(categoryLabel)
         addAll(tags.take(2))
     }.joinToString(" · ").ifBlank { "校园话题" }
+}
+
+private fun Post.buildLocationText(): String {
+    return locationLabel.ifBlank {
+        if (country.isNotBlank() && !country.contains("中国") && !country.equals("China", ignoreCase = true)) {
+            country
+        } else {
+            listOf(province, city, district)
+                .filter { it.isNotBlank() }
+                .distinct()
+                .joinToString(" ")
+        }
+    }
 }
 
 private fun String.toCategoryLabel(): String {

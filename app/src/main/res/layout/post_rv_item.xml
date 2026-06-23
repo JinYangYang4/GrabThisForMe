@@ -97,6 +97,24 @@
                     android:text="乐于助人"
                     android:textColor="#E68654"
                     android:textSize="11sp" />
+
+                <View
+                    android:id="@+id/location_dot"
+                    android:layout_width="3dp"
+                    android:layout_height="3dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="#CCCCCC" />
+
+                <TextView
+                    android:id="@+id/tv_post_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="#999999"
+                    android:textSize="11sp"
+                    tools:text="广东 广州 天河" />
             </LinearLayout>
 
             <!-- 关注按钮 -->

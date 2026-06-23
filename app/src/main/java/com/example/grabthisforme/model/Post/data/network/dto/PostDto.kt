@@ -13,7 +13,14 @@ data class PostDto(
     val authorName: String = "",
     val authorAvatarUrl: String = "",
     val likeCount: Int = 0,
-    val commentCount: Int = 0
+    val commentCount: Int = 0,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val country: String = "",
+    val province: String = "",
+    val city: String = "",
+    val district: String = "",
+    val locationLabel: String = ""
 )
 
 data class PostDetailDto(
@@ -26,7 +33,14 @@ data class PostDetailDto(
     val author: UserDto,
     val likeCount: Int = 0,
     val commentCount: Int = 0,
-    val likedByCurrentUser: Boolean = false
+    val likedByCurrentUser: Boolean = false,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val country: String = "",
+    val province: String = "",
+    val city: String = "",
+    val district: String = "",
+    val locationLabel: String = ""
 )
 
 data class PostCommentDto(
@@ -35,7 +49,8 @@ data class PostCommentDto(
     val message: String? = null,
     val imageUrls: List<String> = emptyList(),
     val commenter: UserDto,
-    val replyCount: Int = 0
+    val replyCount: Int = 0,
+    val commenterProvince: String = ""
 )
 
 data class PostReplyDto(
@@ -53,7 +68,14 @@ data class CreatePostRequest(
     val content: String,
     val images: List<String> = emptyList(),
     val categoryKey: String,
-    val customTags: List<String> = emptyList()
+    val customTags: List<String> = emptyList(),
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val country: String = "",
+    val province: String = "",
+    val city: String = "",
+    val district: String = "",
+    val locationLabel: String = ""
 )
 
 data class SetPostLikedRequest(
@@ -62,7 +84,8 @@ data class SetPostLikedRequest(
 
 data class CreateCommentRequest(
     val message: String? = null,
-    val imageUrls: List<String> = emptyList()
+    val imageUrls: List<String> = emptyList(),
+    val commenterProvince: String = ""
 )
 
 data class CreateReplyRequest(

@@ -71,8 +71,8 @@ class GroupDetailFragment : Fragment() {
             binding.tvManager.text = uiModel.managerText
             binding.tvVibe.text = uiModel.vibeText
             binding.tvTips.text = uiModel.tipsText
-            binding.btnPrimaryAction.text = uiModel.primaryActionText
-            binding.btnSecondaryAction.text = uiModel.secondaryActionText
+            binding.tvPrimaryAction.text = uiModel.primaryActionText
+            binding.tvSecondaryAction.text = uiModel.secondaryActionText
         }
         viewModel.memberList.observe(viewLifecycleOwner) { members ->
             memberAdapter.submitList(members)
