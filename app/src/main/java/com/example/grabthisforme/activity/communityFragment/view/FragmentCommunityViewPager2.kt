@@ -78,6 +78,7 @@ class FragmentCommunityViewPager2 : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRV()
+        initRefresh()
         initObserve()
         initNearbyRetry()
         if (tabMode == CommunityTabMode.NEARBY) {
@@ -115,6 +116,15 @@ class FragmentCommunityViewPager2 : Fragment() {
         })
     }
 
+    private fun initRefresh() {
+        binding.swipeRefreshLayout.setOnChildScrollUpCallback { _, _ ->
+            binding.rvTask.canScrollVertically(-1)
+        }
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            requestRefresh()
+        }
+    }
+
     private fun initObserve() {
         viewModel.postList.observe(viewLifecycleOwner) { posts ->
             adapter.submitList(posts)
@@ -129,6 +139,9 @@ class FragmentCommunityViewPager2 : Fragment() {
         viewModel.initialLoading.observe(viewLifecycleOwner) { loading ->
             binding.progressBar.isVisible = loading
         }
+        viewModel.refreshing.observe(viewLifecycleOwner) { refreshing ->
+            binding.swipeRefreshLayout.isRefreshing = refreshing
+        }
     }
 
     private fun initNearbyRetry() {
@@ -136,6 +149,14 @@ class FragmentCommunityViewPager2 : Fragment() {
             if (tabMode == CommunityTabMode.NEARBY) {
                 ensureLocationPermissionAndLoad()
             }
+        }
+    }
+
+    private fun requestRefresh() {
+        if (tabMode == CommunityTabMode.NEARBY) {
+            ensureLocationPermissionAndLoad()
+        } else {
+            viewModel.refreshFeed()
         }
     }
 
@@ -152,6 +173,11 @@ class FragmentCommunityViewPager2 : Fragment() {
         return LOCATION_PERMISSIONS.any { permission ->
             ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
         }
+    }
+
+    fun refreshCurrentFeed() {
+        if (!isAdded || _binding == null) return
+        requestRefresh()
     }
 
     override fun onDestroyView() {

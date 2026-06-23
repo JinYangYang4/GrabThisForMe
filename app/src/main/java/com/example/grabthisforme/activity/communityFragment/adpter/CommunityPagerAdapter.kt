@@ -9,6 +9,7 @@ import com.example.grabthisforme.activity.communityFragment.view.FragmentCommuni
 class CommunityPagerAdapter(
     fragment: Fragment
 ) : FragmentStateAdapter(fragment) {
+    private val fragments = mutableMapOf<Int, FragmentCommunityViewPager2>()
 
     override fun getItemCount(): Int = CommunityTabs.items.size
 
@@ -18,6 +19,10 @@ class CommunityPagerAdapter(
             title = spec.title,
             mode = spec.mode.name,
             categoryKey = spec.categoryKey
-        )
+        ).also { fragments[position] = it }
+    }
+
+    fun getFragment(position: Int): FragmentCommunityViewPager2? {
+        return fragments[position]
     }
 }

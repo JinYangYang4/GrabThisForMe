@@ -42,6 +42,9 @@ class CommunityViewModel @Inject constructor(
     private val _initialLoading = MutableLiveData(true)
     val initialLoading: LiveData<Boolean> get() = _initialLoading
 
+    private val _refreshing = MutableLiveData(false)
+    val refreshing: LiveData<Boolean> get() = _refreshing
+
     private var hasMore = true
     private var isLoading = false
     private var nextBeforeTime = System.currentTimeMillis() + 1L
@@ -53,13 +56,51 @@ class CommunityViewModel @Inject constructor(
 
     fun loadMore() {
         if (tabMode == CommunityTabMode.NEARBY || isLoading || !hasMore) return
-        requestPage(reset = false)
+        requestPage(reset = false, fromUserRefresh = false)
+    }
+
+    fun refreshFeed() {
+        when (tabMode) {
+            CommunityTabMode.NEARBY -> loadNearbyFeed(fromUserRefresh = true)
+            CommunityTabMode.LATEST,
+            CommunityTabMode.CATEGORY -> requestPage(reset = true, fromUserRefresh = true)
+        }
     }
 
     fun loadNearbyFeed() {
+        loadNearbyFeed(fromUserRefresh = false)
+    }
+
+    fun onNearbyPermissionDenied() {
+        if (tabMode != CommunityTabMode.NEARBY) return
+        _postList.value = emptyList()
+        _emptyMessage.value = "请开启定位权限后再查看附近帖子"
+        _emptyVisible.value = true
+        _initialLoading.value = false
+        _refreshing.value = false
+        hasMore = false
+    }
+
+    private fun loadInitial() {
+        if (tabMode == CommunityTabMode.NEARBY) {
+            _postList.value = emptyList()
+            _emptyMessage.value = "附近页面需要先获取定位权限"
+            _emptyVisible.value = true
+            _initialLoading.value = false
+            hasMore = false
+            return
+        }
+        requestPage(reset = true, fromUserRefresh = false)
+    }
+
+    private fun loadNearbyFeed(fromUserRefresh: Boolean) {
         if (tabMode != CommunityTabMode.NEARBY || isLoading) return
         isLoading = true
-        _initialLoading.value = true
+        if (fromUserRefresh) {
+            _refreshing.value = true
+        } else {
+            _initialLoading.value = true
+        }
         _emptyVisible.value = false
         viewModelScope.launch {
             amapLocationProvider.getCurrentLocation()
@@ -77,36 +118,20 @@ class CommunityViewModel @Inject constructor(
                     hasMore = false
                 }
             _initialLoading.value = false
+            _refreshing.value = false
             isLoading = false
         }
     }
 
-    fun onNearbyPermissionDenied() {
-        if (tabMode != CommunityTabMode.NEARBY) return
-        _postList.value = emptyList()
-        _emptyMessage.value = "请开启定位权限后再查看附近帖子"
-        _emptyVisible.value = true
-        _initialLoading.value = false
-        hasMore = false
-    }
-
-    private fun loadInitial() {
-        if (tabMode == CommunityTabMode.NEARBY) {
-            _postList.value = emptyList()
-            _emptyMessage.value = "附近页需要先获取定位权限"
-            _emptyVisible.value = true
-            _initialLoading.value = false
-            hasMore = false
-            return
-        }
-        requestPage(reset = true)
-    }
-
-    private fun requestPage(reset: Boolean) {
+    private fun requestPage(reset: Boolean, fromUserRefresh: Boolean) {
         if (isLoading) return
         isLoading = true
         if (reset) {
-            _initialLoading.value = true
+            if (fromUserRefresh) {
+                _refreshing.value = true
+            } else {
+                _initialLoading.value = true
+            }
             hasMore = true
             nextBeforeTime = System.currentTimeMillis() + 1L
         }
@@ -136,6 +161,7 @@ class CommunityViewModel @Inject constructor(
                 _emptyVisible.value = false
             }
             _initialLoading.value = false
+            _refreshing.value = false
             isLoading = false
         }
     }
@@ -149,6 +175,7 @@ class CommunityViewModel @Inject constructor(
     }
 
     private fun buildNearbyReadyMessage(location: AppLocation): String {
+        lastNearbyLocation = location
         val targetArea = location.displayText
         return "已获取你在“$targetArea”的位置。\n附近帖子还需要后端接入帖子坐标存储与距离筛选后才能展示。"
     }

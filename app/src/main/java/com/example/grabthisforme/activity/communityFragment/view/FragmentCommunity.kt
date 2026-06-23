@@ -24,6 +24,7 @@ class FragmentCommunity : Fragment() {
     private var _binding: FragmentCommunityBinding? = null
     private val binding get() = _binding!!
     private val sharedViewModel: MainViewModel by activityViewModels()
+    private lateinit var pagerAdapter: CommunityPagerAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,8 +55,8 @@ class FragmentCommunity : Fragment() {
     }
 
     private fun initVP2() {
-        val adapter = CommunityPagerAdapter(this)
-        binding.viewpager2.adapter = adapter
+        pagerAdapter = CommunityPagerAdapter(this)
+        binding.viewpager2.adapter = pagerAdapter
         val titles = CommunityTabs.items.map { it.title }
         TabLayoutMediator(binding.tabLayout, binding.viewpager2) { tab, position ->
             val customView = LayoutInflater.from(requireContext())
@@ -86,6 +87,16 @@ class FragmentCommunity : Fragment() {
                     val textView = tab?.customView?.findViewById<TextView>(R.id.tab_text)
                     textView?.background?.alpha = if (i == position) 255 else 0
                 }
+            }
+        })
+        binding.tabLayout.addOnTabSelectedListener(object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab) = Unit
+
+            override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab) = Unit
+
+            override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab) {
+                if (binding.viewpager2.currentItem != tab.position) return
+                pagerAdapter.getFragment(tab.position)?.refreshCurrentFeed()
             }
         })
     }
