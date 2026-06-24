@@ -7,10 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.activity.viewModels
 import androidx.fragment.app.activityViewModels
-import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
@@ -18,7 +15,8 @@ import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.informationFragment.adapter.InformationPagerAdapter
 import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
 import com.example.grabthisforme.databinding.FragmentInformationBinding
-import com.google.android.material.tabs.TabLayout
+import com.example.grabthisforme.ui.menu.AnchoredActionMenuItem
+import com.example.grabthisforme.ui.menu.AnchoredActionMenuPopup
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -27,6 +25,8 @@ class FragmentInformation : Fragment() {
     private var _binding : FragmentInformationBinding?=null
     private val binding get() = _binding!!
     private val sharedViewModel : MainViewModel by activityViewModels()
+    private var addMenuPopup: AnchoredActionMenuPopup? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -38,9 +38,9 @@ class FragmentInformation : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
+        addMenuPopup = AnchoredActionMenuPopup(requireContext())
         initVP2()
-        val targetView = view.findViewById<ImageView>(R.id.iv_Add)
-        iv_Add_init(targetView.id)
+        initAddMenu()
         initObserve()
     }
     fun initVP2(){
@@ -91,10 +91,33 @@ class FragmentInformation : Fragment() {
             override fun onPageScrollStateChanged(state: Int) {}
         })
     }
-    fun iv_Add_init(targetView : Int){
-        binding.ivAdd.setOnClickListener {view ->
-            val menuDialog = InformationLeftBottomMenuDialog.newInstance(targetView)
-            fragmentManager?.let { menuDialog.show(it, "left_bottom_menu") }
+    fun initAddMenu(){
+        binding.ivAdd.setOnClickListener {
+            addMenuPopup?.show(
+                anchor = binding.ivAdd,
+                items = listOf(
+                    AnchoredActionMenuItem(
+                        id = "create_group",
+                        title = "创建群聊",
+                        iconRes = R.drawable.ic_make_talk,
+                        iconBackgroundRes = R.drawable.bg_my_quick_icon_misty_mint
+                    ),
+                    AnchoredActionMenuItem(
+                        id = "add_friend",
+                        title = "添加好友",
+                        iconRes = R.drawable.ic_add_friend,
+                        iconBackgroundRes = R.drawable.bg_my_quick_icon_soft_apricot
+                    )
+                )
+            ) { item ->
+                when (item.id) {
+                    "create_group" -> Unit
+                    "add_friend" -> {
+                        (requireActivity() as MainActivity)
+                            .intentToMiscFragment(R.id.action_blankFragment_to_fragmentSearchFriendOrGroupOrConversation2)
+                    }
+                }
+            }
         }
     }
     fun initObserve(){
@@ -114,5 +137,12 @@ class FragmentInformation : Fragment() {
         binding.ivAvatar.setOnClickListener {
             sharedViewModel.drawerOpenStateToOpen()
         }
+    }
+
+    override fun onDestroyView() {
+        addMenuPopup?.dismiss()
+        addMenuPopup = null
+        super.onDestroyView()
+        _binding = null
     }
 }

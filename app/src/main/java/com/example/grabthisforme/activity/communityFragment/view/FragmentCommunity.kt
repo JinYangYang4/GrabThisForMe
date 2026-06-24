@@ -16,6 +16,8 @@ import com.example.grabthisforme.activity.communityFragment.model.CommunityTabs
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
 import com.example.grabthisforme.databinding.FragmentCommunityBinding
+import com.example.grabthisforme.ui.menu.AnchoredActionMenuItem
+import com.example.grabthisforme.ui.menu.AnchoredActionMenuPopup
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,6 +27,7 @@ class FragmentCommunity : Fragment() {
     private val binding get() = _binding!!
     private val sharedViewModel: MainViewModel by activityViewModels()
     private lateinit var pagerAdapter: CommunityPagerAdapter
+    private var addMenuPopup: AnchoredActionMenuPopup? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,9 +40,9 @@ class FragmentCommunity : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        addMenuPopup = AnchoredActionMenuPopup(requireContext())
         initVP2()
-        val targetView = view.findViewById<ImageView>(R.id.iv_Add)
-        initAddMenu(targetView.id)
+        initAddMenu()
         initClickListener()
         initObserve()
     }
@@ -111,16 +114,43 @@ class FragmentCommunity : Fragment() {
         }
     }
 
-    private fun initAddMenu(targetView: Int) {
+    private fun initAddMenu() {
         binding.ivAdd.setOnClickListener {
-            val menuDialog = CommunityLeftBottomMenuDialog.newInstance(targetView)
-            parentFragmentManager.let { manager ->
-                menuDialog.show(manager, "left_bottom_menu")
+            addMenuPopup?.show(
+                anchor = binding.ivAdd,
+                items = listOf(
+                    AnchoredActionMenuItem(
+                        id = "create_topic",
+                        title = "发起话题",
+                        iconRes = R.drawable.ic_make_talk,
+                        iconBackgroundRes = R.drawable.bg_my_quick_icon_misty_mint
+                    ),
+                    AnchoredActionMenuItem(
+                        id = "add_friend",
+                        title = "添加好友",
+                        iconRes = R.drawable.ic_add_friend,
+                        iconBackgroundRes = R.drawable.bg_my_quick_icon_soft_apricot
+                    )
+                )
+            ) { item ->
+                when (item.id) {
+                    "create_topic" -> {
+                        (requireActivity() as MainActivity)
+                            .intentToMiscFragment(R.id.action_blankFragment_to_postTopicFragemnt)
+                    }
+
+                    "add_friend" -> {
+                        (requireActivity() as MainActivity)
+                            .intentToMiscFragment(R.id.action_blankFragment_to_fragmentSearchFriendOrGroupOrConversation2)
+                    }
+                }
             }
         }
     }
 
     override fun onDestroyView() {
+        addMenuPopup?.dismiss()
+        addMenuPopup = null
         super.onDestroyView()
         _binding = null
     }
