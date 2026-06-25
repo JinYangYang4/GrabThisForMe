@@ -1,9 +1,63 @@
 package com.example.grabthisforme.model.conversation.data.repository
 
+import com.example.grabthisforme.model.conversation.data.network.api.ConversationApi
+import com.example.grabthisforme.model.conversation.data.network.api.CreateSingleConversationRequest
+import com.example.grabthisforme.model.conversation.data.network.api.SetConversationHiddenRequest
+import com.example.grabthisforme.model.conversation.data.network.dto.ConversationDto
+import com.example.grabthisforme.model.message.data.network.dto.MessageDto
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ConversationRemoteRepository @Inject constructor() {
-    // Remote conversation APIs can be connected here later.
+class ConversationRemoteRepository @Inject constructor(
+    private val conversationApi: ConversationApi
+) {
+
+    suspend fun listConversations(): Result<List<ConversationDto>> {
+        return runCatching {
+            requireSuccessfulData(conversationApi.listConversations())
+        }
+    }
+
+    suspend fun listMessages(conversationId: String): Result<List<MessageDto>> {
+        return runCatching {
+            requireSuccessfulData(conversationApi.listMessages(conversationId))
+        }
+    }
+
+    suspend fun createSingleConversation(peerUserId: Long): Result<ConversationDto> {
+        return runCatching {
+            requireSuccessfulData(
+                conversationApi.createSingleConversation(CreateSingleConversationRequest(peerUserId))
+            )
+        }
+    }
+
+    suspend fun markRead(conversationId: String): Result<Unit> {
+        return runCatching {
+            requireSuccessful(conversationApi.markRead(conversationId))
+        }
+    }
+
+    suspend fun setHidden(conversationId: String, hidden: Boolean): Result<Unit> {
+        return runCatching {
+            requireSuccessful(
+                conversationApi.setHidden(conversationId, SetConversationHiddenRequest(hidden))
+            )
+        }
+    }
+
+    private fun requireSuccessful(response: com.example.grabthisforme.model.network.ApiResponse<*>) {
+        if (response.code != 0) {
+            error(response.message.ifBlank { "Network request failed" })
+        }
+    }
+
+    private fun <T> requireSuccessfulData(response: com.example.grabthisforme.model.network.ApiResponse<T>): T {
+        val data = response.data
+        if (response.code != 0 || data == null) {
+            error(response.message.ifBlank { "Network request failed" })
+        }
+        return data
+    }
 }

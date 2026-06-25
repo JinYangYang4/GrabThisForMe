@@ -25,6 +25,9 @@ interface MessageDao {
     @Query("SELECT * FROM message_content WHERE conversationId = :conversationId ORDER BY timestamp DESC LIMIT 1")
     suspend fun getLatestMessageEntityByConversationId(conversationId: String): MessageEntity?
 
+    @Query("SELECT COUNT(*) FROM message_content WHERE messageId = :messageId")
+    suspend fun countByMessageId(messageId: String): Int
+
     @Query("DELETE FROM message_content WHERE messageId = :messageId")
     suspend fun deleteMessageById(messageId: String)
 

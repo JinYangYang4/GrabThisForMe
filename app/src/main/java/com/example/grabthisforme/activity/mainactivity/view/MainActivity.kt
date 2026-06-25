@@ -31,9 +31,11 @@ import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
 import com.example.grabthisforme.activity.fragment_misc.default_entry.view.BlankFragment
 import com.example.grabthisforme.activity.fragment_misc.default_entry.view.BlankFragmentDirections
 import com.example.grabthisforme.databinding.ActivityMainBinding
+import com.example.grabthisforme.model.chat.data.realtime.ChatRealtimeManager
 import com.example.grabthisforme.model.store.domain.Store
 import com.example.grabthisforme.model.user.domain.User
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -41,6 +43,8 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
+    @Inject
+    lateinit var chatRealtimeManager: ChatRealtimeManager
     private val targetScale = 0.97f
 
     // region nestedScrollView_menu — drawer image stretch
@@ -82,6 +86,11 @@ class MainActivity : AppCompatActivity() {
         initRvStore()
         initNestedScrollViewTouch()
         initHandleSidebarClick()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        chatRealtimeManager.connectIfNeeded()
     }
     fun viewModelObserve(){
         viewModel.drawerOpenState.observe(this){ openState ->

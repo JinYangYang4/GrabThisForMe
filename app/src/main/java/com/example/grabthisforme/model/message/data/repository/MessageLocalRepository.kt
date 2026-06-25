@@ -29,6 +29,10 @@ class MessageLocalRepository @Inject constructor(
     }
 
     suspend fun sendMessage(conversationId: String, message: Message): Message {
+        return upsertIncomingMessage(conversationId, message)
+    }
+
+    suspend fun upsertIncomingMessage(conversationId: String, message: Message): Message {
         conversationDao.insertConversationIfNotExists(
             ConversationEntity(
                 conversationId = conversationId,
@@ -58,7 +62,7 @@ class MessageLocalRepository @Inject constructor(
             timestamp = System.currentTimeMillis(),
             status = Message.MessageStatus.SENT
         )
-        return sendMessage(conversationId, message)
+        return upsertIncomingMessage(conversationId, message)
     }
 
     suspend fun sendImageMessage(conversationId: String, mediaUrl: String): Message {
@@ -71,7 +75,25 @@ class MessageLocalRepository @Inject constructor(
             timestamp = System.currentTimeMillis(),
             status = Message.MessageStatus.SENT
         )
-        return sendMessage(conversationId, message)
+        return upsertIncomingMessage(conversationId, message)
+    }
+
+    suspend fun replaceMessages(conversationId: String, messages: List<Message>) {
+        messageDao.deleteMessagesByConversationId(conversationId)
+        if (messages.isEmpty()) return
+        messageDao.upsertMessages(messages.map { it.toEntity(conversationId) })
+        messages.lastOrNull()?.let { lastMessage ->
+            conversationDao.updateLastMessage(conversationId, lastMessage.messageId, lastMessage.timestamp)
+        }
+    }
+
+    suspend fun hasMessage(messageId: String): Boolean {
+        return messageDao.countByMessageId(messageId) > 0
+    }
+
+    suspend fun markConversationReadForUser(conversationId: String, userId: Long) {
+        conversationUserStateDao.updateUnreadCount(conversationId, userId, 0)
+        conversationUserStateDao.updateHiddenState(conversationId, userId, false)
     }
 
     suspend fun deleteMessage(messageId: String) {

@@ -24,8 +24,9 @@ class AnchoredActionMenuView @JvmOverloads constructor(
     private val shadowOffsetY = dp(3f)
     private val arrowWidth = dp(18f)
     private val arrowHeight = dp(10f)
-    private val arrowSideGap = dp(6f)
-    private val cornerRadius = dp(22f)
+    private val arrowSideGap = dp(3f)
+    private val cornerRadius = dp(10f)
+    private val arrowVerticalOffset = dp(20f)
     private val contentHorizontalPadding = dp(10f).toInt()
     private val contentVerticalPadding = dp(10f).toInt()
     private val dividerInset = dp(14f)
@@ -105,8 +106,8 @@ class AnchoredActionMenuView @JvmOverloads constructor(
         canvas.drawRoundRect(left, top, right, bottom, cornerRadius, cornerRadius, strokePaint)
 
         val clampedArrowCenterY = arrowCenterY.coerceIn(
-            top + cornerRadius,
-            bottom - cornerRadius
+            top + arrowVerticalOffset,
+            bottom - arrowVerticalOffset
         )
         val arrowBaseX = right
         val arrowTipX = width - shadowHorizontalInset

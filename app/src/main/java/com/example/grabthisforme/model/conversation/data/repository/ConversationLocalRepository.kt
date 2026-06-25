@@ -114,29 +114,29 @@ class ConversationLocalRepository @Inject constructor(
             }
             .stateIn(repositoryScope, SharingStarted.Eagerly, emptyList())
 
-    init {
-        repositoryScope.launch {
-            if (conversationDao.getConversationCount() == 0) {
-                seedMockConversations()
-            }
-        }
-    }
-
-    private suspend fun seedMockConversations() {
-        val fakeConversations = Conversation.generateFakeConversations(10, 1)
-        fakeConversations.forEach { conversation ->
-            val peer = conversation.conversationPeer
-            if (peer is Conversation.ConversationPeer.Single && peer.user != null) {
-                ensureUserExists(peer.user)
-            }
-            saveConversation(conversation)
-        }
-    }
 
     suspend fun saveConversation(conversation: Conversation) {
         conversationDao.upsertConversation(conversation.toEntity())
         syncParticipants(conversation.conversationId, buildConversationParticipantIds(conversation))
         ensureCurrentUserState(conversation.conversationId)
+    }
+
+    suspend fun syncRemoteConversation(
+        conversation: Conversation,
+        unreadCount: Int,
+        isHidden: Boolean
+    ) {
+        conversationDao.upsertConversation(conversation.toEntity())
+        syncParticipants(conversation.conversationId, buildConversationParticipantIds(conversation))
+        val currentUserId = userRepository.currentUserId.value ?: return
+        conversationUserStateDao.upsertState(
+            ConversationUserStateEntity(
+                conversationId = conversation.conversationId,
+                userId = currentUserId,
+                unreadCount = unreadCount,
+                isHidden = isHidden
+            )
+        )
     }
 
     suspend fun findOrCreateSingleConversation(peerUser: User): Conversation {

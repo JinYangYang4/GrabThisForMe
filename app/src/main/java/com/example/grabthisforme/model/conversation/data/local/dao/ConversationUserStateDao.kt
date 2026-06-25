@@ -39,4 +39,7 @@ interface ConversationUserStateDao {
 
     @Query("UPDATE conversation_user_state SET unreadCount = unreadCount + :delta WHERE conversationId = :conversationId AND userId IN (:userIds)")
     suspend fun increaseUnreadCount(conversationId: String, userIds: List<Long>, delta: Int = 1)
+
+    @Query("SELECT * FROM conversation_user_state WHERE conversationId = :conversationId AND userId = :userId LIMIT 1")
+    suspend fun getState(conversationId: String, userId: Long): ConversationUserStateEntity?
 }

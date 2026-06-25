@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -33,7 +32,7 @@ class FragmentChatViewModel @Inject constructor(
     private val contactDirectoryRepository: ContactDirectoryRepository
 ) : ViewModel() {
 
-    private val _keyboardState: MutableLiveData<Boolean> = MutableLiveData(false)
+    private val _keyboardState = MutableLiveData(false)
     val keyboardStatus: LiveData<Boolean> get() = _keyboardState
 
     private val _canSend = MutableLiveData(false)
@@ -48,10 +47,10 @@ class FragmentChatViewModel @Inject constructor(
     private val _openGroupDetailId = MutableLiveData<Long?>(null)
     val openGroupDetailId: LiveData<Long?> get() = _openGroupDetailId
 
-    private val _conversationId = MutableStateFlow<String?>(null)
+    private val conversationIdFlow = MutableStateFlow<String?>(null)
 
     private val currentConversation = combine(
-        _conversationId,
+        conversationIdFlow,
         conversationRepository.allConversations
     ) { conversationId, conversations ->
         conversations.firstOrNull { it.conversationId == conversationId }
@@ -62,10 +61,9 @@ class FragmentChatViewModel @Inject constructor(
         contactDirectoryRepository.directoryState
     ) { conversation, directoryState ->
         conversation?.toChatConversationUiModel(directoryState)
-        }
-        .asLiveData()
+    }.asLiveData()
 
-    val messages: LiveData<List<MessageUiModel>> = _conversationId
+    val messages: LiveData<List<MessageUiModel>> = conversationIdFlow
         .flatMapLatest { conversationId ->
             if (conversationId == null) {
                 flowOf(emptyList())
@@ -104,8 +102,11 @@ class FragmentChatViewModel @Inject constructor(
     }
 
     fun loadMessages(conversationId: String) {
-        _conversationId.value = conversationId
+        conversationIdFlow.value = conversationId
         viewModelScope.launch {
+            conversationRepository.refreshRemoteConversations()
+            messageRepository.setActiveConversation(conversationId)
+            messageRepository.refreshConversationMessages(conversationId)
             conversationRepository.markConversationAsRead(conversationId)
         }
     }
@@ -162,8 +163,13 @@ class FragmentChatViewModel @Inject constructor(
         }
     }
 
+    override fun onCleared() {
+        messageRepository.setActiveConversation(null)
+        super.onCleared()
+    }
+
     private fun currentConversationValue(): Conversation? {
-        val conversationId = _conversationId.value ?: return null
+        val conversationId = conversationIdFlow.value ?: return null
         return conversationRepository.allConversations.value.firstOrNull { conversation ->
             conversation.conversationId == conversationId
         }
@@ -188,7 +194,7 @@ class FragmentChatViewModel @Inject constructor(
                 val group = targetId?.let(directoryState::findGroup)
                 ChatConversationUiModel(
                     title = group?.groupName?.takeIf { it.isNotBlank() } ?: "群聊",
-                    subtitle = "点击头像查看聊群信息",
+                    subtitle = "点击头像查看群聊信息",
                     avatarUrl = null,
                     isGroup = true,
                     groupDetailId = targetId
