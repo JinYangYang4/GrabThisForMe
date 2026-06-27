@@ -3,6 +3,7 @@ package com.example.grabthisforme.di
 import com.example.grabthisforme.model.network.AuthInterceptor
 import com.example.grabthisforme.model.auth.data.network.api.AuthApi
 import com.example.grabthisforme.model.conversation.data.network.api.ConversationApi
+import com.example.grabthisforme.model.friendAndGroup.data.network.api.FriendAndGroupApi
 import com.example.grabthisforme.model.message.data.network.api.MessageApi
 import com.example.grabthisforme.model.post.data.network.api.PostApi
 import com.example.grabthisforme.model.user.data.network.api.UserApi
@@ -86,6 +87,12 @@ object NetworkModule {
     @Singleton
     fun provideMessageApi(retrofit: Retrofit): MessageApi {
         return retrofit.create(MessageApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFriendAndGroupApi(retrofit: Retrofit): FriendAndGroupApi {
+        return retrofit.create(FriendAndGroupApi::class.java)
     }
 
 }

@@ -3,7 +3,6 @@ package com.example.grabthisforme.activity.fragment_misc.chat_fragment.viewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.grabthisforme.activity.fragment_misc.chat_fragment.ui_model.ChatConversationUiModel
 import com.example.grabthisforme.activity.fragment_misc.chat_fragment.ui_model.MessageUiModel
@@ -18,9 +17,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -47,23 +49,27 @@ class FragmentChatViewModel @Inject constructor(
     private val _openGroupDetailId = MutableLiveData<Long?>(null)
     val openGroupDetailId: LiveData<Long?> get() = _openGroupDetailId
 
-    private val conversationIdFlow = MutableStateFlow<String?>(null)
+    private val _isLoadingOlderMessages = MutableStateFlow(false)
+    val isLoadingOlderMessages: StateFlow<Boolean> = _isLoadingOlderMessages
 
-    private val currentConversation = combine(
+    private val conversationIdFlow = MutableStateFlow<String?>(null)
+    private var hasMoreOlderMessages = true
+
+    private val currentConversation: StateFlow<Conversation?> = combine(
         conversationIdFlow,
         conversationRepository.allConversations
     ) { conversationId, conversations ->
         conversations.firstOrNull { it.conversationId == conversationId }
-    }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000L), null)
 
-    val conversationUiModel: LiveData<ChatConversationUiModel?> = combine(
+    val conversationUiModel: StateFlow<ChatConversationUiModel?> = combine(
         currentConversation,
         contactDirectoryRepository.directoryState
     ) { conversation, directoryState ->
         conversation?.toChatConversationUiModel(directoryState)
-    }.asLiveData()
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000L), null)
 
-    val messages: LiveData<List<MessageUiModel>> = conversationIdFlow
+    val messages: StateFlow<List<MessageUiModel>> = conversationIdFlow
         .flatMapLatest { conversationId ->
             if (conversationId == null) {
                 flowOf(emptyList())
@@ -77,7 +83,7 @@ class FragmentChatViewModel @Inject constructor(
                 }
             }
         }
-        .asLiveData()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000L), emptyList())
 
     fun turnKeyboardStateToTure() {
         if (_keyboardState.value != true) {
@@ -107,12 +113,13 @@ class FragmentChatViewModel @Inject constructor(
             conversationRepository.refreshRemoteConversations()
             messageRepository.setActiveConversation(conversationId)
             messageRepository.refreshConversationMessages(conversationId)
-            conversationRepository.markConversationAsRead(conversationId)
+            val lastSeenTime = conversationRepository.getConversationById(conversationId)?.lastMessage?.timestamp
+            conversationRepository.markConversationAsRead(conversationId, lastSeenTime)
         }
     }
 
     fun onTopAvatarClick() {
-        val conversation = currentConversationValue() ?: return
+        val conversation = currentConversation.value ?: return
         when (conversation.type) {
             Conversation.ConversationType.SINGLE -> {
                 val userId = (conversation.conversationPeer as? Conversation.ConversationPeer.Single)
@@ -163,16 +170,32 @@ class FragmentChatViewModel @Inject constructor(
         }
     }
 
-    override fun onCleared() {
-        messageRepository.setActiveConversation(null)
-        super.onCleared()
+    fun markCurrentConversationAsRead() {
+        val conversationId = conversationIdFlow.value ?: return
+        val lastSeenTime = currentConversation.value?.lastMessage?.timestamp
+        viewModelScope.launch {
+            conversationRepository.markConversationAsRead(conversationId, lastSeenTime)
+        }
     }
 
-    private fun currentConversationValue(): Conversation? {
-        val conversationId = conversationIdFlow.value ?: return null
-        return conversationRepository.allConversations.value.firstOrNull { conversation ->
-            conversation.conversationId == conversationId
+    fun loadOlderMessagesIfNeeded() {
+        val conversationId = conversationIdFlow.value ?: return
+        if (_isLoadingOlderMessages.value || !hasMoreOlderMessages) return
+        viewModelScope.launch {
+            _isLoadingOlderMessages.value = true
+            hasMoreOlderMessages = messageRepository.loadOlderMessages(conversationId)
+            _isLoadingOlderMessages.value = false
         }
+    }
+
+    fun onChatPageStopped() {
+        markCurrentConversationAsRead()
+        messageRepository.setActiveConversation(null)
+    }
+
+    override fun onCleared() {
+        onChatPageStopped()
+        super.onCleared()
     }
 
     private fun Conversation.toChatConversationUiModel(

@@ -1,12 +1,13 @@
 package com.example.grabthisforme.model.conversation.data.repository
 
+import android.util.Log
 import com.example.grabthisforme.model.conversation.data.local.entity.ConversationUserStateEntity
 import com.example.grabthisforme.model.conversation.data.network.dto.ConversationDto
 import com.example.grabthisforme.model.conversation.data.network.dto.ConversationParticipantDto
 import com.example.grabthisforme.model.conversation.domain.Conversation
 import com.example.grabthisforme.model.conversation.mapper.buildConversationPeer
 import com.example.grabthisforme.model.message.domain.Message
-import com.example.grabthisforme.model.message.mapper.toDomain
+import com.example.grabthisforme.model.message.mapper.toDomainOrNull
 import com.example.grabthisforme.model.user.data.repository.UserRepository
 import com.example.grabthisforme.model.user.domain.User
 import javax.inject.Inject
@@ -29,12 +30,15 @@ class ConversationRepository @Inject constructor(
     }
 
     suspend fun findOrCreateSingleConversation(peerUser: User): Conversation {
+        localRepository.findSingleConversationByPeerId(peerUser.id)?.let { localConversation ->
+            return localConversation
+        }
         return remoteRepository.createSingleConversation(peerUser.id)
             .mapCatching { dto ->
                 syncConversationFromRemote(dto)
             }
-            .getOrElse {
-                localRepository.findOrCreateSingleConversation(peerUser)
+            .getOrElse { throwable ->
+                throw throwable
             }
     }
 
@@ -42,7 +46,9 @@ class ConversationRepository @Inject constructor(
         groupId: Long,
         members: List<User>
     ): Conversation {
-        return localRepository.findOrCreateGroupConversation(groupId, members)
+        return localRepository.getAllConversations().firstOrNull { conversation ->
+            conversation.type == Conversation.ConversationType.GROUP && conversation.targetId == groupId
+        } ?: localRepository.findOrCreateGroupConversation(groupId, members)
     }
 
     suspend fun getConversationById(conversationId: String): Conversation? {
@@ -62,34 +68,57 @@ class ConversationRepository @Inject constructor(
         localRepository.setConversationHidden(conversationId, hidden)
     }
 
-    suspend fun markConversationAsRead(conversationId: String) {
-        remoteRepository.markRead(conversationId)
-        localRepository.markConversationAsRead(conversationId)
+    suspend fun markConversationAsRead(conversationId: String, lastReadTime: Long? = null) {
+        remoteRepository.markRead(conversationId, lastReadTime)
+        localRepository.markConversationAsRead(conversationId, lastReadTime)
     }
 
     suspend fun refreshRemoteConversations() {
         val conversations = remoteRepository.listConversations().getOrNull() ?: return
-        conversations.forEach { dto ->
+
+        Log.d("test11", "refreshRemoteConversations: ${conversations.size}")
+
+        val syncedConversations = conversations.map { dto ->
             syncConversationFromRemote(dto)
         }
+        val currentUserId = userRepository.currentUserId.value ?: return
+        localRepository.syncCurrentUserConversationMembership(
+            remoteConversationIds = syncedConversations.map { it.conversationId }.toSet(),
+            remoteStatesByConversationId = conversations.associate { dto ->
+                dto.conversationId to ConversationUserStateEntity(
+                    conversationId = dto.conversationId,
+                    userId = currentUserId,
+                    unreadCount = dto.unreadCount,
+                    isHidden = dto.isHidden,
+                    lastReadTime = dto.lastReadTime
+                )
+            }
+        )
     }
 
     suspend fun syncRemoteConversationSnapshot(
         conversationId: String,
-        lastMessage: Message,
+        lastMessage: Message?,
         unreadCount: Int = 0,
         isHidden: Boolean = false
     ) {
         val existing = localRepository.getConversationById(conversationId)
+        val existingState = localRepository.getCurrentUserConversationState(conversationId)
+        val resolvedLastTime = lastMessage?.timestamp ?: existing?.lastTime ?: 0L
         val conversation = existing?.copy(
             lastMessage = lastMessage,
-            lastTime = lastMessage.timestamp
+            lastTime = resolvedLastTime
         ) ?: Conversation(
             conversationId = conversationId,
             lastMessage = lastMessage,
-            lastTime = lastMessage.timestamp
+            lastTime = resolvedLastTime
         )
-        localRepository.syncRemoteConversation(conversation, unreadCount, isHidden)
+        localRepository.syncRemoteConversation(
+            conversation = conversation,
+            unreadCount = existingState?.unreadCount ?: unreadCount,
+            isHidden = existingState?.isHidden ?: isHidden,
+            lastReadTime = existingState?.lastReadTime
+        )
     }
 
     private suspend fun syncConversationFromRemote(dto: ConversationDto): Conversation {
@@ -121,10 +150,15 @@ class ConversationRepository @Inject constructor(
                 conversationType = dto.conversationType,
                 users = peerUsers
             ),
-            lastMessage = dto.lastMessage.toDomain(),
-            lastTime = dto.lastTime
+            lastMessage = dto.lastMessage.toDomainOrNull(),
+            lastTime = dto.lastMessage?.timestamp ?: dto.lastTime
         )
-        localRepository.syncRemoteConversation(conversation, dto.unreadCount, dto.isHidden)
+        localRepository.syncRemoteConversation(
+            conversation = conversation,
+            unreadCount = dto.unreadCount,
+            isHidden = dto.isHidden,
+            lastReadTime = dto.lastReadTime
+        )
         return conversation
     }
 

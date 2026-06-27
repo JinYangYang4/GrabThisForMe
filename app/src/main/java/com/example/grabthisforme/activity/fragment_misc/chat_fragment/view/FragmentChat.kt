@@ -25,9 +25,13 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.fragment_misc.chat_fragment.adapter.ChatMessageRecyclerViewAdapter
@@ -39,6 +43,7 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class FragmentChat : Fragment(), BottomSheetDialogPhoto.OnPhotosSelectedListener {
@@ -183,22 +188,31 @@ class FragmentChat : Fragment(), BottomSheetDialogPhoto.OnPhotosSelectedListener
                 }
             }
         }
-        chatViewModel.messages.observe(viewLifecycleOwner) { messages ->
-            chatAdapter.submitList(messages)
-            if (messages.isNotEmpty()) {
-                binding.rvChatMessages.post {
-                    binding.rvChatMessages.scrollToPosition(messages.size - 1)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    chatViewModel.messages.collect { messages ->
+                        Log.d("test11", "initObserve: ${messages.size}")
+                        chatAdapter.submitList(messages)
+                        if (messages.isNotEmpty()) {
+                            binding.rvChatMessages.post {
+                                binding.rvChatMessages.scrollToPosition(messages.size - 1)
+                            }
+                        }
+                    }
+                }
+                launch {
+                    chatViewModel.conversationUiModel.collect { uiModel ->
+                        binding.tvName.text = uiModel?.title ?: "聊天"
+                        binding.tvChatSubtitle.text = uiModel?.subtitle ?: "点击头像查看详细资料"
+                        Glide.with(this@FragmentChat)
+                            .load(uiModel?.avatarUrl)
+                            .placeholder(R.drawable.ic_back_charactor2)
+                            .error(R.drawable.ic_back_charactor2)
+                            .into(binding.ivTopAvatar)
+                    }
                 }
             }
-        }
-        chatViewModel.conversationUiModel.observe(viewLifecycleOwner) { uiModel ->
-            binding.tvName.text = uiModel?.title ?: "聊天"
-            binding.tvChatSubtitle.text = uiModel?.subtitle ?: "点击头像查看详细资料"
-            Glide.with(this)
-                .load(uiModel?.avatarUrl)
-                .placeholder(R.drawable.ic_back_charactor2)
-                .error(R.drawable.ic_back_charactor2)
-                .into(binding.ivTopAvatar)
         }
         chatViewModel.openUserDetailId.observe(viewLifecycleOwner) { userId ->
             if (userId == null || userId <= 0L) return@observe
@@ -242,6 +256,16 @@ class FragmentChat : Fragment(), BottomSheetDialogPhoto.OnPhotosSelectedListener
         binding.rvChatMessages.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.rvChatMessages.adapter = chatAdapter
+        binding.rvChatMessages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy >= 0) return
+                val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
+                if (layoutManager.findFirstVisibleItemPosition() <= 2) {
+                    chatViewModel.loadOlderMessagesIfNeeded()
+                }
+            }
+        })
     }
 
     private fun initView() {
@@ -394,6 +418,7 @@ class FragmentChat : Fragment(), BottomSheetDialogPhoto.OnPhotosSelectedListener
 
     override fun onStop() {
         super.onStop()
+        chatViewModel.onChatPageStopped()
         val rootView = binding.root
         if (::globalLayoutListener.isInitialized) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {

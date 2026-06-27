@@ -26,6 +26,8 @@ fun MessageDto.toDomain(): Message {
     )
 }
 
+fun MessageDto?.toDomainOrNull(): Message? = this?.toDomain()
+
 fun Message.toDto(): MessageDto {
     return MessageDto(
         messageId = messageId,
@@ -37,6 +39,8 @@ fun Message.toDto(): MessageDto {
         status = status.name
     )
 }
+
+fun Message?.toDtoOrNull(): MessageDto? = this?.toDto()
 
 fun MessageEntity.toDomain(): Message {
     return Message(

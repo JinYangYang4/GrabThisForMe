@@ -12,6 +12,7 @@ import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @Singleton
@@ -23,6 +24,9 @@ class MessageRepository @Inject constructor(
     private val userRepository: UserRepository,
     chatRealtimeManager: ChatRealtimeManager
 ) {
+    companion object {
+        const val MESSAGE_PAGE_SIZE = 20
+    }
     private val repositoryScope = CoroutineScope(Dispatchers.IO)
     @Volatile
     private var activeConversationId: String? = null
@@ -78,9 +82,14 @@ class MessageRepository @Inject constructor(
     }
 
     suspend fun refreshConversationMessages(conversationId: String) {
-        val messages = conversationRemoteRepository.listMessages(conversationId)
+        val messages = conversationRemoteRepository.listMessages(
+            conversationId = conversationId,
+            beforeTime = null,
+            limit = MESSAGE_PAGE_SIZE
+        )
             .getOrNull()
             ?.map { dto -> dto.toDomain() }
+            ?.sortedWith(compareBy<Message> { it.timestamp }.thenBy { it.messageId })
             ?: return
         localRepository.replaceMessages(conversationId, messages)
         messages.lastOrNull()?.let { lastMessage ->
@@ -89,6 +98,25 @@ class MessageRepository @Inject constructor(
                 lastMessage = lastMessage
             )
         }
+    }
+
+    suspend fun loadOlderMessages(conversationId: String): Boolean {
+        val currentMessages = localRepository.getMessagesByConversation(conversationId)
+        val currentSnapshot = currentMessages.first()
+        val oldestTimestamp = currentSnapshot.firstOrNull()?.timestamp
+        val page = conversationRemoteRepository.listMessages(
+            conversationId = conversationId,
+            beforeTime = oldestTimestamp,
+            limit = MESSAGE_PAGE_SIZE
+        )
+            .getOrNull()
+            ?.map { dto -> dto.toDomain() }
+            ?.sortedWith(compareBy<Message> { it.timestamp }.thenBy { it.messageId })
+            .orEmpty()
+
+        if (page.isEmpty()) return false
+        localRepository.replaceMessages(conversationId, page)
+        return page.size >= MESSAGE_PAGE_SIZE
     }
 
     private suspend fun handleIncomingRealtimeMessage(conversationId: String, message: Message) {
@@ -104,8 +132,15 @@ class MessageRepository @Inject constructor(
         if (message.senderId == currentUserId) return
 
         if (activeConversationId == conversationId) {
-            localRepository.markConversationReadForUser(conversationId, currentUserId)
-            conversationRepository.markConversationAsRead(conversationId)
+            localRepository.markConversationReadForUser(
+                conversationId = conversationId,
+                userId = currentUserId,
+                lastReadTime = message.timestamp
+            )
+            conversationRepository.markConversationAsRead(
+                conversationId = conversationId,
+                lastReadTime = message.timestamp
+            )
         } else {
             conversationRepository.syncRemoteConversationSnapshot(
                 conversationId = conversationId,

@@ -7,6 +7,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ConversationApi {
 
@@ -14,13 +15,20 @@ interface ConversationApi {
     suspend fun listConversations(): ApiResponse<List<ConversationDto>>
 
     @GET("api/conversations/{conversationId}/messages")
-    suspend fun listMessages(@Path("conversationId") conversationId: String): ApiResponse<List<MessageDto>>
+    suspend fun listMessages(
+        @Path("conversationId") conversationId: String,
+        @Query("beforeTime") beforeTime: Long? = null,
+        @Query("limit") limit: Int = 20
+    ): ApiResponse<List<MessageDto>>
 
     @POST("api/conversations/single")
     suspend fun createSingleConversation(@Body request: CreateSingleConversationRequest): ApiResponse<ConversationDto>
 
     @POST("api/conversations/{conversationId}/read")
-    suspend fun markRead(@Path("conversationId") conversationId: String): ApiResponse<Unit>
+    suspend fun markRead(
+        @Path("conversationId") conversationId: String,
+        @Body request: MarkConversationReadRequest
+    ): ApiResponse<Unit>
 
     @POST("api/conversations/{conversationId}/hidden")
     suspend fun setHidden(
@@ -35,4 +43,8 @@ data class CreateSingleConversationRequest(
 
 data class SetConversationHiddenRequest(
     val hidden: Boolean
+)
+
+data class MarkConversationReadRequest(
+    val lastReadTime: Long? = null
 )

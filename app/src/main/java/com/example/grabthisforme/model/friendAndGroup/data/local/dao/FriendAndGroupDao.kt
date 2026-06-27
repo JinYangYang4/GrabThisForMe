@@ -42,6 +42,12 @@ interface FriendAndGroupDao {
     @Query("DELETE FROM user_friend_relation WHERE userId = :userId AND friendUserId = :friendUserId")
     suspend fun deleteFriendRelation(userId: Long, friendUserId: Long)
 
+    @Query("DELETE FROM user_friend_relation WHERE userId = :userId AND friendUserId IN (:friendUserIds)")
+    suspend fun deleteFriendRelations(userId: Long, friendUserIds: List<Long>)
+
+    @Query("DELETE FROM user_friend_relation WHERE userId = :userId")
+    suspend fun deleteFriendRelationsByUserId(userId: Long)
+
     @Query("SELECT * FROM chat_group ORDER BY createTime DESC")
     fun observeAllGroups(): Flow<List<ChatGroupEntity>>
 
@@ -65,6 +71,12 @@ interface FriendAndGroupDao {
 
     @Query("DELETE FROM user_group_relation WHERE userId = :userId AND groupId = :groupId")
     suspend fun deleteUserGroupRelation(userId: Long, groupId: Long)
+
+    @Query("DELETE FROM user_group_relation WHERE userId = :userId AND groupId IN (:groupIds)")
+    suspend fun deleteUserGroupRelations(userId: Long, groupIds: List<Long>)
+
+    @Query("DELETE FROM user_group_relation WHERE userId = :userId")
+    suspend fun deleteUserGroupRelationsByUserId(userId: Long)
 
     @Query("DELETE FROM chat_group WHERE groupId IN (:groupIds)")
     suspend fun deleteGroupsByIds(groupIds: List<Long>)

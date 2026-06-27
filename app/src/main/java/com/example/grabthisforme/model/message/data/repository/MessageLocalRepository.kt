@@ -1,5 +1,6 @@
 package com.example.grabthisforme.model.message.data.repository
 
+import android.util.Log
 import com.example.grabthisforme.model.conversation.data.local.dao.ConversationDao
 import com.example.grabthisforme.model.conversation.data.local.dao.ConversationUserStateDao
 import com.example.grabthisforme.model.conversation.data.local.entity.ConversationEntity
@@ -24,8 +25,9 @@ class MessageLocalRepository @Inject constructor(
     private val userRepository: UserRepository
 ) {
     fun getMessagesByConversation(conversationId: String): Flow<List<Message>> {
-        return messageDao.observeMessageEntitiesByConversationId(conversationId)
+        val Messages =  messageDao.observeMessageEntitiesByConversationId(conversationId)
             .map { entities -> entities.map { it.toDomain() } }
+        return Messages
     }
 
     suspend fun sendMessage(conversationId: String, message: Message): Message {
@@ -79,10 +81,15 @@ class MessageLocalRepository @Inject constructor(
     }
 
     suspend fun replaceMessages(conversationId: String, messages: List<Message>) {
-        messageDao.deleteMessagesByConversationId(conversationId)
         if (messages.isEmpty()) return
-        messageDao.upsertMessages(messages.map { it.toEntity(conversationId) })
-        messages.lastOrNull()?.let { lastMessage ->
+        val mergedMessages = (
+            messageDao.getMessageEntitiesByConversationId(conversationId).map { it.toDomain() } + messages
+            )
+            .associateBy { it.messageId }
+            .values
+            .sortedWith(compareBy<Message> { it.timestamp }.thenBy { it.messageId })
+        messageDao.upsertMessages(mergedMessages.map { it.toEntity(conversationId) })
+        mergedMessages.lastOrNull()?.let { lastMessage ->
             conversationDao.updateLastMessage(conversationId, lastMessage.messageId, lastMessage.timestamp)
         }
     }
@@ -91,9 +98,8 @@ class MessageLocalRepository @Inject constructor(
         return messageDao.countByMessageId(messageId) > 0
     }
 
-    suspend fun markConversationReadForUser(conversationId: String, userId: Long) {
-        conversationUserStateDao.updateUnreadCount(conversationId, userId, 0)
-        conversationUserStateDao.updateHiddenState(conversationId, userId, false)
+    suspend fun markConversationReadForUser(conversationId: String, userId: Long, lastReadTime: Long?) {
+        conversationUserStateDao.markRead(conversationId, userId, lastReadTime)
     }
 
     suspend fun deleteMessage(messageId: String) {
@@ -105,29 +111,23 @@ class MessageLocalRepository @Inject constructor(
     }
 
     private suspend fun updateConversationVisibilityAfterMessage(conversationId: String, senderId: Long) {
-        val participantIds = conversationRelationDao.getParticipantUserIds(conversationId)
-        if (participantIds.isEmpty()) return
-
-        conversationUserStateDao.insertStatesIfAbsent(
-            participantIds.distinct().map { userId ->
-                ConversationUserStateEntity(
-                    conversationId = conversationId,
-                    userId = userId,
-                    unreadCount = 0
-                )
-            }
+        val currentUserId = userRepository.currentUserId.value ?: return
+        conversationUserStateDao.insertStateIfAbsent(
+            ConversationUserStateEntity(
+                conversationId = conversationId,
+                userId = currentUserId,
+                unreadCount = 0
+            )
         )
-
-        conversationUserStateDao.updateHiddenState(
-            conversationId = conversationId,
-            userId = senderId,
-            isHidden = false
-        )
-
-        val receiverIds = participantIds.filterNot { userId -> userId == senderId }.distinct()
-        if (receiverIds.isNotEmpty()) {
-            conversationUserStateDao.increaseUnreadCount(conversationId, receiverIds)
-            conversationUserStateDao.updateHiddenStates(conversationId, receiverIds, false)
+        if (senderId == currentUserId) {
+            conversationUserStateDao.updateHiddenState(
+                conversationId = conversationId,
+                userId = currentUserId,
+                isHidden = false
+            )
+            return
         }
+        conversationUserStateDao.increaseUnreadCount(conversationId, listOf(currentUserId))
+        conversationUserStateDao.updateHiddenState(conversationId, currentUserId, false)
     }
 }

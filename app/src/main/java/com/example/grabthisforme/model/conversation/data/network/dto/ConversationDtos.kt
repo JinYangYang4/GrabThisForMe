@@ -7,9 +7,10 @@ data class ConversationDto(
     val conversationType: String = "SINGLE",
     val targetId: Long? = null,
     val peerUserIds: List<Long> = emptyList(),
-    val lastMessage: MessageDto,
+    val lastMessage: MessageDto? = null,
     val lastTime: Long,
     val unreadCount: Int = 0,
     val isHidden: Boolean = false,
+    val lastReadTime: Long? = null,
     val participants: List<ConversationParticipantDto> = emptyList()
 )

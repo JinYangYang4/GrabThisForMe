@@ -6,7 +6,8 @@ import com.example.grabthisforme.model.conversation.data.network.dto.Conversatio
 import com.example.grabthisforme.model.conversation.domain.Conversation
 import com.example.grabthisforme.model.message.domain.Message
 import com.example.grabthisforme.model.message.mapper.toDomain
-import com.example.grabthisforme.model.message.mapper.toDto
+import com.example.grabthisforme.model.message.mapper.toDomainOrNull
+import com.example.grabthisforme.model.message.mapper.toDtoOrNull
 import com.example.grabthisforme.model.user.domain.User
 
 private fun String.toConversationType(): Conversation.ConversationType {
@@ -59,7 +60,7 @@ fun ConversationDto.toDomain(): Conversation {
         type = conversationType.toConversationType(),
         targetId = targetId,
         conversationPeer = buildConversationPeerFromIds(conversationType, peerUserIds),
-        lastMessage = lastMessage.toDomain(),
+        lastMessage = lastMessage.toDomainOrNull(),
         lastTime = lastTime
     )
 }
@@ -70,12 +71,12 @@ fun Conversation.toDto(): ConversationDto {
         conversationType = type.asStoredName(),
         targetId = targetIdOrNull(),
         peerUserIds = buildPeerIds(conversationPeer),
-        lastMessage = lastMessage.toDto(),
+        lastMessage = lastMessage.toDtoOrNull(),
         lastTime = lastTime
     )
 }
 
-fun ConversationEntity.toDomain(lastMessage: Message, peerUsers: List<User>): Conversation {
+fun ConversationEntity.toDomain(lastMessage: Message?, peerUsers: List<User>): Conversation {
     return Conversation(
         conversationId = conversationId,
         type = conversationType.toConversationType(),
@@ -88,15 +89,7 @@ fun ConversationEntity.toDomain(lastMessage: Message, peerUsers: List<User>): Co
 
 fun ConversationBundleEntity.toDomain(peerUsers: List<User>): Conversation {
     return conversation.toDomain(
-        lastMessage = lastMessage?.toDomain()
-            ?: Message(
-                messageId = conversation.lastMessageId,
-                senderId = 0L,
-                type = Message.MessageType.TEXT,
-                content = "",
-                timestamp = conversation.lastTime,
-                status = Message.MessageStatus.SENT
-            ),
+        lastMessage = lastMessage?.toDomain(),
         peerUsers = peerUsers
     )
 }
@@ -106,7 +99,7 @@ fun Conversation.toEntity(): ConversationEntity {
         conversationId = conversationId,
         conversationType = type.asStoredName(),
         targetId = targetIdOrNull(),
-        lastMessageId = lastMessage.messageId,
+        lastMessageId = lastMessage?.messageId,
         lastTime = lastTime
     )
 }

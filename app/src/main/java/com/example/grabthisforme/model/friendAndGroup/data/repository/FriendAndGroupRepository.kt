@@ -3,6 +3,7 @@ package com.example.grabthisforme.model.friendAndGroup.data.repository
 import com.example.grabthisforme.model.friendAndGroup.Friend
 import com.example.grabthisforme.model.friendAndGroup.Group
 import com.example.grabthisforme.model.friendAndGroup.data.local.entity.UserGroupRelationEntity
+import com.example.grabthisforme.model.conversation.data.repository.ConversationRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.StateFlow
@@ -10,7 +11,8 @@ import kotlinx.coroutines.flow.StateFlow
 @Singleton
 class FriendAndGroupRepository @Inject constructor(
     private val localRepository: FriendAndGroupLocalRepository,
-    private val remoteRepository: FriendAndGroupRemoteRepository
+    private val remoteRepository: FriendAndGroupRemoteRepository,
+    private val conversationRepository: ConversationRepository
 ) {
     val allUsers: StateFlow<List<com.example.grabthisforme.model.user.domain.User>> = localRepository.allUsers
     val currentUserFriends: StateFlow<List<Friend>> = localRepository.currentUserFriends
@@ -24,7 +26,11 @@ class FriendAndGroupRepository @Inject constructor(
     }
 
     suspend fun addFriend(friendUserId: Long) {
-        localRepository.addFriend(friendUserId)
+        remoteRepository.addFriend(friendUserId)
+            .onSuccess {
+                refreshRemoteFriends()
+                conversationRepository.refreshRemoteConversations()
+            }
     }
 
     suspend fun removeFriend(friendUserId: Long) {
@@ -37,5 +43,19 @@ class FriendAndGroupRepository @Inject constructor(
 
     suspend fun leaveGroup(groupId: Long) {
         localRepository.leaveGroup(groupId)
+    }
+
+    suspend fun refreshRemoteFriends() {
+        remoteRepository.listFriends()
+            .onSuccess { friends ->
+                localRepository.syncCurrentUserFriends(friends)
+            }
+    }
+
+    suspend fun refreshRemoteGroups() {
+        remoteRepository.listGroups()
+            .onSuccess { groups ->
+                localRepository.syncCurrentUserGroups(groups)
+            }
     }
 }

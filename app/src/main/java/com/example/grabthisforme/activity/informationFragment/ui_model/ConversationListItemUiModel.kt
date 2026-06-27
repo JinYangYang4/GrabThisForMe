@@ -29,18 +29,20 @@ fun Conversation.toConversationListItemUiModel(
         is Conversation.ConversationPeer.Group -> null
     }
     val unreadCount = state?.unreadCount ?: 0
+
     return ConversationListItemUiModel(
         conversationId = conversationId,
         title = title,
         avatarUrl = avatarUrl,
         lastMessageText = buildLastMessageText(lastMessage),
-        timeText = formatConversationTime(lastTime),
+        timeText = formatConversationTime(lastTime, lastMessage != null),
         unreadCount = unreadCount,
         showUnreadBadge = unreadCount > 0
     )
 }
 
-private fun buildLastMessageText(message: Message): String {
+private fun buildLastMessageText(message: Message?): String {
+    if (message == null) return "暂无消息"
     return when (message.type) {
         Message.MessageType.IMAGE -> "[图片]"
         Message.MessageType.VOICE -> "[语音]"
@@ -49,7 +51,8 @@ private fun buildLastMessageText(message: Message): String {
     }
 }
 
-private fun formatConversationTime(timestamp: Long): String {
+private fun formatConversationTime(timestamp: Long, hasLastMessage: Boolean): String {
+    if (!hasLastMessage || timestamp <= 0L) return ""
     val timeInMillis = if (timestamp.toString().length == 10) timestamp * 1000 else timestamp
     val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     return sdf.format(Date(timeInMillis))

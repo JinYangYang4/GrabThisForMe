@@ -9,7 +9,7 @@ data class Conversation(
     val type: ConversationType = ConversationType.SINGLE,
     val targetId: Long? = null,
     val conversationPeer: ConversationPeer = ConversationPeer.Single(user = null),
-    val lastMessage: Message,
+    val lastMessage: Message?,
     val lastTime: Long
 ) {
     enum class ConversationType {

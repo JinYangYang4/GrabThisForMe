@@ -42,7 +42,7 @@ class FragmentConversation : Fragment() {
     }
 
     private fun initRecyclerView() {
-        val messageAdapter = ConversationRecyclerViewAdapter(
+        val conversationAdapter = ConversationRecyclerViewAdapter(
             clickListener = { conversationId ->
                 val action = BlankFragmentDirections.actionBlankFragmentToFragmentChat(conversationId)
                 (requireActivity() as MainActivity).NewNavController_navgite(action)
@@ -51,7 +51,7 @@ class FragmentConversation : Fragment() {
                 showConversationMenu(anchor, item)
             }
         )
-        binding.rvMassage.adapter = messageAdapter
+        binding.rvMassage.adapter = conversationAdapter
         binding.rvMassage.layoutManager = LinearLayoutManager(context)
     }
 
@@ -69,8 +69,7 @@ class FragmentConversation : Fragment() {
 
     private fun initObserve() {
         viewModel.conversations.observe(viewLifecycleOwner) { conversations ->
-            val adapter = binding.rvMassage.adapter as? ConversationRecyclerViewAdapter
-            adapter?.submitList(conversations)
+            (binding.rvMassage.adapter as? ConversationRecyclerViewAdapter)?.submitList(conversations)
         }
     }
 

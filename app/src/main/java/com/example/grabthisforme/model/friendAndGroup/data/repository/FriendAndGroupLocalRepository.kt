@@ -5,12 +5,15 @@ import com.example.grabthisforme.model.friendAndGroup.Group
 import com.example.grabthisforme.model.friendAndGroup.data.local.dao.FriendAndGroupDao
 import com.example.grabthisforme.model.friendAndGroup.data.local.entity.UserFriendRelationEntity
 import com.example.grabthisforme.model.friendAndGroup.data.local.entity.UserGroupRelationEntity
+import com.example.grabthisforme.model.friendAndGroup.data.network.dto.GroupDto
 import com.example.grabthisforme.model.friendAndGroup.mapper.toDomain
 import com.example.grabthisforme.model.friendAndGroup.mapper.toEntity
 import com.example.grabthisforme.model.user.data.local.dao.UserDao
 import com.example.grabthisforme.model.user.data.repository.UserRepository
 import com.example.grabthisforme.model.user.domain.User
 import com.example.grabthisforme.model.user.mapper.toDomain
+import com.example.grabthisforme.model.user.mapper.toDomain as userDtoToDomain
+import com.example.grabthisforme.model.user.data.network.dto.UserDto
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
@@ -165,6 +168,77 @@ class FriendAndGroupLocalRepository @Inject constructor(
         val reverseRelation = relation.copy(userId = friendUserId, friendUserId = currentUserId)
         ensureUserExists(friendUser)
         friendAndGroupDao.upsertFriendRelations(listOf(relation, reverseRelation))
+    }
+
+    suspend fun syncCurrentUserFriends(friendUsers: List<UserDto>) {
+        val currentUserId = userRepository.currentUserId.value ?: return
+        val friendDomains = friendUsers.map { dto -> dto.userDtoToDomain() }
+        ensureUsersExist(friendDomains)
+        val existingRelations = friendAndGroupDao.getFriendRelationsByUserId(currentUserId)
+        val existingByFriendId = existingRelations.associateBy { it.friendUserId }
+        val remoteFriendIds = friendDomains.map { it.id }.toSet()
+
+        val staleFriendIds = existingByFriendId.keys - remoteFriendIds
+        if (staleFriendIds.isNotEmpty()) {
+            friendAndGroupDao.deleteFriendRelations(currentUserId, staleFriendIds.toList())
+        }
+
+        if (friendDomains.isNotEmpty()) {
+            val now = System.currentTimeMillis()
+            val relationsToUpsert = friendDomains.map { friend ->
+                val existing = existingByFriendId[friend.id]
+                UserFriendRelationEntity(
+                    userId = currentUserId,
+                    friendUserId = friend.id,
+                    status = Friend.FriendStatus.ACCEPTED.name,
+                    addedTime = existing?.addedTime ?: now
+                )
+            }
+            friendAndGroupDao.upsertFriendRelations(relationsToUpsert)
+        }
+    }
+
+    suspend fun syncCurrentUserGroups(groups: List<GroupDto>) {
+        val currentUserId = userRepository.currentUserId.value ?: return
+        val allMembers = groups.flatMap { group ->
+            group.members.mapNotNull { member -> member.user?.userDtoToDomain() }
+        }
+        ensureUsersExist(allMembers)
+        val existingRelations = friendAndGroupDao.getUserGroupRelationsByUserId(currentUserId)
+        val existingByGroupId = existingRelations.associateBy { it.groupId }
+        val remoteGroupIds = groups.map { it.groupId }.toSet()
+
+        val staleGroupIds = existingByGroupId.keys - remoteGroupIds
+        if (staleGroupIds.isNotEmpty()) {
+            friendAndGroupDao.deleteUserGroupRelations(currentUserId, staleGroupIds.toList())
+            friendAndGroupDao.deleteGroupsByIds(staleGroupIds.toList())
+        }
+
+        if (groups.isNotEmpty()) {
+            friendAndGroupDao.upsertGroups(
+                groups.map { group ->
+                    com.example.grabthisforme.model.friendAndGroup.data.local.entity.ChatGroupEntity(
+                        groupId = group.groupId,
+                        groupName = group.groupName,
+                        createTime = group.createTime
+                    )
+                }
+            )
+            val currentUserRelations = groups.mapNotNull { group ->
+                group.members.firstOrNull { member -> member.userId == currentUserId }?.let { member ->
+                    val existing = existingByGroupId[group.groupId]
+                    UserGroupRelationEntity(
+                        userId = currentUserId,
+                        groupId = group.groupId,
+                        role = member.role,
+                        joinedTime = existing?.joinedTime ?: member.joinedTime
+                    )
+                }
+            }
+            if (currentUserRelations.isNotEmpty()) {
+                friendAndGroupDao.upsertUserGroupRelations(currentUserRelations)
+            }
+        }
     }
 
     suspend fun removeFriend(friendUserId: Long) {

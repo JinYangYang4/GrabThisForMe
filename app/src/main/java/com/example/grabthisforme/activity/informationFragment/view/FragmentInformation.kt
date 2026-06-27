@@ -8,23 +8,29 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.activity.informationFragment.adapter.InformationPagerAdapter
+import com.example.grabthisforme.activity.informationFragment.viewmodel.InformationViewModel
 import com.example.grabthisforme.activity.mainactivity.viewmodel.MainViewModel
 import com.example.grabthisforme.databinding.FragmentInformationBinding
 import com.example.grabthisforme.ui.menu.AnchoredActionMenuItem
 import com.example.grabthisforme.ui.menu.AnchoredActionMenuPopup
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import kotlin.getValue
 
 @AndroidEntryPoint
 class FragmentInformation : Fragment() {
     private var _binding : FragmentInformationBinding?=null
     private val binding get() = _binding!!
     private val sharedViewModel : MainViewModel by activityViewModels()
+    private val viewModel: InformationViewModel by viewModels()
     private var addMenuPopup: AnchoredActionMenuPopup? = null
 
     override fun onCreateView(
@@ -42,6 +48,13 @@ class FragmentInformation : Fragment() {
         initVP2()
         initAddMenu()
         initObserve()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch {
+            viewModel.refreshRemoteConversations()
+        }
     }
     fun initVP2(){
         Log.d("test111", "Fragment onCreateView") // 确认Fragment是否加载

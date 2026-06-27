@@ -20,7 +20,7 @@ data class ConversationEntity(
     @PrimaryKey val conversationId: String,
     val conversationType: String,
     val targetId: Long? = null,
-    val lastMessageId: String,
+    val lastMessageId: String? = null,
     val lastTime: Long
 )
 
@@ -50,7 +50,8 @@ data class ConversationUserStateEntity(
     val conversationId: String,
     val userId: Long,
     val unreadCount: Int = 0,
-    val isHidden: Boolean = false
+    val isHidden: Boolean = false,
+    val lastReadTime: Long? = null
 )
 
 data class ConversationBundleEntity(

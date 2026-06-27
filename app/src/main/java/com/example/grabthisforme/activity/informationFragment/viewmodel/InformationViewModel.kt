@@ -56,6 +56,7 @@ class InformationViewModel @Inject constructor(
                     joinedGroups.forEach { group ->
                         add(ContactItem.GroupItem(group))
                     }
+
                 }
             }
         }
@@ -93,7 +94,12 @@ class InformationViewModel @Inject constructor(
 
     fun markConversationAsRead(conversationId: String) {
         viewModelScope.launch {
-            conversationRepository.markConversationAsRead(conversationId)
+            val conversation = conversationRepository.getConversationById(conversationId)
+            val lastSeenTime = conversation?.lastMessage?.timestamp
+            conversationRepository.markConversationAsRead(conversationId, lastSeenTime)
         }
+    }
+    suspend fun refreshRemoteConversations(){
+        conversationRepository.refreshRemoteConversations()
     }
 }

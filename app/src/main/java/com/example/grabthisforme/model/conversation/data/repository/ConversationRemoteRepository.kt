@@ -1,7 +1,9 @@
 package com.example.grabthisforme.model.conversation.data.repository
 
+import android.util.Log
 import com.example.grabthisforme.model.conversation.data.network.api.ConversationApi
 import com.example.grabthisforme.model.conversation.data.network.api.CreateSingleConversationRequest
+import com.example.grabthisforme.model.conversation.data.network.api.MarkConversationReadRequest
 import com.example.grabthisforme.model.conversation.data.network.api.SetConversationHiddenRequest
 import com.example.grabthisforme.model.conversation.data.network.dto.ConversationDto
 import com.example.grabthisforme.model.message.data.network.dto.MessageDto
@@ -19,9 +21,19 @@ class ConversationRemoteRepository @Inject constructor(
         }
     }
 
-    suspend fun listMessages(conversationId: String): Result<List<MessageDto>> {
+    suspend fun listMessages(
+        conversationId: String,
+        beforeTime: Long? = null,
+        limit: Int = 20
+    ): Result<List<MessageDto>> {
         return runCatching {
-            requireSuccessfulData(conversationApi.listMessages(conversationId))
+            requireSuccessfulData(
+                conversationApi.listMessages(
+                    conversationId = conversationId,
+                    beforeTime = beforeTime,
+                    limit = limit
+                )
+            )
         }
     }
 
@@ -33,9 +45,14 @@ class ConversationRemoteRepository @Inject constructor(
         }
     }
 
-    suspend fun markRead(conversationId: String): Result<Unit> {
+    suspend fun markRead(conversationId: String, lastReadTime: Long?): Result<Unit> {
         return runCatching {
-            requireSuccessful(conversationApi.markRead(conversationId))
+            requireSuccessful(
+                conversationApi.markRead(
+                    conversationId = conversationId,
+                    request = MarkConversationReadRequest(lastReadTime)
+                )
+            )
         }
     }
 

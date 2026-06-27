@@ -37,6 +37,12 @@ interface ConversationUserStateDao {
     @Query("UPDATE conversation_user_state SET unreadCount = :unreadCount WHERE conversationId = :conversationId AND userId = :userId")
     suspend fun updateUnreadCount(conversationId: String, userId: Long, unreadCount: Int)
 
+    @Query("UPDATE conversation_user_state SET lastReadTime = :lastReadTime WHERE conversationId = :conversationId AND userId = :userId")
+    suspend fun updateLastReadTime(conversationId: String, userId: Long, lastReadTime: Long?)
+
+    @Query("UPDATE conversation_user_state SET unreadCount = 0, isHidden = 0, lastReadTime = :lastReadTime WHERE conversationId = :conversationId AND userId = :userId")
+    suspend fun markRead(conversationId: String, userId: Long, lastReadTime: Long?)
+
     @Query("UPDATE conversation_user_state SET unreadCount = unreadCount + :delta WHERE conversationId = :conversationId AND userId IN (:userIds)")
     suspend fun increaseUnreadCount(conversationId: String, userIds: List<Long>, delta: Int = 1)
 

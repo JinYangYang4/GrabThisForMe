@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.example.grabthisforme.model.conversation.data.local.entity.ConversationBundleEntity
 import com.example.grabthisforme.model.conversation.data.local.entity.ConversationEntity
 import kotlinx.coroutines.flow.Flow
@@ -12,11 +13,28 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ConversationDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsertConversation(conversation: ConversationEntity)
+    @Update
+    suspend fun updateConversation(conversation: ConversationEntity): Int
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsertConversations(conversations: List<ConversationEntity>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertConversation(conversation: ConversationEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertConversations(conversations: List<ConversationEntity>): List<Long>
+
+    @Transaction
+    suspend fun upsertConversation(conversation: ConversationEntity) {
+        if (updateConversation(conversation) == 0) {
+            insertConversation(conversation)
+        }
+    }
+
+    @Transaction
+    suspend fun upsertConversations(conversations: List<ConversationEntity>) {
+        conversations.forEach { conversation ->
+            upsertConversation(conversation)
+        }
+    }
 
     @Transaction
     @Query("SELECT * FROM conversation WHERE conversationId = :conversationId LIMIT 1")
