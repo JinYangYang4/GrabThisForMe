@@ -13,6 +13,7 @@ import com.example.grabthisforme.model.user.domain.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.flow.collectLatest
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -51,12 +52,20 @@ class MainViewModel @Inject constructor(
     private val _initializationError = MutableLiveData<String?>(null)
     val initializationError: LiveData<String?> get() = _initializationError
 
+    private val _totalUnreadCount = MutableLiveData(0)
+    val totalUnreadCount: LiveData<Int> get() = _totalUnreadCount
+
     private var hasInitializedRemoteData = false
 
     init {
         viewModelScope.launch {
             userRepository.currentUser.collect { user ->
                 _currentUser.postValue(user)
+            }
+        }
+        viewModelScope.launch {
+            conversationRepository.totalUnreadCount.collectLatest { unreadCount ->
+                _totalUnreadCount.postValue(unreadCount)
             }
         }
     }

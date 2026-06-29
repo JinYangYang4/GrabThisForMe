@@ -12,7 +12,13 @@ import com.example.grabthisforme.model.user.data.repository.UserRepository
 import com.example.grabthisforme.model.user.domain.User
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 @Singleton
 class ConversationRepository @Inject constructor(
@@ -23,11 +29,18 @@ class ConversationRepository @Inject constructor(
     companion object {
         private const val TAG = "ConversationRemoteDiag"
     }
+    private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     val allConversations: StateFlow<List<Conversation>> = localRepository.allConversations
 
     val currentUserConversationStates: StateFlow<List<ConversationUserStateEntity>> =
         localRepository.currentUserConversationStates
+
+    val totalUnreadCount: StateFlow<Int> = currentUserConversationStates
+        .map { states ->
+            states.sumOf { state -> state.unreadCount.coerceAtLeast(0) }
+        }
+        .stateIn(repositoryScope, SharingStarted.Eagerly, 0)
 
     suspend fun saveConversation(conversation: Conversation) {
         localRepository.saveConversation(conversation)

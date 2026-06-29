@@ -121,19 +121,45 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:alpha="@{viewModel.selectedTab == 2 ? 1f : 0.5f}"
                             android:gravity="center_horizontal"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:clipChildren="false"
+                            android:clipToPadding="false">
 
-                            <ImageView
-                                android:layout_width="25dp"
-                                android:layout_height="25dp"
-                                android:background="@drawable/bg_circle"
-                                android:backgroundTint="@color/white_fff8"
-                                android:clipToOutline="true"
-                                android:padding="2dp"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/ic_information" />
+                            <FrameLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content">
+
+                                <ImageView
+                                    android:id="@+id/ivInformation"
+                                    android:layout_width="25dp"
+                                    android:layout_height="25dp"
+                                    android:background="@drawable/bg_circle"
+                                    android:backgroundTint="@color/white_fff8"
+                                    android:clipToOutline="true"
+                                    android:alpha="@{viewModel.selectedTab == 2 ? 1f : 0.5f}"
+                                    android:padding="2dp"
+                                    android:scaleType="centerCrop"
+                                    android:src="@drawable/ic_information" />
+
+                                <TextView
+                                    android:id="@+id/tv_information_unread_badge"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="end|top"
+                                    android:layout_marginEnd="-8dp"
+                                    android:background="@drawable/bg_unread_badge"
+                                    android:gravity="center"
+                                    android:paddingStart="5dp"
+                                    android:paddingTop="1dp"
+                                    android:paddingEnd="5dp"
+                                    android:paddingBottom="1dp"
+                                    android:text='@{viewModel.totalUnreadCount > 99 ? "99+" : String.valueOf(viewModel.totalUnreadCount)}'
+                                    android:textColor="@android:color/white"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold"
+                                    android:visibility='@{viewModel.totalUnreadCount > 0 ? View.VISIBLE : View.GONE}' />
+                            </FrameLayout>
 
                             <TextView
                                 android:layout_width="wrap_content"
