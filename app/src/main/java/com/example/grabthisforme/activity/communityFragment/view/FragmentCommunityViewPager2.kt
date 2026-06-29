@@ -81,6 +81,11 @@ class FragmentCommunityViewPager2 : Fragment() {
         initRefresh()
         initObserve()
         initNearbyRetry()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.ensureInitialLoaded()
         if (tabMode == CommunityTabMode.NEARBY) {
             ensureLocationPermissionAndLoad()
         }

@@ -28,12 +28,6 @@ class PostRepository @Inject constructor(
     val myPostList = localRepository.myPostList
     val likedPostList = localRepository.likedPostList
 
-    init {
-        repositoryScope.launch {
-            refreshPosts()
-        }
-    }
-
     suspend fun refreshPosts(): List<Post> {
         val result = remoteRepository.listPosts(
             limit = DEFAULT_POST_PAGE_SIZE,

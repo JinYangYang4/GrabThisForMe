@@ -109,6 +109,15 @@ class MainActivity : AppCompatActivity() {
                 .placeholder(R.drawable.cat)
                 .error(R.drawable.cat)
                 .into(binding.ivHeadPic)
+            if (user != null) {
+                viewModel.initializeMainDataIfNeeded()
+            }
+        }
+        viewModel.initializationError.observe(this) { message ->
+            if (!message.isNullOrBlank()) {
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                viewModel.onInitializationErrorConsumed()
+            }
         }
     }
     fun initNavigationBottom(){

@@ -49,8 +49,11 @@ class CommunityViewModel @Inject constructor(
     private var isLoading = false
     private var nextBeforeTime = System.currentTimeMillis() + 1L
     private var lastNearbyLocation: AppLocation? = null
+    private var hasInitialized = false
 
-    init {
+    fun ensureInitialLoaded() {
+        if (hasInitialized) return
+        hasInitialized = true
         loadInitial()
     }
 

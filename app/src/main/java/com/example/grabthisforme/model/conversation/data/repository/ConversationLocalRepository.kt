@@ -166,17 +166,7 @@ class ConversationLocalRepository @Inject constructor(
     suspend fun findOrCreateSingleConversation(peerUser: User): Conversation {
         ensureUserExists(peerUser)
         findSingleConversationByPeerId(peerUser.id)?.let { existing ->
-            conversationSyncMutex.withLock {
-                database.withTransaction {
-                    syncParticipants(
-                        existing.conversationId,
-                        buildConversationParticipantIds(
-                            conversationPeer = Conversation.ConversationPeer.Single(peerUser)
-                        )
-                    )
-                    ensureCurrentUserState(existing.conversationId)
-                }
-            }
+            prepareConversationForOpen(existing.conversationId)
             return existing
         }
 
@@ -211,17 +201,7 @@ class ConversationLocalRepository @Inject constructor(
             conversationType = Conversation.ConversationType.GROUP.name,
             targetId = groupId
         )?.let { bundle ->
-            conversationSyncMutex.withLock {
-                database.withTransaction {
-                    syncParticipants(
-                        bundle.conversation.conversationId,
-                        buildConversationParticipantIds(
-                            conversationPeer = Conversation.ConversationPeer.Group(distinctMembers)
-                        )
-                    )
-                    ensureCurrentUserState(bundle.conversation.conversationId)
-                }
-            }
+            prepareConversationForOpen(bundle.conversation.conversationId)
             return bundle.toDomain(distinctMembers)
         }
 
@@ -277,14 +257,6 @@ class ConversationLocalRepository @Inject constructor(
     ) {
         conversationSyncMutex.withLock {
             database.withTransaction {
-                val currentUserId = userRepository.currentUserId.value ?: return@withTransaction
-                val localConversationIds = conversationRelationDao.getConversationIdsByUserId(currentUserId).toSet()
-                val staleConversationIds = localConversationIds - remoteConversationIds
-
-                staleConversationIds.forEach { conversationId ->
-                    deleteConversationDirect(conversationId)
-                }
-
                 if (remoteStatesByConversationId.isNotEmpty()) {
                     conversationUserStateDao.upsertStates(remoteStatesByConversationId.values.toList())
                 }
@@ -323,6 +295,29 @@ class ConversationLocalRepository @Inject constructor(
         conversationUserStateDao.deleteStatesByConversationId(conversationId)
         conversationRelationDao.deleteAllParticipants(conversationId)
         conversationDao.deleteConversationById(conversationId)
+    }
+
+    private suspend fun prepareConversationForOpen(conversationId: String) {
+        conversationSyncMutex.withLock {
+            database.withTransaction {
+                val conversationExists = conversationDao.getConversationBundleById(conversationId) != null
+                if (!conversationExists) {
+                    Log.w(TAG, "prepareConversationForOpen skipped: missing conversationId=$conversationId")
+                    return@withTransaction
+                }
+                ensureCurrentUserState(conversationId)
+                val currentUserId = userRepository.currentUserId.value ?: return@withTransaction
+                Log.d(
+                    TAG,
+                    "prepareConversationForOpen: conversationId=$conversationId, userId=$currentUserId, hidden=false"
+                )
+                conversationUserStateDao.updateHiddenState(
+                    conversationId = conversationId,
+                    userId = currentUserId,
+                    isHidden = false
+                )
+            }
+        }
     }
 
     private suspend fun syncParticipants(conversationId: String, userIds: List<Long>) {

@@ -110,7 +110,6 @@ class FragmentChatViewModel @Inject constructor(
     fun loadMessages(conversationId: String) {
         conversationIdFlow.value = conversationId
         viewModelScope.launch {
-            conversationRepository.refreshRemoteConversations()
             messageRepository.setActiveConversation(conversationId)
             messageRepository.refreshConversationMessages(conversationId)
             val lastSeenTime = conversationRepository.getConversationById(conversationId)?.lastMessage?.timestamp

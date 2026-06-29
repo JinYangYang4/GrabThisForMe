@@ -1,9 +1,13 @@
 package com.example.grabthisforme.activity.mainactivity.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.grabthisforme.model.conversation.data.repository.ConversationRepository
+import com.example.grabthisforme.model.friendAndGroup.data.repository.FriendAndGroupRepository
+import com.example.grabthisforme.model.post.data.repository.PostRepository
 import com.example.grabthisforme.model.user.data.repository.UserRepository
 import com.example.grabthisforme.model.user.domain.User
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,7 +15,16 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(userRepository: UserRepository) : ViewModel() {
+class MainViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+    private val friendAndGroupRepository: FriendAndGroupRepository,
+    private val conversationRepository: ConversationRepository,
+    private val postRepository: PostRepository
+) : ViewModel() {
+    companion object {
+        private const val TAG = "MainInitDiag"
+    }
+
     private var _drawerOpenState = MutableLiveData(false)
     val drawerOpenState: LiveData<Boolean> get() = _drawerOpenState
 
@@ -31,12 +44,56 @@ class MainViewModel @Inject constructor(userRepository: UserRepository) : ViewMo
     val drawerAccountText: LiveData<String> = _drawerAccountText
     private var _currentUser = MutableLiveData<User?>()
     val currentUser : LiveData<User?> = _currentUser
+
+    private val _isInitializing = MutableLiveData(false)
+    val isInitializing: LiveData<Boolean> get() = _isInitializing
+
+    private val _initializationError = MutableLiveData<String?>(null)
+    val initializationError: LiveData<String?> get() = _initializationError
+
+    private var hasInitializedRemoteData = false
+
     init {
         viewModelScope.launch {
             userRepository.currentUser.collect { user ->
                 _currentUser.postValue(user)
             }
         }
+    }
+
+    fun initializeMainDataIfNeeded(force: Boolean = false) {
+        if (_isInitializing.value == true) return
+        if (hasInitializedRemoteData && !force) return
+
+        viewModelScope.launch {
+            val currentUserId = userRepository.currentUserId.value
+            if (currentUserId == null) {
+                Log.d(TAG, "initialize skipped: currentUserId is null")
+                return@launch
+            }
+            _isInitializing.postValue(true)
+            _initializationError.postValue(null)
+            runCatching {
+                Log.d(TAG, "initialize start: currentUserId=$currentUserId")
+                friendAndGroupRepository.refreshRemoteFriends()
+                Log.d(TAG, "friends sync complete")
+                friendAndGroupRepository.refreshRemoteGroups()
+                Log.d(TAG, "groups sync complete")
+                conversationRepository.refreshRemoteConversations()
+                Log.d(TAG, "conversations sync complete")
+                postRepository.refreshPosts()
+                Log.d(TAG, "posts sync complete")
+                hasInitializedRemoteData = true
+            }.onFailure { throwable ->
+                Log.e(TAG, "initialize failed", throwable)
+                _initializationError.postValue(throwable.message ?: "初始化失败")
+            }
+            _isInitializing.postValue(false)
+        }
+    }
+
+    fun onInitializationErrorConsumed() {
+        _initializationError.value = null
     }
 
     fun openNewFragment_ture() {

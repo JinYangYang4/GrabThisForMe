@@ -39,6 +39,7 @@ class ConversationRepository @Inject constructor(
         }
         return remoteRepository.createSingleConversation(peerUser.id)
             .mapCatching { dto ->
+                Log.i(TAG, "findOrCreateSingleConversation:${peerUser.id} ")
                 syncConversationFromRemote(dto)
             }
     }

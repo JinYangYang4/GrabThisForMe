@@ -55,7 +55,7 @@ class SwitchAccountsViewModel @Inject constructor(
             }
 
             authRepository.login(
-                identifier = targetUser.accountName,
+                identifier = targetUser.id.toString(),
                 password = password
             ).onSuccess { user ->
                 _switchAccountSuccess.postValue(user)

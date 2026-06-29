@@ -50,12 +50,6 @@ class FragmentInformation : Fragment() {
         initObserve()
     }
 
-    override fun onResume() {
-        super.onResume()
-        lifecycleScope.launch {
-            viewModel.refreshRemoteConversations()
-        }
-    }
     fun initVP2(){
         Log.d("test111", "Fragment onCreateView") // 确认Fragment是否加载
         val adapter = InformationPagerAdapter(this)
