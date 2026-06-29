@@ -1,5 +1,6 @@
 package com.example.grabthisforme.activity.fragment_misc.search.friend.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -70,6 +71,9 @@ class SearchFriendOrGroupOrConversationViewModel @Inject constructor(
 
     private val _openGroupDetailId = MutableLiveData<Long?>(null)
     val openGroupDetailId: LiveData<Long?> get() = _openGroupDetailId
+
+    private val _errorMessage = MutableLiveData<String?>(null)
+    val errorMessage: LiveData<String?> get() = _errorMessage
 
     var fullList: MutableList<SearchContent> = mutableListOf()
     var limitedList: MutableList<SearchContent> = mutableListOf()
@@ -205,6 +209,10 @@ class SearchFriendOrGroupOrConversationViewModel @Inject constructor(
         _openGroupDetailId.value = null
     }
 
+    fun onErrorMessageConsumed() {
+        _errorMessage.value = null
+    }
+
     private fun refreshSearchResults() {
         val keyword = _searchInput.value?.trim().orEmpty()
         if (keyword.isBlank()) {
@@ -257,7 +265,7 @@ class SearchFriendOrGroupOrConversationViewModel @Inject constructor(
 
     private fun openConversation(target: SearchTargetSource) {
         viewModelScope.launch {
-            val conversation = when (target.type) {
+            val result = when (target.type) {
                 SearchTargetType.FRIEND -> conversationRepository.findOrCreateSingleConversation(
                     peerUser = contactDirectoryRepository.directoryState.value.findFriend(target.id)?.who ?: return@launch
                 )
@@ -267,7 +275,13 @@ class SearchFriendOrGroupOrConversationViewModel @Inject constructor(
                     members = contactDirectoryRepository.directoryState.value.findGroup(target.id)?.members ?: return@launch
                 )
             }
-            _openConversationId.postValue(conversation.conversationId)
+            result.onSuccess { conversation ->
+                _openConversationId.postValue(conversation.conversationId)
+                Log.e("SearchContactViewModel", "open conversation success")
+            }.onFailure { throwable ->
+                Log.e("SearchContactViewModel", "open conversation failed", throwable)
+                _errorMessage.postValue("打开会话失败")
+            }
         }
     }
 

@@ -166,7 +166,7 @@ class FriendAndGroupLocalRepository @Inject constructor(
             addedTime = now
         )
         val reverseRelation = relation.copy(userId = friendUserId, friendUserId = currentUserId)
-        ensureUserExists(friendUser)
+        ensureUsersExist(listOf(friendUser))
         friendAndGroupDao.upsertFriendRelations(listOf(relation, reverseRelation))
     }
 
@@ -265,15 +265,8 @@ class FriendAndGroupLocalRepository @Inject constructor(
         friendAndGroupDao.deleteUserGroupRelation(currentUserId, groupId)
     }
 
-    private suspend fun ensureUserExists(user: User) {
-        val exists = userDao.getUserBasicBundlesByIds(listOf(user.id)).isNotEmpty()
-        if (!exists) {
-            userDao.saveUser(user)
-        }
-    }
-
     private suspend fun ensureUsersExist(users: List<User>) {
-        users.distinctBy { it.id }.forEach { ensureUserExists(it) }
+        userRepository.ensureCachedUsers(users)
     }
 
     private suspend fun ensureGroupExists(groupId: Long, groupName: String = "") {

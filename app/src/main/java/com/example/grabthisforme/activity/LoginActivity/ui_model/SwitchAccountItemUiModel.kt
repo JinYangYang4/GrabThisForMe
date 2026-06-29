@@ -14,7 +14,7 @@ fun User.toSwitchAccountItemUiModel(): SwitchAccountItemUiModel {
     return SwitchAccountItemUiModel(
         userId = id,
         displayName = name,
-        accountText = id.toString(),
+        accountText = accountName,
         avatarUrl = headPic,
         isCurrent = isCurrent
     )

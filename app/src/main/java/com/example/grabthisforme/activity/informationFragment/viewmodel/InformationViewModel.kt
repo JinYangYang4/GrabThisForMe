@@ -1,5 +1,6 @@
 package com.example.grabthisforme.activity.informationFragment.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -65,20 +66,33 @@ class InformationViewModel @Inject constructor(
     private val _openConversationId = MutableLiveData<String?>(null)
     val openConversationId: LiveData<String?> = _openConversationId
 
+    private val _errorMessage = MutableLiveData<String?>(null)
+    val errorMessage: LiveData<String?> = _errorMessage
+
     fun onFriendClicked(friend: Friend) {
         viewModelScope.launch {
-            val conversation = conversationRepository.findOrCreateSingleConversation(friend.who)
-            _openConversationId.value = conversation.conversationId
+            conversationRepository.findOrCreateSingleConversation(friend.who)
+                .onSuccess { conversation ->
+                    _openConversationId.value = conversation.conversationId
+                }
+                .onFailure { throwable ->
+                    Log.e("InformationViewModel", "open single conversation failed", throwable)
+                    _errorMessage.value = "打开会话失败"
+                }
         }
     }
 
     fun onGroupClicked(group: Group) {
         viewModelScope.launch {
-            val conversation = conversationRepository.findOrCreateGroupConversation(
+            conversationRepository.findOrCreateGroupConversation(
                 groupId = group.groupId,
                 members = group.members
-            )
-            _openConversationId.value = conversation.conversationId
+            ).onSuccess { conversation ->
+                _openConversationId.value = conversation.conversationId
+            }.onFailure { throwable ->
+                Log.e("InformationViewModel", "open group conversation failed", throwable)
+                _errorMessage.value = "打开群聊失败"
+            }
         }
     }
 
@@ -101,5 +115,9 @@ class InformationViewModel @Inject constructor(
     }
     suspend fun refreshRemoteConversations(){
         conversationRepository.refreshRemoteConversations()
+    }
+
+    fun onErrorMessageConsumed() {
+        _errorMessage.value = null
     }
 }

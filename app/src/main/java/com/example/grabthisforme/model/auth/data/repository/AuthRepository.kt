@@ -28,7 +28,10 @@ class AuthRepository @Inject constructor(
             )
             val data = requireSuccessfulData(response.code, response.message, response.data)
             authTokenDataStore.saveToken(data.token)
-            val user = data.user.toDomain(passwordHash = password)
+            val user = data.user.toDomain(
+                passwordHash = password,
+                isLoginAccount = true
+            )
             userRepository.upsertAndSetCurrent(user)
             user
         }
@@ -55,7 +58,10 @@ class AuthRepository @Inject constructor(
             val data = requireSuccessfulData(response.code, response.message, response.data)
             Log.d("test11", "saveToken: ${data.token}")
             authTokenDataStore.saveToken(data.token)
-            val user = data.user.toDomain(passwordHash = password)
+            val user = data.user.toDomain(
+                passwordHash = password,
+                isLoginAccount = true
+            )
             userRepository.upsertUser(user)
             user
         }

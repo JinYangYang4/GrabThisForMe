@@ -1,9 +1,11 @@
 package com.example.grabthisforme.model.friendAndGroup.data.repository
 
+import android.util.Log
 import com.example.grabthisforme.model.friendAndGroup.Friend
 import com.example.grabthisforme.model.friendAndGroup.Group
 import com.example.grabthisforme.model.friendAndGroup.data.local.entity.UserGroupRelationEntity
 import com.example.grabthisforme.model.conversation.data.repository.ConversationRepository
+import com.example.grabthisforme.model.user.data.repository.UserRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +14,8 @@ import kotlinx.coroutines.flow.StateFlow
 class FriendAndGroupRepository @Inject constructor(
     private val localRepository: FriendAndGroupLocalRepository,
     private val remoteRepository: FriendAndGroupRemoteRepository,
-    private val conversationRepository: ConversationRepository
+    private val conversationRepository: ConversationRepository,
+    private val userRepository: UserRepository
 ) {
     val allUsers: StateFlow<List<com.example.grabthisforme.model.user.domain.User>> = localRepository.allUsers
     val currentUserFriends: StateFlow<List<Friend>> = localRepository.currentUserFriends
@@ -26,10 +29,18 @@ class FriendAndGroupRepository @Inject constructor(
     }
 
     suspend fun addFriend(friendUserId: Long) {
+        Log.e(
+            "AddFriendDiag",
+            "frontend addFriend request: currentUserId=${userRepository.currentUserId.value}, friendUserId=$friendUserId"
+        )
         remoteRepository.addFriend(friendUserId)
             .onSuccess {
                 refreshRemoteFriends()
                 conversationRepository.refreshRemoteConversations()
+                Log.e("AddFriendDiag", "frontend addFriend success: friendUserId=$friendUserId")
+            }
+            .onFailure {
+                Log.e("AddFriendDiag", "frontend addFriend failed: friendUserId=$friendUserId, message=${it.message}", it)
             }
     }
 
@@ -38,7 +49,11 @@ class FriendAndGroupRepository @Inject constructor(
     }
 
     suspend fun joinGroup(groupId: Long, role: String = UserGroupRelationEntity.MEMBER_ROLE) {
-        localRepository.joinGroup(groupId, role)
+        remoteRepository.joinGroup(groupId)
+            .onSuccess {
+                refreshRemoteGroups()
+                conversationRepository.refreshRemoteConversations()
+            }
     }
 
     suspend fun leaveGroup(groupId: Long) {

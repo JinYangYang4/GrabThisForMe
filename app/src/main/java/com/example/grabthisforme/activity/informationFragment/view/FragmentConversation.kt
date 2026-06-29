@@ -1,6 +1,7 @@
 package com.example.grabthisforme.activity.informationFragment.view
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -69,6 +70,7 @@ class FragmentConversation : Fragment() {
 
     private fun initObserve() {
         viewModel.conversations.observe(viewLifecycleOwner) { conversations ->
+            Log.d("test11", "initObserve1: ${conversations.size}")
             (binding.rvMassage.adapter as? ConversationRecyclerViewAdapter)?.submitList(conversations)
         }
     }

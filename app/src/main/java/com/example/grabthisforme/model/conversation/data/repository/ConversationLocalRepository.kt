@@ -1,5 +1,6 @@
 package com.example.grabthisforme.model.conversation.data.repository
 
+import android.util.Log
 import androidx.room.withTransaction
 import com.example.grabthisforme.model.AppDataBase.AppDatabase
 import com.example.grabthisforme.model.conversation.data.local.dao.ConversationDao
@@ -42,6 +43,10 @@ class ConversationLocalRepository @Inject constructor(
     private val userDao: UserDao,
     private val userRepository: UserRepository
 ) {
+    companion object {
+        private const val TAG = "ConversationCacheDiag"
+    }
+
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val conversationSyncMutex = Mutex()
 
@@ -135,8 +140,16 @@ class ConversationLocalRepository @Inject constructor(
     ) {
         conversationSyncMutex.withLock {
             database.withTransaction {
+                Log.d(
+                    TAG,
+                    "syncRemoteConversation start: conversationId=${conversation.conversationId}, type=${conversation.type}, targetId=${conversation.targetId}, unreadCount=$unreadCount, isHidden=$isHidden"
+                )
                 upsertConversationGraph(conversation)
                 val currentUserId = userRepository.currentUserId.value ?: return@withTransaction
+                Log.d(
+                    TAG,
+                    "upsert conversation_user_state: conversationId=${conversation.conversationId}, userId=$currentUserId, unreadCount=$unreadCount, isHidden=$isHidden, lastReadTime=$lastReadTime"
+                )
                 conversationUserStateDao.upsertState(
                     ConversationUserStateEntity(
                         conversationId = conversation.conversationId,
@@ -281,6 +294,10 @@ class ConversationLocalRepository @Inject constructor(
 
     private suspend fun upsertConversationGraph(conversation: Conversation) {
         reconcileConversationIdentityConflict(conversation)
+        Log.d(
+            TAG,
+            "upsert conversation: conversationId=${conversation.conversationId}, type=${conversation.type.name}, targetId=${conversation.targetId}, peerIds=${buildConversationParticipantIds(conversation.conversationPeer)}"
+        )
         conversationDao.upsertConversation(conversation.toEntity())
         syncParticipants(
             conversationId = conversation.conversationId,
@@ -295,6 +312,10 @@ class ConversationLocalRepository @Inject constructor(
             targetId = targetId
         ) ?: return
         if (existing.conversation.conversationId == conversation.conversationId) return
+        Log.w(
+            TAG,
+            "reconcileConversationIdentityConflict delete old conversation: newConversationId=${conversation.conversationId}, oldConversationId=${existing.conversation.conversationId}, type=${conversation.type.name}, targetId=$targetId"
+        )
         deleteConversationDirect(existing.conversation.conversationId)
     }
 
@@ -305,6 +326,11 @@ class ConversationLocalRepository @Inject constructor(
     }
 
     private suspend fun syncParticipants(conversationId: String, userIds: List<Long>) {
+        ensureUsersExistByIds(userIds)
+        Log.d(
+            TAG,
+            "syncParticipants start: conversationId=$conversationId, userIds=${userIds.distinct()}"
+        )
         val targetParticipants = userIds.distinct().mapIndexed { index, userId ->
             ConversationParticipantEntity(
                 conversationId = conversationId,
@@ -318,6 +344,7 @@ class ConversationLocalRepository @Inject constructor(
 
         val toDelete = existingByUserId.keys - targetByUserId.keys
         if (toDelete.isNotEmpty()) {
+            Log.d(TAG, "delete conversation_participant: conversationId=$conversationId, userIds=$toDelete")
             conversationRelationDao.deleteParticipants(conversationId, toDelete.toList())
         }
 
@@ -325,6 +352,10 @@ class ConversationLocalRepository @Inject constructor(
             !existingByUserId.containsKey(participant.userId)
         }
         if (toInsert.isNotEmpty()) {
+            Log.d(
+                TAG,
+                "insert conversation_participant: conversationId=$conversationId, userIds=${toInsert.map { it.userId }}"
+            )
             conversationRelationDao.insertParticipants(toInsert)
         }
 
@@ -333,12 +364,20 @@ class ConversationLocalRepository @Inject constructor(
             existing.sortOrder != participant.sortOrder
         }
         if (toUpdate.isNotEmpty()) {
+            Log.d(
+                TAG,
+                "update conversation_participant sortOrder: conversationId=$conversationId, userIds=${toUpdate.map { it.userId }}"
+            )
             conversationRelationDao.updateParticipants(toUpdate)
         }
     }
 
     private suspend fun ensureCurrentUserState(conversationId: String) {
         val currentUserId = userRepository.currentUserId.value ?: return
+        Log.d(
+            TAG,
+            "ensureCurrentUserState: conversationId=$conversationId, userId=$currentUserId"
+        )
         conversationUserStateDao.insertStateIfAbsent(
             ConversationUserStateEntity(
                 conversationId = conversationId,
@@ -364,19 +403,20 @@ class ConversationLocalRepository @Inject constructor(
     }
 
     private suspend fun ensureUserExists(user: User) {
-        val exists = userDao.getUserBasicBundlesByIds(listOf(user.id)).isNotEmpty()
-        if (!exists) userDao.saveUser(user)
+        userRepository.ensureCachedUsers(listOf(user))
     }
 
     private suspend fun ensureUsersExist(users: List<User>) {
-        if (users.isEmpty()) return
-        val distinctUsers = users.distinctBy { it.id }
-        val existingIds = userDao.getUserBasicBundlesByIds(distinctUsers.map { it.id })
-            .map { it.account.userId }
-            .toSet()
-        distinctUsers
-            .filterNot { user -> existingIds.contains(user.id) }
-            .forEach { user -> userDao.saveUser(user) }
+        userRepository.ensureCachedUsers(users)
+    }
+
+    private suspend fun ensureUsersExistByIds(userIds: List<Long>) {
+        userRepository.ensureCachedUsers(
+            userIds
+                .filter { it > 0L }
+                .distinct()
+                .map(::buildPlaceholderUser)
+        )
     }
 
     private fun buildConversationParticipantIds(conversationPeer: Conversation.ConversationPeer): List<Long> {
@@ -388,7 +428,13 @@ class ConversationLocalRepository @Inject constructor(
         return participantIds.distinct()
     }
 
-    private fun buildPlaceholderUser(userId: Long): User = User(id = userId, name = "", headPic = "")
+    private fun buildPlaceholderUser(userId: Long): User = User(
+        id = userId,
+        name = "",
+        headPic = "",
+        accountName = userId.toString(),
+        isLoginAccount = false
+    )
 
     private data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
 }

@@ -42,7 +42,7 @@ data class User(
         isCurrent: Boolean = false,
         accountName: String = name,
         passwordHash: String = "",
-        isLoginAccount: Boolean = true,
+        isLoginAccount: Boolean = false,
         lastLoginTime: Long? = null,
         setting: UserSetting? = null,
         likeCount: Long = 0L,

@@ -5,7 +5,7 @@ data class UserAccount(
     val accountName: String,
     val passwordHash: String = "",
     val isCurrent: Boolean = false,
-    val isLoginAccount: Boolean = true,
+    val isLoginAccount: Boolean = false,
     val createTime: Long = System.currentTimeMillis(),
     val lastLoginTime: Long? = null
 )

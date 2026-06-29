@@ -33,7 +33,7 @@ class SwitchAccountsBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(requireActivity()).get(SwitchAccountsViewModel::class.java)
+        viewModel = ViewModelProvider(requireActivity())[SwitchAccountsViewModel::class.java]
         initRecyclerView()
         observeViewModelData()
     }
@@ -44,11 +44,7 @@ class SwitchAccountsBottomSheetDialogFragment : BottomSheetDialogFragment() {
                 viewModel.switchToUser(selectedUser.userId)
             },
             onIvCurrentClick = { selectedUser ->
-                Toast.makeText(
-                    requireContext(),
-                    "Delete: " + selectedUser.displayName,
-                    Toast.LENGTH_SHORT
-                ).show()
+                viewModel.deleteUser(selectedUser.userId)
             }
         )
 
@@ -79,6 +75,20 @@ class SwitchAccountsBottomSheetDialogFragment : BottomSheetDialogFragment() {
                 ).show()
                 dismiss()
                 navigateToMainActivity()
+            }
+        }
+
+        viewModel.switchAccountError.observe(viewLifecycleOwner) { message ->
+            if (!message.isNullOrBlank()) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                viewModel.onSwitchAccountErrorConsumed()
+            }
+        }
+
+        viewModel.deleteAccountMessage.observe(viewLifecycleOwner) { message ->
+            if (!message.isNullOrBlank()) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                viewModel.onDeleteAccountMessageConsumed()
             }
         }
     }

@@ -24,6 +24,9 @@ interface ConversationApi {
     @POST("api/conversations/single")
     suspend fun createSingleConversation(@Body request: CreateSingleConversationRequest): ApiResponse<ConversationDto>
 
+    @POST("api/conversations/group/{groupId}/open")
+    suspend fun openGroupConversation(@Path("groupId") groupId: Long): ApiResponse<ConversationDto>
+
     @POST("api/conversations/{conversationId}/read")
     suspend fun markRead(
         @Path("conversationId") conversationId: String,

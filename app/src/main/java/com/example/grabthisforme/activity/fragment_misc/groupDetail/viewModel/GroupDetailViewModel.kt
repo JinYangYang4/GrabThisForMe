@@ -1,5 +1,6 @@
 package com.example.grabthisforme.activity.fragment_misc.groupDetail.viewModel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -34,6 +35,9 @@ class GroupDetailViewModel @Inject constructor(
 
     private val _openUserDetailId = MutableLiveData<Long?>(null)
     val openUserDetailId: LiveData<Long?> get() = _openUserDetailId
+
+    private val _errorMessage = MutableLiveData<String?>(null)
+    val errorMessage: LiveData<String?> get() = _errorMessage
 
     init {
         viewModelScope.launch {
@@ -78,11 +82,15 @@ class GroupDetailViewModel @Inject constructor(
         val state = contactDirectoryRepository.directoryState.value
         val group = state.findGroup(groupId) ?: return
         viewModelScope.launch {
-            val conversation = conversationRepository.findOrCreateGroupConversation(
+            conversationRepository.findOrCreateGroupConversation(
                 groupId = group.groupId,
                 members = group.members
-            )
-            _openConversationId.value = conversation.conversationId
+            ).onSuccess { conversation ->
+                _openConversationId.value = conversation.conversationId
+            }.onFailure { throwable ->
+                Log.e("GroupDetailViewModel", "open group conversation failed", throwable)
+                _errorMessage.value = "打开群聊失败"
+            }
         }
     }
 
@@ -96,5 +104,9 @@ class GroupDetailViewModel @Inject constructor(
 
     fun onUserDetailNavigationConsumed() {
         _openUserDetailId.value = null
+    }
+
+    fun onErrorMessageConsumed() {
+        _errorMessage.value = null
     }
 }

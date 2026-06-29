@@ -24,6 +24,10 @@ class MessageLocalRepository @Inject constructor(
     private val conversationUserStateDao: ConversationUserStateDao,
     private val userRepository: UserRepository
 ) {
+    companion object {
+        private const val TAG = "MessageCacheDiag"
+    }
+
     fun getMessagesByConversation(conversationId: String): Flow<List<Message>> {
         val Messages =  messageDao.observeMessageEntitiesByConversationId(conversationId)
             .map { entities -> entities.map { it.toDomain() } }
@@ -35,6 +39,15 @@ class MessageLocalRepository @Inject constructor(
     }
 
     suspend fun upsertIncomingMessage(conversationId: String, message: Message): Message {
+        Log.d(
+            TAG,
+            "upsertIncomingMessage start: conversationId=$conversationId, messageId=${message.messageId}, senderId=${message.senderId}, timestamp=${message.timestamp}"
+        )
+        ensureMessageSenderCached(message)
+        Log.d(
+            TAG,
+            "ensure conversation exists for message: conversationId=$conversationId, lastMessageId=${message.messageId}"
+        )
         conversationDao.insertConversationIfNotExists(
             ConversationEntity(
                 conversationId = conversationId,
@@ -43,6 +56,10 @@ class MessageLocalRepository @Inject constructor(
                 lastMessageId = message.messageId,
                 lastTime = message.timestamp
             )
+        )
+        Log.d(
+            TAG,
+            "upsert message_content: conversationId=$conversationId, messageId=${message.messageId}, senderId=${message.senderId}"
         )
         messageDao.upsertMessage(message.toEntity(conversationId))
         conversationDao.updateLastMessage(
@@ -82,12 +99,21 @@ class MessageLocalRepository @Inject constructor(
 
     suspend fun replaceMessages(conversationId: String, messages: List<Message>) {
         if (messages.isEmpty()) return
+        Log.d(
+            TAG,
+            "replaceMessages start: conversationId=$conversationId, incomingCount=${messages.size}, senderIds=${messages.map { it.senderId }.distinct()}"
+        )
+        ensureMessageSendersCached(messages)
         val mergedMessages = (
             messageDao.getMessageEntitiesByConversationId(conversationId).map { it.toDomain() } + messages
             )
             .associateBy { it.messageId }
             .values
             .sortedWith(compareBy<Message> { it.timestamp }.thenBy { it.messageId })
+        Log.d(
+            TAG,
+            "upsert message_content batch: conversationId=$conversationId, mergedCount=${mergedMessages.size}, messageIds=${mergedMessages.map { it.messageId }}"
+        )
         messageDao.upsertMessages(mergedMessages.map { it.toEntity(conversationId) })
         mergedMessages.lastOrNull()?.let { lastMessage ->
             conversationDao.updateLastMessage(conversationId, lastMessage.messageId, lastMessage.timestamp)
@@ -129,5 +155,31 @@ class MessageLocalRepository @Inject constructor(
         }
         conversationUserStateDao.increaseUnreadCount(conversationId, listOf(currentUserId))
         conversationUserStateDao.updateHiddenState(conversationId, currentUserId, false)
+    }
+
+    private suspend fun ensureMessageSenderCached(message: Message) {
+        ensureMessageSendersCached(listOf(message))
+    }
+
+    private suspend fun ensureMessageSendersCached(messages: List<Message>) {
+        val cachedUsers = messages
+            .mapNotNull { message ->
+                message.senderId
+                    .takeIf { it > 0L }
+                    ?.let { senderId ->
+                        com.example.grabthisforme.model.user.domain.User(
+                            id = senderId,
+                            name = "",
+                            headPic = "",
+                            accountName = senderId.toString(),
+                            isLoginAccount = false
+                        )
+                    }
+            }
+        Log.d(
+            TAG,
+            "ensureMessageSendersCached: senderIds=${cachedUsers.map { it.id }.distinct()}"
+        )
+        userRepository.ensureCachedUsers(cachedUsers)
     }
 }

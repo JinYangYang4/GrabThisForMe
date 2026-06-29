@@ -45,7 +45,10 @@ fun User.toStatisticsEntity(): UserStatisticsEntity {
     )
 }
 
-fun UserDto.toDomain(passwordHash: String = ""): User {
+fun UserDto.toDomain(
+    passwordHash: String = "",
+    isLoginAccount: Boolean = false
+): User {
     return User(
         id = id,
         name = name ?: accountName ?: id.toString(),
@@ -58,7 +61,7 @@ fun UserDto.toDomain(passwordHash: String = ""): User {
         signature = signature,
         accountName = accountName ?: id.toString(),
         passwordHash = passwordHash,
-        isLoginAccount = true,
+        isLoginAccount = isLoginAccount,
         lastLoginTime = lastLoginTime,
         likeCount = statistics?.likeCount ?: 0L,
         fanCount = statistics?.fanCount ?: 0L,

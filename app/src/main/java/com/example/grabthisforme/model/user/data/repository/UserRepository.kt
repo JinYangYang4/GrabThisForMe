@@ -57,12 +57,24 @@ class UserRepository @Inject constructor(
         localRepository.saveUsers(users)
     }
 
+    suspend fun ensureCachedUsers(users: List<User>) {
+        localRepository.ensureCachedUsers(users)
+    }
+
     suspend fun upsertAndSetCurrent(user: User) {
         localRepository.setCurrentUser(user)
     }
 
     suspend fun logoutCurrentUser() {
         localRepository.logoutCurrentUser()
+    }
+
+    suspend fun deleteUserById(userId: Long) {
+        localRepository.deleteUserById(userId)
+    }
+
+    suspend fun deleteUsersByIds(userIds: List<Long>) {
+        localRepository.deleteUsersByIds(userIds)
     }
 
     suspend fun updateCurrentUserStatistics(transform: (UserStatistics) -> UserStatistics): User? {

@@ -80,6 +80,12 @@ interface UserDao {
     @Query("UPDATE user_account SET isCurrent = 0")
     suspend fun resetAllCurrent()
 
+    @Query("UPDATE user_account SET isLoginAccount = 0, isCurrent = 0, passwordHash = '' WHERE userId = :userId")
+    suspend fun clearLoginAccount(userId: Long)
+
+    @Query("UPDATE user_account SET isLoginAccount = 0, isCurrent = 0, passwordHash = '' WHERE userId IN (:userIds)")
+    suspend fun clearLoginAccounts(userIds: List<Long>)
+
     @Query("DELETE FROM user_account WHERE userId = :userId")
     suspend fun deleteUserById(userId: Long)
 

@@ -20,6 +20,10 @@ class ConversationRepository @Inject constructor(
     private val remoteRepository: ConversationRemoteRepository,
     private val userRepository: UserRepository
 ) {
+    companion object {
+        private const val TAG = "ConversationRemoteDiag"
+    }
+
     val allConversations: StateFlow<List<Conversation>> = localRepository.allConversations
 
     val currentUserConversationStates: StateFlow<List<ConversationUserStateEntity>> =
@@ -29,26 +33,29 @@ class ConversationRepository @Inject constructor(
         localRepository.saveConversation(conversation)
     }
 
-    suspend fun findOrCreateSingleConversation(peerUser: User): Conversation {
+    suspend fun findOrCreateSingleConversation(peerUser: User): Result<Conversation> {
         localRepository.findSingleConversationByPeerId(peerUser.id)?.let { localConversation ->
-            return localConversation
+            return Result.success(localConversation)
         }
         return remoteRepository.createSingleConversation(peerUser.id)
             .mapCatching { dto ->
                 syncConversationFromRemote(dto)
-            }
-            .getOrElse { throwable ->
-                throw throwable
             }
     }
 
     suspend fun findOrCreateGroupConversation(
         groupId: Long,
         members: List<User>
-    ): Conversation {
-        return localRepository.getAllConversations().firstOrNull { conversation ->
+    ): Result<Conversation> {
+        localRepository.getAllConversations().firstOrNull { conversation ->
             conversation.type == Conversation.ConversationType.GROUP && conversation.targetId == groupId
-        } ?: localRepository.findOrCreateGroupConversation(groupId, members)
+        }?.let { localConversation ->
+            return Result.success(localConversation)
+        }
+        return remoteRepository.openGroupConversation(groupId)
+            .mapCatching { dto ->
+                syncConversationFromRemote(dto)
+            }
     }
 
     suspend fun getConversationById(conversationId: String): Conversation? {
@@ -126,7 +133,7 @@ class ConversationRepository @Inject constructor(
             participant.toDomain()
         }
         if (participants.isNotEmpty()) {
-            userRepository.upsertUsers(participants)
+            userRepository.ensureCachedUsers(participants)
         }
 
         val currentUserId = userRepository.currentUserId.value
@@ -142,16 +149,34 @@ class ConversationRepository @Inject constructor(
             Conversation.ConversationType.SINGLE
         }
 
+        val resolvedTargetId = when (conversationType) {
+            Conversation.ConversationType.GROUP -> dto.targetId
+            Conversation.ConversationType.SINGLE -> {
+                val peerUserId = peerUsers.firstOrNull()?.id
+                if (dto.targetId == currentUserId && peerUserId != null) {
+                    Log.w(
+                        TAG,
+                        "single conversation targetId fallback: conversationId=${dto.conversationId}, dtoTargetId=${dto.targetId}, currentUserId=$currentUserId, resolvedPeerUserId=$peerUserId"
+                    )
+                }
+                peerUserId ?: dto.targetId
+            }
+        }
+
         val conversation = Conversation(
             conversationId = dto.conversationId,
             type = conversationType,
-            targetId = dto.targetId,
+            targetId = resolvedTargetId,
             conversationPeer = buildConversationPeer(
                 conversationType = dto.conversationType,
                 users = peerUsers
             ),
             lastMessage = dto.lastMessage.toDomainOrNull(),
             lastTime = dto.lastMessage?.timestamp ?: dto.lastTime
+        )
+        Log.d(
+            TAG,
+            "syncConversationFromRemote resolved: conversationId=${dto.conversationId}, type=${conversationType.name}, dtoTargetId=${dto.targetId}, resolvedTargetId=$resolvedTargetId, peerIds=${peerUsers.map { it.id }}"
         )
         localRepository.syncRemoteConversation(
             conversation = conversation,

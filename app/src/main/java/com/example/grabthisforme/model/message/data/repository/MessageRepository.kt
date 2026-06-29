@@ -91,6 +91,7 @@ class MessageRepository @Inject constructor(
             ?.map { dto -> dto.toDomain() }
             ?.sortedWith(compareBy<Message> { it.timestamp }.thenBy { it.messageId })
             ?: return
+        ensureMessageSendersCached(messages)
         localRepository.replaceMessages(conversationId, messages)
         messages.lastOrNull()?.let { lastMessage ->
             conversationRepository.syncRemoteConversationSnapshot(
@@ -115,6 +116,7 @@ class MessageRepository @Inject constructor(
             .orEmpty()
 
         if (page.isEmpty()) return false
+        ensureMessageSendersCached(page)
         localRepository.replaceMessages(conversationId, page)
         return page.size >= MESSAGE_PAGE_SIZE
     }
@@ -122,6 +124,7 @@ class MessageRepository @Inject constructor(
     private suspend fun handleIncomingRealtimeMessage(conversationId: String, message: Message) {
         if (localRepository.hasMessage(message.messageId)) return
 
+        ensureMessageSendersCached(listOf(message))
         localRepository.upsertIncomingMessage(conversationId, message)
 
         if (conversationRepository.getConversationById(conversationId) == null) {
@@ -147,5 +150,22 @@ class MessageRepository @Inject constructor(
                 lastMessage = message
             )
         }
+    }
+
+    private suspend fun ensureMessageSendersCached(messages: List<Message>) {
+        val cachedUsers = messages.mapNotNull { message ->
+            message.senderId
+                .takeIf { it > 0L }
+                ?.let { senderId ->
+                    com.example.grabthisforme.model.user.domain.User(
+                        id = senderId,
+                        name = "",
+                        headPic = "",
+                        accountName = senderId.toString(),
+                        isLoginAccount = false
+                    )
+                }
+        }
+        userRepository.ensureCachedUsers(cachedUsers)
     }
 }

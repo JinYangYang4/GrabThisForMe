@@ -17,4 +17,7 @@ interface FriendAndGroupApi {
 
     @POST("api/social/friends/{friendUserId}")
     suspend fun addFriend(@Path("friendUserId") friendUserId: Long): ApiResponse<Unit>
+
+    @POST("api/social/groups/{groupId}/join")
+    suspend fun joinGroup(@Path("groupId") groupId: Long): ApiResponse<Unit>
 }

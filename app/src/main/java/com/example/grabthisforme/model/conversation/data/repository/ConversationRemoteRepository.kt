@@ -45,6 +45,12 @@ class ConversationRemoteRepository @Inject constructor(
         }
     }
 
+    suspend fun openGroupConversation(groupId: Long): Result<ConversationDto> {
+        return runCatching {
+            requireSuccessfulData(conversationApi.openGroupConversation(groupId))
+        }
+    }
+
     suspend fun markRead(conversationId: String, lastReadTime: Long?): Result<Unit> {
         return runCatching {
             requireSuccessful(

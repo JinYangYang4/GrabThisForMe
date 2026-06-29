@@ -1,5 +1,6 @@
 package com.example.grabthisforme.model.user.data.repository
 
+import android.util.Log
 import com.example.grabthisforme.model.relation.data.dao.UserRelationDao
 import com.example.grabthisforme.model.relation.data.entity.UserLikedGoodsEntity
 import com.example.grabthisforme.model.relation.data.entity.UserLikedPostEntity
@@ -7,6 +8,7 @@ import com.example.grabthisforme.model.relation.data.entity.UserLikedStoreEntity
 import com.example.grabthisforme.model.user.data.local.dao.UserDao
 import com.example.grabthisforme.model.user.domain.User
 import com.example.grabthisforme.model.user.domain.UserStatistics
+import com.example.grabthisforme.model.user.mapper.toDomain
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -20,21 +22,60 @@ class UserLocalRepository @Inject constructor(
     private val userDao: UserDao,
     private val userRelationDao: UserRelationDao
 ) {
+    companion object {
+        private const val TAG = "UserCacheDiag"
+    }
 
     val currentUser: Flow<User?> = userDao.getCurrentUser()
 
     val allLoginUsers: Flow<List<User>> = userDao.getAllLoginUsers()
 
     suspend fun saveUser(user: User) {
-        userDao.saveUser(user)
+        userDao.saveUser(resolvePersistedUser(user))
     }
 
     suspend fun saveUsers(users: List<User>) {
-        users.forEach { userDao.saveUser(it) }
+        users.forEach { userDao.saveUser(resolvePersistedUser(it)) }
+    }
+
+    suspend fun ensureCachedUsers(users: List<User>) {
+        if (users.isEmpty()) return
+        val distinctUsers = users
+            .filter { user -> user.id > 0L }
+            .distinctBy { user -> user.id }
+            .map(::toCachedUser)
+        if (distinctUsers.isEmpty()) return
+
+        val existingIds = userDao.getUserBasicBundlesByIds(distinctUsers.map { it.id })
+            .map { it.account.userId }
+            .toSet()
+        Log.d(
+            TAG,
+            "ensureCachedUsers start: requested=${distinctUsers.map { it.id }}, existing=${existingIds.toList()}"
+        )
+
+        distinctUsers
+            .filterNot { user -> existingIds.contains(user.id) }
+            .forEach { user ->
+                val resolved = resolvePersistedUser(user)
+                Log.d(
+                    TAG,
+                    "cache user insert: userId=${resolved.id}, accountName=${resolved.accountName}, isLoginAccount=${resolved.isLoginAccount}"
+                )
+                userDao.saveUser(resolved)
+            }
     }
 
     suspend fun setCurrentUser(user: User) {
-        userDao.loginAndSetCurrent(user)
+        val resolvedUser = resolvePersistedUser(user)
+        userDao.loginAndSetCurrent(
+            resolvedUser.copy(
+                account = resolvedUser.account.copy(
+                    isCurrent = true,
+                    isLoginAccount = true
+                )
+            )
+        )
     }
 
     suspend fun logoutCurrentUser() {
@@ -42,11 +83,11 @@ class UserLocalRepository @Inject constructor(
     }
 
     suspend fun deleteUserById(userId: Long) {
-        userDao.deleteUserById(userId)
+        userDao.clearLoginAccount(userId)
     }
 
     suspend fun deleteUsersByIds(userIds: List<Long>) {
-        userDao.deleteUsersByIds(userIds)
+        userDao.clearLoginAccounts(userIds)
     }
 
     suspend fun updateCurrentUserStatistics(transform: (UserStatistics) -> UserStatistics): User? {
@@ -60,6 +101,39 @@ class UserLocalRepository @Inject constructor(
         )
         userDao.saveUser(updatedUser)
         return updatedUser
+    }
+
+    private suspend fun resolvePersistedUser(user: User): User {
+        val existing = userDao.getUserBasicBundlesByIds(listOf(user.id))
+            .firstOrNull()
+            ?.toDomain()
+        val resolvedPassword = user.account.passwordHash.ifBlank {
+            existing?.account?.passwordHash.orEmpty()
+        }
+        val resolvedIsLoginAccount = user.isLoginAccount || existing?.isLoginAccount == true
+        val resolvedIsCurrent = user.isCurrent || existing?.isCurrent == true
+        return user.copy(
+            account = user.account.copy(
+                passwordHash = resolvedPassword,
+                isLoginAccount = resolvedIsLoginAccount,
+                isCurrent = resolvedIsCurrent
+            )
+        )
+    }
+
+    private fun toCachedUser(user: User): User {
+        return user.copy(
+            account = user.account.copy(
+                accountName = user.account.accountName.ifBlank { user.id.toString() },
+                passwordHash = "",
+                isCurrent = false,
+                isLoginAccount = false
+            ),
+            profile = user.profile.copy(
+                displayName = user.profile.displayName.ifBlank { user.account.accountName.ifBlank { user.id.toString() } },
+                avatarUrl = user.profile.avatarUrl
+            )
+        )
     }
 
     suspend fun isStoreLiked(storeId: Long, userId: Long): Boolean {
