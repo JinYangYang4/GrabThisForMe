@@ -6,6 +6,7 @@ import com.example.grabthisforme.model.user.data.network.dto.UserDto
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface FriendAndGroupApi {
 
@@ -14,6 +15,9 @@ interface FriendAndGroupApi {
 
     @GET("api/social/groups")
     suspend fun listGroups(): ApiResponse<List<GroupDto>>
+
+    @GET("api/social/groups/search")
+    suspend fun searchGroups(@Query("keyword") keyword: String): ApiResponse<List<GroupDto>>
 
     @POST("api/social/friends/{friendUserId}")
     suspend fun addFriend(@Path("friendUserId") friendUserId: Long): ApiResponse<Unit>

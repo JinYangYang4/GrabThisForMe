@@ -10,6 +10,8 @@ import com.example.grabthisforme.model.user.domain.User
 import com.example.grabthisforme.model.user.mapper.toDomain
 import javax.inject.Inject
 import javax.inject.Singleton
+import org.json.JSONObject
+import retrofit2.HttpException
 
 @Singleton
 class AuthRepository @Inject constructor(
@@ -34,6 +36,8 @@ class AuthRepository @Inject constructor(
             )
             userRepository.upsertAndSetCurrent(user)
             user
+        }.recoverCatching { throwable ->
+            throw throwable.toReadableAuthException()
         }
     }
 
@@ -64,6 +68,8 @@ class AuthRepository @Inject constructor(
             )
             userRepository.upsertUser(user)
             user
+        }.recoverCatching { throwable ->
+            throw throwable.toReadableAuthException()
         }
     }
 
@@ -72,5 +78,17 @@ class AuthRepository @Inject constructor(
             error(message.ifBlank { "Network request failed" })
         }
         return data
+    }
+
+    private fun Throwable.toReadableAuthException(): Throwable {
+        if (this !is HttpException) return this
+        val errorBody = response()?.errorBody()?.string().orEmpty()
+        val readableMessage = runCatching {
+            JSONObject(errorBody).optString("message")
+        }.getOrNull().orEmpty()
+        if (readableMessage.isNotBlank()) {
+            return IllegalStateException(readableMessage, this)
+        }
+        return this
     }
 }

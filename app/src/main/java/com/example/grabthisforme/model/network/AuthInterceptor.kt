@@ -12,6 +12,10 @@ class AuthInterceptor @Inject constructor(
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
+        val path = chain.request().url.encodedPath
+        if (path == "/api/auth/login" || path == "/api/auth/register") {
+            return chain.proceed(chain.request())
+        }
         val token = runBlocking { authTokenDataStore.getToken() }
         val requestBuilder = chain.request().newBuilder()
         if (!token.isNullOrBlank()) {

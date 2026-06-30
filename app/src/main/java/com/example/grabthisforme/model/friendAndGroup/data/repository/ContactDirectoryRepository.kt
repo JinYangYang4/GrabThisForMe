@@ -42,22 +42,14 @@ class ContactDirectoryRepository @Inject constructor(
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     val directoryState: StateFlow<ContactDirectoryState> = combine(
-        friendAndGroupRepository.allUsers,
         friendAndGroupRepository.currentUserFriends,
-        friendAndGroupRepository.allGroups,
+        friendAndGroupRepository.currentUserGroups,
         friendAndGroupRepository.currentUserGroupIds
-    ) { users, currentUserFriends, groups, joinedGroupIds ->
+    ) { currentUserFriends, groups, joinedGroupIds ->
         val connectedFriendsById = currentUserFriends.associateBy { it.friendId }
         val connectedFriendIds = connectedFriendsById.keys
         ContactDirectoryState(
-            friends = users.map { user ->
-                connectedFriendsById[user.id] ?: Friend(
-                    friendId = user.id,
-                    who = user,
-                    addedTime = 0L,
-                    status = Friend.FriendStatus.PENDING
-                )
-            },
+            friends = currentUserFriends,
             groups = groups,
             connectedFriendIds = connectedFriendIds,
             joinedGroupIds = joinedGroupIds

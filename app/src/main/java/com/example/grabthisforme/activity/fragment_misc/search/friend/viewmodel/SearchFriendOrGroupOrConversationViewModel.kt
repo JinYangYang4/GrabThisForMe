@@ -9,10 +9,22 @@ import com.example.grabthisforme.activity.fragment_misc.search.friend.ui_model.S
 import com.example.grabthisforme.activity.fragment_misc.search.model.SearchContent
 import com.example.grabthisforme.activity.fragment_misc.search.model.SearchDao
 import com.example.grabthisforme.model.conversation.data.repository.ConversationRepository
+import com.example.grabthisforme.model.friendAndGroup.Friend
+import com.example.grabthisforme.model.friendAndGroup.Group
+import com.example.grabthisforme.model.friendAndGroup.data.network.dto.GroupDto
 import com.example.grabthisforme.model.friendAndGroup.data.repository.ContactDirectoryRepository
 import com.example.grabthisforme.model.friendAndGroup.data.repository.ContactDirectoryState
+import com.example.grabthisforme.model.friendAndGroup.data.repository.FriendAndGroupRemoteRepository
+import com.example.grabthisforme.model.user.data.network.dto.UserDto
+import com.example.grabthisforme.model.user.data.repository.UserRemoteRepository
+import com.example.grabthisforme.model.user.data.repository.UserRepository
+import com.example.grabthisforme.model.user.domain.User
+import com.example.grabthisforme.model.user.mapper.toDomain
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -21,7 +33,10 @@ import kotlinx.coroutines.launch
 class SearchFriendOrGroupOrConversationViewModel @Inject constructor(
     private val searchDao: SearchDao,
     private val conversationRepository: ConversationRepository,
-    private val contactDirectoryRepository: ContactDirectoryRepository
+    private val contactDirectoryRepository: ContactDirectoryRepository,
+    private val friendAndGroupRemoteRepository: FriendAndGroupRemoteRepository,
+    private val userRemoteRepository: UserRemoteRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _searchHistoryList = MutableLiveData<MutableList<SearchContent>>()
@@ -60,7 +75,7 @@ class SearchFriendOrGroupOrConversationViewModel @Inject constructor(
     private val _searchResultExpandLabel = MutableLiveData("展开更多")
     val searchResultExpandLabel: LiveData<String> get() = _searchResultExpandLabel
 
-    private val _searchResultSummary = MutableLiveData("支持按联系人名、聊群名或 ID 检索")
+    private val _searchResultSummary = MutableLiveData("支持按联系人昵称、账号、群名或 ID 搜索")
     val searchResultSummary: LiveData<String> get() = _searchResultSummary
 
     private val _openConversationId = MutableLiveData<String?>(null)
@@ -77,7 +92,14 @@ class SearchFriendOrGroupOrConversationViewModel @Inject constructor(
 
     var fullList: MutableList<SearchContent> = mutableListOf()
     var limitedList: MutableList<SearchContent> = mutableListOf()
+
     private var currentMatchedTargets: List<SearchTargetSource> = emptyList()
+    private var remoteSearchJob: Job? = null
+    private var lastRemoteKeyword: String = ""
+    private var lastRemoteUsers: List<User> = emptyList()
+    private var lastRemoteGroups: List<Group> = emptyList()
+    private var lastUserSearchSucceeded = false
+    private var lastGroupSearchSucceeded = false
 
     init {
         viewModelScope.launch {
@@ -161,14 +183,24 @@ class SearchFriendOrGroupOrConversationViewModel @Inject constructor(
 
     fun updateSearchInput(content: String) {
         _searchInput.value = content
-        if (content.isBlank()) {
+        val keyword = content.trim()
+        if (keyword.isBlank()) {
+            remoteSearchJob?.cancel()
+            clearRemoteSearchSnapshot()
             resetSearchResults()
-        } else {
-            refreshSearchResults()
+            return
         }
+        _searchResultExpanded.value = false
+        _searchResultExpandLabel.value = "展开更多"
+        _searchResultVisible.value = true
+        _searchResultEmpty.value = false
+        _searchResultSummary.value = "正在从服务器搜索联系人和群聊..."
+        requestRemoteSearch(keyword)
     }
 
     fun clearSearchInput() {
+        remoteSearchJob?.cancel()
+        clearRemoteSearchSnapshot()
         _searchInput.value = ""
         resetSearchResults()
     }
@@ -213,6 +245,36 @@ class SearchFriendOrGroupOrConversationViewModel @Inject constructor(
         _errorMessage.value = null
     }
 
+    private fun requestRemoteSearch(keyword: String) {
+        remoteSearchJob?.cancel()
+        remoteSearchJob = viewModelScope.launch {
+            delay(SEARCH_DEBOUNCE_MILLIS)
+            val usersDeferred = async { userRemoteRepository.searchUsers(keyword) }
+            val groupsDeferred = async { friendAndGroupRemoteRepository.searchGroups(keyword) }
+
+            val userResult = usersDeferred.await()
+            val groupResult = groupsDeferred.await()
+            if (_searchInput.value?.trim() != keyword) return@launch
+
+            val currentUserId = userRepository.currentUserId.value
+            lastRemoteKeyword = keyword
+            lastUserSearchSucceeded = userResult.isSuccess
+            lastGroupSearchSucceeded = groupResult.isSuccess
+            lastRemoteUsers = userResult.getOrNull()
+                .orEmpty()
+                .map { userDto -> userDto.toDomain() }
+                .filter { user -> user.id != currentUserId }
+            lastRemoteGroups = groupResult.getOrNull()
+                .orEmpty()
+                .map { groupDto -> groupDto.toDomain() }
+
+            if (userResult.isFailure && groupResult.isFailure) {
+                _errorMessage.postValue("远程搜索失败，已回退到本地好友和已加入群聊")
+            }
+            refreshSearchResults()
+        }
+    }
+
     private fun refreshSearchResults() {
         val keyword = _searchInput.value?.trim().orEmpty()
         if (keyword.isBlank()) {
@@ -221,7 +283,7 @@ class SearchFriendOrGroupOrConversationViewModel @Inject constructor(
         }
 
         val directoryState = contactDirectoryRepository.directoryState.value
-        val searchTargets = buildSearchTargets(directoryState)
+        val searchTargets = buildSearchTargets(keyword, directoryState)
         currentMatchedTargets = searchTargets
             .mapNotNull { target ->
                 val score = target.matchScore(keyword)
@@ -244,12 +306,38 @@ class SearchFriendOrGroupOrConversationViewModel @Inject constructor(
         _searchResultVisible.value = true
         _searchResultEmpty.value = limitedTargets.isEmpty()
         _searchResultExpandVisible.value = currentMatchedTargets.size > SEARCH_RESULT_COLLAPSED_LIMIT
-        _searchResultSummary.value = when {
-            currentMatchedTargets.isEmpty() -> "没有找到相关联系人或聊群，试试名称或 ID"
-            currentMatchedTargets.size > SEARCH_RESULT_EXPANDED_LIMIT -> "当前匹配结果较多，最多展开显示前 50 条"
-            else -> "支持按联系人名、聊群名或 ID 检索，当前找到 ${currentMatchedTargets.size} 条结果"
-        }
         _searchResultExpandLabel.value = if (_searchResultExpanded.value == true) "收起结果" else "展开更多"
+        _searchResultSummary.value = buildSearchSummary()
+    }
+
+    private fun buildSearchTargets(
+        keyword: String,
+        directoryState: ContactDirectoryState
+    ): List<SearchTargetSource> {
+        val useRemoteUsers = lastRemoteKeyword == keyword && lastUserSearchSucceeded
+        val useRemoteGroups = lastRemoteKeyword == keyword && lastGroupSearchSucceeded
+
+        val userTargets = if (useRemoteUsers) {
+            buildUserTargets(lastRemoteUsers, directoryState)
+        } else {
+            buildFriendTargets(directoryState.friends, directoryState)
+        }
+
+        val groupTargets = if (useRemoteGroups) {
+            buildGroupTargets(lastRemoteGroups, directoryState)
+        } else {
+            buildGroupTargets(directoryState.groups, directoryState)
+        }
+        return userTargets + groupTargets
+    }
+
+    private fun buildSearchSummary(): String {
+        return when {
+            currentMatchedTargets.isEmpty() -> "没有找到相关联系人或群聊，请尝试昵称、账号、群名或 ID"
+            currentMatchedTargets.size > SEARCH_RESULT_EXPANDED_LIMIT -> "匹配结果较多，最多展开显示前 $SEARCH_RESULT_EXPANDED_LIMIT 条"
+            lastUserSearchSucceeded || lastGroupSearchSucceeded -> "已优先显示服务器搜索结果，共找到 ${currentMatchedTargets.size} 条"
+            else -> "服务器搜索失败，当前显示本地好友和已加入群聊，共 ${currentMatchedTargets.size} 条"
+        }
     }
 
     private fun resetSearchResults() {
@@ -258,31 +346,53 @@ class SearchFriendOrGroupOrConversationViewModel @Inject constructor(
         _searchResultExpanded.value = false
         _searchResultExpandVisible.value = false
         _searchResultExpandLabel.value = "展开更多"
-        _searchResultSummary.value = "支持按联系人名、聊群名或 ID 检索"
+        _searchResultSummary.value = "支持按联系人昵称、账号、群名或 ID 搜索"
         _searchResultList.value = emptyList()
         currentMatchedTargets = emptyList()
+    }
+
+    private fun clearRemoteSearchSnapshot() {
+        lastRemoteKeyword = ""
+        lastRemoteUsers = emptyList()
+        lastRemoteGroups = emptyList()
+        lastUserSearchSucceeded = false
+        lastGroupSearchSucceeded = false
     }
 
     private fun openConversation(target: SearchTargetSource) {
         viewModelScope.launch {
             val result = when (target.type) {
-                SearchTargetType.FRIEND -> conversationRepository.findOrCreateSingleConversation(
-                    peerUser = contactDirectoryRepository.directoryState.value.findFriend(target.id)?.who ?: return@launch
-                )
+                SearchTargetType.FRIEND -> {
+                    val peerUser = resolveUser(target.id) ?: return@launch
+                    conversationRepository.findOrCreateSingleConversation(peerUser = peerUser)
+                }
 
-                SearchTargetType.GROUP -> conversationRepository.findOrCreateGroupConversation(
-                    groupId = target.id,
-                    members = contactDirectoryRepository.directoryState.value.findGroup(target.id)?.members ?: return@launch
-                )
+                SearchTargetType.GROUP -> {
+                    val group = resolveGroup(target.id) ?: return@launch
+                    conversationRepository.findOrCreateGroupConversation(
+                        groupId = target.id,
+                        members = group.members
+                    )
+                }
             }
             result.onSuccess { conversation ->
                 _openConversationId.postValue(conversation.conversationId)
-                Log.e("SearchContactViewModel", "open conversation success")
+                Log.d("SearchContactViewModel", "open conversation success")
             }.onFailure { throwable ->
                 Log.e("SearchContactViewModel", "open conversation failed", throwable)
                 _errorMessage.postValue("打开会话失败")
             }
         }
+    }
+
+    private fun resolveUser(userId: Long): User? {
+        return contactDirectoryRepository.directoryState.value.findFriend(userId)?.who
+            ?: lastRemoteUsers.firstOrNull { user -> user.id == userId }
+    }
+
+    private fun resolveGroup(groupId: Long): Group? {
+        return contactDirectoryRepository.directoryState.value.findGroup(groupId)
+            ?: lastRemoteGroups.firstOrNull { group -> group.groupId == groupId }
     }
 
     private data class SearchTargetSource(
@@ -329,7 +439,7 @@ class SearchFriendOrGroupOrConversationViewModel @Inject constructor(
                     title = title,
                     subtitle = subtitle,
                     badgeText = "联系人",
-                    statusText = if (isConnected) "已添加，可直接发消息" else "还不是联系人，可以先发起添加",
+                    statusText = if (isConnected) "已添加，可直接进入资料或发起聊天" else "尚未添加，可先发起好友申请",
                     actionText = if (isConnected) null else "添加好友",
                     isFriend = true,
                     isConnected = isConnected
@@ -339,9 +449,9 @@ class SearchFriendOrGroupOrConversationViewModel @Inject constructor(
                     stableId = stableId,
                     title = title,
                     subtitle = subtitle,
-                    badgeText = "聊群",
-                    statusText = if (isConnected) "已加入，可直接进入会话" else "尚未加入，加入后可参与群聊",
-                    actionText = if (isConnected) null else "加入聊群",
+                    badgeText = "群聊",
+                    statusText = if (isConnected) "已加入，可直接进入群详情" else "尚未加入，可先加入群聊",
+                    actionText = if (isConnected) null else "加入群聊",
                     isFriend = false,
                     isConnected = isConnected
                 )
@@ -358,63 +468,104 @@ class SearchFriendOrGroupOrConversationViewModel @Inject constructor(
         private const val HISTORY_COLLAPSED_LIMIT = 10
         private const val SEARCH_RESULT_COLLAPSED_LIMIT = 15
         private const val SEARCH_RESULT_EXPANDED_LIMIT = 50
+        private const val SEARCH_DEBOUNCE_MILLIS = 300L
 
-        private fun buildSearchTargets(
+        private fun buildFriendTargets(
+            friends: List<Friend>,
             directoryState: ContactDirectoryState
         ): List<SearchTargetSource> {
-            val friendTargets = directoryState.friends.mapIndexed { index, friend ->
-                val userIdText = friend.friendId.toString()
-                SearchTargetSource(
-                    stableId = "friend_${friend.friendId}",
-                    id = friend.friendId,
-                    type = SearchTargetType.FRIEND,
-                    title = friend.who.name,
-                    subtitle = buildFriendSubtitle(
-                        userIdText = userIdText,
-                        signature = friend.who.signature
-                    ),
-                    searchKeywords = buildList {
-                        add(friend.who.name)
-                        add(friend.who.signature ?: "")
-                        add(friend.who.phone ?: "")
-                        add(friend.who.accountName)
-                        add(userIdText)
-                        add("id$userIdText")
-                        add("ID$userIdText")
-                    }.filter { it.isNotBlank() },
+            return friends.mapIndexed { index, friend ->
+                friend.who.toSearchTargetSource(
                     isConnected = directoryState.isFriendConnected(friend.friendId),
                     sortOrder = index
                 )
             }
+        }
 
-            val groupTargets = directoryState.groups.mapIndexed { index, group ->
+        private fun buildUserTargets(
+            users: List<User>,
+            directoryState: ContactDirectoryState
+        ): List<SearchTargetSource> {
+            return users.mapIndexed { index, user ->
+                user.toSearchTargetSource(
+                    isConnected = directoryState.isFriendConnected(user.id),
+                    sortOrder = index
+                )
+            }
+        }
+
+        private fun User.toSearchTargetSource(
+            isConnected: Boolean,
+            sortOrder: Int
+        ): SearchTargetSource {
+            val userIdText = id.toString()
+            return SearchTargetSource(
+                stableId = "friend_$id",
+                id = id,
+                type = SearchTargetType.FRIEND,
+                title = name,
+                subtitle = buildFriendSubtitle(userIdText = userIdText, signature = signature),
+                searchKeywords = buildList {
+                    add(name)
+                    add(signature ?: "")
+                    add(phone ?: "")
+                    add(accountName)
+                    add(userIdText)
+                    add("id$userIdText")
+                    add("ID$userIdText")
+                }.filter { it.isNotBlank() },
+                isConnected = isConnected,
+                sortOrder = sortOrder
+            )
+        }
+
+        private fun buildGroupTargets(
+            groups: List<Group>,
+            directoryState: ContactDirectoryState
+        ): List<SearchTargetSource> {
+            return groups.mapIndexed { index, group ->
                 val groupIdText = group.groupId.toString()
                 SearchTargetSource(
                     stableId = "group_${group.groupId}",
                     id = group.groupId,
                     type = SearchTargetType.GROUP,
                     title = group.groupName,
-                    subtitle = "群ID $groupIdText · ${group.members.size} 位成员",
+                    subtitle = "群 ID $groupIdText · ${group.members.size} 位成员",
                     searchKeywords = buildList {
                         add(group.groupName)
                         add(groupIdText)
                         add("id$groupIdText")
                         add("ID$groupIdText")
-                        group.members.take(5).forEach { add(it.name) }
+                        group.members.take(5).forEach { member -> add(member.name) }
                     }.filter { it.isNotBlank() },
                     isConnected = directoryState.isGroupJoined(group.groupId),
                     sortOrder = 100 + index
                 )
             }
+        }
 
-            return friendTargets + groupTargets
+        private fun GroupDto.toDomain(): Group {
+            val members = members.map { memberDto ->
+                memberDto.user?.toDomain() ?: User(
+                    id = memberDto.userId,
+                    name = memberDto.userId.toString(),
+                    headPic = "",
+                    accountName = memberDto.userId.toString()
+                )
+            }
+            return Group(
+                groupId = groupId,
+                groupName = groupName,
+                members = members,
+                createTime = createTime
+            )
         }
 
         private fun buildFriendSubtitle(
             userIdText: String,
             signature: String?
         ): String {
-            val normalizedSignature = signature?.takeIf { it.isNotBlank() } ?: "校园互助中"
+            val normalizedSignature = signature?.takeIf { it.isNotBlank() } ?: "校园互助用户"
             return "ID $userIdText · $normalizedSignature"
         }
     }

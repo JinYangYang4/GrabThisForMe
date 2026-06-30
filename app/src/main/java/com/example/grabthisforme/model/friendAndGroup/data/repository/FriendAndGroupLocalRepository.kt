@@ -38,19 +38,6 @@ class FriendAndGroupLocalRepository @Inject constructor(
 
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    val allUsers: StateFlow<List<User>> = combine(
-        userDao.observeAllUserBasicBundles(),
-        userRepository.currentUserId
-    ) { bundles, currentUserId ->
-        bundles.map { it.toDomain() }
-            .filter { user -> user.id != currentUserId }
-            .sortedBy { user -> user.name }
-    }.stateIn(
-        scope = repositoryScope,
-        started = SharingStarted.Eagerly,
-        initialValue = emptyList()
-    )
-
     val currentUserFriends: StateFlow<List<Friend>> = userRepository.currentUserId
         .flatMapLatest { currentUserId ->
             if (currentUserId == null) {
@@ -76,6 +63,17 @@ class FriendAndGroupLocalRepository @Inject constructor(
                         }
                     }
             }
+        }
+        .stateIn(
+            scope = repositoryScope,
+            started = SharingStarted.Eagerly,
+            initialValue = emptyList()
+        )
+
+    val allUsers: StateFlow<List<User>> = currentUserFriends
+        .map { friends ->
+            friends.map { friend -> friend.who }
+                .sortedBy { user -> user.name }
         }
         .stateIn(
             scope = repositoryScope,

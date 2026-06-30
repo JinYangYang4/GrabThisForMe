@@ -35,6 +35,17 @@ class FriendAndGroupRemoteRepository @Inject constructor(
         }
     }
 
+    suspend fun searchGroups(keyword: String): Result<List<GroupDto>> {
+        return runCatching {
+            val response = friendAndGroupApi.searchGroups(keyword)
+            val data = response.data
+            if (response.code != 0 || data == null) {
+                error(response.message.ifBlank { "Search groups failed" })
+            }
+            data
+        }
+    }
+
     suspend fun addFriend(friendUserId: Long): Result<Unit> {
         return runCatching {
             val response = friendAndGroupApi.addFriend(friendUserId)
