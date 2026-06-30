@@ -8,16 +8,19 @@ import java.util.Date
 import java.util.Locale
 
 data class MessageUiModel(
-    val messageId: String,
+    val clientMsgId: String,
+    val serverMsgId: String?,
     val senderId: Long,
     val senderAvatarUrl: String?,
     val type: Message.MessageType,
+    val status: Message.MessageStatus,
     val content: String?,
     val mediaUrl: String?,
     val timestamp: Long,
     val timeText: String,
     val showTime: Boolean,
-    val isMine: Boolean
+    val isMine: Boolean,
+    val showFailedIndicator: Boolean
 )
 
 fun List<Message>.toMessageUiModels(
@@ -32,16 +35,19 @@ fun List<Message>.toMessageUiModels(
         val shouldShowTime = previousTimestamp == null ||
             message.timestamp - previousTimestamp >= showTimeThresholdMillis
         MessageUiModel(
-            messageId = message.messageId,
+            clientMsgId = message.clientMsgId,
+            serverMsgId = message.serverMsgId,
             senderId = message.senderId,
             senderAvatarUrl = senderMap[message.senderId]?.headPic,
             type = message.type,
+            status = message.status,
             content = message.content,
             mediaUrl = message.mediaUrl,
             timestamp = message.timestamp,
             timeText = formatMessageTime(message.timestamp),
             showTime = shouldShowTime,
-            isMine = currentUserId != null && message.senderId == currentUserId
+            isMine = currentUserId != null && message.senderId == currentUserId,
+            showFailedIndicator = message.status == Message.MessageStatus.FAILED
         )
     }
 }

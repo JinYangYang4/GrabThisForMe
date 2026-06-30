@@ -80,7 +80,7 @@ import com.example.grabthisforme.model.user.data.local.entity.UserStatisticsEnti
         StoreGoodsCategoryItemEntity::class,
         StoreTagEntity::class
     ],
-    version = 38,
+    version = 40,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

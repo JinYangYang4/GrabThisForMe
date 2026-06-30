@@ -16,12 +16,14 @@ private fun String.toMessageStatus(): Message.MessageStatus {
 
 fun MessageDto.toDomain(): Message {
     return Message(
-        messageId = messageId,
+        clientMsgId = clientMsgId ?: messageId,
+        serverMsgId = messageId,
         senderId = senderId,
         type = type.toMessageType(),
         content = content,
         mediaUrl = mediaUrl,
         timestamp = timestamp,
+        serverTimestamp = timestamp,
         status = status.toMessageStatus()
     )
 }
@@ -30,7 +32,8 @@ fun MessageDto?.toDomainOrNull(): Message? = this?.toDomain()
 
 fun Message.toDto(): MessageDto {
     return MessageDto(
-        messageId = messageId,
+        clientMsgId = clientMsgId,
+        messageId = serverMsgId ?: clientMsgId,
         senderId = senderId,
         type = type.name,
         content = content,
@@ -44,25 +47,29 @@ fun Message?.toDtoOrNull(): MessageDto? = this?.toDto()
 
 fun MessageEntity.toDomain(): Message {
     return Message(
-        messageId = messageId,
+        clientMsgId = clientMsgId,
+        serverMsgId = serverMsgId,
         senderId = senderId ?: 0L,
         type = type.toMessageType(),
         content = content,
         mediaUrl = mediaUrl,
         timestamp = timestamp,
+        serverTimestamp = serverTimestamp,
         status = status.toMessageStatus()
     )
 }
 
 fun Message.toEntity(conversationId: String): MessageEntity {
     return MessageEntity(
-        messageId = messageId,
+        clientMsgId = clientMsgId,
+        serverMsgId = serverMsgId,
         conversationId = conversationId,
         senderId = senderId.takeIf { it > 0L },
         type = type.name,
         content = content,
         mediaUrl = mediaUrl,
         timestamp = timestamp,
+        serverTimestamp = serverTimestamp,
         status = status.name
     )
 }

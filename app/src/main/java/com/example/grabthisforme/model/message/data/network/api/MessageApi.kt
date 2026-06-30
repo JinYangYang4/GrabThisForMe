@@ -16,6 +16,7 @@ interface MessageApi {
 }
 
 data class SendMessageRequest(
+    val clientMsgId: String,
     val type: String,
     val content: String? = null,
     val mediaUrl: String? = null

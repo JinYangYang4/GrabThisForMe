@@ -1,6 +1,7 @@
 package com.example.grabthisforme.model.message.data.network.dto
 
 data class MessageDto(
+    val clientMsgId: String? = null,
     val messageId: String,
     val senderId: Long = 0L,
     val type: String,

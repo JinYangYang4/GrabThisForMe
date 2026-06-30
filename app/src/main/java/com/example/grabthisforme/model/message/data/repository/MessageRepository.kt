@@ -54,22 +54,32 @@ class MessageRepository @Inject constructor(
     }
 
     suspend fun sendTextMessage(conversationId: String, text: String): Message {
-        return remoteRepository.sendTextMessage(conversationId, text)
-            .mapCatching { message ->
-                localRepository.upsertIncomingMessage(conversationId, message)
+        val pendingMessage = localRepository.createPendingTextMessage(conversationId, text)
+        return remoteRepository.sendTextMessage(conversationId, pendingMessage.clientMsgId, text)
+            .mapCatching { remoteMessage ->
+                localRepository.markMessageSent(pendingMessage.clientMsgId, remoteMessage)
             }
             .getOrElse {
-                localRepository.sendTextMessage(conversationId, text)
+                localRepository.markMessageStatus(
+                    pendingMessage.clientMsgId,
+                    Message.MessageStatus.FAILED
+                )
+                pendingMessage.copy(status = Message.MessageStatus.FAILED)
             }
     }
 
     suspend fun sendImageMessage(conversationId: String, mediaUrl: String): Message {
-        return remoteRepository.sendImageMessage(conversationId, mediaUrl)
-            .mapCatching { message ->
-                localRepository.upsertIncomingMessage(conversationId, message)
+        val pendingMessage = localRepository.createPendingImageMessage(conversationId, mediaUrl)
+        return remoteRepository.sendImageMessage(conversationId, pendingMessage.clientMsgId, mediaUrl)
+            .mapCatching { remoteMessage ->
+                localRepository.markMessageSent(pendingMessage.clientMsgId, remoteMessage)
             }
             .getOrElse {
-                localRepository.sendImageMessage(conversationId, mediaUrl)
+                localRepository.markMessageStatus(
+                    pendingMessage.clientMsgId,
+                    Message.MessageStatus.FAILED
+                )
+                pendingMessage.copy(status = Message.MessageStatus.FAILED)
             }
     }
 
@@ -89,7 +99,7 @@ class MessageRepository @Inject constructor(
         )
             .getOrNull()
             ?.map { dto -> dto.toDomain() }
-            ?.sortedWith(compareBy<Message> { it.timestamp }.thenBy { it.messageId })
+            ?.sortedWith(compareBy<Message> { it.serverTimestamp ?: it.timestamp }.thenBy { it.clientMsgId })
             ?: return
         ensureMessageSendersCached(messages)
         localRepository.replaceMessages(conversationId, messages)
@@ -104,7 +114,8 @@ class MessageRepository @Inject constructor(
     suspend fun loadOlderMessages(conversationId: String): Boolean {
         val currentMessages = localRepository.getMessagesByConversation(conversationId)
         val currentSnapshot = currentMessages.first()
-        val oldestTimestamp = currentSnapshot.firstOrNull()?.timestamp
+        val oldestTimestamp = currentSnapshot
+            .minOfOrNull { message -> message.serverTimestamp ?: message.timestamp }
         val page = conversationRemoteRepository.listMessages(
             conversationId = conversationId,
             beforeTime = oldestTimestamp,
@@ -112,7 +123,7 @@ class MessageRepository @Inject constructor(
         )
             .getOrNull()
             ?.map { dto -> dto.toDomain() }
-            ?.sortedWith(compareBy<Message> { it.timestamp }.thenBy { it.messageId })
+            ?.sortedWith(compareBy<Message> { it.serverTimestamp ?: it.timestamp }.thenBy { it.clientMsgId })
             .orEmpty()
 
         if (page.isEmpty()) return false
@@ -122,7 +133,15 @@ class MessageRepository @Inject constructor(
     }
 
     private suspend fun handleIncomingRealtimeMessage(conversationId: String, message: Message) {
-        if (localRepository.hasMessage(message.messageId)) return
+        message.serverMsgId?.let { serverMsgId ->
+            if (localRepository.hasServerMessage(serverMsgId)) return
+        }
+        if (localRepository.hasMessage(message.clientMsgId)) {
+            if (message.status == Message.MessageStatus.SENT) {
+                localRepository.markMessageSent(message.clientMsgId, message)
+            }
+            return
+        }
 
         ensureMessageSendersCached(listOf(message))
         localRepository.upsertIncomingMessage(conversationId, message)
@@ -138,11 +157,11 @@ class MessageRepository @Inject constructor(
             localRepository.markConversationReadForUser(
                 conversationId = conversationId,
                 userId = currentUserId,
-                lastReadTime = message.timestamp
+                lastReadTime = message.serverTimestamp ?: message.timestamp
             )
             conversationRepository.markConversationAsRead(
                 conversationId = conversationId,
-                lastReadTime = message.timestamp
+                lastReadTime = message.serverTimestamp ?: message.timestamp
             )
         } else {
             conversationRepository.syncRemoteConversationSnapshot(

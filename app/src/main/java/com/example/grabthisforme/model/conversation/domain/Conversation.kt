@@ -60,11 +60,13 @@ data class Conversation(
                 val senderId = if (index % 2 == 0) currentUserId else user.id
                 messages.add(
                     Message(
-                        messageId = UUID.randomUUID().toString(),
+                        clientMsgId = UUID.randomUUID().toString(),
+                        serverMsgId = UUID.randomUUID().toString(),
                         senderId = senderId,
                         type = Message.MessageType.TEXT,
                         content = "Mock message ${index + 1} from ${user.name}",
                         timestamp = System.currentTimeMillis() - (index * 1000L * 60L),
+                        serverTimestamp = System.currentTimeMillis() - (index * 1000L * 60L),
                         status = Message.MessageStatus.READ
                     )
                 )

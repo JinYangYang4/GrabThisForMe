@@ -11,6 +11,7 @@ import com.example.grabthisforme.model.message.mapper.toDomain
 import com.example.grabthisforme.model.message.mapper.toEntity
 import com.example.grabthisforme.model.relation.data.dao.ConversationRelationDao
 import com.example.grabthisforme.model.user.data.repository.UserRepository
+import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -38,34 +39,76 @@ class MessageLocalRepository @Inject constructor(
         return upsertIncomingMessage(conversationId, message)
     }
 
+    suspend fun createPendingTextMessage(conversationId: String, text: String): Message {
+        val currentUserId = userRepository.currentUserId.value ?: 0L
+        val message = Message(
+            clientMsgId = "LOCAL_${UUID.randomUUID()}",
+            senderId = currentUserId,
+            type = Message.MessageType.TEXT,
+            content = text.trim(),
+            timestamp = System.currentTimeMillis(),
+            status = Message.MessageStatus.SENDING
+        )
+        return upsertIncomingMessage(conversationId, message)
+    }
+
+    suspend fun createPendingImageMessage(conversationId: String, mediaUrl: String): Message {
+        val currentUserId = userRepository.currentUserId.value ?: 0L
+        val message = Message(
+            clientMsgId = "LOCAL_${UUID.randomUUID()}",
+            senderId = currentUserId,
+            type = Message.MessageType.IMAGE,
+            mediaUrl = mediaUrl,
+            timestamp = System.currentTimeMillis(),
+            status = Message.MessageStatus.SENDING
+        )
+        return upsertIncomingMessage(conversationId, message)
+    }
+
+    suspend fun markMessageStatus(clientMsgId: String, status: Message.MessageStatus) {
+        messageDao.updateMessageStatus(clientMsgId, status.name)
+    }
+
+    suspend fun markMessageSent(clientMsgId: String, remoteMessage: Message): Message {
+        ensureMessageSenderCached(remoteMessage)
+        messageDao.markMessageSent(
+            clientMsgId = clientMsgId,
+            serverMsgId = remoteMessage.serverMsgId ?: error("serverMsgId missing"),
+            serverTimestamp = remoteMessage.serverTimestamp,
+            status = remoteMessage.status.name
+        )
+        return messageDao.getMessageEntityByClientMsgId(clientMsgId)?.toDomain()
+            ?: remoteMessage.copy(clientMsgId = clientMsgId)
+    }
+
     suspend fun upsertIncomingMessage(conversationId: String, message: Message): Message {
         Log.d(
             TAG,
-            "upsertIncomingMessage start: conversationId=$conversationId, messageId=${message.messageId}, senderId=${message.senderId}, timestamp=${message.timestamp}"
+            "upsertIncomingMessage start: conversationId=$conversationId, clientMsgId=${message.clientMsgId}, serverMsgId=${message.serverMsgId}, senderId=${message.senderId}, timestamp=${message.timestamp}"
         )
         ensureMessageSenderCached(message)
         Log.d(
             TAG,
-            "ensure conversation exists for message: conversationId=$conversationId, lastMessageId=${message.messageId}"
+            "ensure conversation exists for message: conversationId=$conversationId, lastMessageId=${message.clientMsgId}"
         )
         conversationDao.insertConversationIfNotExists(
             ConversationEntity(
                 conversationId = conversationId,
                 conversationType = "SINGLE",
                 targetId = null,
-                lastMessageId = message.messageId,
-                lastTime = message.timestamp
+                lastMessageId = message.clientMsgId,
+                lastTime = message.serverTimestamp ?: message.timestamp
             )
         )
         Log.d(
             TAG,
-            "upsert message_content: conversationId=$conversationId, messageId=${message.messageId}, senderId=${message.senderId}"
+            "upsert message_content: conversationId=$conversationId, clientMsgId=${message.clientMsgId}, serverMsgId=${message.serverMsgId}, senderId=${message.senderId}"
         )
         messageDao.upsertMessage(message.toEntity(conversationId))
         conversationDao.updateLastMessage(
             conversationId = conversationId,
-            messageId = message.messageId,
-            timestamp = message.timestamp
+            messageId = message.clientMsgId,
+            timestamp = message.serverTimestamp ?: message.timestamp
         )
         updateConversationVisibilityAfterMessage(conversationId, message.senderId)
         return message
@@ -74,7 +117,7 @@ class MessageLocalRepository @Inject constructor(
     suspend fun sendTextMessage(conversationId: String, text: String): Message {
         val currentUserId = userRepository.currentUserId.value ?: 0L
         val message = Message(
-            messageId = "MSG_${System.currentTimeMillis()}",
+            clientMsgId = "LOCAL_${UUID.randomUUID()}",
             senderId = currentUserId,
             type = Message.MessageType.TEXT,
             content = text.trim(),
@@ -87,7 +130,7 @@ class MessageLocalRepository @Inject constructor(
     suspend fun sendImageMessage(conversationId: String, mediaUrl: String): Message {
         val currentUserId = userRepository.currentUserId.value ?: 0L
         val message = Message(
-            messageId = "MSG_${System.currentTimeMillis()}",
+            clientMsgId = "LOCAL_${UUID.randomUUID()}",
             senderId = currentUserId,
             type = Message.MessageType.IMAGE,
             mediaUrl = mediaUrl,
@@ -107,29 +150,37 @@ class MessageLocalRepository @Inject constructor(
         val mergedMessages = (
             messageDao.getMessageEntitiesByConversationId(conversationId).map { it.toDomain() } + messages
             )
-            .associateBy { it.messageId }
+            .associateBy { it.serverMsgId ?: it.clientMsgId }
             .values
-            .sortedWith(compareBy<Message> { it.timestamp }.thenBy { it.messageId })
+            .sortedWith(compareBy<Message> { it.serverTimestamp ?: it.timestamp }.thenBy { it.clientMsgId })
         Log.d(
             TAG,
-            "upsert message_content batch: conversationId=$conversationId, mergedCount=${mergedMessages.size}, messageIds=${mergedMessages.map { it.messageId }}"
+            "upsert message_content batch: conversationId=$conversationId, mergedCount=${mergedMessages.size}, clientMsgIds=${mergedMessages.map { it.clientMsgId }}, serverMsgIds=${mergedMessages.map { it.serverMsgId }}"
         )
         messageDao.upsertMessages(mergedMessages.map { it.toEntity(conversationId) })
         mergedMessages.lastOrNull()?.let { lastMessage ->
-            conversationDao.updateLastMessage(conversationId, lastMessage.messageId, lastMessage.timestamp)
+            conversationDao.updateLastMessage(
+                conversationId,
+                lastMessage.clientMsgId,
+                lastMessage.serverTimestamp ?: lastMessage.timestamp
+            )
         }
     }
 
-    suspend fun hasMessage(messageId: String): Boolean {
-        return messageDao.countByMessageId(messageId) > 0
+    suspend fun hasMessage(clientMsgId: String): Boolean {
+        return messageDao.countByClientMsgId(clientMsgId) > 0
+    }
+
+    suspend fun hasServerMessage(serverMsgId: String): Boolean {
+        return messageDao.countByServerMsgId(serverMsgId) > 0
     }
 
     suspend fun markConversationReadForUser(conversationId: String, userId: Long, lastReadTime: Long?) {
         conversationUserStateDao.markRead(conversationId, userId, lastReadTime)
     }
 
-    suspend fun deleteMessage(messageId: String) {
-        messageDao.deleteMessageById(messageId)
+    suspend fun deleteMessage(clientMsgId: String) {
+        messageDao.deleteMessageByClientMsgId(clientMsgId)
     }
 
     suspend fun deleteMessagesByConversation(conversationId: String) {

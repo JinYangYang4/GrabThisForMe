@@ -242,7 +242,7 @@ class FragmentChat : Fragment(), BottomSheetDialogPhoto.OnPhotosSelectedListener
                     .filter { it.type == com.example.grabthisforme.model.message.domain.Message.MessageType.IMAGE }
                     .filter { !it.mediaUrl.isNullOrBlank() }
                 val imageUrls = imageMessages.mapNotNull { it.mediaUrl }
-                val initialIndex = imageMessages.indexOfFirst { it.messageId == imageMessage.messageId }
+                val initialIndex = imageMessages.indexOfFirst { it.clientMsgId == imageMessage.clientMsgId }
                     .takeIf { it >= 0 }
                     ?: 0
                 val previewDialog = PhotoPreviewDialog.newInstance(imageUrls, initialIndex)

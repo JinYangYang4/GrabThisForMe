@@ -1,8 +1,10 @@
 package com.example.grabthisforme.activity.fragment_misc.chat_fragment.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -20,6 +22,9 @@ class ChatMessageRecyclerViewAdapter(
     private val onImageClick: OnImageClick,
     private val onPeerAvatarClick: OnPeerAvatarClick
 ) : ListAdapter<MessageUiModel, ChatMessageRecyclerViewAdapter.ViewHolder>(MessageDiffCallback()) {
+    companion object {
+        private const val SEND_INDICATOR_DELAY_MILLIS = 1_000L
+    }
 
     inner class ViewHolder(private val binding: RvChatMessageItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -31,6 +36,8 @@ class ChatMessageRecyclerViewAdapter(
                 bindPeerMessage(message)
             }
 
+            bindSendState(message)
+
             if (message.showTime) {
                 binding.llTime.visibility = View.VISIBLE
                 binding.tvTime.text = message.timeText
@@ -40,6 +47,57 @@ class ChatMessageRecyclerViewAdapter(
 
             binding.root.setOnClickListener {
                 clickListener.invoke(message)
+            }
+        }
+
+        private fun bindSendState(message: MessageUiModel) {
+            if (!message.isMine) {
+                binding.flSendState.visibility = View.GONE
+                binding.ivSending.clearAnimation()
+                return
+            }
+
+            val shouldShowDelayedSending = message.status == Message.MessageStatus.SENDING &&
+                System.currentTimeMillis() - message.timestamp >= SEND_INDICATOR_DELAY_MILLIS
+
+            when {
+                shouldShowDelayedSending -> {
+                    binding.flSendState.visibility = View.VISIBLE
+                    binding.ivSending.visibility = View.VISIBLE
+                    binding.tvSendFailed.visibility = View.GONE
+                    binding.ivSending.startAnimation(
+                        AnimationUtils.loadAnimation(binding.root.context, R.anim.anim_rotate_infinite)
+                    )
+                }
+
+                message.showFailedIndicator -> {
+                    binding.flSendState.visibility = View.VISIBLE
+                    binding.ivSending.clearAnimation()
+                    binding.ivSending.visibility = View.GONE
+                    binding.tvSendFailed.visibility = View.VISIBLE
+                }
+
+                message.status == Message.MessageStatus.SENDING -> {
+                    binding.flSendState.visibility = View.GONE
+                    binding.ivSending.clearAnimation()
+                    val remainingDelay = (SEND_INDICATOR_DELAY_MILLIS -
+                        (System.currentTimeMillis() - message.timestamp)).coerceAtLeast(0L)
+                    binding.root.postDelayed({
+                        val adapterPosition = bindingAdapterPosition
+                        if (adapterPosition == RecyclerView.NO_POSITION) return@postDelayed
+                        val currentMessage = getItem(adapterPosition)
+                        if (currentMessage.clientMsgId == message.clientMsgId &&
+                            currentMessage.status == Message.MessageStatus.SENDING
+                        ) {
+                            notifyItemChanged(adapterPosition)
+                        }
+                    }, remainingDelay)
+                }
+
+                else -> {
+                    binding.flSendState.visibility = View.GONE
+                    binding.ivSending.clearAnimation()
+                }
             }
         }
 
@@ -122,7 +180,8 @@ class ChatMessageRecyclerViewAdapter(
 
     class MessageDiffCallback : DiffUtil.ItemCallback<MessageUiModel>() {
         override fun areItemsTheSame(oldItem: MessageUiModel, newItem: MessageUiModel): Boolean {
-            return oldItem.messageId == newItem.messageId
+            Log.d("MessageDiffCallback", "areItemsTheSame:${oldItem.clientMsgId == newItem.clientMsgId}")
+            return oldItem.clientMsgId == newItem.clientMsgId
         }
 
         override fun areContentsTheSame(oldItem: MessageUiModel, newItem: MessageUiModel): Boolean {

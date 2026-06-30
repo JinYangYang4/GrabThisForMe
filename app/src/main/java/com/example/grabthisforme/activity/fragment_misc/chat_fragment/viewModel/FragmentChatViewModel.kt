@@ -112,7 +112,9 @@ class FragmentChatViewModel @Inject constructor(
         viewModelScope.launch {
             messageRepository.setActiveConversation(conversationId)
             messageRepository.refreshConversationMessages(conversationId)
-            val lastSeenTime = conversationRepository.getConversationById(conversationId)?.lastMessage?.timestamp
+            val lastSeenTime = conversationRepository.getConversationById(conversationId)?.lastMessage?.let { message ->
+                message.serverTimestamp ?: message.timestamp
+            }
             conversationRepository.markConversationAsRead(conversationId, lastSeenTime)
         }
     }
@@ -163,15 +165,17 @@ class FragmentChatViewModel @Inject constructor(
         }
     }
 
-    fun deleteMessage(messageId: String) {
+    fun deleteMessage(clientMsgId: String) {
         viewModelScope.launch {
-            messageRepository.deleteMessage(messageId)
+            messageRepository.deleteMessage(clientMsgId)
         }
     }
 
     fun markCurrentConversationAsRead() {
         val conversationId = conversationIdFlow.value ?: return
-        val lastSeenTime = currentConversation.value?.lastMessage?.timestamp
+        val lastSeenTime = currentConversation.value?.lastMessage?.let { message ->
+            message.serverTimestamp ?: message.timestamp
+        }
         viewModelScope.launch {
             conversationRepository.markConversationAsRead(conversationId, lastSeenTime)
         }

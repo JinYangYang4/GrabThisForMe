@@ -29,12 +29,14 @@ import com.example.grabthisforme.model.user.data.local.entity.UserAccountEntity
     ]
 )
 data class MessageEntity(
-    @PrimaryKey val messageId: String,
+    @PrimaryKey val clientMsgId: String,
+    val serverMsgId: String? = null,
     val conversationId: String,
     val senderId: Long? = null,
     val type: String,
     val content: String? = null,
     val mediaUrl: String? = null,
     val timestamp: Long,
+    val serverTimestamp: Long? = null,
     val status: String
 )

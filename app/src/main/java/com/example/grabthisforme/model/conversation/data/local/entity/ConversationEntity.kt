@@ -58,7 +58,7 @@ data class ConversationBundleEntity(
     @Embedded val conversation: ConversationEntity,
     @Relation(
         parentColumn = "lastMessageId",
-        entityColumn = "messageId"
+        entityColumn = "clientMsgId"
     )
     val lastMessage: MessageEntity?
 )

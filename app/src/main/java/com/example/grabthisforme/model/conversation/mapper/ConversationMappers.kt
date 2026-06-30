@@ -99,7 +99,7 @@ fun Conversation.toEntity(): ConversationEntity {
         conversationId = conversationId,
         conversationType = type.asStoredName(),
         targetId = targetIdOrNull(),
-        lastMessageId = lastMessage?.messageId,
+        lastMessageId = lastMessage?.clientMsgId,
         lastTime = lastTime
     )
 }

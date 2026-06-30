@@ -12,12 +12,13 @@ class MessageRemoteRepository @Inject constructor(
     private val messageApi: MessageApi
 ) {
 
-    suspend fun sendTextMessage(conversationId: String, text: String): Result<Message> {
+    suspend fun sendTextMessage(conversationId: String, clientMsgId: String, text: String): Result<Message> {
         return runCatching {
             requireSuccessfulMessage(
                 messageApi.sendMessage(
                     conversationId = conversationId,
                     request = SendMessageRequest(
+                        clientMsgId = clientMsgId,
                         type = Message.MessageType.TEXT.name,
                         content = text.trim()
                     )
@@ -26,12 +27,13 @@ class MessageRemoteRepository @Inject constructor(
         }
     }
 
-    suspend fun sendImageMessage(conversationId: String, mediaUrl: String): Result<Message> {
+    suspend fun sendImageMessage(conversationId: String, clientMsgId: String, mediaUrl: String): Result<Message> {
         return runCatching {
             requireSuccessfulMessage(
                 messageApi.sendMessage(
                     conversationId = conversationId,
                     request = SendMessageRequest(
+                        clientMsgId = clientMsgId,
                         type = Message.MessageType.IMAGE.name,
                         mediaUrl = mediaUrl
                     )
