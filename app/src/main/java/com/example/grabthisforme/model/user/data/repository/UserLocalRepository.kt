@@ -1,6 +1,4 @@
 package com.example.grabthisforme.model.user.data.repository
-
-import android.util.Log
 import com.example.grabthisforme.model.relation.data.dao.UserRelationDao
 import com.example.grabthisforme.model.relation.data.entity.UserLikedGoodsEntity
 import com.example.grabthisforme.model.relation.data.entity.UserLikedPostEntity
@@ -49,19 +47,10 @@ class UserLocalRepository @Inject constructor(
         val existingIds = userDao.getUserBasicBundlesByIds(distinctUsers.map { it.id })
             .map { it.account.userId }
             .toSet()
-        Log.d(
-            TAG,
-            "ensureCachedUsers start: requested=${distinctUsers.map { it.id }}, existing=${existingIds.toList()}"
-        )
-
         distinctUsers
             .filterNot { user -> existingIds.contains(user.id) }
             .forEach { user ->
                 val resolved = resolvePersistedUser(user)
-                Log.d(
-                    TAG,
-                    "cache user insert: userId=${resolved.id}, accountName=${resolved.accountName}, isLoginAccount=${resolved.isLoginAccount}"
-                )
                 userDao.saveUser(resolved)
             }
     }
@@ -201,3 +190,4 @@ class UserLocalRepository @Inject constructor(
         return userRelationDao.getUserPostsByUserId(userId).map { it.postId }
     }
 }
+

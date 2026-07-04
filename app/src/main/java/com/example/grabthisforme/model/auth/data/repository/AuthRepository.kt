@@ -1,6 +1,4 @@
 package com.example.grabthisforme.model.auth.data.repository
-
-import android.util.Log
 import com.example.grabthisforme.model.auth.data.network.api.AuthApi
 import com.example.grabthisforme.model.auth.data.network.dto.LoginRequest
 import com.example.grabthisforme.model.auth.data.network.dto.RegisterRequest
@@ -60,7 +58,6 @@ class AuthRepository @Inject constructor(
             )
 
             val data = requireSuccessfulData(response.code, response.message, response.data)
-            Log.d("test11", "saveToken: ${data.token}")
             authTokenDataStore.saveToken(data.token)
             val user = data.user.toDomain(
                 passwordHash = password,
@@ -92,3 +89,4 @@ class AuthRepository @Inject constructor(
         return this
     }
 }
+

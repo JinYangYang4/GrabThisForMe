@@ -5,6 +5,7 @@ import com.example.grabthisforme.model.friendAndGroup.Group
 import com.example.grabthisforme.model.friendAndGroup.data.local.dao.FriendAndGroupDao
 import com.example.grabthisforme.model.friendAndGroup.data.local.entity.UserFriendRelationEntity
 import com.example.grabthisforme.model.friendAndGroup.data.local.entity.UserGroupRelationEntity
+import com.example.grabthisforme.model.friendAndGroup.data.network.dto.FriendRequestDto
 import com.example.grabthisforme.model.friendAndGroup.data.network.dto.GroupDto
 import com.example.grabthisforme.model.friendAndGroup.mapper.toDomain
 import com.example.grabthisforme.model.friendAndGroup.mapper.toEntity
@@ -89,6 +90,34 @@ class FriendAndGroupLocalRepository @Inject constructor(
             initialValue = emptySet()
         )
 
+    val currentUserPendingFriendRequests: StateFlow<List<Friend>> = userRepository.currentUserId
+        .flatMapLatest { currentUserId ->
+            if (currentUserId == null) {
+                flowOf(emptyList())
+            } else {
+                friendAndGroupDao.observePendingFriendRelationsByUserId(currentUserId)
+                    .flatMapLatest { relations ->
+                        val friendIds = relations.map { it.friendUserId }.distinct()
+                        if (friendIds.isEmpty()) {
+                            flowOf(emptyList())
+                        } else {
+                            userDao.observeUserBasicBundlesByIds(friendIds)
+                                .map { bundles ->
+                                    val usersById = bundles.map { it.toDomain() }.associateBy { it.id }
+                                    relations.mapNotNull { relation ->
+                                        usersById[relation.friendUserId]?.let(relation::toDomain)
+                                    }
+                                }
+                        }
+                    }
+            }
+        }
+        .stateIn(
+            scope = repositoryScope,
+            started = SharingStarted.Eagerly,
+            initialValue = emptyList()
+        )
+
     val allGroups: StateFlow<List<Group>> = combine(
         friendAndGroupDao.observeAllGroups(),
         friendAndGroupDao.observeAllUserGroupRelations()
@@ -149,22 +178,26 @@ class FriendAndGroupLocalRepository @Inject constructor(
         ensureGroupExists(group.groupId, group.groupName)
     }
 
-    suspend fun addFriend(friendUserId: Long) {
+    suspend fun addFriend(friendUserId: Long, friendUser: User? = null) {
         val currentUserId = userRepository.currentUserId.value ?: return
         if (currentUserId == friendUserId) return
-        val friendUser = userDao.getUserBasicBundlesByIds(listOf(friendUserId))
+        val cachedFriendUser = friendUser ?: userDao.getUserBasicBundlesByIds(listOf(friendUserId))
             .firstOrNull()
             ?.toDomain()
-        if (friendUser == null) return
+        if (cachedFriendUser == null) return
         val now = System.currentTimeMillis()
         val relation = UserFriendRelationEntity(
             userId = currentUserId,
             friendUserId = friendUserId,
-            status = Friend.FriendStatus.ACCEPTED.name,
+            status = Friend.FriendStatus.PENDING_SENT.name,
             addedTime = now
         )
-        val reverseRelation = relation.copy(userId = friendUserId, friendUserId = currentUserId)
-        ensureUsersExist(listOf(friendUser))
+        val reverseRelation = relation.copy(
+            userId = friendUserId,
+            friendUserId = currentUserId,
+            status = Friend.FriendStatus.PENDING_RECEIVED.name
+        )
+        ensureUsersExist(listOf(cachedFriendUser))
         friendAndGroupDao.upsertFriendRelations(listOf(relation, reverseRelation))
     }
 
@@ -193,6 +226,36 @@ class FriendAndGroupLocalRepository @Inject constructor(
                 )
             }
             friendAndGroupDao.upsertFriendRelations(relationsToUpsert)
+        }
+    }
+
+    suspend fun syncCurrentUserFriendRequests(requests: List<FriendRequestDto>) {
+        val currentUserId = userRepository.currentUserId.value ?: return
+        val requestUsers = requests.mapNotNull { request -> request.user?.userDtoToDomain() }
+        ensureUsersExist(requestUsers)
+
+        val existingRelations = friendAndGroupDao.getFriendRelationsByUserId(currentUserId)
+        val existingPendingByFriendId = existingRelations
+            .filter { relation -> relation.status != Friend.FriendStatus.ACCEPTED.name }
+            .associateBy { it.friendUserId }
+        val remotePendingIds = requests.map { it.userId }.toSet()
+
+        val stalePendingIds = existingPendingByFriendId.keys - remotePendingIds
+        if (stalePendingIds.isNotEmpty()) {
+            friendAndGroupDao.deleteFriendRelations(currentUserId, stalePendingIds.toList())
+        }
+
+        if (requests.isNotEmpty()) {
+            val pendingRelations = requests.map { request ->
+                val existing = existingPendingByFriendId[request.userId]
+                UserFriendRelationEntity(
+                    userId = currentUserId,
+                    friendUserId = request.userId,
+                    status = request.status,
+                    addedTime = existing?.addedTime ?: request.addedTime
+                )
+            }
+            friendAndGroupDao.upsertFriendRelations(pendingRelations)
         }
     }
 

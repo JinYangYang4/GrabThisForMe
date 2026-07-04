@@ -84,6 +84,9 @@
         <action
             android:id="@+id/action_blankFragment_to_personalInformation"
             app:destination="@id/personalInformation" />
+        <action
+            android:id="@+id/action_blankFragment_to_newFriendFragment"
+            app:destination="@id/newFriendFragment" />
     </fragment>
     <fragment
         android:id="@+id/fragmentSignIn"
@@ -238,6 +241,15 @@
         <action
             android:id="@+id/action_fragmentSearchFriendOrGroupOrConversation_to_groupDetailFragment"
             app:destination="@id/groupDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/newFriendFragment"
+        android:name="com.example.grabthisforme.activity.fragment_misc.new_friend.view.NewFriendFragment"
+        android:label="NewFriendFragment"
+        tools:layout="@layout/fragment_new_friend">
+        <action
+            android:id="@+id/action_newFriendFragment_to_userDetailFragment"
+            app:destination="@id/userDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/userDetailFragment"

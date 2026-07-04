@@ -5,6 +5,6 @@ import androidx.annotation.DrawableRes
 data class AnchoredActionMenuItem(
     val id: String,
     val title: String,
-    @DrawableRes val iconRes: Int,
-    @DrawableRes val iconBackgroundRes: Int
+    @param:DrawableRes val iconRes: Int,
+    @param:DrawableRes val iconBackgroundRes: Int
 )

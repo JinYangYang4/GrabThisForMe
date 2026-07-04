@@ -1,6 +1,4 @@
 package com.example.grabthisforme.model.post.data.repository
-
-import android.util.Log
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Comment
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Reply
 import com.example.grabthisforme.model.post.domain.Post
@@ -37,12 +35,10 @@ class PostRepository @Inject constructor(
         result.onSuccess { page ->
             localRepository.savePosts(page.items)
             _allPostList.value = page.items.sortedByDescending { it.createTime }
-            Log.d("test11", "refreshPosts: ${page.items.size}")
         }
         return result.getOrElse {
             val localPosts = localRepository.allPostList.value
             _allPostList.value = localPosts
-            Log.d("test11", "refreshPosts: ${it.message}")
             PostRemoteRepository.CursorPage(
                 items = localPosts,
                 hasMore = false
@@ -76,7 +72,6 @@ class PostRepository @Inject constructor(
                 localRepository.savePost(remotePost)
             }
             .onFailure {
-                Log.e("com.example.grabthisforme.model.post.data.repository.getPost", "e:${it.message}")
             }
         emitAll(localRepository.getPost(postId))
     }
@@ -93,7 +88,6 @@ class PostRepository @Inject constructor(
                 localRepository.cacheComments(postId, page.items)
             }
             .onFailure {
-                Log.e("com.example.grabthisforme.model.post.data.repository.getCommentPage", "e:${it.message}")
             }
             .getOrElse {
                 PostRemoteRepository.CursorPage(
@@ -112,10 +106,8 @@ class PostRepository @Inject constructor(
         return remoteRepository.getReplies(postId, commentId, limit, beforeTime)
             .onSuccess { page ->
                 localRepository.cacheReplies(postId, commentId, page.items)
-                Log.d("test11", "getReplyPage: ${page.items.size}")
             }
             .getOrElse {
-                Log.d("test11", "getReplyPage: ${it.message}")
                 PostRemoteRepository.CursorPage(
                     items = localRepository.getReplyPage(commentId, limit),
                     hasMore = false
@@ -283,3 +275,4 @@ class PostRepository @Inject constructor(
         private const val DEFAULT_POST_PAGE_SIZE = 20
     }
 }
+

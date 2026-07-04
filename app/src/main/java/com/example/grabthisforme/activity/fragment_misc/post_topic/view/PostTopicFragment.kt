@@ -237,7 +237,10 @@ class PostTopicFragment : Fragment() {
             binding.cgCustomTags.addView(
                 Chip(requireContext()).apply {
                     text = tag
-                    chipCornerRadius = 30f
+                    shapeAppearanceModel = shapeAppearanceModel
+                        .toBuilder()
+                        .setAllCornerSizes(30f)
+                        .build()
                     chipStrokeWidth = 0f
                     isCloseIconVisible = true
                     isCheckable = false

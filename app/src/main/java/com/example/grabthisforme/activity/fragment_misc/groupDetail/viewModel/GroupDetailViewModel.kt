@@ -1,6 +1,4 @@
 package com.example.grabthisforme.activity.fragment_misc.groupDetail.viewModel
-
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -48,7 +46,7 @@ class GroupDetailViewModel @Inject constructor(
                     groupId = group.groupId,
                     groupName = group.groupName,
                     memberCountText = "${group.members.size} 位成员",
-                    statusText = if (joined) "你已加入这个群聊，可直接查看讨论" else "还未加入，可先加入再参与互助",
+                    statusText = if (joined) "你已加入这个群聊，可直接查看讨论" else "还未加入，可先加群再参与互助",
                     primaryActionText = if (joined) "退出群聊" else "加入群聊",
                     secondaryActionText = if (joined) "进入群聊" else "临时会话",
                     isJoined = joined,
@@ -88,8 +86,7 @@ class GroupDetailViewModel @Inject constructor(
             ).onSuccess { conversation ->
                 _openConversationId.value = conversation.conversationId
             }.onFailure { throwable ->
-                Log.e("GroupDetailViewModel", "open group conversation failed", throwable)
-                _errorMessage.value = "打开群聊失败"
+                _errorMessage.value = "鎵撳紑缇よ亰澶辫触"
             }
         }
     }

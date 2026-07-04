@@ -1,12 +1,12 @@
 package com.example.grabthisforme.activity.informationFragment.adapter
 
-import com.example.grabthisforme.R
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.grabthisforme.R
 import com.example.grabthisforme.databinding.ItemContactBinding
 import com.example.grabthisforme.databinding.ItemGroupHeaderBinding
 import com.example.grabthisforme.model.friendAndGroup.ContactItem
@@ -16,16 +16,16 @@ class AllFriendOrGroupRecyclerViewAdapter(
 ) : ListAdapter<ContactItem, RecyclerView.ViewHolder>(ContactItemDiffCallback()) {
 
     companion object {
-        const val TYPE_FRIEND_HEADER = 0
-        const val TYPE_CONTACT = 1
-        const val TYPE_GROUP_HEADER = 2
+        private const val TYPE_FRIEND_HEADER = 0
+        private const val TYPE_CONTACT = 1
+        private const val TYPE_GROUP_HEADER = 2
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            TYPE_FRIEND_HEADER -> FriendHeaderViewHolder.inflateFrom(parent)
+            TYPE_FRIEND_HEADER -> HeaderViewHolder.inflateFrom(parent)
+            TYPE_GROUP_HEADER -> HeaderViewHolder.inflateFrom(parent)
             TYPE_CONTACT -> ContactViewHolder.inflateFrom(parent)
-            TYPE_GROUP_HEADER -> GroupHeaderViewHolder.inflateFrom(parent)
             else -> throw IllegalArgumentException("Unknown viewType")
         }
     }
@@ -33,9 +33,13 @@ class AllFriendOrGroupRecyclerViewAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
         when (holder) {
-            is FriendHeaderViewHolder -> holder.bind(item as ContactItem.FriendHeader)
+            is HeaderViewHolder -> when (item) {
+                is ContactItem.FriendHeader -> holder.bind(item.title)
+                is ContactItem.GroupHeader -> holder.bind(item.title)
+                else -> Unit
+            }
+
             is ContactViewHolder -> holder.bind(item, onItemClickListener)
-            is GroupHeaderViewHolder -> holder.bind(item as ContactItem.GroupHeader)
         }
     }
 
@@ -47,28 +51,32 @@ class AllFriendOrGroupRecyclerViewAdapter(
         }
     }
 
-    // Friend Header ViewHolder
-    class FriendHeaderViewHolder(val binding: ItemGroupHeaderBinding) : RecyclerView.ViewHolder(binding.root) {
+    class HeaderViewHolder(
+        private val binding: ItemGroupHeaderBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+
         companion object {
-            fun inflateFrom(parent: ViewGroup): FriendHeaderViewHolder {
-                val layoutInflater = LayoutInflater.from(parent.context)
-                val binding = ItemGroupHeaderBinding.inflate(layoutInflater, parent, false)
-                return FriendHeaderViewHolder(binding)
+            fun inflateFrom(parent: ViewGroup): HeaderViewHolder {
+                val inflater = LayoutInflater.from(parent.context)
+                return HeaderViewHolder(
+                    ItemGroupHeaderBinding.inflate(inflater, parent, false)
+                )
             }
         }
 
-        fun bind(header: ContactItem.FriendHeader) {
-            binding.tvGroupName.text = header.title
+        fun bind(title: String) {
+            binding.tvGroupName.text = title
         }
     }
 
-    // Contact ViewHolder (friend or group)
-    class ContactViewHolder(val binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ContactViewHolder(
+        private val binding: ItemContactBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+
         companion object {
             fun inflateFrom(parent: ViewGroup): ContactViewHolder {
-                val layoutInflater = LayoutInflater.from(parent.context)
-                val binding = ItemContactBinding.inflate(layoutInflater, parent, false)
-                return ContactViewHolder(binding)
+                val inflater = LayoutInflater.from(parent.context)
+                return ContactViewHolder(ItemContactBinding.inflate(inflater, parent, false))
             }
         }
 
@@ -83,33 +91,19 @@ class AllFriendOrGroupRecyclerViewAdapter(
                     binding.vOnlineIndicator.visibility = View.VISIBLE
                     binding.flGroupBadge.visibility = View.GONE
                     binding.ivAvatar.setImageResource(R.drawable.ic_back_charactor2)
-                    binding.root.setOnClickListener { clickListener(item) }
                 }
+
                 is ContactItem.GroupItem -> {
                     binding.tvContactName.text = item.group.groupName
                     binding.tvContactSignature.visibility = View.GONE
                     binding.vOnlineIndicator.visibility = View.GONE
                     binding.flGroupBadge.visibility = View.VISIBLE
                     binding.ivAvatar.setImageResource(R.drawable.ic_back_charactor2)
-                    binding.root.setOnClickListener { clickListener(item) }
                 }
-                else -> {}
-            }
-        }
-    }
 
-    // Group Header ViewHolder
-    class GroupHeaderViewHolder(val binding: ItemGroupHeaderBinding) : RecyclerView.ViewHolder(binding.root) {
-        companion object {
-            fun inflateFrom(parent: ViewGroup): GroupHeaderViewHolder {
-                val layoutInflater = LayoutInflater.from(parent.context)
-                val binding = ItemGroupHeaderBinding.inflate(layoutInflater, parent, false)
-                return GroupHeaderViewHolder(binding)
+                else -> return
             }
-        }
-
-        fun bind(header: ContactItem.GroupHeader) {
-            binding.tvGroupName.text = header.title
+            binding.root.setOnClickListener { clickListener(item) }
         }
     }
 

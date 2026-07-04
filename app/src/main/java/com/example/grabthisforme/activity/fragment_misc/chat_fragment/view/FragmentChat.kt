@@ -8,7 +8,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -192,7 +191,6 @@ class FragmentChat : Fragment(), BottomSheetDialogPhoto.OnPhotosSelectedListener
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     chatViewModel.messages.collect { messages ->
-                        Log.d("test11", "initObserve: ${messages.size}")
                         chatAdapter.submitList(messages)
                         if (messages.isNotEmpty()) {
                             binding.rvChatMessages.post {
@@ -203,8 +201,8 @@ class FragmentChat : Fragment(), BottomSheetDialogPhoto.OnPhotosSelectedListener
                 }
                 launch {
                     chatViewModel.conversationUiModel.collect { uiModel ->
-                        binding.tvName.text = uiModel?.title ?: "聊天"
-                        binding.tvChatSubtitle.text = uiModel?.subtitle ?: "点击头像查看详细资料"
+                        binding.tvName.text = uiModel?.title ?: "鑱婂ぉ"
+                        binding.tvChatSubtitle.text = uiModel?.subtitle ?: "鐐瑰嚮澶村儚鏌ョ湅璇︾粏璧勬枡"
                         Glide.with(this@FragmentChat)
                             .load(uiModel?.avatarUrl)
                             .placeholder(R.drawable.ic_back_charactor2)
@@ -339,7 +337,7 @@ class FragmentChat : Fragment(), BottomSheetDialogPhoto.OnPhotosSelectedListener
                         Toast.makeText(requireContext(), "拍照失败：无法获取照片", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    Toast.makeText(requireContext(), "拍照已取消或失败", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "鎷嶇収宸插彇娑堟垨澶辫触", Toast.LENGTH_SHORT).show()
                 }
             }
     }
@@ -354,8 +352,7 @@ class FragmentChat : Fragment(), BottomSheetDialogPhoto.OnPhotosSelectedListener
             )
             takePictureLauncher.launch(photoUri!!)
         } catch (exception: IOException) {
-            Toast.makeText(requireContext(), "创建照片文件失败：${exception.message}", Toast.LENGTH_SHORT).show()
-            Log.e("FragmentChat", "创建照片文件失败", exception)
+            Toast.makeText(requireContext(), "鍒涘缓鐓х墖鏂囦欢澶辫触锛?{exception.message}", Toast.LENGTH_SHORT).show()
         }
     }
 

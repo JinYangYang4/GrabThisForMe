@@ -1,5 +1,4 @@
 package com.example.grabthisforme.model.message.data.repository
-
 import com.example.grabthisforme.model.chat.data.realtime.ChatRealtimeEvent
 import com.example.grabthisforme.model.chat.data.realtime.ChatRealtimeManager
 import com.example.grabthisforme.model.conversation.data.repository.ConversationRemoteRepository
@@ -22,10 +21,11 @@ class MessageRepository @Inject constructor(
     private val conversationRemoteRepository: ConversationRemoteRepository,
     private val conversationRepository: ConversationRepository,
     private val userRepository: UserRepository,
-    chatRealtimeManager: ChatRealtimeManager
+    private val chatRealtimeManager: ChatRealtimeManager
 ) {
     companion object {
         const val MESSAGE_PAGE_SIZE = 20
+        private const val REALTIME_ACK_TAG = "RealtimeAckDiag"
     }
     private val repositoryScope = CoroutineScope(Dispatchers.IO)
     @Volatile
@@ -36,6 +36,7 @@ class MessageRepository @Inject constructor(
             chatRealtimeManager.events.collect { event ->
                 if (event is ChatRealtimeEvent.MessageReceived) {
                     handleIncomingRealtimeMessage(event.conversationId, event.message)
+                    chatRealtimeManager.ack(event.ackId)
                 }
             }
         }
@@ -188,3 +189,4 @@ class MessageRepository @Inject constructor(
         userRepository.ensureCachedUsers(cachedUsers)
     }
 }
+

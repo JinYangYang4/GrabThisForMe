@@ -14,8 +14,10 @@ fun UserFriendRelationEntity.toDomain(friendUser: User): Friend {
         addedTime = addedTime,
         status = when (status) {
             Friend.FriendStatus.ACCEPTED.name -> Friend.FriendStatus.ACCEPTED
+            Friend.FriendStatus.PENDING_SENT.name -> Friend.FriendStatus.PENDING_SENT
+            Friend.FriendStatus.PENDING_RECEIVED.name -> Friend.FriendStatus.PENDING_RECEIVED
             Friend.FriendStatus.REJECTED.name -> Friend.FriendStatus.REJECTED
-            else -> Friend.FriendStatus.PENDING
+            else -> Friend.FriendStatus.PENDING_SENT
         }
     )
 }

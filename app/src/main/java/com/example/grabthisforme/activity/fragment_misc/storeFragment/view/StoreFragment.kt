@@ -80,7 +80,7 @@ class StoreFragment : Fragment() {
                     storeViewModel.setMySelectGoosView(false)
                 } else {
                     isEnabled = false
-                    requireActivity().onBackPressed()
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
                     isEnabled = true
                 }
             }

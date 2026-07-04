@@ -7,6 +7,8 @@ data class SearchContactResultUiModel(
     val badgeText: String,
     val statusText: String,
     val actionText: String?,
+    val actionEnabled: Boolean,
     val isFriend: Boolean,
-    val isConnected: Boolean
+    val isConnected: Boolean,
+    val connectedText: String? = null
 )

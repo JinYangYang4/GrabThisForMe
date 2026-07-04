@@ -1,6 +1,4 @@
 package com.example.grabthisforme.activity.fragment_misc.userDetail.viewModel
-
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -43,7 +41,7 @@ class UserDetailViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             contactDirectoryRepository.directoryState.collectLatest { state ->
-                val friend = state.findFriend(userId) ?: return@collectLatest
+                val friend = state.findFriend(userId) ?: state.findPendingFriendRequest(userId) ?: return@collectLatest
                 val isConnected = state.isFriendConnected(userId)
                 _uiModel.value = UserDetailUiModel(
                     userId = friend.friendId,
@@ -51,15 +49,19 @@ class UserDetailViewModel @Inject constructor(
                     signature = friend.who.signature ?: "这个人很低调，但在校园生活里很靠谱",
                     phoneText = "电话：${friend.who.phone ?: "未公开"}",
                     genderText = "性别：" + when (friend.who.gender) {
-                        UserProfile.GENDER_MALE -> "男生"
-                        UserProfile.GENDER_FEMALE -> "女生"
+                        UserProfile.GENDER_MALE -> "鐢风敓"
+                        UserProfile.GENDER_FEMALE -> "濂崇敓"
                         else -> "未设置"
                     },
-                    statusText = if (isConnected) "已是联系人，可随时发消息" else "还不是联系人，可先添加再聊",
+                    statusText = if (isConnected) {
+                        "已是联系人，可随时发消息"
+                    } else {
+                        "还不是联系人，可先添加再聊天"
+                    },
                     primaryActionText = if (isConnected) "删除好友" else "添加好友",
                     secondaryActionText = if (isConnected) "发消息" else "临时会话",
                     isConnected = isConnected,
-                    accountHint = "账号 ${friend.who.accountName}",
+                    accountHint = "璐﹀彿 ${friend.who.accountName}",
                     campusHint = "适合拼单、跑腿、闲置交换这类校园轻社交场景",
                     activityHint = "最近常出现在生活区、快递站和校内互助群里",
                     groupSummary = "你们有 ${state.commonGroupsForUser(userId).size} 个共同群聊"
@@ -86,15 +88,14 @@ class UserDetailViewModel @Inject constructor(
 
     fun onSecondaryActionClick() {
         val state = contactDirectoryRepository.directoryState.value
-        val friend = state.findFriend(userId) ?: return
+        val friend = state.findFriend(userId) ?: state.findPendingFriendRequest(userId) ?: return
         viewModelScope.launch {
             conversationRepository.findOrCreateSingleConversation(friend.who)
                 .onSuccess { conversation ->
                     _openConversationId.value = conversation.conversationId
                 }
                 .onFailure { throwable ->
-                    Log.e("UserDetailViewModel", "open single conversation failed", throwable)
-                    _errorMessage.value = "打开会话失败"
+                    _errorMessage.value = "鎵撳紑浼氳瘽澶辫触"
                 }
         }
     }

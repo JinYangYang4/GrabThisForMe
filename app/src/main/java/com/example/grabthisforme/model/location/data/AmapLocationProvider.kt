@@ -13,7 +13,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 
 @Singleton
 class AmapLocationProvider @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) {
 
     suspend fun getCurrentLocation(): Result<AppLocation> {

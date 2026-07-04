@@ -1,6 +1,4 @@
 package com.example.grabthisforme.activity.informationFragment.adapter
-
-import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.grabthisforme.activity.informationFragment.view.FragmentConversation
@@ -21,3 +19,4 @@ class InformationPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragmen
         }
     }
 }
+

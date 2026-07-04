@@ -1,6 +1,4 @@
 package com.example.grabthisforme.activity.fragment_misc.postDetailFragment.viewModel
-
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -223,8 +221,6 @@ class PostDetailViewModel @Inject constructor(
                     limit = COMMENT_FETCH_LIMIT,
                     beforeTime = beforeTime
                 )
-                Log.d("test11", "loadMoreComments: ${comments.items.size}")
-
                 val previousSize = currentComments.size
                 if (comments.items.isNotEmpty()) {
                     appendComments(comments.items)
@@ -428,3 +424,4 @@ class PostDetailViewModel @Inject constructor(
         val parentReplyId: Long?
     )
 }
+

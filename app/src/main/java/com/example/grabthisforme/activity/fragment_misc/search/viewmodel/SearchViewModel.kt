@@ -1,6 +1,4 @@
 package com.example.grabthisforme.activity.fragment_misc.search.viewmodel
-
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -107,3 +105,4 @@ class SearchViewModel @Inject constructor(
         _searchInput.value = ""
     }
 }
+

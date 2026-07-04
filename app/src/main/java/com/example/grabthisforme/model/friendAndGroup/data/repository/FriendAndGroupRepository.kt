@@ -1,11 +1,10 @@
 package com.example.grabthisforme.model.friendAndGroup.data.repository
-
-import android.util.Log
 import com.example.grabthisforme.model.friendAndGroup.Friend
 import com.example.grabthisforme.model.friendAndGroup.Group
 import com.example.grabthisforme.model.friendAndGroup.data.local.entity.UserGroupRelationEntity
 import com.example.grabthisforme.model.conversation.data.repository.ConversationRepository
 import com.example.grabthisforme.model.user.data.repository.UserRepository
+import com.example.grabthisforme.model.user.domain.User
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +18,7 @@ class FriendAndGroupRepository @Inject constructor(
 ) {
     val allUsers: StateFlow<List<com.example.grabthisforme.model.user.domain.User>> = localRepository.allUsers
     val currentUserFriends: StateFlow<List<Friend>> = localRepository.currentUserFriends
+    val currentUserPendingFriendRequests: StateFlow<List<Friend>> = localRepository.currentUserPendingFriendRequests
     val currentUserFriendIds: StateFlow<Set<Long>> = localRepository.currentUserFriendIds
     val allGroups: StateFlow<List<Group>> = localRepository.allGroups
     val currentUserGroups: StateFlow<List<Group>> = localRepository.currentUserGroups
@@ -28,19 +28,13 @@ class FriendAndGroupRepository @Inject constructor(
         localRepository.upsertGroup(group)
     }
 
-    suspend fun addFriend(friendUserId: Long) {
-        Log.e(
-            "AddFriendDiag",
-            "frontend addFriend request: currentUserId=${userRepository.currentUserId.value}, friendUserId=$friendUserId"
-        )
+    suspend fun addFriend(friendUserId: Long, friendUser: User? = null) {
         remoteRepository.addFriend(friendUserId)
             .onSuccess {
                 refreshRemoteFriends()
-                conversationRepository.refreshRemoteConversations()
-                Log.e("AddFriendDiag", "frontend addFriend success: friendUserId=$friendUserId")
+                refreshRemoteFriendRequests()
             }
             .onFailure {
-                Log.e("AddFriendDiag", "frontend addFriend failed: friendUserId=$friendUserId, message=${it.message}", it)
             }
     }
 
@@ -67,6 +61,22 @@ class FriendAndGroupRepository @Inject constructor(
             }
     }
 
+    suspend fun refreshRemoteFriendRequests() {
+        remoteRepository.listFriendRequests()
+            .onSuccess { requests ->
+                localRepository.syncCurrentUserFriendRequests(requests)
+            }
+    }
+
+    suspend fun acceptFriendRequest(friendUserId: Long) {
+        remoteRepository.acceptFriend(friendUserId)
+            .onSuccess {
+                refreshRemoteFriendRequests()
+                refreshRemoteFriends()
+                conversationRepository.refreshRemoteConversations()
+            }
+    }
+
     suspend fun refreshRemoteGroups() {
         remoteRepository.listGroups()
             .onSuccess { groups ->
@@ -74,3 +84,4 @@ class FriendAndGroupRepository @Inject constructor(
             }
     }
 }
+

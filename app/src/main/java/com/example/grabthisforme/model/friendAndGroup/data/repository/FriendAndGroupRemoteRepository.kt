@@ -1,7 +1,6 @@
 package com.example.grabthisforme.model.friendAndGroup.data.repository
-
-import android.util.Log
 import com.example.grabthisforme.model.friendAndGroup.data.network.dto.GroupDto
+import com.example.grabthisforme.model.friendAndGroup.data.network.dto.FriendRequestDto
 import com.example.grabthisforme.model.user.data.network.dto.UserDto
 import com.example.grabthisforme.model.friendAndGroup.data.network.api.FriendAndGroupApi
 import javax.inject.Inject
@@ -35,6 +34,17 @@ class FriendAndGroupRemoteRepository @Inject constructor(
         }
     }
 
+    suspend fun listFriendRequests(): Result<List<FriendRequestDto>> {
+        return runCatching {
+            val response = friendAndGroupApi.listFriendRequests()
+            val data = response.data
+            if (response.code != 0 || data == null) {
+                error(response.message.ifBlank { "List friend requests failed" })
+            }
+            data
+        }
+    }
+
     suspend fun searchGroups(keyword: String): Result<List<GroupDto>> {
         return runCatching {
             val response = friendAndGroupApi.searchGroups(keyword)
@@ -57,17 +67,16 @@ class FriendAndGroupRemoteRepository @Inject constructor(
                 val errorBody = runCatching {
                     throwable.response()?.errorBody()?.string()
                 }.getOrNull()
-                Log.e(
-                    "AddFriendDiag",
-                    "addFriend http failed: code=${throwable.code()}, friendUserId=$friendUserId, errorBody=$errorBody",
-                    throwable
-                )
             } else {
-                Log.e(
-                    "AddFriendDiag",
-                    "addFriend failed: friendUserId=$friendUserId, message=${throwable.message}",
-                    throwable
-                )
+            }
+        }
+    }
+
+    suspend fun acceptFriend(friendUserId: Long): Result<Unit> {
+        return runCatching {
+            val response = friendAndGroupApi.acceptFriend(friendUserId)
+            if (response.code != 0) {
+                error(response.message.ifBlank { "Accept friend request failed" })
             }
         }
     }
@@ -81,3 +90,4 @@ class FriendAndGroupRemoteRepository @Inject constructor(
         }
     }
 }
+

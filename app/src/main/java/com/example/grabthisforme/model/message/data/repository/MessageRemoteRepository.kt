@@ -47,6 +47,6 @@ class MessageRemoteRepository @Inject constructor(
         if (response.code != 0) {
             error(response.message.ifBlank { "Network request failed" })
         }
-        return data.toDomain() ?: error("Network request returned empty message body")
+        return data.toDomain()
     }
 }

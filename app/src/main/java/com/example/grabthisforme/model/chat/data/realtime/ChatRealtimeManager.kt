@@ -1,6 +1,4 @@
 package com.example.grabthisforme.model.chat.data.realtime
-
-import android.util.Log
 import com.example.grabthisforme.di.NetworkModule
 import com.example.grabthisforme.model.conversation.data.network.dto.ConversationSocketPayloadDto
 import com.example.grabthisforme.model.message.mapper.toDomain
@@ -68,7 +66,19 @@ class ChatRealtimeManager @Inject constructor(
         isConnected = false
     }
 
-    private fun sendStompFrame(command: String, headers: Map<String, String> = emptyMap(), body: String = "") {
+    fun ack(ackId: String?) {
+        if (ackId.isNullOrBlank()) return
+        sendStompFrame(
+            command = "ACK",
+            headers = mapOf("id" to ackId)
+        )
+    }
+
+    private fun sendStompFrame(
+        command: String,
+        headers: Map<String, String> = emptyMap(),
+        body: String = ""
+    ) {
         val socket = webSocket ?: return
         val frame = buildString {
             append(command).append('\n')
@@ -91,7 +101,19 @@ class ChatRealtimeManager @Inject constructor(
                 val headerEndIndex = rawFrame.indexOf("\n\n")
                 val headerPart = if (headerEndIndex >= 0) rawFrame.substring(0, headerEndIndex) else rawFrame
                 val body = if (headerEndIndex >= 0) rawFrame.substring(headerEndIndex + 2) else ""
-                val command = headerPart.lineSequence().firstOrNull().orEmpty()
+                val headerLines = headerPart.lineSequence().toList()
+                val command = headerLines.firstOrNull().orEmpty()
+                val headers = headerLines
+                    .drop(1)
+                    .mapNotNull { line ->
+                        val separatorIndex = line.indexOf(':')
+                        if (separatorIndex <= 0) {
+                            null
+                        } else {
+                            line.substring(0, separatorIndex) to line.substring(separatorIndex + 1)
+                        }
+                    }
+                    .toMap()
 
                 when (command) {
                     "CONNECTED" -> {
@@ -102,31 +124,54 @@ class ChatRealtimeManager @Inject constructor(
                             headers = mapOf(
                                 "id" to "sub-user-queue-messages",
                                 "destination" to "/user/queue/messages",
-                                "ack" to "auto"
+                                "ack" to "client-individual"
                             )
                         )
                         _events.tryEmit(ChatRealtimeEvent.Connected)
                     }
 
                     "MESSAGE" -> {
+                        val ackId = headers["ack"] ?: headers["message-id"]
                         runCatching {
                             val payload = gson.fromJson(body, ConversationSocketPayloadDto::class.java)
-                            val message = payload.message?.toDomain() ?: return@runCatching
-                            if (payload.type == "conversation.message") {
-                                _events.tryEmit(
-                                    ChatRealtimeEvent.MessageReceived(
-                                        conversationId = payload.conversationId,
-                                        message = message
+                            when (payload.type) {
+                                "conversation.message" -> {
+                                    val message = payload.message?.toDomain() ?: return@runCatching
+                                    val conversationId = payload.conversationId ?: return@runCatching
+                                    _events.tryEmit(
+                                        ChatRealtimeEvent.MessageReceived(
+                                            conversationId = conversationId,
+                                            message = message,
+                                            ackId = ackId
+                                        )
                                     )
-                                )
+                                }
+
+                                "friend.request.received" -> {
+                                    val friendUserId = payload.friendRequest?.userId ?: return@runCatching
+                                    _events.tryEmit(
+                                        ChatRealtimeEvent.FriendRequestReceived(
+                                            friendUserId = friendUserId,
+                                            ackId = ackId
+                                        )
+                                    )
+                                }
+
+                                "friend.request.accepted" -> {
+                                    val friendUserId = payload.friendRequest?.userId ?: return@runCatching
+                                    _events.tryEmit(
+                                        ChatRealtimeEvent.FriendRequestAccepted(
+                                            friendUserId = friendUserId,
+                                            ackId = ackId
+                                        )
+                                    )
+                                }
                             }
                         }.onFailure { throwable ->
-                            Log.e("ChatRealtimeManager", "Failed to parse STOMP message body", throwable)
                         }
                     }
 
                     "ERROR" -> {
-                        Log.e("ChatRealtimeManager", "STOMP server returned ERROR frame: $body")
                     }
                 }
             }
@@ -162,3 +207,4 @@ class ChatRealtimeManager @Inject constructor(
         }
     }
 }
+

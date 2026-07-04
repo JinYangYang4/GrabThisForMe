@@ -91,8 +91,8 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:${navVersion}")
     implementation("com.contrarywind:Android-PickerView:4.1.9")
     implementation("com.google.android.material:material:1.5.0")
-    implementation ("com.github.bumptech.glide:glide:4.16.0")
-    annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
     implementation("androidx.navigation:navigation-fragment-ktx:${nav_version}")
     implementation("androidx.navigation:navigation-ui:${nav_version}")
 
@@ -110,8 +110,6 @@ dependencies {
     implementation("io.github.kyant0:backdrop:$backdrop_version")
 
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
-    implementation("com.github.bumptech.glide:glide:4.16.0")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
     implementation(libs.androidx.core.ktx)

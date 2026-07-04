@@ -1,10 +1,9 @@
 package com.example.grabthisforme.activity.informationFragment.viewmodel
-
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.example.grabthisforme.activity.informationFragment.ui_model.ConversationListItemUiModel
 import com.example.grabthisforme.activity.informationFragment.ui_model.toConversationListItemUiModel
@@ -38,6 +37,9 @@ class InformationViewModel @Inject constructor(
     val contactItems: LiveData<List<ContactItem>> = contactDirectoryRepository.directoryState
         .map { state ->
             buildList {
+                val pendingRequests = state.pendingFriendRequests.filter { request ->
+                    request.status == Friend.FriendStatus.PENDING_RECEIVED
+                }
                 val connectedFriends = state.friends.filter { friend ->
                     state.isFriendConnected(friend.friendId)
                 }
@@ -45,20 +47,36 @@ class InformationViewModel @Inject constructor(
                     state.isGroupJoined(group.groupId)
                 }
 
-                if (connectedFriends.isNotEmpty()) {
-                    add(ContactItem.FriendHeader("联系人"))
-                    connectedFriends.forEach { friend ->
-                        add(ContactItem.FriendItem(friend))
-                    }
+                add(ContactItem.FriendHeader("联系人"))
+                connectedFriends.forEach { friend ->
+                    add(ContactItem.FriendItem(friend))
                 }
 
-                if (joinedGroups.isNotEmpty()) {
-                    add(ContactItem.GroupHeader("聊群"))
-                    joinedGroups.forEach { group ->
-                        add(ContactItem.GroupItem(group))
-                    }
-
+                add(ContactItem.GroupHeader("鑱婄兢"))
+                joinedGroups.forEach { group ->
+                    add(ContactItem.GroupItem(group))
                 }
+            }
+        }
+        .asLiveData()
+
+    val newFriendUnreadCount: LiveData<Int> = contactDirectoryRepository.directoryState
+        .map { state ->
+            state.pendingFriendRequests.count { request ->
+                request.status == Friend.FriendStatus.PENDING_RECEIVED
+            }
+        }
+        .asLiveData()
+
+    val newFriendSubtitle: LiveData<String> = contactDirectoryRepository.directoryState
+        .map { state ->
+            val count = state.pendingFriendRequests.count { request ->
+                request.status == Friend.FriendStatus.PENDING_RECEIVED
+            }
+            if (count == 0) {
+                "暂时没有新的好友申请"
+            } else {
+                "你有 $count 条新的好友申请"
             }
         }
         .asLiveData()
@@ -76,8 +94,7 @@ class InformationViewModel @Inject constructor(
                     _openConversationId.value = conversation.conversationId
                 }
                 .onFailure { throwable ->
-                    Log.e("InformationViewModel", "open single conversation failed", throwable)
-                    _errorMessage.value = "打开会话失败"
+                    _errorMessage.value = "鎵撳紑浼氳瘽澶辫触"
                 }
         }
     }
@@ -90,8 +107,7 @@ class InformationViewModel @Inject constructor(
             ).onSuccess { conversation ->
                 _openConversationId.value = conversation.conversationId
             }.onFailure { throwable ->
-                Log.e("InformationViewModel", "open group conversation failed", throwable)
-                _errorMessage.value = "打开群聊失败"
+                _errorMessage.value = "鎵撳紑缇よ亰澶辫触"
             }
         }
     }
@@ -113,7 +129,8 @@ class InformationViewModel @Inject constructor(
             conversationRepository.markConversationAsRead(conversationId, lastSeenTime)
         }
     }
-    suspend fun refreshRemoteConversations(){
+
+    suspend fun refreshRemoteConversations() {
         conversationRepository.refreshRemoteConversations()
     }
 

@@ -1,7 +1,6 @@
 package com.example.grabthisforme.activity.fragment_misc.create.viewModel
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -37,7 +36,6 @@ class CreateSecondHandGoodsViewModel @Inject constructor(
 
     fun selectPhoto(uri: Uri) {
         _selectedPhotoUri.value = uri
-        Log.d("test11", "selectPhoto: ")
     }
 
     fun submitSecondhandGoods(
@@ -57,11 +55,11 @@ class CreateSecondHandGoodsViewModel @Inject constructor(
             return
         }
         if (pic.isBlank()) {
-            _createResult.value = CreateSecondhandResult(false, "请选择商品图片")
+            _createResult.value = CreateSecondhandResult(false, "璇烽€夋嫨鍟嗗搧鍥剧墖")
             return
         }
-        if (categoryText.isBlank() || categoryText == "请选择商品类别") {
-            _createResult.value = CreateSecondhandResult(false, "请选择商品类别")
+        if (categoryText.isBlank() || categoryText == "璇烽€夋嫨鍟嗗搧绫诲埆") {
+            _createResult.value = CreateSecondhandResult(false, "璇烽€夋嫨鍟嗗搧绫诲埆")
             return
         }
 
@@ -98,10 +96,10 @@ class CreateSecondHandGoodsViewModel @Inject constructor(
                 )
                 goodsRepository.saveSecondhandGoods(goods)
             }.onSuccess {
-                _createResult.postValue(CreateSecondhandResult(true, "二手商品发布成功"))
+                _createResult.postValue(CreateSecondhandResult(true, "浜屾墜鍟嗗搧鍙戝竷鎴愬姛"))
             }.onFailure {
                 _createResult.postValue(
-                    CreateSecondhandResult(false, "发布失败: ${it.message ?: "未知错误"}")
+                    CreateSecondhandResult(false, "鍙戝竷澶辫触: ${it.message ?: "鏈煡閿欒"}")
                 )
             }
         }
@@ -111,7 +109,7 @@ class CreateSecondHandGoodsViewModel @Inject constructor(
         val now = System.currentTimeMillis()
         return User(
             id = now,
-            name = "游客",
+            name = "娓稿",
             headPic = "",
             passwordHash = "",
             isCurrent = true
@@ -120,13 +118,13 @@ class CreateSecondHandGoodsViewModel @Inject constructor(
 
     private fun mapCategory(categoryText: String): Goods.GoodsCategory {
         return when (categoryText.trim()) {
-            "数码产品" -> Goods.GoodsCategory.DIGITAL
-            "服饰鞋帽" -> Goods.GoodsCategory.CLOTHING
-            "家居用品" -> Goods.GoodsCategory.HOME
-            "图书文具" -> Goods.GoodsCategory.BOOK
-            "美妆护肤" -> Goods.GoodsCategory.BEAUTY
-            "运动器材" -> Goods.GoodsCategory.SPORT
-            "食品" -> Goods.GoodsCategory.FOOD
+            "鏁扮爜浜у搧" -> Goods.GoodsCategory.DIGITAL
+            "鏈嶉グ闉嬪附" -> Goods.GoodsCategory.CLOTHING
+            "瀹跺眳鐢ㄥ搧" -> Goods.GoodsCategory.HOME
+            "鍥句功鏂囧叿" -> Goods.GoodsCategory.BOOK
+            "缇庡鎶よ偆" -> Goods.GoodsCategory.BEAUTY
+            "杩愬姩鍣ㄦ潗" -> Goods.GoodsCategory.SPORT
+            "椋熷搧" -> Goods.GoodsCategory.FOOD
             else -> Goods.GoodsCategory.OTHER
         }
     }

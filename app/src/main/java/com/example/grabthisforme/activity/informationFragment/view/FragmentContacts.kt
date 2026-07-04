@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.fragment_misc.default_entry.view.BlankFragmentDirections
 import com.example.grabthisforme.activity.informationFragment.adapter.AllFriendOrGroupRecyclerViewAdapter
 import com.example.grabthisforme.activity.informationFragment.viewmodel.InformationViewModel
@@ -49,11 +50,22 @@ class FragmentContacts : Fragment() {
             }
         }
         binding.rvAll.adapter = adapter
+        binding.llNewFriend.setOnClickListener {
+            (requireActivity() as MainActivity)
+                .intentToMiscFragment(R.id.action_blankFragment_to_newFriendFragment)
+        }
     }
 
     private fun initObserve() {
         viewModel.contactItems.observe(viewLifecycleOwner) { items ->
             adapter.submitList(items)
+        }
+        viewModel.newFriendSubtitle.observe(viewLifecycleOwner) { subtitle ->
+            binding.tvNewFriendSubtitle.text = subtitle
+        }
+        viewModel.newFriendUnreadCount.observe(viewLifecycleOwner) { count ->
+            binding.tvNewFriendBadge.visibility = if (count > 0) View.VISIBLE else View.GONE
+            binding.tvNewFriendBadge.text = count.toString()
         }
         viewModel.openConversationId.observe(viewLifecycleOwner) { conversationId ->
             if (conversationId.isNullOrBlank()) return@observe

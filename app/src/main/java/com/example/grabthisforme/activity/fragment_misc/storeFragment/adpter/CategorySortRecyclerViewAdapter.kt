@@ -1,6 +1,4 @@
 package com.example.grabthisforme.activity.fragment_misc.storeFragment.adpter
-
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -69,3 +67,4 @@ class CategorySortRecyclerViewAdapter :
         }
     }
 }
+

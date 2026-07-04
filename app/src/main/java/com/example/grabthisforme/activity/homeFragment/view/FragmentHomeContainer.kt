@@ -1,7 +1,6 @@
 package com.example.grabthisforme.activity.homeFragment.view
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -37,7 +36,6 @@ class FragmentHomeContainer : Fragment() {
         )
         containerNavHostFragment.navController.setGraph(R.navigation.nav_graph_home)
         sharedViewModel.page.observe(viewLifecycleOwner){page->
-            Log.d("test1", "onCreateView: $page")
             if (page == 1){
                 containerNavHostFragment.navController.navigate(R.id.fragmentHome1)
             }else{

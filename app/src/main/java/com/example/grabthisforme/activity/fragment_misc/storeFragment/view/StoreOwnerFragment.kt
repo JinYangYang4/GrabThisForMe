@@ -1,7 +1,6 @@
 package com.example.grabthisforme.activity.fragment_misc.storeFragment.view
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -130,7 +129,6 @@ class StoreOwnerFragment : Fragment() {
                 }
                 launch {
                     viewModel.goodsList.collectLatest { goodsList ->
-                        Log.d("test11", "initObserve:${goodsList.size}")
                         goodsAdapter.submitList(goodsList)
                     }
                 }

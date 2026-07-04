@@ -36,21 +36,23 @@ class PhotoRecyclerViewAdapter(val type : Int) : ListAdapter<PhotoItem,
             )
 
             binding.root.setOnClickListener {
+                val position = bindingAdapterPosition
+                if (position == RecyclerView.NO_POSITION) return@setOnClickListener
                 if (type == SELECT_UNLIMIT){
                     val newState = !photoItem.isSelected
-                    val currentItem = getItem(adapterPosition)
+                    val currentItem = getItem(position)
                     currentItem.isSelected = newState
-                    notifyItemChanged(adapterPosition)
+                    notifyItemChanged(position)
                 }else {
                     if (lastSelectedPos != -1) {
                         getItem(lastSelectedPos).isSelected = false
                         notifyItemChanged(lastSelectedPos)
                     }
                     val newState = !photoItem.isSelected
-                    val currentItem = getItem(adapterPosition)
+                    val currentItem = getItem(position)
                     currentItem.isSelected = newState
-                    lastSelectedPos = adapterPosition
-                    notifyItemChanged(adapterPosition)
+                    lastSelectedPos = position
+                    notifyItemChanged(position)
                 }
 
             }

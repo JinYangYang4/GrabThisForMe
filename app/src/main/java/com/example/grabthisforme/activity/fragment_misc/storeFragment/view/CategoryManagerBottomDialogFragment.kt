@@ -1,8 +1,7 @@
-ï»¿package com.example.grabthisforme.activity.fragment_misc.storeFragment.view
+package com.example.grabthisforme.activity.fragment_misc.storeFragment.view
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -100,7 +99,7 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
         bottomSheet?.setBackgroundColor(Color.TRANSPARENT)
         val behavior = bottomSheetDialog.behavior
 
-        behavior.state = BottomSheetBehavior.STATE_COLLAPSED // æ­£å¸¸å±•å¼€
+        behavior.state = BottomSheetBehavior.STATE_COLLAPSED // Õı³£Õ¹¿ª
         behavior.isDraggable =false
 
         bottomSheetDialog.window?.apply {
@@ -134,10 +133,10 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
         if (childFragmentManager.findFragmentByTag(LiquidMessageDialogFragment.TAG) != null) return
         LiquidMessageDialogFragment.show(
             fragmentManager = childFragmentManager,
-            title = "ä¿å­˜æ›´æ”¹",
-            message = "æ˜¯å¦ä¿å­˜å½“å‰åˆ†ç±»ç®¡ç†çš„æ›´æ”¹",
-            positiveText = "ç¡®è®¤æ›´æ”¹",
-            negativeText = "ä¸ä¿å­˜",
+            title = "±£´æ¸ü¸Ä",
+            message = "ÊÇ·ñ±£´æµ±Ç°·ÖÀà¹ÜÀíµÄ¸ü¸Ä",
+            positiveText = "È·ÈÏ¸ü¸Ä",
+            negativeText = "²»±£´æ",
             requestKey = CLOSE_PROMPT_REQUEST_KEY,
             cancelable = false
         )
@@ -162,25 +161,25 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun initRecyclerViews() {
-        renameAdapter = CategoryManageRecyclerViewAdapter(actionText = "é‡å‘½å") { category, position ->
+        renameAdapter = CategoryManageRecyclerViewAdapter(actionText = "ÖØÃüÃû") { category, position ->
             renameAdapter.updateSelectedPosition(position)
             renameTargetIndex = categoryList.indexOf(category)
             binding.llRenameInputContainer.visibility = View.VISIBLE
-            binding.tvRenameTarget.text = "å½“å‰åˆ†ç±»ï¼š$category"
+            binding.tvRenameTarget.text = "µ±Ç°·ÖÀà£º$category"
             binding.etRenameCategoryName.setText(category)
             binding.etRenameCategoryName.setSelection(binding.etRenameCategoryName.text?.length ?: 0)
         }
 
-        deleteAdapter = CategoryManageRecyclerViewAdapter(actionText = "åˆ é™¤") { category, _ ->
+        deleteAdapter = CategoryManageRecyclerViewAdapter(actionText = "É¾³ı") { category, _ ->
             if (isProtectedCategory(category)) {
-                Toast.makeText(requireContext(), "è¯¥åˆ†ç±»æš‚ä¸æ”¯æŒåˆ é™¤", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "¸Ã·ÖÀàÔİ²»Ö§³ÖÉ¾³ı", Toast.LENGTH_SHORT).show()
                 return@CategoryManageRecyclerViewAdapter
             }
             categoryList.remove(category)
             refreshCategoryAdapters()
             binding.llRenameInputContainer.visibility = View.GONE
             renameTargetIndex = RecyclerView.NO_POSITION
-            Toast.makeText(requireContext(), "å·²åˆ é™¤ï¼Œå•†å“å°†è½¬å…¥æœªåˆ†ç±»", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "ÒÑÉ¾³ı£¬ÉÌÆ·½«×ªÈëÎ´·ÖÀà", Toast.LENGTH_SHORT).show()
         }
 
         sortAdapter = CategorySortRecyclerViewAdapter()
@@ -257,11 +256,11 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
         binding.tvAddCategorySubmit.setOnClickListener {
             val categoryName = binding.etNewCategoryName.text?.toString().orEmpty().trim()
             if (categoryName.isBlank()) {
-                Toast.makeText(requireContext(), "åˆ†ç±»åä¸èƒ½ä¸ºç©º", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "·ÖÀàÃû²»ÄÜÎª¿Õ", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             if (categoryList.contains(categoryName)) {
-                Toast.makeText(requireContext(), "åˆ†ç±»åå·²å­˜åœ¨", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "·ÖÀàÃûÒÑ´æÔÚ", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             categoryList.add(categoryName)
@@ -279,15 +278,15 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
             if (renameTargetIndex !in categoryList.indices) return@setOnClickListener
             val newName = binding.etRenameCategoryName.text?.toString().orEmpty().trim()
             if (newName.isBlank()) {
-                Toast.makeText(requireContext(), "åˆ†ç±»åä¸èƒ½ä¸ºç©º", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "·ÖÀàÃû²»ÄÜÎª¿Õ", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             if (categoryList.contains(newName) && categoryList[renameTargetIndex] != newName) {
-                Toast.makeText(requireContext(), "åˆ†ç±»åå·²å­˜åœ¨", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "·ÖÀàÃûÒÑ´æÔÚ", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             if (isProtectedCategory(categoryList[renameTargetIndex])) {
-                Toast.makeText(requireContext(), "è¯¥åˆ†ç±»æš‚ä¸æ”¯æŒé‡å‘½å", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "¸Ã·ÖÀàÔİ²»Ö§³ÖÖØÃüÃû", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             recordRename(categoryList[renameTargetIndex], newName)
@@ -387,7 +386,6 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun showTab(tabMode: TabMode,comeFromDrag : Boolean = true) {
-        Log.d("test11", "showTab: $comeFromDrag")
         if (!comeFromDrag){
             currentTabMode = tabMode
         }
@@ -461,9 +459,10 @@ class CategoryManagerBottomDialogFragment : BottomSheetDialogFragment() {
     }
 
     private enum class TabMode(val title: String) {
-        ADD("æ–°å¢"),
-        RENAME("é‡å‘½å"),
-        DELETE("åˆ é™¤"),
-        SORT("æ’åº")
+        ADD("ĞÂÔö"),
+        RENAME("ÖØÃüÃû"),
+        DELETE("É¾³ı"),
+        SORT("ÅÅĞò")
     }
 }
+

@@ -1,6 +1,4 @@
 package com.example.grabthisforme.activity.fragment_misc.setfragment.viewmodel
-
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -103,13 +101,6 @@ class AccountSecurityViewModel @Inject constructor(
             newPassword != user.account.passwordHash &&
             isPasswordValid(newPassword)
         _canSubmit.value = canSubmitValue
-        Log.d("pwdCheck", "user是否为空: ${user == null}")
-        Log.d("pwdCheck", "原密码非空: ${originalPassword.isNotBlank()}")
-        Log.d("pwdCheck", "新密码非空: ${newPassword.isNotBlank()}")
-        Log.d("pwdCheck", "原密码匹配哈希: ${user?.account?.passwordHash}")
-        Log.d("pwdCheck", "新旧密码不一致: ${newPassword != user?.account?.passwordHash}")
-        Log.d("pwdCheck", "新密码格式合法: ${isPasswordValid(newPassword)}")
-        Log.d("pwdCheck", "最终能否提交: $canSubmitValue")
     }
 
     private fun isPasswordValid(password: String): Boolean {
@@ -125,3 +116,4 @@ data class AccountSecurityResult(
     val message: String,
     val eventId: Long = System.currentTimeMillis()
 )
+

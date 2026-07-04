@@ -1,6 +1,4 @@
 package com.example.grabthisforme.model.conversation.data.repository
-
-import android.util.Log
 import com.example.grabthisforme.model.conversation.data.local.entity.ConversationUserStateEntity
 import com.example.grabthisforme.model.conversation.data.network.dto.ConversationDto
 import com.example.grabthisforme.model.conversation.data.network.dto.ConversationParticipantDto
@@ -52,7 +50,6 @@ class ConversationRepository @Inject constructor(
         }
         return remoteRepository.createSingleConversation(peerUser.id)
             .mapCatching { dto ->
-                Log.i(TAG, "findOrCreateSingleConversation:${peerUser.id} ")
                 syncConversationFromRemote(dto)
             }
     }
@@ -96,9 +93,6 @@ class ConversationRepository @Inject constructor(
 
     suspend fun refreshRemoteConversations() {
         val conversations = remoteRepository.listConversations().getOrNull() ?: return
-
-        Log.d("test11", "refreshRemoteConversations: ${conversations.size}")
-
         val syncedConversations = conversations.map { dto ->
             syncConversationFromRemote(dto)
         }
@@ -168,10 +162,6 @@ class ConversationRepository @Inject constructor(
             Conversation.ConversationType.SINGLE -> {
                 val peerUserId = peerUsers.firstOrNull()?.id
                 if (dto.targetId == currentUserId && peerUserId != null) {
-                    Log.w(
-                        TAG,
-                        "single conversation targetId fallback: conversationId=${dto.conversationId}, dtoTargetId=${dto.targetId}, currentUserId=$currentUserId, resolvedPeerUserId=$peerUserId"
-                    )
                 }
                 peerUserId ?: dto.targetId
             }
@@ -187,10 +177,6 @@ class ConversationRepository @Inject constructor(
             ),
             lastMessage = dto.lastMessage.toDomainOrNull(),
             lastTime = dto.lastMessage?.timestamp ?: dto.lastTime
-        )
-        Log.d(
-            TAG,
-            "syncConversationFromRemote resolved: conversationId=${dto.conversationId}, type=${conversationType.name}, dtoTargetId=${dto.targetId}, resolvedTargetId=$resolvedTargetId, peerIds=${peerUsers.map { it.id }}"
         )
         localRepository.syncRemoteConversation(
             conversation = conversation,
@@ -217,3 +203,4 @@ class ConversationRepository @Inject constructor(
         )
     }
 }
+

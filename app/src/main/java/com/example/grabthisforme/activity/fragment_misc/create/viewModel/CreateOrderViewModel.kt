@@ -1,6 +1,4 @@
 package com.example.grabthisforme.activity.fragment_misc.create.viewModel
-
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -130,12 +128,12 @@ class CreateOrderViewModel @Inject constructor(
         }
 
         val goodsMessage = buildString {
-            append("快递单号: ")
+            append("蹇€掑崟鍙? ")
             append(expressNo)
-            append("；取件码: ")
+            append("锛涘彇浠剁爜: ")
             append(pickupCode)
             if (remark.isNotBlank()) {
-                append("；备注: ")
+                append("锛涘娉? ")
                 append(remark)
             }
         }
@@ -143,7 +141,7 @@ class CreateOrderViewModel @Inject constructor(
         saveOrderInternal(
             goods = Goods(
                 id = System.currentTimeMillis(),
-                name = "取件代取 - $expressCompany",
+                name = "鍙栦欢浠ｅ彇 - $expressCompany",
                 message = goodsMessage,
                 price = 0.0,
                 pic = ""
@@ -167,7 +165,6 @@ class CreateOrderViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val buyer = userRepository.currentUser.value ?: buildFallbackUser()
-                Log.d("test11", "saveOrderInternal:${userRepository.currentUser.value?.id} ")
                 val order = Order(
                     sender = null,
                     orderId = "ORDER_${System.currentTimeMillis()}",
@@ -186,14 +183,14 @@ class CreateOrderViewModel @Inject constructor(
                 _createResult.postValue(
                     CreateOrderResult(
                         success = true,
-                        message = "订单创建成功"
+                        message = "璁㈠崟鍒涘缓鎴愬姛"
                     )
                 )
             }.onFailure {
                 _createResult.postValue(
                     CreateOrderResult(
                         success = false,
-                        message = "订单创建失败: ${it.message ?: "未知错误"}"
+                        message = "璁㈠崟鍒涘缓澶辫触: ${it.message ?: "鏈煡閿欒"}"
                     )
                 )
             }
@@ -212,7 +209,7 @@ class CreateOrderViewModel @Inject constructor(
         val now = System.currentTimeMillis()
         return User(
             id = now,
-            name = "游客",
+            name = "娓稿",
             headPic = "",
             passwordHash = "",
             isCurrent = true

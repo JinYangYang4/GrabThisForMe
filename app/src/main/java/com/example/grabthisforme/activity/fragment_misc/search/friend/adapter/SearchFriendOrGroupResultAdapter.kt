@@ -59,10 +59,17 @@ class SearchFriendOrGroupResultAdapter(
             binding.vOnlineIndicator.visibility = if (item.isFriend) View.VISIBLE else View.GONE
 
             binding.tvAction.visibility = if (item.actionText.isNullOrBlank()) View.GONE else View.VISIBLE
-            binding.tvConnected.visibility = if (item.isConnected) View.VISIBLE else View.GONE
 
-            if (item.isConnected) {
-                binding.tvConnected.text = if (item.isFriend) "已添加" else "已加入"
+            val rightStatusText = item.connectedText
+                ?: if (item.isConnected) {
+                    if (item.isFriend) "已添加" else "已加入"
+                } else {
+                    null
+                }
+            binding.tvConnected.visibility = if (rightStatusText.isNullOrBlank()) View.GONE else View.VISIBLE
+
+            if (!rightStatusText.isNullOrBlank()) {
+                binding.tvConnected.text = rightStatusText
                 binding.tvConnected.backgroundTintList = ColorStateList.valueOf(
                     ContextCompat.getColor(
                         context,
@@ -83,6 +90,8 @@ class SearchFriendOrGroupResultAdapter(
                     context,
                     if (item.isFriend) R.drawable.bg_primary_pill_green else R.drawable.bg_primary_pill_orange
                 )
+                binding.tvAction.alpha = if (item.actionEnabled) 1f else 0.55f
+                binding.tvAction.isEnabled = item.actionEnabled
                 binding.tvActionText.setTextColor(ContextCompat.getColor(context, android.R.color.white))
             }
 
@@ -90,7 +99,9 @@ class SearchFriendOrGroupResultAdapter(
                 onItemClick(item.stableId)
             }
             binding.tvAction.setOnClickListener {
-                onActionClick(item.stableId)
+                if (item.actionEnabled) {
+                    onActionClick(item.stableId)
+                }
             }
         }
     }

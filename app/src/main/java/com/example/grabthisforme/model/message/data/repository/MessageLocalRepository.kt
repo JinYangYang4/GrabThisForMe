@@ -1,6 +1,4 @@
 package com.example.grabthisforme.model.message.data.repository
-
-import android.util.Log
 import com.example.grabthisforme.model.conversation.data.local.dao.ConversationDao
 import com.example.grabthisforme.model.conversation.data.local.dao.ConversationUserStateDao
 import com.example.grabthisforme.model.conversation.data.local.entity.ConversationEntity
@@ -82,15 +80,7 @@ class MessageLocalRepository @Inject constructor(
     }
 
     suspend fun upsertIncomingMessage(conversationId: String, message: Message): Message {
-        Log.d(
-            TAG,
-            "upsertIncomingMessage start: conversationId=$conversationId, clientMsgId=${message.clientMsgId}, serverMsgId=${message.serverMsgId}, senderId=${message.senderId}, timestamp=${message.timestamp}"
-        )
         ensureMessageSenderCached(message)
-        Log.d(
-            TAG,
-            "ensure conversation exists for message: conversationId=$conversationId, lastMessageId=${message.clientMsgId}"
-        )
         conversationDao.insertConversationIfNotExists(
             ConversationEntity(
                 conversationId = conversationId,
@@ -99,10 +89,6 @@ class MessageLocalRepository @Inject constructor(
                 lastMessageId = message.clientMsgId,
                 lastTime = message.serverTimestamp ?: message.timestamp
             )
-        )
-        Log.d(
-            TAG,
-            "upsert message_content: conversationId=$conversationId, clientMsgId=${message.clientMsgId}, serverMsgId=${message.serverMsgId}, senderId=${message.senderId}"
         )
         messageDao.upsertMessage(message.toEntity(conversationId))
         conversationDao.updateLastMessage(
@@ -142,10 +128,6 @@ class MessageLocalRepository @Inject constructor(
 
     suspend fun replaceMessages(conversationId: String, messages: List<Message>) {
         if (messages.isEmpty()) return
-        Log.d(
-            TAG,
-            "replaceMessages start: conversationId=$conversationId, incomingCount=${messages.size}, senderIds=${messages.map { it.senderId }.distinct()}"
-        )
         ensureMessageSendersCached(messages)
         val mergedMessages = (
             messageDao.getMessageEntitiesByConversationId(conversationId).map { it.toDomain() } + messages
@@ -153,10 +135,6 @@ class MessageLocalRepository @Inject constructor(
             .associateBy { it.serverMsgId ?: it.clientMsgId }
             .values
             .sortedWith(compareBy<Message> { it.serverTimestamp ?: it.timestamp }.thenBy { it.clientMsgId })
-        Log.d(
-            TAG,
-            "upsert message_content batch: conversationId=$conversationId, mergedCount=${mergedMessages.size}, clientMsgIds=${mergedMessages.map { it.clientMsgId }}, serverMsgIds=${mergedMessages.map { it.serverMsgId }}"
-        )
         messageDao.upsertMessages(mergedMessages.map { it.toEntity(conversationId) })
         mergedMessages.lastOrNull()?.let { lastMessage ->
             conversationDao.updateLastMessage(
@@ -227,10 +205,7 @@ class MessageLocalRepository @Inject constructor(
                         )
                     }
             }
-        Log.d(
-            TAG,
-            "ensureMessageSendersCached: senderIds=${cachedUsers.map { it.id }.distinct()}"
-        )
         userRepository.ensureCachedUsers(cachedUsers)
     }
 }
+

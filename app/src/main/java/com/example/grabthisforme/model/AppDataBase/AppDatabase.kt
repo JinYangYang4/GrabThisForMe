@@ -110,7 +110,7 @@ abstract class AppDatabase : RoomDatabase() {
                     "grab_this_for_me_core_db"
                 )
 
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration(true)
                     .build()
                 INSTANCE = instance
                 instance

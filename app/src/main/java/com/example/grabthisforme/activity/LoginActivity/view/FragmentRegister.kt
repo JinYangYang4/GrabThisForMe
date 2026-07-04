@@ -1,14 +1,10 @@
 package com.example.grabthisforme.activity.LoginActivity.view
 
 import android.content.Context
-import android.graphics.Rect
 import android.os.Bundle
-import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.view.ViewCompat
@@ -16,8 +12,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.grabthisforme.databinding.FragmentRegisterBinding
-import com.example.grabthisforme.model.network.AuthTokenDataStore
 import com.example.grabthisforme.model.auth.data.repository.AuthRepository
+import com.example.grabthisforme.model.network.AuthTokenDataStore
 import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -27,8 +23,10 @@ import kotlinx.coroutines.launch
 class FragmentRegister : Fragment() {
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
+
     @Inject
     lateinit var authRepository: AuthRepository
+
     @Inject
     lateinit var authTokenDataStore: AuthTokenDataStore
 
@@ -52,11 +50,8 @@ class FragmentRegister : Fragment() {
             insets
         }
     }
-    override fun onStop() {
-        super.onStop()
 
-    }
-    fun initClick(){
+    private fun initClick() {
         binding.layoutRegister.setOnClickListener {
             getUserItem()
         }
@@ -67,33 +62,40 @@ class FragmentRegister : Fragment() {
             clearInputFocus()
         }
     }
+
     private fun getUserItem() {
         val context = context ?: return
-        if (binding == null) return
-        val userName = binding.etUserName.text?.toString()?.trim() ?: ""
-        val password = binding.etPassword.text?.toString()?.trim() ?: ""
-        val passwordMakeSure = binding.etPasswordMakeSure.text?.toString()?.trim() ?: ""
+        val currentBinding = _binding ?: return
+        val userName = currentBinding.etUserName.text?.toString()?.trim() ?: ""
+        val password = currentBinding.etPassword.text?.toString()?.trim() ?: ""
+        val passwordMakeSure = currentBinding.etPasswordMakeSure.text?.toString()?.trim() ?: ""
+
         val isInputValid = when {
             userName.isEmpty() -> {
-                showInputError(binding.tilName, "用户名不能为空")
+                showInputError(currentBinding.tilName, "用户名不能为空")
                 false
             }
+
             password.isEmpty() -> {
-                showInputError(binding.tilPassword, "密码不能为空")
+                showInputError(currentBinding.tilPassword, "密码不能为空")
                 false
             }
+
             passwordMakeSure.isEmpty() -> {
-                showInputError(binding.tilPasswordMakeSure, "确认密码不能为空")
+                showInputError(currentBinding.tilPasswordMakeSure, "确认密码不能为空")
                 false
             }
+
             password != passwordMakeSure -> {
-                showInputError(binding.tilPasswordMakeSure, "两次输入的密码不一致")
-                binding.etPasswordMakeSure.setText("") // 直接操作EditText更简洁
+                showInputError(currentBinding.tilPasswordMakeSure, "两次输入的密码不一致")
+                currentBinding.etPasswordMakeSure.setText("")
                 false
             }
+
             else -> true
         }
         if (!isInputValid) return
+
         lifecycleScope.launch {
             val result = authRepository.register(
                 accountName = userName,
@@ -102,9 +104,8 @@ class FragmentRegister : Fragment() {
             )
             clearInputFocus()
             if (result.isSuccess) {
-                Toast.makeText(context, "用户创建成功：$userName", Toast.LENGTH_SHORT).show()
-
-                requireFragmentManager().popBackStack()
+                Toast.makeText(context, "注册成功：$userName", Toast.LENGTH_SHORT).show()
+                parentFragmentManager.popBackStack()
             } else {
                 Toast.makeText(
                     context,
@@ -114,6 +115,7 @@ class FragmentRegister : Fragment() {
             }
         }
     }
+
     private fun showInputError(textInputLayout: TextInputLayout, errorMsg: String) {
         textInputLayout.error = errorMsg
         textInputLayout.postDelayed({
@@ -122,13 +124,13 @@ class FragmentRegister : Fragment() {
         textInputLayout.editText?.requestFocus()
     }
 
-
     private fun clearInputFocus() {
         val currentFocus = requireActivity().currentFocus ?: return
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(currentFocus.windowToken, 0)
         currentFocus.clearFocus()
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

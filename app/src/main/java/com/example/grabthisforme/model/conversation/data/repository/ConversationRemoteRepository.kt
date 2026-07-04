@@ -1,6 +1,4 @@
 package com.example.grabthisforme.model.conversation.data.repository
-
-import android.util.Log
 import com.example.grabthisforme.model.conversation.data.network.api.ConversationApi
 import com.example.grabthisforme.model.conversation.data.network.api.CreateSingleConversationRequest
 import com.example.grabthisforme.model.conversation.data.network.api.MarkConversationReadRequest
@@ -84,3 +82,4 @@ class ConversationRemoteRepository @Inject constructor(
         return data
     }
 }
+

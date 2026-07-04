@@ -1,10 +1,10 @@
 package com.example.grabthisforme.activity.mainactivity.viewmodel
-
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.grabthisforme.model.chat.data.realtime.ChatRealtimeEvent
+import com.example.grabthisforme.model.chat.data.realtime.ChatRealtimeManager
 import com.example.grabthisforme.model.conversation.data.repository.ConversationRepository
 import com.example.grabthisforme.model.friendAndGroup.data.repository.FriendAndGroupRepository
 import com.example.grabthisforme.model.post.data.repository.PostRepository
@@ -20,7 +20,8 @@ class MainViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val friendAndGroupRepository: FriendAndGroupRepository,
     private val conversationRepository: ConversationRepository,
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository,
+    private val chatRealtimeManager: ChatRealtimeManager
 ) : ViewModel() {
     companion object {
         private const val TAG = "MainInitDiag"
@@ -41,7 +42,7 @@ class MainViewModel @Inject constructor(
     private val _drawerUserName = MutableLiveData("作者")
     val drawerUserName: LiveData<String> = _drawerUserName
 
-    private val _drawerAccountText = MutableLiveData("账号：1233231")
+    private val _drawerAccountText = MutableLiveData("账号：233231")
     val drawerAccountText: LiveData<String> = _drawerAccountText
     private var _currentUser = MutableLiveData<User?>()
     val currentUser : LiveData<User?> = _currentUser
@@ -68,6 +69,25 @@ class MainViewModel @Inject constructor(
                 _totalUnreadCount.postValue(unreadCount)
             }
         }
+        viewModelScope.launch {
+            chatRealtimeManager.events.collectLatest { event ->
+                when (event) {
+                    is ChatRealtimeEvent.FriendRequestReceived -> {
+                        friendAndGroupRepository.refreshRemoteFriendRequests()
+                        chatRealtimeManager.ack(event.ackId)
+                    }
+
+                    is ChatRealtimeEvent.FriendRequestAccepted -> {
+                        friendAndGroupRepository.refreshRemoteFriendRequests()
+                        friendAndGroupRepository.refreshRemoteFriends()
+                        conversationRepository.refreshRemoteConversations()
+                        chatRealtimeManager.ack(event.ackId)
+                    }
+
+                    else -> Unit
+                }
+            }
+        }
     }
 
     fun initializeMainDataIfNeeded(force: Boolean = false) {
@@ -77,24 +97,18 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             val currentUserId = userRepository.currentUserId.value
             if (currentUserId == null) {
-                Log.d(TAG, "initialize skipped: currentUserId is null")
                 return@launch
             }
             _isInitializing.postValue(true)
             _initializationError.postValue(null)
             runCatching {
-                Log.d(TAG, "initialize start: currentUserId=$currentUserId")
                 friendAndGroupRepository.refreshRemoteFriends()
-                Log.d(TAG, "friends sync complete")
+                friendAndGroupRepository.refreshRemoteFriendRequests()
                 friendAndGroupRepository.refreshRemoteGroups()
-                Log.d(TAG, "groups sync complete")
                 conversationRepository.refreshRemoteConversations()
-                Log.d(TAG, "conversations sync complete")
                 postRepository.refreshPosts()
-                Log.d(TAG, "posts sync complete")
                 hasInitializedRemoteData = true
             }.onFailure { throwable ->
-                Log.e(TAG, "initialize failed", throwable)
                 _initializationError.postValue(throwable.message ?: "初始化失败")
             }
             _isInitializing.postValue(false)

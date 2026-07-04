@@ -3,7 +3,6 @@ package com.example.grabthisforme.activity.fragment_misc.search.view
 import android.annotation.SuppressLint
 import android.graphics.Rect
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -80,7 +79,6 @@ class SearchGoodsFragment : Fragment() {
     private fun observeSearchHistory() {
         sharedViewModel.searchHistoryList.observe(viewLifecycleOwner) { list ->
             searchAdapterHistory.submitList(ArrayList(list))
-            Log.d("test11", "observeSearchHistory: ${list.size}")
             sharedViewModel.setDeleteMode(false)
         }
     }
@@ -295,3 +293,4 @@ class SearchGoodsFragment : Fragment() {
         _binding = null
     }
 }
+

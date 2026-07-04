@@ -39,6 +39,21 @@ interface FriendAndGroupDao {
     @Query("SELECT * FROM user_friend_relation WHERE userId = :userId ORDER BY addedTime DESC")
     suspend fun getFriendRelationsByUserId(userId: Long): List<UserFriendRelationEntity>
 
+    @Query(
+        """
+        SELECT * FROM user_friend_relation
+        WHERE userId = :userId
+          AND status IN (:pendingSentStatus, :pendingReceivedStatus, :rejectedStatus)
+        ORDER BY addedTime DESC
+        """
+    )
+    fun observePendingFriendRelationsByUserId(
+        userId: Long,
+        pendingSentStatus: String = "PENDING_SENT",
+        pendingReceivedStatus: String = "PENDING_RECEIVED",
+        rejectedStatus: String = "REJECTED"
+    ): Flow<List<UserFriendRelationEntity>>
+
     @Query("DELETE FROM user_friend_relation WHERE userId = :userId AND friendUserId = :friendUserId")
     suspend fun deleteFriendRelation(userId: Long, friendUserId: Long)
 

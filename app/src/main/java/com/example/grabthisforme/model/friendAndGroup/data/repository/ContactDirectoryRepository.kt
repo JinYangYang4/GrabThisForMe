@@ -15,15 +15,25 @@ import kotlinx.coroutines.launch
 
 data class ContactDirectoryState(
     val friends: List<Friend>,
+    val pendingFriendRequests: List<Friend>,
     val groups: List<Group>,
     val connectedFriendIds: Set<Long>,
+    val pendingIncomingFriendIds: Set<Long>,
+    val pendingOutgoingFriendIds: Set<Long>,
     val joinedGroupIds: Set<Long>
 ) {
     fun findFriend(friendId: Long): Friend? = friends.firstOrNull { it.friendId == friendId }
 
+    fun findPendingFriendRequest(friendId: Long): Friend? =
+        pendingFriendRequests.firstOrNull { it.friendId == friendId }
+
     fun findGroup(groupId: Long): Group? = groups.firstOrNull { it.groupId == groupId }
 
     fun isFriendConnected(friendId: Long): Boolean = connectedFriendIds.contains(friendId)
+
+    fun isPendingIncoming(friendId: Long): Boolean = pendingIncomingFriendIds.contains(friendId)
+
+    fun isPendingOutgoing(friendId: Long): Boolean = pendingOutgoingFriendIds.contains(friendId)
 
     fun isGroupJoined(groupId: Long): Boolean = joinedGroupIds.contains(groupId)
 
@@ -43,15 +53,27 @@ class ContactDirectoryRepository @Inject constructor(
 
     val directoryState: StateFlow<ContactDirectoryState> = combine(
         friendAndGroupRepository.currentUserFriends,
+        friendAndGroupRepository.currentUserPendingFriendRequests,
         friendAndGroupRepository.currentUserGroups,
         friendAndGroupRepository.currentUserGroupIds
-    ) { currentUserFriends, groups, joinedGroupIds ->
+    ) { currentUserFriends, pendingFriendRequests, groups, joinedGroupIds ->
         val connectedFriendsById = currentUserFriends.associateBy { it.friendId }
         val connectedFriendIds = connectedFriendsById.keys
+        val pendingIncomingFriendIds = pendingFriendRequests
+            .filter { request -> request.status == Friend.FriendStatus.PENDING_RECEIVED }
+            .map { request -> request.friendId }
+            .toSet()
+        val pendingOutgoingFriendIds = pendingFriendRequests
+            .filter { request -> request.status == Friend.FriendStatus.PENDING_SENT }
+            .map { request -> request.friendId }
+            .toSet()
         ContactDirectoryState(
             friends = currentUserFriends,
+            pendingFriendRequests = pendingFriendRequests,
             groups = groups,
             connectedFriendIds = connectedFriendIds,
+            pendingIncomingFriendIds = pendingIncomingFriendIds,
+            pendingOutgoingFriendIds = pendingOutgoingFriendIds,
             joinedGroupIds = joinedGroupIds
         )
     }.stateIn(
@@ -59,8 +81,11 @@ class ContactDirectoryRepository @Inject constructor(
         started = SharingStarted.Eagerly,
         initialValue = ContactDirectoryState(
             friends = emptyList(),
+            pendingFriendRequests = emptyList(),
             groups = emptyList(),
             connectedFriendIds = emptySet(),
+            pendingIncomingFriendIds = emptySet(),
+            pendingOutgoingFriendIds = emptySet(),
             joinedGroupIds = emptySet()
         )
     )
@@ -68,6 +93,12 @@ class ContactDirectoryRepository @Inject constructor(
     fun addFriend(friendId: Long) {
         repositoryScope.launch {
             friendAndGroupRepository.addFriend(friendId)
+        }
+    }
+
+    fun acceptFriendRequest(friendId: Long) {
+        repositoryScope.launch {
+            friendAndGroupRepository.acceptFriendRequest(friendId)
         }
     }
 

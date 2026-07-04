@@ -1,6 +1,4 @@
 package com.example.grabthisforme.activity.fragment_misc.chat_fragment.adapter
-
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -180,7 +178,6 @@ class ChatMessageRecyclerViewAdapter(
 
     class MessageDiffCallback : DiffUtil.ItemCallback<MessageUiModel>() {
         override fun areItemsTheSame(oldItem: MessageUiModel, newItem: MessageUiModel): Boolean {
-            Log.d("MessageDiffCallback", "areItemsTheSame:${oldItem.clientMsgId == newItem.clientMsgId}")
             return oldItem.clientMsgId == newItem.clientMsgId
         }
 
@@ -189,3 +186,4 @@ class ChatMessageRecyclerViewAdapter(
         }
     }
 }
+
