@@ -10,11 +10,11 @@ import com.example.grabthisforme.model.friendAndGroup.data.network.dto.GroupDto
 import com.example.grabthisforme.model.friendAndGroup.mapper.toDomain
 import com.example.grabthisforme.model.friendAndGroup.mapper.toEntity
 import com.example.grabthisforme.model.user.data.local.dao.UserDao
+import com.example.grabthisforme.model.user.data.network.dto.UserBriefDto
 import com.example.grabthisforme.model.user.data.repository.UserRepository
 import com.example.grabthisforme.model.user.domain.User
 import com.example.grabthisforme.model.user.mapper.toDomain
-import com.example.grabthisforme.model.user.mapper.toDomain as userDtoToDomain
-import com.example.grabthisforme.model.user.data.network.dto.UserDto
+import com.example.grabthisforme.model.user.mapper.toDomain as userBriefDtoToDomain
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
@@ -201,9 +201,9 @@ class FriendAndGroupLocalRepository @Inject constructor(
         friendAndGroupDao.upsertFriendRelations(listOf(relation, reverseRelation))
     }
 
-    suspend fun syncCurrentUserFriends(friendUsers: List<UserDto>) {
+    suspend fun syncCurrentUserFriends(friendUsers: List<UserBriefDto>) {
         val currentUserId = userRepository.currentUserId.value ?: return
-        val friendDomains = friendUsers.map { dto -> dto.userDtoToDomain() }
+        val friendDomains = friendUsers.map { dto -> dto.userBriefDtoToDomain() }
         ensureUsersExist(friendDomains)
         val existingRelations = friendAndGroupDao.getFriendRelationsByUserId(currentUserId)
         val existingByFriendId = existingRelations.associateBy { it.friendUserId }
@@ -231,7 +231,7 @@ class FriendAndGroupLocalRepository @Inject constructor(
 
     suspend fun syncCurrentUserFriendRequests(requests: List<FriendRequestDto>) {
         val currentUserId = userRepository.currentUserId.value ?: return
-        val requestUsers = requests.mapNotNull { request -> request.user?.userDtoToDomain() }
+        val requestUsers = requests.mapNotNull { request -> request.user?.userBriefDtoToDomain() }
         ensureUsersExist(requestUsers)
 
         val existingRelations = friendAndGroupDao.getFriendRelationsByUserId(currentUserId)
@@ -262,7 +262,7 @@ class FriendAndGroupLocalRepository @Inject constructor(
     suspend fun syncCurrentUserGroups(groups: List<GroupDto>) {
         val currentUserId = userRepository.currentUserId.value ?: return
         val allMembers = groups.flatMap { group ->
-            group.members.mapNotNull { member -> member.user?.userDtoToDomain() }
+            group.members.mapNotNull { member -> member.user?.userBriefDtoToDomain() }
         }
         ensureUsersExist(allMembers)
         val existingRelations = friendAndGroupDao.getUserGroupRelationsByUserId(currentUserId)

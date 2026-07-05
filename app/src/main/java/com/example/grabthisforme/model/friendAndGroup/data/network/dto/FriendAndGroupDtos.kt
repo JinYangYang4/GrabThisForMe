@@ -1,19 +1,19 @@
 package com.example.grabthisforme.model.friendAndGroup.data.network.dto
 
-import com.example.grabthisforme.model.user.data.network.dto.UserDto
+import com.example.grabthisforme.model.user.data.network.dto.UserBriefDto
 
 data class FriendRequestDto(
     val userId: Long,
     val status: String,
     val addedTime: Long,
-    val user: UserDto? = null
+    val user: UserBriefDto? = null
 )
 
 data class GroupMemberDto(
     val userId: Long,
     val role: String,
     val joinedTime: Long,
-    val user: UserDto? = null
+    val user: UserBriefDto? = null
 )
 
 data class GroupDto(

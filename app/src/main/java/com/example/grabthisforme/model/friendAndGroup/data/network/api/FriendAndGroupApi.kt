@@ -3,7 +3,7 @@ package com.example.grabthisforme.model.friendAndGroup.data.network.api
 import com.example.grabthisforme.model.friendAndGroup.data.network.dto.GroupDto
 import com.example.grabthisforme.model.friendAndGroup.data.network.dto.FriendRequestDto
 import com.example.grabthisforme.model.network.ApiResponse
-import com.example.grabthisforme.model.user.data.network.dto.UserDto
+import com.example.grabthisforme.model.user.data.network.dto.UserBriefDto
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -12,7 +12,7 @@ import retrofit2.http.Query
 interface FriendAndGroupApi {
 
     @GET("api/social/friends")
-    suspend fun listFriends(): ApiResponse<List<UserDto>>
+    suspend fun listFriends(): ApiResponse<List<UserBriefDto>>
 
     @GET("api/social/friend-requests")
     suspend fun listFriendRequests(): ApiResponse<List<FriendRequestDto>>

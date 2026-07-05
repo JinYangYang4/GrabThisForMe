@@ -1,7 +1,7 @@
 package com.example.grabthisforme.model.friendAndGroup.data.repository
 import com.example.grabthisforme.model.friendAndGroup.data.network.dto.GroupDto
 import com.example.grabthisforme.model.friendAndGroup.data.network.dto.FriendRequestDto
-import com.example.grabthisforme.model.user.data.network.dto.UserDto
+import com.example.grabthisforme.model.user.data.network.dto.UserBriefDto
 import com.example.grabthisforme.model.friendAndGroup.data.network.api.FriendAndGroupApi
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -12,7 +12,7 @@ class FriendAndGroupRemoteRepository @Inject constructor(
     private val friendAndGroupApi: FriendAndGroupApi
 ) {
 
-    suspend fun listFriends(): Result<List<UserDto>> {
+    suspend fun listFriends(): Result<List<UserBriefDto>> {
         return runCatching {
             val response = friendAndGroupApi.listFriends()
             val data = response.data

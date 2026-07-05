@@ -3,6 +3,7 @@ package com.example.grabthisforme.model.post.data.mock
 import com.example.grabthisforme.model.post.data.network.dto.PostDto
 import com.example.grabthisforme.model.post.domain.Post
 import com.example.grabthisforme.model.post.mapper.toDomain
+import com.example.grabthisforme.model.user.data.network.dto.UserBriefDto
 import com.example.grabthisforme.model.user.domain.User
 
 object PostMockData {
@@ -21,9 +22,7 @@ object PostMockData {
                 content = "Sunny day, feeling good.",
                 images = listOf("post_img_1"),
                 createTime = now - 10 * 60 * 1000,
-                authorId = users[0].id,
-                authorName = users[0].name,
-                authorAvatarUrl = users[0].headPic,
+                author = users[0].toBriefDto(),
                 likeCount = 12,
                 commentCount = 3
             ),
@@ -32,9 +31,7 @@ object PostMockData {
                 content = "Finished watching a great movie.",
                 images = emptyList(),
                 createTime = now - 30 * 60 * 1000,
-                authorId = users[1].id,
-                authorName = users[1].name,
-                authorAvatarUrl = users[1].headPic,
+                author = users[1].toBriefDto(),
                 likeCount = 5,
                 commentCount = 1
             ),
@@ -43,9 +40,7 @@ object PostMockData {
                 content = "Coding after work, still going strong.",
                 images = listOf("post_img_2", "post_img_3"),
                 createTime = now - 60 * 60 * 1000,
-                authorId = users[2].id,
-                authorName = users[2].name,
-                authorAvatarUrl = users[2].headPic,
+                author = users[2].toBriefDto(),
                 likeCount = 23,
                 commentCount = 8
             ),
@@ -54,9 +49,7 @@ object PostMockData {
                 content = "Weekend hike was amazing.",
                 images = listOf("post_img_4"),
                 createTime = now - 2 * 60 * 60 * 1000,
-                authorId = users[0].id,
-                authorName = users[0].name,
-                authorAvatarUrl = users[0].headPic,
+                author = users[0].toBriefDto(),
                 likeCount = 34,
                 commentCount = 6
             ),
@@ -65,9 +58,7 @@ object PostMockData {
                 content = "Learning Kotlin feels smoother every day.",
                 images = emptyList(),
                 createTime = now - 3 * 60 * 60 * 1000,
-                authorId = users[2].id,
-                authorName = users[2].name,
-                authorAvatarUrl = users[2].headPic,
+                author = users[2].toBriefDto(),
                 likeCount = 18,
                 commentCount = 4
             ),
@@ -76,9 +67,7 @@ object PostMockData {
                 content = "Sharing today's sky photo.",
                 images = listOf("post_img_5"),
                 createTime = now - 5 * 60 * 60 * 1000,
-                authorId = users[1].id,
-                authorName = users[1].name,
-                authorAvatarUrl = users[1].headPic,
+                author = users[1].toBriefDto(),
                 likeCount = 42,
                 commentCount = 11
             )
@@ -96,6 +85,14 @@ object PostMockData {
             id = userId,
             name = userName,
             headPic = avatar
+        )
+    }
+
+    private fun User.toBriefDto(): UserBriefDto {
+        return UserBriefDto(
+            id = id,
+            name = name,
+            headPic = headPic
         )
     }
 }

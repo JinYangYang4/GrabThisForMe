@@ -1,13 +1,13 @@
 package com.example.grabthisforme.model.conversation.data.repository
 import com.example.grabthisforme.model.conversation.data.local.entity.ConversationUserStateEntity
 import com.example.grabthisforme.model.conversation.data.network.dto.ConversationDto
-import com.example.grabthisforme.model.conversation.data.network.dto.ConversationParticipantDto
 import com.example.grabthisforme.model.conversation.domain.Conversation
 import com.example.grabthisforme.model.conversation.mapper.buildConversationPeer
 import com.example.grabthisforme.model.message.domain.Message
 import com.example.grabthisforme.model.message.mapper.toDomainOrNull
 import com.example.grabthisforme.model.user.data.repository.UserRepository
 import com.example.grabthisforme.model.user.domain.User
+import com.example.grabthisforme.model.user.mapper.toDomain
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
@@ -185,22 +185,6 @@ class ConversationRepository @Inject constructor(
             lastReadTime = dto.lastReadTime
         )
         return conversation
-    }
-
-    private fun ConversationParticipantDto.toDomain(): User {
-        return User(
-            id = id,
-            name = name ?: accountName ?: id.toString(),
-            headPic = headPic.orEmpty(),
-            phone = phone,
-            email = email,
-            gender = gender ?: 2,
-            createTime = createTime ?: System.currentTimeMillis(),
-            isVip = isVip ?: false,
-            signature = signature,
-            accountName = accountName ?: id.toString(),
-            lastLoginTime = lastLoginTime
-        )
     }
 }
 

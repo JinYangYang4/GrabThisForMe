@@ -3,6 +3,7 @@ package com.example.grabthisforme.model.user.data.repository
 import com.example.grabthisforme.model.goods.data.network.dto.GoodsDto
 import com.example.grabthisforme.model.network.ApiResponse
 import com.example.grabthisforme.model.user.data.network.api.UserApi
+import com.example.grabthisforme.model.user.data.network.dto.UserBriefDto
 import com.example.grabthisforme.model.user.data.network.dto.UserDto
 import com.example.grabthisforme.model.post.data.network.dto.PostDto
 import com.example.grabthisforme.model.store.data.network.dto.StoreDto
@@ -14,7 +15,7 @@ class UserRemoteRepository @Inject constructor(
     private val userApi: UserApi
 ) {
 
-    suspend fun searchUsers(keyword: String): Result<List<UserDto>> {
+    suspend fun searchUsers(keyword: String): Result<List<UserBriefDto>> {
         return runCatching {
             requireSuccessfulData(userApi.searchUsers(keyword))
         }

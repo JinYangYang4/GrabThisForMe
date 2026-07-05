@@ -1,4 +1,5 @@
 package com.example.grabthisforme.model.chat.data.realtime
+import android.util.Log
 import com.example.grabthisforme.di.NetworkModule
 import com.example.grabthisforme.model.conversation.data.network.dto.ConversationSocketPayloadDto
 import com.example.grabthisforme.model.message.mapper.toDomain
@@ -132,6 +133,7 @@ class ChatRealtimeManager @Inject constructor(
 
                     "MESSAGE" -> {
                         val ackId = headers["ack"] ?: headers["message-id"]
+                        Log.d("MESSAGE_ackID", "handleStompMessage: $ackId")
                         runCatching {
                             val payload = gson.fromJson(body, ConversationSocketPayloadDto::class.java)
                             when (payload.type) {
@@ -168,10 +170,12 @@ class ChatRealtimeManager @Inject constructor(
                                 }
                             }
                         }.onFailure { throwable ->
+                            Log.i("MESSAGE_onFailure", "MESSAGE_onFailure")
                         }
                     }
 
                     "ERROR" -> {
+                        Log.i("handleStompMessage", "error")
                     }
                 }
             }

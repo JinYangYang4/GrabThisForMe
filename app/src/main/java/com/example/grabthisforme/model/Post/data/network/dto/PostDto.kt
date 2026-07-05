@@ -1,6 +1,6 @@
 package com.example.grabthisforme.model.post.data.network.dto
 
-import com.example.grabthisforme.model.user.data.network.dto.UserDto
+import com.example.grabthisforme.model.user.data.network.dto.UserBriefDto
 
 data class PostDto(
     val postId: String,
@@ -9,9 +9,7 @@ data class PostDto(
     val createTime: Long,
     val categoryKey: String = "",
     val customTags: List<String> = emptyList(),
-    val authorId: Long = 0L,
-    val authorName: String = "",
-    val authorAvatarUrl: String = "",
+    val author: UserBriefDto,
     val likeCount: Int = 0,
     val commentCount: Int = 0,
     val latitude: Double? = null,
@@ -30,7 +28,7 @@ data class PostDetailDto(
     val createTime: Long,
     val categoryKey: String = "",
     val customTags: List<String> = emptyList(),
-    val author: UserDto,
+    val author: UserBriefDto,
     val likeCount: Int = 0,
     val commentCount: Int = 0,
     val likedByCurrentUser: Boolean = false,
@@ -48,7 +46,7 @@ data class PostCommentDto(
     val time: Long,
     val message: String? = null,
     val imageUrls: List<String> = emptyList(),
-    val commenter: UserDto,
+    val commenter: UserBriefDto,
     val replyCount: Int = 0,
     val commenterProvince: String = ""
 )
@@ -60,8 +58,8 @@ data class PostReplyDto(
     val time: Long,
     val message: String? = null,
     val imageUrls: List<String> = emptyList(),
-    val commenter: UserDto,
-    val beCommenter: UserDto
+    val commenter: UserBriefDto,
+    val beCommenter: UserBriefDto
 )
 
 data class CreatePostRequest(

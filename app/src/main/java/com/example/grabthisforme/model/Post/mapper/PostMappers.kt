@@ -15,6 +15,7 @@ import com.example.grabthisforme.model.post.domain.PostStats
 import com.example.grabthisforme.model.relation.data.entity.UserPostEntity
 import com.example.grabthisforme.model.user.data.local.entity.UserAccountEntity
 import com.example.grabthisforme.model.user.data.local.entity.UserProfileEntity
+import com.example.grabthisforme.model.user.data.network.dto.UserBriefDto
 import com.example.grabthisforme.model.user.mapper.toDomain
 import org.json.JSONArray
 
@@ -42,9 +43,9 @@ fun PostDto.toDomain(): Post {
         customTags = customTags,
         createTime = createTime,
         author = PostAuthor(
-            authorId = authorId,
-            authorName = authorName,
-            authorAvatarUrl = authorAvatarUrl
+            authorId = author.id,
+            authorName = author.name ?: author.accountName.orEmpty(),
+            authorAvatarUrl = author.headPic.orEmpty()
         ),
         likeCount = likeCount,
         commentCount = commentCount,
@@ -167,9 +168,11 @@ fun Post.toDto(): PostDto {
         createTime = createTime,
         categoryKey = categoryKey,
         customTags = customTags,
-        authorId = author.authorId,
-        authorName = author.authorName,
-        authorAvatarUrl = author.authorAvatarUrl,
+        author = UserBriefDto(
+            id = author.authorId,
+            name = author.authorName,
+            headPic = author.authorAvatarUrl
+        ),
         likeCount = likeCount,
         commentCount = commentCount,
         latitude = latitude,

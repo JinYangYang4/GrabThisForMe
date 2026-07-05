@@ -5,6 +5,7 @@ import com.example.grabthisforme.model.user.data.local.entity.UserBasicBundleEnt
 import com.example.grabthisforme.model.user.data.local.entity.UserBundleEntity
 import com.example.grabthisforme.model.user.data.local.entity.UserProfileEntity
 import com.example.grabthisforme.model.user.data.local.entity.UserStatisticsEntity
+import com.example.grabthisforme.model.user.data.network.dto.UserBriefDto
 import com.example.grabthisforme.model.user.data.network.dto.UserDto
 import com.example.grabthisforme.model.user.data.network.dto.UserStatisticsDto
 import com.example.grabthisforme.model.user.domain.User
@@ -73,6 +74,18 @@ fun UserDto.toDomain(
     )
 }
 
+fun UserBriefDto.toDomain(): User {
+    return User(
+        id = id,
+        name = name ?: accountName ?: id.toString(),
+        headPic = headPic.orEmpty(),
+        gender = UserProfile.GENDER_UNKNOWN,
+        createTime = System.currentTimeMillis(),
+        isVip = false,
+        accountName = accountName ?: id.toString()
+    )
+}
+
 fun User.toDto(): UserDto {
     return UserDto(
         id = id,
@@ -91,6 +104,15 @@ fun User.toDto(): UserDto {
             fanCount = fanCount,
             followCount = followCount
         )
+    )
+}
+
+fun User.toBriefDto(): UserBriefDto {
+    return UserBriefDto(
+        id = id,
+        accountName = accountName,
+        name = name,
+        headPic = headPic
     )
 }
 
