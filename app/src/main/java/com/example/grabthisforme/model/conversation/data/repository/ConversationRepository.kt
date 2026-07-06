@@ -1,4 +1,6 @@
 package com.example.grabthisforme.model.conversation.data.repository
+import android.util.Log
+import com.example.grabthisforme.model.chat.data.realtime.ChatRealtimeManager
 import com.example.grabthisforme.model.conversation.data.local.entity.ConversationUserStateEntity
 import com.example.grabthisforme.model.conversation.data.network.dto.ConversationDto
 import com.example.grabthisforme.model.conversation.domain.Conversation
@@ -22,11 +24,9 @@ import kotlinx.coroutines.flow.stateIn
 class ConversationRepository @Inject constructor(
     private val localRepository: ConversationLocalRepository,
     private val remoteRepository: ConversationRemoteRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val chatRealtimeManager: ChatRealtimeManager
 ) {
-    companion object {
-        private const val TAG = "ConversationRemoteDiag"
-    }
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     val allConversations: StateFlow<List<Conversation>> = localRepository.allConversations
@@ -87,8 +87,25 @@ class ConversationRepository @Inject constructor(
     }
 
     suspend fun markConversationAsRead(conversationId: String, lastReadTime: Long? = null) {
-        remoteRepository.markRead(conversationId, lastReadTime)
-        localRepository.markConversationAsRead(conversationId, lastReadTime)
+        val currentState = localRepository.getCurrentUserConversationState(conversationId)
+        val resolvedLastReadTime = lastReadTime
+            ?: localRepository.getConversationById(conversationId)
+                ?.lastMessage
+                ?.let { message -> message.serverTimestamp ?: message.timestamp }
+
+        val hasUnread = (currentState?.unreadCount ?: 0) > 0
+        val hasReadCursorAdvanced = resolvedLastReadTime != null &&
+            resolvedLastReadTime > (currentState?.lastReadTime ?: Long.MIN_VALUE)
+
+        if (!hasUnread && !hasReadCursorAdvanced) {
+            return
+        }
+
+        val sentBySocket = chatRealtimeManager.sendConversationRead(conversationId, resolvedLastReadTime)
+        if (!sentBySocket) {
+            remoteRepository.markRead(conversationId, resolvedLastReadTime)
+        }
+        localRepository.markConversationAsRead(conversationId, resolvedLastReadTime)
     }
 
     suspend fun refreshRemoteConversations() {
@@ -187,4 +204,3 @@ class ConversationRepository @Inject constructor(
         return conversation
     }
 }
-

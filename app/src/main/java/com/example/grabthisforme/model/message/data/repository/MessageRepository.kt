@@ -31,12 +31,14 @@ class MessageRepository @Inject constructor(
     @Volatile
     private var activeConversationId: String? = null
 
+    fun initializeRealtimeSync() = Unit
+
     init {
         repositoryScope.launch {
             chatRealtimeManager.events.collect { event ->
                 if (event is ChatRealtimeEvent.MessageReceived) {
                     handleIncomingRealtimeMessage(event.conversationId, event.message)
-                    chatRealtimeManager.ack(event.ackId)
+                    chatRealtimeManager.ack(event.stompAckId, event.deliveryAckId)
                 }
             }
         }

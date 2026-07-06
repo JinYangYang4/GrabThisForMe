@@ -9,14 +9,17 @@ sealed interface ChatRealtimeEvent {
     data class MessageReceived(
         val conversationId: String,
         val message: Message,
-        val ackId: String? = null
+        val stompAckId: String? = null,
+        val deliveryAckId: String? = null
     ) : ChatRealtimeEvent
     data class FriendRequestReceived(
         val friendUserId: Long,
-        val ackId: String? = null
+        val stompAckId: String? = null,
+        val deliveryAckId: String? = null
     ) : ChatRealtimeEvent
     data class FriendRequestAccepted(
         val friendUserId: Long,
-        val ackId: String? = null
+        val stompAckId: String? = null,
+        val deliveryAckId: String? = null
     ) : ChatRealtimeEvent
 }

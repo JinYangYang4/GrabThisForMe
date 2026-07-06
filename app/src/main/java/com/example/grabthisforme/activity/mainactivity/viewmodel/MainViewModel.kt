@@ -7,6 +7,7 @@ import com.example.grabthisforme.model.chat.data.realtime.ChatRealtimeEvent
 import com.example.grabthisforme.model.chat.data.realtime.ChatRealtimeManager
 import com.example.grabthisforme.model.conversation.data.repository.ConversationRepository
 import com.example.grabthisforme.model.friendAndGroup.data.repository.FriendAndGroupRepository
+import com.example.grabthisforme.model.message.data.repository.MessageRepository
 import com.example.grabthisforme.model.post.data.repository.PostRepository
 import com.example.grabthisforme.model.user.data.repository.UserRepository
 import com.example.grabthisforme.model.user.domain.User
@@ -21,7 +22,8 @@ class MainViewModel @Inject constructor(
     private val friendAndGroupRepository: FriendAndGroupRepository,
     private val conversationRepository: ConversationRepository,
     private val postRepository: PostRepository,
-    private val chatRealtimeManager: ChatRealtimeManager
+    private val chatRealtimeManager: ChatRealtimeManager,
+    private val messageRepository: MessageRepository
 ) : ViewModel() {
     companion object {
         private const val TAG = "MainInitDiag"
@@ -59,6 +61,7 @@ class MainViewModel @Inject constructor(
     private var hasInitializedRemoteData = false
 
     init {
+        messageRepository.initializeRealtimeSync()
         viewModelScope.launch {
             userRepository.currentUser.collect { user ->
                 _currentUser.postValue(user)
@@ -72,16 +75,20 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             chatRealtimeManager.events.collectLatest { event ->
                 when (event) {
+                    is ChatRealtimeEvent.ConnectionFailed -> {
+                        chatRealtimeManager.connectIfNeeded()
+                    }
+
                     is ChatRealtimeEvent.FriendRequestReceived -> {
                         friendAndGroupRepository.refreshRemoteFriendRequests()
-                        chatRealtimeManager.ack(event.ackId)
+                        chatRealtimeManager.ack(event.stompAckId, event.deliveryAckId)
                     }
 
                     is ChatRealtimeEvent.FriendRequestAccepted -> {
                         friendAndGroupRepository.refreshRemoteFriendRequests()
                         friendAndGroupRepository.refreshRemoteFriends()
                         conversationRepository.refreshRemoteConversations()
-                        chatRealtimeManager.ack(event.ackId)
+                        chatRealtimeManager.ack(event.stompAckId, event.deliveryAckId)
                     }
 
                     else -> Unit

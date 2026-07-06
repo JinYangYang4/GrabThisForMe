@@ -7,5 +7,6 @@ data class ConversationSocketPayloadDto(
     val type: String,
     val conversationId: String? = null,
     val message: MessageDto? = null,
-    val friendRequest: FriendRequestDto? = null
+    val friendRequest: FriendRequestDto? = null,
+    val deliveryAckId: String? = null
 )

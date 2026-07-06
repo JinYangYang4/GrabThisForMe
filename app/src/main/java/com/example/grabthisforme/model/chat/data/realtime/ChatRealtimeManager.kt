@@ -1,5 +1,4 @@
 package com.example.grabthisforme.model.chat.data.realtime
-import android.util.Log
 import com.example.grabthisforme.di.NetworkModule
 import com.example.grabthisforme.model.conversation.data.network.dto.ConversationSocketPayloadDto
 import com.example.grabthisforme.model.message.mapper.toDomain
@@ -25,6 +24,15 @@ class ChatRealtimeManager @Inject constructor(
     private val authTokenDataStore: AuthTokenDataStore,
     private val gson: Gson
 ) {
+    private data class PushDeliveryAckSocketRequest(
+        val deliveryAckId: String
+    )
+
+    private data class ConversationReadSocketRequest(
+        val conversationId: String,
+        val lastReadTime: Long? = null
+    )
+
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val _events = MutableSharedFlow<ChatRealtimeEvent>(extraBufferCapacity = 64)
     val events: SharedFlow<ChatRealtimeEvent> = _events
@@ -67,11 +75,39 @@ class ChatRealtimeManager @Inject constructor(
         isConnected = false
     }
 
-    fun ack(ackId: String?) {
-        if (ackId.isNullOrBlank()) return
-        sendStompFrame(
-            command = "ACK",
-            headers = mapOf("id" to ackId)
+    fun ack(stompAckId: String?, deliveryAckId: String? = null) {
+        if (!stompAckId.isNullOrBlank()) {
+            sendStompFrame(
+                command = "ACK",
+                headers = mapOf("id" to stompAckId)
+            )
+        }
+        if (!deliveryAckId.isNullOrBlank()) {
+            sendStompFrame(
+                command = "SEND",
+                headers = mapOf(
+                    "destination" to "/app/push/ack",
+                    "content-type" to "application/json"
+                ),
+                body = gson.toJson(PushDeliveryAckSocketRequest(deliveryAckId))
+            )
+        }
+    }
+
+    fun sendConversationRead(conversationId: String, lastReadTime: Long?): Boolean {
+        if (conversationId.isBlank() || !isConnected) return false
+        return sendStompFrame(
+            command = "SEND",
+            headers = mapOf(
+                "destination" to "/app/conversations/read",
+                "content-type" to "application/json"
+            ),
+            body = gson.toJson(
+                ConversationReadSocketRequest(
+                    conversationId = conversationId,
+                    lastReadTime = lastReadTime
+                )
+            )
         )
     }
 
@@ -79,8 +115,8 @@ class ChatRealtimeManager @Inject constructor(
         command: String,
         headers: Map<String, String> = emptyMap(),
         body: String = ""
-    ) {
-        val socket = webSocket ?: return
+    ): Boolean {
+        val socket = webSocket ?: return false
         val frame = buildString {
             append(command).append('\n')
             headers.forEach { (key, value) ->
@@ -90,7 +126,7 @@ class ChatRealtimeManager @Inject constructor(
             append(body)
             append('\u0000')
         }
-        socket.send(frame)
+        return socket.send(frame)
     }
 
     private fun handleStompMessage(frameText: String) {
@@ -132,8 +168,7 @@ class ChatRealtimeManager @Inject constructor(
                     }
 
                     "MESSAGE" -> {
-                        val ackId = headers["ack"] ?: headers["message-id"]
-                        Log.d("MESSAGE_ackID", "handleStompMessage: $ackId")
+                        val stompAckId = headers["ack"] ?: headers["message-id"]
                         runCatching {
                             val payload = gson.fromJson(body, ConversationSocketPayloadDto::class.java)
                             when (payload.type) {
@@ -144,7 +179,8 @@ class ChatRealtimeManager @Inject constructor(
                                         ChatRealtimeEvent.MessageReceived(
                                             conversationId = conversationId,
                                             message = message,
-                                            ackId = ackId
+                                            stompAckId = stompAckId,
+                                            deliveryAckId = payload.deliveryAckId
                                         )
                                     )
                                 }
@@ -154,7 +190,8 @@ class ChatRealtimeManager @Inject constructor(
                                     _events.tryEmit(
                                         ChatRealtimeEvent.FriendRequestReceived(
                                             friendUserId = friendUserId,
-                                            ackId = ackId
+                                            stompAckId = stompAckId,
+                                            deliveryAckId = payload.deliveryAckId
                                         )
                                     )
                                 }
@@ -164,19 +201,16 @@ class ChatRealtimeManager @Inject constructor(
                                     _events.tryEmit(
                                         ChatRealtimeEvent.FriendRequestAccepted(
                                             friendUserId = friendUserId,
-                                            ackId = ackId
+                                            stompAckId = stompAckId,
+                                            deliveryAckId = payload.deliveryAckId
                                         )
                                     )
                                 }
                             }
-                        }.onFailure { throwable ->
-                            Log.i("MESSAGE_onFailure", "MESSAGE_onFailure")
                         }
                     }
 
-                    "ERROR" -> {
-                        Log.i("handleStompMessage", "error")
-                    }
+                    "ERROR" -> Unit
                 }
             }
     }
@@ -211,4 +245,3 @@ class ChatRealtimeManager @Inject constructor(
         }
     }
 }
-
