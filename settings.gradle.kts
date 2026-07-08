@@ -18,3 +18,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "GrabThisForMe"
 include(":app")
+include(":GTFM_AI_Agent")

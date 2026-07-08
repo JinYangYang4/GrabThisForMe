@@ -38,7 +38,7 @@
 
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="高德的APIkey" />
+            android:value="9f68103bbba67b799e592643722fda0f" />
 
         <activity
             android:name=".activity.LoginActivity.view.LoginActivity"
