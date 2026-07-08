@@ -2,6 +2,13 @@ package com.example.grabthisforme.activity.fragment_misc.postDetailFragment.doma
 
 import com.example.grabthisforme.model.user.domain.User
 
+enum class LocalSendStatus {
+    NONE,
+    SENDING,
+    FAILED,
+    SUCCESS
+}
+
 data class Comment(
     val id: Long,
     val time: Long,
@@ -10,7 +17,8 @@ data class Comment(
     val commenter: User? = null,
     val replies: List<Reply> = emptyList(),
     val replyCount: Int = replies.size,
-    val commenterProvince: String = ""
+    val commenterProvince: String = "",
+    val sendStatus: LocalSendStatus = LocalSendStatus.NONE
 ) {
     val hasReplies: Boolean get() = replyCount > 0 || replies.isNotEmpty()
 }

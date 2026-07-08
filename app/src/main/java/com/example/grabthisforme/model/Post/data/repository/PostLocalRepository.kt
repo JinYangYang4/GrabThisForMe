@@ -185,6 +185,23 @@ class PostLocalRepository @Inject constructor(
         }
     }
 
+    suspend fun upsertComment(postId: String, comment: Comment): List<Comment> {
+        return commentCacheMutex.withLock {
+            postDao.upsertComment(comment.toEntity(postId))
+            syncCommentCount(postId)
+            getStoredComments(postId)
+        }
+    }
+
+    suspend fun replaceComment(postId: String, oldCommentId: Long, newComment: Comment): List<Comment> {
+        return commentCacheMutex.withLock {
+            postDao.deleteCommentById(oldCommentId)
+            postDao.upsertComment(newComment.toEntity(postId))
+            syncCommentCount(postId)
+            getStoredComments(postId)
+        }
+    }
+
     suspend fun addReply(postId: String, parentCommentId: Long, reply: Reply): List<Comment> {
         return replyCacheMutex.withLock {
             postDao.mergeCachedReplies(
@@ -192,6 +209,28 @@ class PostLocalRepository @Inject constructor(
                 incomingReplies = listOf(reply.copy(parentCommentId = parentCommentId).toEntity(postId)),
                 limit = MAX_CACHED_REPLIES_PER_COMMENT
             )
+            getStoredComments(postId)
+        }
+    }
+
+    suspend fun upsertReply(postId: String, parentCommentId: Long, reply: Reply): List<Comment> {
+        return replyCacheMutex.withLock {
+            if (postDao.countCommentById(parentCommentId) <= 0) return@withLock getStoredComments(postId)
+            postDao.upsertReply(reply.copy(parentCommentId = parentCommentId).toEntity(postId))
+            getStoredComments(postId)
+        }
+    }
+
+    suspend fun replaceReply(
+        postId: String,
+        parentCommentId: Long,
+        oldReplyId: Long,
+        newReply: Reply
+    ): List<Comment> {
+        return replyCacheMutex.withLock {
+            if (postDao.countCommentById(parentCommentId) <= 0) return@withLock getStoredComments(postId)
+            postDao.deleteReplyById(oldReplyId)
+            postDao.upsertReply(newReply.copy(parentCommentId = parentCommentId).toEntity(postId))
             getStoredComments(postId)
         }
     }

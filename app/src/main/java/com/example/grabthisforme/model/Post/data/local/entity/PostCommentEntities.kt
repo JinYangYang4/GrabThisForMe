@@ -29,7 +29,8 @@ data class PostCommentEntity(
     val commenterId: Long = 0L,
     val commenterName: String = "",
     val commenterAvatarUrl: String = "",
-    val commenterProvince: String = ""
+    val commenterProvince: String = "",
+    val sendStatus: String = "NONE"
 )
 
 @Entity(
@@ -69,5 +70,6 @@ data class PostReplyEntity(
     val commenterAvatarUrl: String = "",
     val beCommenterId: Long = 0L,
     val beCommenterName: String = "",
-    val beCommenterAvatarUrl: String = ""
+    val beCommenterAvatarUrl: String = "",
+    val sendStatus: String = "NONE"
 )

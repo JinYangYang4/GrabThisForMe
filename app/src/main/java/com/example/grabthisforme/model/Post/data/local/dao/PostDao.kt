@@ -61,6 +61,12 @@ interface PostDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertReplies(entities: List<PostReplyEntity>)
 
+    @Query("DELETE FROM post_comment WHERE commentId = :commentId")
+    suspend fun deleteCommentById(commentId: Long)
+
+    @Query("DELETE FROM post_reply WHERE replyId = :replyId")
+    suspend fun deleteReplyById(replyId: Long)
+
     @Query("SELECT * FROM post_comment WHERE postId = :postId ORDER BY time DESC")
     suspend fun getCommentEntitiesForMerge(postId: String): List<PostCommentEntity>
 

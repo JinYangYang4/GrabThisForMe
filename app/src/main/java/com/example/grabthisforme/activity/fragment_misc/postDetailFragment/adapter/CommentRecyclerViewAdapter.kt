@@ -10,12 +10,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.grabthisforme.R
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Comment
+import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.LocalSendStatus
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Reply
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.ui.state.CommentUiState
 import com.example.grabthisforme.databinding.RvCommentItemBinding
 
-private const val DEFAULT_USER_NAME = "匿名"
-private const val DEFAULT_COMMENT_CONTENT = "暂无评论内容"
+private const val DEFAULT_USER_NAME = "\u533f\u540d"
+private const val DEFAULT_COMMENT_CONTENT = "\u6682\u65e0\u8bc4\u8bba\u5185\u5bb9"
 
 class CommentRecyclerViewAdapter(
     private val onItemClick: ((Comment, Int, Long) -> Unit)? = null,
@@ -95,26 +96,35 @@ class CommentRecyclerViewAdapter(
             binding.tvCommentProvince.visibility =
                 if (comment.commenterProvince.isBlank()) View.GONE else View.VISIBLE
             binding.tvCommentContent.text = comment.message ?: DEFAULT_COMMENT_CONTENT
-            binding.tvCommentTime.text = formatTimeLeft(comment.time)
+            binding.tvCommentTime.text = buildCommentMetaText(comment)
             refreshReplyUI(state)
         }
 
         private fun formatTimeLeft(sendTime: Long): String {
             val duration = System.currentTimeMillis() - sendTime
-            if (duration <= 60 * 1000) return "刚刚"
+            if (duration <= 60 * 1000) return "\u521a\u521a"
 
             val hours = duration / (1000 * 60 * 60)
             val minutes = (duration % (1000 * 60 * 60)) / (1000 * 60)
 
             return when {
-                hours > 0 -> "${hours}小时前"
-                else -> "${minutes} 分钟前"
+                hours > 0 -> "${hours}\u5c0f\u65f6\u524d"
+                else -> "${minutes} \u5206\u949f\u524d"
             }
         }
 
         private fun getOrCreateCommentUiState(comment: Comment): CommentUiState {
             return commentUiStateMap.getOrPut(comment.id) {
                 CommentUiState(commentId = comment.id)
+            }
+        }
+
+        private fun buildCommentMetaText(comment: Comment): String {
+            return when (comment.sendStatus) {
+                LocalSendStatus.NONE -> formatTimeLeft(comment.time)
+                LocalSendStatus.SENDING -> "\u53d1\u9001\u4e2d"
+                LocalSendStatus.FAILED -> "\u53d1\u9001\u5931\u8d25"
+                LocalSendStatus.SUCCESS -> "\u53d1\u9001\u6210\u529f"
             }
         }
 
@@ -139,7 +149,7 @@ class CommentRecyclerViewAdapter(
                 binding.tvCollapseExtraReply.visibility = View.GONE
                 binding.tvLoadMoreReply.visibility = View.GONE
                 binding.tvToggleReply.visibility = View.VISIBLE
-                binding.tvToggleReply.text = "展开回复($totalReplyCount)"
+                binding.tvToggleReply.text = "\u5c55\u5f00\u56de\u590d($totalReplyCount)"
             }
         }
 

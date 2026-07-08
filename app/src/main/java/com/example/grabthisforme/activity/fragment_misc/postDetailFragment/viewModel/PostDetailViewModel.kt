@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Comment
+import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.LocalSendStatus
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Reply
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.ui_model.PostDetailHeaderUiModel
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.ui_model.PostDetailStatsUiModel
@@ -76,6 +77,7 @@ class PostDetailViewModel @Inject constructor(
             showMissingPostState()
         } else {
             observePost()
+            observeComments()
             loadInitialComments()
             observeLikeState()
             preloadCommentProvince()
@@ -120,15 +122,26 @@ class PostDetailViewModel @Inject constructor(
             commenter = userRepository.currentUser.value ?: fallbackUser,
             replies = emptyList(),
             replyCount = 0,
-            commenterProvince = cachedCommentProvince
+            commenterProvince = cachedCommentProvince,
+            sendStatus = LocalSendStatus.SENDING
         )
-        addCommentLocal(pendingComment)
         clearInputText()
 
         viewModelScope.launch {
+            postRepository.addCommentLocal(postId, pendingComment)
             postRepository.addComment(postId, pendingComment)
                 .onSuccess { remoteComment ->
-                    replaceComment(pendingComment.id, remoteComment)
+                    postRepository.replaceCommentLocal(
+                        postId = postId,
+                        oldCommentId = pendingComment.id,
+                        newComment = remoteComment.copy(sendStatus = LocalSendStatus.SUCCESS)
+                    )
+                }
+                .onFailure {
+                    postRepository.updateCommentLocal(
+                        postId = postId,
+                        comment = pendingComment.copy(sendStatus = LocalSendStatus.FAILED)
+                    )
                 }
         }
         return true
@@ -156,17 +169,32 @@ class PostDetailViewModel @Inject constructor(
             beCommenter = replyTarget.beCommenter,
             parentReplyId = replyTarget.parentReplyId
         )
-        addReplyLocal(commentPosition, pendingReply)
         clearInputText()
 
         viewModelScope.launch {
+            postRepository.addReplyLocal(
+                postId = postId,
+                parentCommentId = parentCommentId,
+                reply = pendingReply
+            )
             postRepository.addReply(
                 postId = postId,
                 parentCommentId = parentCommentId,
                 reply = pendingReply,
                 beCommenterId = replyTarget.beCommenterId
             ).onSuccess { remoteReply ->
-                replaceReply(parentCommentId, pendingReply.id, remoteReply)
+                postRepository.replaceReplyLocal(
+                    postId = postId,
+                    parentCommentId = parentCommentId,
+                    oldReplyId = pendingReply.id,
+                    newReply = remoteReply.copy(sendStatus = LocalSendStatus.SUCCESS)
+                )
+            }.onFailure {
+                postRepository.updateReplyLocal(
+                    postId = postId,
+                    parentCommentId = parentCommentId,
+                    reply = pendingReply.copy(sendStatus = LocalSendStatus.FAILED)
+                )
             }
         }
         return true
@@ -196,8 +224,6 @@ class PostDetailViewModel @Inject constructor(
                 if (replies.items.isEmpty()) {
                     break
                 }
-
-                appendCommentReplies(commentId, replies.items)
                 currentComment = _commentList.value.orEmpty().firstOrNull { it.id == commentId } ?: break
 
                 if (!replies.hasMore) {
@@ -222,9 +248,6 @@ class PostDetailViewModel @Inject constructor(
                     beforeTime = beforeTime
                 )
                 val previousSize = currentComments.size
-                if (comments.items.isNotEmpty()) {
-                    appendComments(comments.items)
-                }
                 val mergedSize = _commentList.value.orEmpty().size
                 val addedCount = mergedSize - previousSize
 
@@ -251,7 +274,8 @@ class PostDetailViewModel @Inject constructor(
             beCommenter = beCommenter,
             imageUrls = emptyList(),
             parentCommentId = parentCommentId,
-            parentReplyId = parentReplyId
+            parentReplyId = parentReplyId,
+            sendStatus = LocalSendStatus.SENDING
         )
     }
 
@@ -294,6 +318,17 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
+    private fun observeComments() {
+        viewModelScope.launch {
+            postRepository.getCommentList(postId).collectLatest { comments ->
+                _commentList.value = comments
+                updatePostStats(
+                    commentCount = maxOf(comments.size, _postStatsUiModel.value?.commentCount ?: 0)
+                )
+            }
+        }
+    }
+
     private fun loadInitialComments() {
         commentPagingExhausted = false
         loadMoreComments()
@@ -315,76 +350,6 @@ class PostDetailViewModel @Inject constructor(
                     cachedCommentProvince = location.provinceDisplayText
                 }
         }
-    }
-
-    private fun addCommentLocal(comment: Comment) {
-        val updatedList = listOf(comment) + _commentList.value.orEmpty()
-        _commentList.value = updatedList
-        updatePostStats(commentCount = maxOf(updatedList.size, (_postStatsUiModel.value?.commentCount ?: 0) + 1))
-    }
-
-    private fun replaceComment(oldCommentId: Long, newComment: Comment) {
-        val updatedList = _commentList.value.orEmpty().map { comment ->
-            if (comment.id == oldCommentId) newComment else comment
-        }
-        _commentList.value = updatedList
-    }
-
-    private fun addReplyLocal(commentPosition: Int, reply: Reply) {
-        val currentList = _commentList.value.orEmpty()
-        if (commentPosition !in currentList.indices) return
-
-        val targetComment = currentList[commentPosition]
-        val updatedReplies = listOf(reply) + targetComment.replies
-        val updatedComment = targetComment.copy(
-            replies = updatedReplies,
-            replyCount = maxOf(targetComment.replyCount, updatedReplies.size)
-        )
-        val updatedList = currentList.toMutableList()
-        updatedList[commentPosition] = updatedComment
-        _commentList.value = updatedList
-    }
-
-    private fun replaceReply(parentCommentId: Long, oldReplyId: Long, newReply: Reply) {
-        val updatedList = _commentList.value.orEmpty().map { comment ->
-            if (comment.id != parentCommentId) {
-                comment
-            } else {
-                val updatedReplies = comment.replies.map { reply ->
-                    if (reply.id == oldReplyId) newReply else reply
-                }
-                comment.copy(
-                    replies = updatedReplies,
-                    replyCount = maxOf(comment.replyCount, updatedReplies.size)
-                )
-            }
-        }
-        _commentList.value = updatedList
-    }
-
-    private fun appendCommentReplies(commentId: Long, replies: List<Reply>) {
-        val updatedList = _commentList.value.orEmpty().map { comment ->
-            if (comment.id != commentId) {
-                comment
-            } else {
-                val mergedReplies = (comment.replies + replies)
-                    .distinctBy { it.id }
-                    .sortedByDescending { it.time }
-                comment.copy(
-                    replies = mergedReplies,
-                    replyCount = maxOf(comment.replyCount, mergedReplies.size)
-                )
-            }
-        }
-        _commentList.value = updatedList
-    }
-
-    private fun appendComments(comments: List<Comment>) {
-        val mergedComments = (_commentList.value.orEmpty() + comments)
-            .distinctBy { it.id }
-            .sortedByDescending { it.time }
-        _commentList.value = mergedComments
-        updatePostStats(commentCount = maxOf(mergedComments.size, _postStatsUiModel.value?.commentCount ?: 0))
     }
 
     private fun renderPost(post: Post?) {
@@ -424,4 +389,3 @@ class PostDetailViewModel @Inject constructor(
         val parentReplyId: Long?
     )
 }
-

@@ -143,6 +143,18 @@ class PostRepository @Inject constructor(
         }
     }
 
+    suspend fun addCommentLocal(postId: String, comment: Comment) {
+        localRepository.addComment(postId, comment)
+    }
+
+    suspend fun updateCommentLocal(postId: String, comment: Comment) {
+        localRepository.upsertComment(postId, comment)
+    }
+
+    suspend fun replaceCommentLocal(postId: String, oldCommentId: Long, newComment: Comment) {
+        localRepository.replaceComment(postId, oldCommentId, newComment)
+    }
+
     suspend fun addReply(
         postId: String,
         parentCommentId: Long,
@@ -159,6 +171,23 @@ class PostRepository @Inject constructor(
         ).onSuccess { remoteReply ->
             localRepository.addReply(postId, parentCommentId, remoteReply)
         }
+    }
+
+    suspend fun addReplyLocal(postId: String, parentCommentId: Long, reply: Reply) {
+        localRepository.addReply(postId, parentCommentId, reply)
+    }
+
+    suspend fun updateReplyLocal(postId: String, parentCommentId: Long, reply: Reply) {
+        localRepository.upsertReply(postId, parentCommentId, reply)
+    }
+
+    suspend fun replaceReplyLocal(
+        postId: String,
+        parentCommentId: Long,
+        oldReplyId: Long,
+        newReply: Reply
+    ) {
+        localRepository.replaceReply(postId, parentCommentId, oldReplyId, newReply)
     }
 
     suspend fun setPostLiked(postId: String, liked: Boolean): Boolean {
@@ -275,4 +304,3 @@ class PostRepository @Inject constructor(
         private const val DEFAULT_POST_PAGE_SIZE = 20
     }
 }
-

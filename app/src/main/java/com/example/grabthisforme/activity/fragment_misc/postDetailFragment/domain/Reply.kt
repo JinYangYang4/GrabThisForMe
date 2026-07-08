@@ -10,5 +10,6 @@ data class Reply(
     val beCommenter: User? = null,
     val imageUrls: List<String> = emptyList(),
     val parentCommentId: Long = 0,
-    val parentReplyId: Long? = null
+    val parentReplyId: Long? = null,
+    val sendStatus: LocalSendStatus = LocalSendStatus.NONE
 )

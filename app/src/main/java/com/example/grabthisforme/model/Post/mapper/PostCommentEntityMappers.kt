@@ -1,6 +1,7 @@
 package com.example.grabthisforme.model.post.mapper
 
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Comment
+import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.LocalSendStatus
 import com.example.grabthisforme.activity.fragment_misc.postDetailFragment.domain.Reply
 import com.example.grabthisforme.model.post.data.local.entity.PostCommentEntity
 import com.example.grabthisforme.model.post.data.local.entity.PostReplyEntity
@@ -17,7 +18,8 @@ fun Comment.toEntity(postId: String): PostCommentEntity {
         commenterId = commenter?.id ?: 0L,
         commenterName = commenter?.name.orEmpty(),
         commenterAvatarUrl = commenter?.headPic.orEmpty(),
-        commenterProvince = commenterProvince
+        commenterProvince = commenterProvince,
+        sendStatus = sendStatus.name
     )
 }
 
@@ -35,7 +37,8 @@ fun Reply.toEntity(postId: String): PostReplyEntity {
         commenterAvatarUrl = commenter?.headPic.orEmpty(),
         beCommenterId = beCommenter?.id ?: 0L,
         beCommenterName = beCommenter?.name.orEmpty(),
-        beCommenterAvatarUrl = beCommenter?.headPic.orEmpty()
+        beCommenterAvatarUrl = beCommenter?.headPic.orEmpty(),
+        sendStatus = sendStatus.name
     )
 }
 
@@ -48,7 +51,8 @@ fun PostCommentEntity.toDomain(replies: List<Reply> = emptyList()): Comment {
         commenter = buildUser(commenterId, commenterName, commenterAvatarUrl),
         replies = replies,
         replyCount = replies.size,
-        commenterProvince = commenterProvince
+        commenterProvince = commenterProvince,
+        sendStatus = sendStatus.toLocalSendStatus()
     )
 }
 
@@ -61,7 +65,8 @@ fun PostReplyEntity.toDomain(): Reply {
         beCommenter = buildUser(beCommenterId, beCommenterName, beCommenterAvatarUrl),
         imageUrls = imageUrlsJson.toStringList(),
         parentCommentId = parentCommentId,
-        parentReplyId = parentReplyId
+        parentReplyId = parentReplyId,
+        sendStatus = sendStatus.toLocalSendStatus()
     )
 }
 
@@ -85,4 +90,8 @@ private fun String.toStringList(): List<String> {
         List(array.length()) { index -> array.optString(index) }
             .filter { it.isNotBlank() }
     }.getOrDefault(emptyList())
+}
+
+private fun String.toLocalSendStatus(): LocalSendStatus {
+    return LocalSendStatus.entries.firstOrNull { it.name == this } ?: LocalSendStatus.NONE
 }
