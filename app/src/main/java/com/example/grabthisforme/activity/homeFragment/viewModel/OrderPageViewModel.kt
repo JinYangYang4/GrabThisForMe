@@ -11,11 +11,20 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class OrderPageViewModel @Inject constructor(
     private val orderRepository: OrderRepository
 ) : ViewModel() {
+
+    fun refresh(page: Int) {
+        if (page == OrderRepository.PAGE_HISTORY) {
+            viewModelScope.launch {
+                runCatching { orderRepository.refreshPurchaseHistory() }
+            }
+        }
+    }
 
     fun ordersByPage(page: Int): StateFlow<List<OrderListItemUiModel>> {
         return orderRepository.ordersByPage(page)

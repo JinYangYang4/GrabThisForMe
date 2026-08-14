@@ -151,7 +151,15 @@ fun GoodsStateDto.toDomainInfo(): GoodsStateInfo {
 
 fun GoodsDto.toDomain(): Goods {
     return Goods(
-        baseInfo = base.toDomainInfo(),
+        baseInfo = GoodsBaseInfo(
+            id = id,
+            storeId = storeId,
+            name = name,
+            message = message,
+            category = categoryKey?.let { key ->
+                Goods.GoodsCategory.entries.firstOrNull { it.name == key || it.desc == key }
+            }
+        ),
         priceInfo = price.toDomainInfo(),
         uiInfo = ui.toDomainInfo(),
         stateInfo = state.toDomainInfo()
@@ -160,13 +168,11 @@ fun GoodsDto.toDomain(): Goods {
 
 fun Goods.toDto(): GoodsDto {
     return GoodsDto(
-        base = GoodsBaseDto(
-            id = id,
-            storeId = storeId,
-            name = name,
-            message = message,
-            category = category?.name
-        ),
+        id = id,
+        storeId = storeId,
+        name = name,
+        message = message,
+        categoryKey = category?.name,
         price = GoodsPriceDto(
             price = price,
             discountPrice = discountPrice,

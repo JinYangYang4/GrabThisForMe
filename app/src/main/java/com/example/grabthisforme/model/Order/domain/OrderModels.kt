@@ -13,8 +13,26 @@ data class OrderParties(
 )
 
 data class OrderGoodsInfo(
-    val goods: Goods
+    val goods: Goods,
+    val quantity: Int = 1,
+    val unitPrice: Double = goods.price,
+    val totalAmount: Double = unitPrice * quantity
 )
+
+data class OrderPurchaseInfo(
+    val orderType: String = TYPE_ERRAND,
+    val purchaseId: String? = null,
+    val storeId: Long = 0L,
+    val storeName: String = "",
+    val subtotalAmount: Double = 0.0,
+    val discountAmount: Double = 0.0,
+    val userCouponId: String? = null
+) {
+    companion object {
+        const val TYPE_ERRAND = "ERRAND"
+        const val TYPE_PURCHASE = "PURCHASE"
+    }
+}
 
 data class OrderRouteInfo(
     val shelfNumber: String = "",  // 货架编号

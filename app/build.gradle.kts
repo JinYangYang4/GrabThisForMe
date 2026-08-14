@@ -20,10 +20,18 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    signingConfigs {
+        create("release") {
+            storeFile = file("D:\\projects\\GrabThisForMe\\xin\\GrabThisForMe\\my-release-key.jks")
+            storePassword = "jyy12345678"
+            keyAlias = "myalias"
+            keyPassword = "jyy12345678"
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

@@ -10,6 +10,7 @@ data class Order(
     val routeInfo: OrderRouteInfo,
     val timeInfo: OrderTimeInfo,
     val statusInfo: OrderStatusInfo = OrderStatusInfo(),
+    val purchaseInfo: OrderPurchaseInfo = OrderPurchaseInfo(),
     val isBuyerSelf: Boolean = false
 ) {
     val orderId: String get() = identity.orderId
@@ -26,6 +27,16 @@ data class Order(
     val endTime: Long get() = timeInfo.endTime
     val orderStatus: Int get() = statusInfo.status
     val isAccepted: Boolean get() = statusInfo.isAccepted
+    val quantity: Int get() = goodsInfo.quantity
+    val unitPrice: Double get() = goodsInfo.unitPrice
+    val totalAmount: Double get() = goodsInfo.totalAmount
+    val orderType: String get() = purchaseInfo.orderType
+    val purchaseId: String? get() = purchaseInfo.purchaseId
+    val storeId: Long get() = purchaseInfo.storeId
+    val storeName: String get() = purchaseInfo.storeName
+    val subtotalAmount: Double get() = purchaseInfo.subtotalAmount
+    val discountAmount: Double get() = purchaseInfo.discountAmount
+    val userCouponId: String? get() = purchaseInfo.userCouponId
 
     constructor(
         sender: User? = null,
@@ -39,11 +50,21 @@ data class Order(
         endTime: Long = 0L,
         orderStatus: Int = OrderStatusInfo.STATUS_PENDING_RECEIPT,
         isAccepted: Boolean = false,
+        quantity: Int = 1,
+        unitPrice: Double = goods.price,
+        totalAmount: Double = unitPrice * quantity,
+        orderType: String = OrderPurchaseInfo.TYPE_ERRAND,
+        purchaseId: String? = null,
+        storeId: Long = goods.storeId,
+        storeName: String = "",
+        subtotalAmount: Double = totalAmount,
+        discountAmount: Double = 0.0,
+        userCouponId: String? = null,
         isBuyerSelf: Boolean = false
     ) : this(
         identity = OrderIdentity(orderId),
         parties = OrderParties(sender = sender, buyer = buyer),
-        goodsInfo = OrderGoodsInfo(goods),
+        goodsInfo = OrderGoodsInfo(goods, quantity, unitPrice, totalAmount),
         routeInfo = OrderRouteInfo(
             shelfNumber = shelf_number,
             aimPosition = aim_position,
@@ -56,6 +77,9 @@ data class Order(
         statusInfo = OrderStatusInfo(
             status = orderStatus,
             isAccepted = isAccepted
+        ),
+        purchaseInfo = OrderPurchaseInfo(
+            orderType, purchaseId, storeId, storeName, subtotalAmount, discountAmount, userCouponId
         ),
         isBuyerSelf = isBuyerSelf
     )

@@ -33,5 +33,15 @@ data class OrderEntity(
     val startTime: Long = 0L,
     val endTime: Long = 0L,
     val orderStatus: Int = 0,
-    val isAccepted: Boolean = false
+    val isAccepted: Boolean = false,
+    val orderType: String = "ERRAND",
+    val purchaseId: String? = null,
+    val storeId: Long = 0L,
+    val storeName: String = "",
+    val quantity: Int = 1,
+    val unitPrice: Double = 0.0,
+    val subtotalAmount: Double = 0.0,
+    val discountAmount: Double = 0.0,
+    val totalAmount: Double = 0.0,
+    val userCouponId: String? = null
 )

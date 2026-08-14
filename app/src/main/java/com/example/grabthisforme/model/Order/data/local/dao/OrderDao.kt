@@ -25,6 +25,9 @@ interface OrderDao {
     @Query("DELETE FROM order_cache WHERE orderId = :orderId")
     suspend fun deleteById(orderId: String)
 
+    @Query("DELETE FROM order_cache WHERE orderType = 'PURCHASE'")
+    suspend fun deletePurchaseHistory()
+
     @Query("SELECT COUNT(*) FROM order_cache")
     suspend fun getOrderCount(): Int
 }

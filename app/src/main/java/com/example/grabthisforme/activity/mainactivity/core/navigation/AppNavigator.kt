@@ -2,6 +2,8 @@ package com.example.grabthisforme.activity.mainactivity.core.navigation
 
 import android.content.Context
 import android.os.Bundle
+import android.os.SystemClock
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavBackStackEntry
@@ -16,6 +18,12 @@ class AppNavigator(
     private val manager: FragmentManager,
     private val containerId: Int
 ) : FragmentNavigator(context, manager, containerId) {
+    companion object {
+        private const val NAV_PERF_TAG = "NavPerf"
+        private const val MONITORED_DESTINATION_CLASS =
+            "com.example.grabthisforme.activity.communityFragment.view.FragmentCommunity"
+    }
+
     private val fragmentCache = HashMap<String, Fragment>()
     private val cachedFragments = setOf(
         "com.example.grabthisforme.activity.communityFragment.view.FragmentCommunity",
@@ -51,8 +59,11 @@ class AppNavigator(
         val entry = entries.last()
         val destination = entry.destination as Destination
         val tag = destination.id.toString()
+        val shouldLogPerf = destination.className == MONITORED_DESTINATION_CLASS
+        val startTimeNanos = if (shouldLogPerf) SystemClock.elapsedRealtimeNanos() else 0L
 
         var fragment = manager.findFragmentByTag(tag)
+        val isFirstOpenWithoutCache = fragment == null
         if (fragment == null) {
             fragment = createFragment(destination.className, entry.arguments)
             manager.beginTransaction().add(containerId, fragment, tag).commitNow()
@@ -69,6 +80,15 @@ class AppNavigator(
         }.commitNow()
 
         state.push(entry)
+
+        if (shouldLogPerf) {
+            val durationMs = (SystemClock.elapsedRealtimeNanos() - startTimeNanos) / 1_000_000.0
+            val scene = if (isFirstOpenWithoutCache) "first_enter_no_cache" else "reenter_with_cache"
+            Log.d(
+                NAV_PERF_TAG,
+                "destination=${destination.className}, scene=$scene, durationMs=$durationMs"
+            )
+        }
     }
 
     override fun popBackStack(popUpTo: NavBackStackEntry, savedState: Boolean) {

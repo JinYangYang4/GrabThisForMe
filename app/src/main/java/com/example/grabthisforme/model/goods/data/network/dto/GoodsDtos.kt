@@ -30,7 +30,11 @@ data class GoodsStateDto(
 )
 
 data class GoodsDto(
-    val base: GoodsBaseDto,
+    val id: Long,
+    val storeId: Long = 0L,
+    val name: String = "",
+    val message: String = "",
+    val categoryKey: String? = null,
     val price: GoodsPriceDto = GoodsPriceDto(),
     val ui: GoodsUiDto = GoodsUiDto(),
     val state: GoodsStateDto = GoodsStateDto()

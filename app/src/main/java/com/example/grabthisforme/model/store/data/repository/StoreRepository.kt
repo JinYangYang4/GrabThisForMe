@@ -4,6 +4,8 @@ import com.example.grabthisforme.model.goods.domain.Goods
 import com.example.grabthisforme.model.store.domain.Store
 import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
+import com.example.grabthisforme.model.store.data.network.api.CreateStoreRequest
+import com.example.grabthisforme.model.store.data.network.api.UpdateStoreCategoriesRequest
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -33,20 +35,39 @@ class StoreRepository @Inject constructor(
         storeId: Long,
         categories: List<String>,
         renamedCategories: Map<String, String> = emptyMap()
-    ) = localRepository.updateStoreCategoriesOnly(storeId, categories, renamedCategories)
+    ) {
+        val dto = remoteRepository.updateCategories(
+            storeId,
+            UpdateStoreCategoriesRequest(categories, renamedCategories)
+        )
+        localRepository.cacheRemoteStore(dto)
+    }
 
-    suspend fun assignGoodsToCategory(storeId: Long, goodsId: Long, category: String) =
-        localRepository.assignGoodsToCategory(storeId, goodsId, category)
+    suspend fun assignGoodsToCategory(storeId: Long, goodsId: Long, category: String) {
+        localRepository.cacheRemoteStore(remoteRepository.assignGoodsCategory(storeId, goodsId, category))
+    }
 
-    suspend fun moveGoodsToUnclassified(storeId: Long, goodsId: Long) =
-        localRepository.moveGoodsToUnclassified(storeId, goodsId)
+    suspend fun moveGoodsToUnclassified(storeId: Long, goodsId: Long) {
+        localRepository.cacheRemoteStore(remoteRepository.assignGoodsCategory(storeId, goodsId, null))
+    }
+
+    suspend fun refreshStore(storeId: Long): Store =
+        localRepository.cacheRemoteStore(remoteRepository.getStore(storeId))
+
+    suspend fun refreshMyStores(): List<Store> = remoteRepository.listMyStores().map {
+        localRepository.cacheRemoteStore(it)
+    }
 
     suspend fun registerStore(
         name: String,
         type: String,
         address: String,
         categories: List<String> = emptyList()
-    ): Store = localRepository.registerStore(name, type, address, categories)
+    ): Store = localRepository.cacheRemoteStore(
+        remoteRepository.createStore(
+            CreateStoreRequest(name = name, type = type, address = address, categories = categories)
+        )
+    )
 
     suspend fun registerStore(
         name: String,
@@ -60,17 +81,21 @@ class StoreRepository @Inject constructor(
         pic: String?,
         tags: List<String>,
         categories: List<String> = emptyList()
-    ): Store = localRepository.registerStore(
-        name = name,
-        type = type,
-        address = address,
-        phone = phone,
-        businessHours = businessHours,
-        minOrderAmount = minOrderAmount,
-        deliveryFee = deliveryFee,
-        isOpen = isOpen,
-        pic = pic,
-        tags = tags,
-        categories = categories
+    ): Store = localRepository.cacheRemoteStore(
+        remoteRepository.createStore(
+            CreateStoreRequest(
+                name = name,
+                type = type,
+                address = address,
+                phone = phone,
+                businessHours = businessHours,
+                minOrderAmount = minOrderAmount,
+                deliveryFee = deliveryFee,
+                isOpen = isOpen,
+                pic = pic,
+                tags = tags,
+                categories = categories
+            )
+        )
     )
 }

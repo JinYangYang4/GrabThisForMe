@@ -151,6 +151,9 @@ class StoreOwnerViewModel @Inject constructor(
     fun loadStore(storeId: Long) {
         selectedStoreId.value = storeId.takeIf { it > 0L }
         selectedCategory.value = Store.CATEGORY_ALL
+        if (storeId > 0L) {
+            viewModelScope.launch { runCatching { storeRepository.refreshStore(storeId) } }
+        }
     }
 
     fun setShowStorePage(showStore: Boolean) {

@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -16,6 +18,7 @@ import com.example.grabthisforme.activity.fragment_misc.storeFragment.adapter.Al
 import com.example.grabthisforme.activity.fragment_misc.storeFragment.adapter.StoreGoodsRecyclerViewAdapter
 import com.example.grabthisforme.activity.fragment_misc.storeFragment.adpter.StoreCategoryRecyclerViewAdapter
 import com.example.grabthisforme.activity.fragment_misc.storeFragment.viewModel.StoreViewModel
+import com.example.grabthisforme.activity.fragment_misc.storeFragment.viewModel.CouponSelectionEvent
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentStoreBinding
 import com.example.grabthisforme.extension.setMaxVisibleItems
@@ -35,6 +38,7 @@ class StoreFragment : Fragment() {
 
     private lateinit var categoryAdapter: StoreCategoryRecyclerViewAdapter
     private var currentStoreId: Long? = null
+    private var lastCouponSelectionEventId = 0L
 
     private val args: StoreFragmentArgs by navArgs()
 
@@ -71,6 +75,14 @@ class StoreFragment : Fragment() {
         storeViewModel.storeDeliveryText.observe(viewLifecycleOwner) { binding.tvDelivery.text = it }
         storeViewModel.storeBusinessHoursText.observe(viewLifecycleOwner) { binding.tvBusinessHours.text = it }
         storeViewModel.priceTotalText.observe(viewLifecycleOwner) { binding.tvPriceTotal.text = it }
+        storeViewModel.purchaseResult.observe(viewLifecycleOwner) { result ->
+            Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+        }
+        storeViewModel.purchaseInProgress.observe(viewLifecycleOwner) { purchasing ->
+            binding.llCheckout.isEnabled = !purchasing
+            binding.llCheckout.alpha = if (purchasing) 0.55f else 1f
+        }
+        storeViewModel.couponSelection.observe(viewLifecycleOwner, ::showCouponSelection)
     }
 
     private fun handleBackPressed() {
@@ -113,6 +125,32 @@ class StoreFragment : Fragment() {
         binding.tvDeleteAll.setOnClickListener {
             storeViewModel.clearSelectedGoods()
         }
+        binding.llCheckout.setOnClickListener {
+            storeViewModel.prepareCheckout()
+        }
+    }
+
+    private fun showCouponSelection(event: CouponSelectionEvent) {
+        if (event.eventId == lastCouponSelectionEventId) return
+        lastCouponSelectionEventId = event.eventId
+        val options = buildList {
+            add("不使用优惠券")
+            event.coupons.forEach { coupon ->
+                val threshold = if (coupon.minimumAmount > 0) {
+                    "满¥${coupon.minimumAmount}"
+                } else {
+                    "无门槛"
+                }
+                add("${coupon.title}（$threshold，减¥${coupon.discountAmount}）")
+            }
+        }.toTypedArray()
+        AlertDialog.Builder(requireContext())
+            .setTitle("选择优惠券")
+            .setItems(options) { _, index ->
+                storeViewModel.checkoutSelectedGoods(event.coupons.getOrNull(index - 1)?.userCouponId)
+            }
+            .setNegativeButton("取消", null)
+            .show()
     }
 
     private fun initObserve() {

@@ -7,6 +7,10 @@ import com.example.grabthisforme.model.friendAndGroup.data.network.api.FriendAnd
 import com.example.grabthisforme.model.message.data.network.api.MessageApi
 import com.example.grabthisforme.model.post.data.network.api.PostApi
 import com.example.grabthisforme.model.user.data.network.api.UserApi
+import com.example.grabthisforme.model.store.data.network.api.StoreApi
+import com.example.grabthisforme.model.goods.data.network.api.GoodsApi
+import com.example.grabthisforme.model.order.data.network.api.OrderApi
+import com.example.grabthisforme.model.coupon.data.network.api.CouponApi
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -94,5 +98,21 @@ object NetworkModule {
     fun provideFriendAndGroupApi(retrofit: Retrofit): FriendAndGroupApi {
         return retrofit.create(FriendAndGroupApi::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun provideStoreApi(retrofit: Retrofit): StoreApi = retrofit.create(StoreApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideGoodsApi(retrofit: Retrofit): GoodsApi = retrofit.create(GoodsApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideOrderApi(retrofit: Retrofit): OrderApi = retrofit.create(OrderApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideCouponApi(retrofit: Retrofit): CouponApi = retrofit.create(CouponApi::class.java)
 
 }

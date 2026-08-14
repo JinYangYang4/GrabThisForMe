@@ -10,6 +10,8 @@ import com.example.grabthisforme.model.order.domain.OrderParties
 import com.example.grabthisforme.model.order.domain.OrderRouteInfo
 import com.example.grabthisforme.model.order.domain.OrderStatusInfo
 import com.example.grabthisforme.model.order.domain.OrderTimeInfo
+import com.example.grabthisforme.model.order.domain.OrderPurchaseInfo
+import com.example.grabthisforme.model.order.data.network.dto.PurchaseRecordDto
 import com.example.grabthisforme.model.user.domain.User
 
 private fun buildUser(
@@ -61,7 +63,10 @@ fun OrderDto.toDomain(): Order {
                 message = goodsMessage,
                 price = goodsPrice,
                 pic = goodsPic
-            )
+            ),
+            quantity = quantity,
+            unitPrice = unitPrice.takeIf { it > 0 } ?: goodsPrice,
+            totalAmount = totalAmount.takeIf { it > 0 } ?: goodsPrice * quantity
         ),
         routeInfo = OrderRouteInfo(
             shelfNumber = shelfNumber,
@@ -75,6 +80,9 @@ fun OrderDto.toDomain(): Order {
         statusInfo = OrderStatusInfo(
             status = orderStatus,
             isAccepted = isAccepted
+        ),
+        purchaseInfo = OrderPurchaseInfo(
+            orderType, purchaseId, storeId, storeName, subtotalAmount, discountAmount, userCouponId
         ),
         isBuyerSelf = false
     )
@@ -100,7 +108,17 @@ fun Order.toDto(): OrderDto {
         startTime = startTime,
         endTime = endTime,
         orderStatus = orderStatus,
-        isAccepted = isAccepted
+        isAccepted = isAccepted,
+        orderType = orderType,
+        purchaseId = purchaseId,
+        storeId = storeId,
+        storeName = storeName,
+        quantity = quantity,
+        unitPrice = unitPrice,
+        subtotalAmount = subtotalAmount,
+        discountAmount = discountAmount,
+        totalAmount = totalAmount,
+        userCouponId = userCouponId
     )
 }
 
@@ -122,7 +140,10 @@ fun OrderEntity.toDomain(): Order {
                 message = goodsMessage,
                 price = goodsPrice,
                 pic = goodsPic
-            )
+            ),
+            quantity = quantity,
+            unitPrice = unitPrice.takeIf { it > 0 } ?: goodsPrice,
+            totalAmount = totalAmount.takeIf { it > 0 } ?: goodsPrice * quantity
         ),
         routeInfo = OrderRouteInfo(
             shelfNumber = shelfNumber,
@@ -136,6 +157,9 @@ fun OrderEntity.toDomain(): Order {
         statusInfo = OrderStatusInfo(
             status = orderStatus,
             isAccepted = isAccepted
+        ),
+        purchaseInfo = OrderPurchaseInfo(
+            orderType, purchaseId, storeId, storeName, subtotalAmount, discountAmount, userCouponId
         ),
         isBuyerSelf = false
     )
@@ -161,6 +185,47 @@ fun Order.toEntity(): OrderEntity {
         startTime = startTime,
         endTime = endTime,
         orderStatus = orderStatus,
-        isAccepted = isAccepted
+        isAccepted = isAccepted,
+        orderType = orderType,
+        purchaseId = purchaseId,
+        storeId = storeId,
+        storeName = storeName,
+        quantity = quantity,
+        unitPrice = unitPrice,
+        subtotalAmount = subtotalAmount,
+        discountAmount = discountAmount,
+        totalAmount = totalAmount,
+        userCouponId = userCouponId
+    )
+}
+
+fun PurchaseRecordDto.toDomain(): Order {
+    val goods = Goods(
+        id = goodsId,
+        storeId = storeId,
+        name = goodsName,
+        message = goodsMessage,
+        price = unitPrice,
+        pic = goodsPic
+    )
+    return Order(
+        orderId = recordId,
+        buyer = User(id = buyerId, name = buyerName, headPic = buyerAvatarUrl),
+        goods = goods,
+        startTime = createdTime,
+        endTime = createdTime,
+        orderStatus = OrderStatusInfo.STATUS_COMPLETED,
+        isAccepted = true,
+        quantity = quantity,
+        unitPrice = unitPrice,
+        totalAmount = totalAmount,
+        orderType = OrderPurchaseInfo.TYPE_PURCHASE,
+        purchaseId = purchaseId,
+        storeId = storeId,
+        storeName = storeName,
+        subtotalAmount = subtotalAmount.takeIf { it > 0 } ?: unitPrice * quantity,
+        discountAmount = discountAmount,
+        userCouponId = userCouponId,
+        isBuyerSelf = true
     )
 }

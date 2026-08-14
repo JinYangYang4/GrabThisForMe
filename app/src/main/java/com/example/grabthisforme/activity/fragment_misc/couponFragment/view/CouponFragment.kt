@@ -10,23 +10,20 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.grabthisforme.activity.fragment_misc.couponFragment.adapter.CouponRecyclerViewAdapter
 import com.example.grabthisforme.activity.fragment_misc.couponFragment.viewModel.CouponViewModel
-import com.example.grabthisforme.activity.fragment_misc.sign_inFragment.model.Coupon
 import com.example.grabthisforme.activity.mainactivity.view.MainActivity
 import com.example.grabthisforme.databinding.FragmentCouponBinding
 import com.example.grabthisforme.util.ViewAnimationUtils
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class CouponFragment : Fragment() {
     private var _binding: FragmentCouponBinding? = null
     private val binding get() = _binding!!
-
-    private lateinit var couponListAdapter: CouponRecyclerViewAdapter
     private val viewModel: CouponViewModel by viewModels()
+    private lateinit var adapter: CouponRecyclerViewAdapter
+    private var lastMessageId = 0L
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, state: Bundle?): View {
         _binding = FragmentCouponBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
@@ -35,82 +32,33 @@ class CouponFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initRVCoupon()
-        initView()
-        loadCouponData()
-        ViewAnimationUtils.animateStaggeredEntrance(
-            binding.couponFiltersCard,
-            binding.couponListCard
-        )
+        adapter = CouponRecyclerViewAdapter(viewModel::buy)
+        binding.rvCouponList.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvCouponList.adapter = adapter
+        binding.rvCouponList.isNestedScrollingEnabled = false
+
+        binding.ivBack.setOnClickListener { parentFragmentManager.popBackStack() }
+        binding.btnMyCoupons.setOnClickListener { viewModel.loadMine() }
+        binding.btnExpiredCoupons.setOnClickListener { viewModel.loadMine() }
+        binding.btnCouponMarket.setOnClickListener { viewModel.loadMarket() }
+
+        viewModel.items.observe(viewLifecycleOwner, adapter::submitList)
+        viewModel.loading.observe(viewLifecycleOwner) { loading ->
+            binding.couponFiltersCard.isEnabled = !loading
+            binding.couponListCard.alpha = if (loading) 0.65f else 1f
+        }
+        viewModel.message.observe(viewLifecycleOwner) { message ->
+            if (message.eventId != lastMessageId) {
+                lastMessageId = message.eventId
+                Toast.makeText(requireContext(), message.text, Toast.LENGTH_SHORT).show()
+            }
+        }
+        ViewAnimationUtils.animateStaggeredEntrance(binding.couponFiltersCard, binding.couponListCard)
     }
 
     override fun onResume() {
         super.onResume()
         (requireActivity() as MainActivity).innerBottomBar()
-    }
-
-    private fun initRVCoupon() {
-        couponListAdapter = CouponRecyclerViewAdapter { coupon ->
-            Toast.makeText(
-                requireContext(),
-                "查看 ${coupon.title} 使用详情",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-        binding.rvCouponList.adapter = couponListAdapter
-        binding.rvCouponList.layoutManager = LinearLayoutManager(
-            requireContext(),
-            LinearLayoutManager.VERTICAL,
-            false
-        )
-        binding.rvCouponList.isNestedScrollingEnabled = false
-    }
-
-    private fun initView() {
-        binding.ivBack.setOnClickListener {
-            parentFragmentManager.popBackStack()
-        }
-    }
-
-    private fun loadCouponData() {
-        val couponTestList = listOf(
-            Coupon(
-                id = 1,
-                title = "满100减20优惠券",
-                denomination = 20.0f,
-                type = "全场通用",
-                desc = "有效期 7 天，订单满100元可用",
-                userStatus = Coupon.UserCouponStatus.UNUSED,
-                receiveTime = "",
-                expireTime = "今日起 7 天后"
-            ),
-            Coupon(
-                id = 2,
-                title = "饮品夜宵专享券",
-                denomination = 10.0f,
-                type = "餐饮专用",
-                desc = "有效期 3 天，校园餐饮可用",
-                userStatus = Coupon.UserCouponStatus.UNUSED,
-                receiveTime = "",
-                expireTime = "本周日前"
-            ),
-            Coupon(
-                id = 3,
-                title = "无门槛5元惊喜券",
-                denomination = 5.0f,
-                type = "全场通用",
-                desc = "无订单金额限制，小额跑腿也能用",
-                userStatus = Coupon.UserCouponStatus.UNUSED,
-                receiveTime = "",
-                expireTime = "今日起 5 天后"
-            )
-        )
-        couponListAdapter.submitList(couponTestList)
-        handleEmptyData(couponTestList)
-    }
-
-    private fun handleEmptyData(couponList: List<Coupon>) {
-        viewModel.updateEmptyState(couponList.isEmpty())
     }
 
     override fun onDestroyView() {

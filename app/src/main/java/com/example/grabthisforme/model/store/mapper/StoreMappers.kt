@@ -58,27 +58,9 @@ fun StoreStatisticsDto.toDomainInfo(): StoreStatistics {
 
 fun StoreDto.toDomain(): Store {
     return Store(
-        identity = identity.toDomainInfo(),
-        location = location.toDomainInfo(),
-        commercialInfo = commercialInfo.toDomainInfo(),
-        statistics = statistics.toDomainInfo()
-    )
-}
-
-fun Store.toDto(): StoreDto {
-    return StoreDto(
-        identity = StoreIdentityDto(
-            id = id,
-            name = name,
-            type = type,
-            ownerId = ownerId
-        ),
-        location = StoreLocationDto(
-            address = address,
-            latitude = latitude,
-            longitude = longitude
-        ),
-        commercialInfo = StoreCommercialInfoDto(
+        identity = StoreIdentity(id = id, name = name, type = type, ownerId = ownerId),
+        location = StoreLocation(address = address, latitude = latitude, longitude = longitude),
+        commercialInfo = StoreCommercialInfo(
             phone = phone,
             businessHours = businessHours,
             minOrderAmount = minOrderAmount,
@@ -88,9 +70,28 @@ fun Store.toDto(): StoreDto {
             rating = rating,
             tags = tags
         ),
-        statistics = StoreStatisticsDto(
-            salesVolume = salesVolume
-        )
+        statistics = StoreStatistics(salesVolume = salesVolume)
+    )
+}
+
+fun Store.toDto(): StoreDto {
+    return StoreDto(
+        id = id,
+        name = name,
+        type = type,
+        ownerId = ownerId,
+        address = address,
+        latitude = latitude,
+        longitude = longitude,
+        phone = phone,
+        businessHours = businessHours,
+        minOrderAmount = minOrderAmount,
+        deliveryFee = deliveryFee,
+        isOpen = isOpen,
+        pic = pic,
+        rating = rating,
+        tags = tags,
+        salesVolume = salesVolume
     )
 }
 

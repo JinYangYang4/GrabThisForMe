@@ -1,6 +1,7 @@
 package com.example.grabthisforme.activity.homeFragment.ui_model
 
 import com.example.grabthisforme.model.order.domain.Order
+import com.example.grabthisforme.model.order.domain.OrderPurchaseInfo
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -21,6 +22,26 @@ data class OrderListItemUiModel(
 )
 
 fun Order.toOrderListItemUiModel(currentTime: Long = System.currentTimeMillis()): OrderListItemUiModel {
+    if (orderType == OrderPurchaseInfo.TYPE_PURCHASE) {
+        return OrderListItemUiModel(
+            orderId = orderId,
+            goodsName = goods.name.ifBlank { "商品" },
+            goodsMessage = goods.message.ifBlank { "暂无商品说明" },
+            goodsPriceText = String.format(Locale.getDefault(), "单价 ￥%.2f", unitPrice),
+            shelfNumberText = "数量：$quantity",
+            aimPositionText = "店铺：${storeName.ifBlank { "未知店铺" }}",
+            sendTimeText = "购买时间：${formatOrderTime(startTime)}",
+            timeLeftText = if (discountAmount > 0) {
+                String.format(Locale.getDefault(), "优惠 ￥%.2f · 实付 ￥%.2f", discountAmount, totalAmount)
+            } else {
+                String.format(Locale.getDefault(), "实付 ￥%.2f", totalAmount)
+            },
+            goodsImageUrl = goods.pic.takeIf { it.isNotBlank() },
+            buyerAvatarUrl = buyer.headPic.takeIf { it.isNotBlank() },
+            isBuyerSelf = true,
+            statusBadgeText = "已支付"
+        )
+    }
     val expired = currentTime > endTime
     val goodsNameText = goods.name.ifBlank { "待采购商品" }
     val goodsMessageText = goods.message.ifBlank { "暂无补充说明" }

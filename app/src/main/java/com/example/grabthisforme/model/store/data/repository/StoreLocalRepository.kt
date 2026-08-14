@@ -9,8 +9,10 @@ import com.example.grabthisforme.model.relation.data.entity.StoreTagEntity
 import com.example.grabthisforme.model.store.data.local.dao.StoreDao
 import com.example.grabthisforme.model.store.data.mock.StoreSampleData
 import com.example.grabthisforme.model.store.domain.Store
+import com.example.grabthisforme.model.store.data.network.dto.StoreDto
 import com.example.grabthisforme.model.store.mapper.toDomain
 import com.example.grabthisforme.model.store.mapper.toEntity
+import com.example.grabthisforme.model.goods.mapper.toDomain
 import com.example.grabthisforme.model.user.data.repository.UserRepository
 import com.example.grabthisforme.model.user.domain.User
 import kotlinx.coroutines.CoroutineScope
@@ -96,6 +98,32 @@ class StoreLocalRepository @Inject constructor(
         stores.forEach { store ->
             syncTags(store.id, store.tags)
         }
+    }
+
+    suspend fun cacheRemoteStore(dto: StoreDto): Store {
+        val store = dto.toDomain()
+        saveStore(store)
+        val goods = dto.categories.flatMap { it.goods }.distinctBy { it.id }
+        goodsRepository.saveGoodsBatch(goods.map { it.toDomain() })
+        val categories = dto.categories.map { category ->
+            StoreGoodsCategoryEntity(
+                groupId = category.groupId,
+                storeId = dto.id,
+                category = category.category,
+                sortOrder = category.sortOrder
+            )
+        }
+        val items = dto.categories.flatMap { category ->
+            category.goods.mapIndexed { index, goodsDto ->
+                StoreGoodsCategoryItemEntity(
+                    groupId = category.groupId,
+                    goodsId = goodsDto.id,
+                    sortOrder = index
+                )
+            }
+        }
+        storeRelationDao.replaceGoodsCategories(dto.id, categories, items)
+        return store
     }
 
     suspend fun deleteStore(storeId: Long) {

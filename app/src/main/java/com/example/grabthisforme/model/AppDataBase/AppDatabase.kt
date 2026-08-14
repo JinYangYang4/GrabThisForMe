@@ -6,6 +6,8 @@ import com.example.grabthisforme.activity.fragment_misc.search.model.SearchDao
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.grabthisforme.model.conversation.data.local.dao.ConversationDao
 import com.example.grabthisforme.model.conversation.data.local.dao.ConversationUserStateDao
 import com.example.grabthisforme.model.conversation.data.local.entity.ConversationEntity
@@ -80,7 +82,7 @@ import com.example.grabthisforme.model.user.data.local.entity.UserStatisticsEnti
         StoreGoodsCategoryItemEntity::class,
         StoreTagEntity::class
     ],
-    version = 41,
+    version = 43,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -99,6 +101,26 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun storeDao(): StoreDao
     abstract fun friendAndGroupDao(): FriendAndGroupDao
     companion object {
+        private val MIGRATION_41_42 = object : Migration(41, 42) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE order_cache ADD COLUMN orderType TEXT NOT NULL DEFAULT 'ERRAND'")
+                db.execSQL("ALTER TABLE order_cache ADD COLUMN purchaseId TEXT")
+                db.execSQL("ALTER TABLE order_cache ADD COLUMN storeId INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE order_cache ADD COLUMN storeName TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE order_cache ADD COLUMN quantity INTEGER NOT NULL DEFAULT 1")
+                db.execSQL("ALTER TABLE order_cache ADD COLUMN unitPrice REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE order_cache ADD COLUMN totalAmount REAL NOT NULL DEFAULT 0")
+            }
+        }
+
+        private val MIGRATION_42_43 = object : Migration(42, 43) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE order_cache ADD COLUMN subtotalAmount REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE order_cache ADD COLUMN discountAmount REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE order_cache ADD COLUMN userCouponId TEXT")
+            }
+        }
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -109,7 +131,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "grab_this_for_me_core_db"
                 )
-
+                    .addMigrations(MIGRATION_41_42, MIGRATION_42_43)
                     .fallbackToDestructiveMigration(true)
                     .build()
                 INSTANCE = instance

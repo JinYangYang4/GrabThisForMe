@@ -54,6 +54,7 @@ class FragmentReceive_Send_HistoryOrder : Fragment() {
         initRecyclerView()
         initEmptyState()
         loadOrders()
+        viewModel.refresh(page)
     }
 
     private fun initRecyclerView() {

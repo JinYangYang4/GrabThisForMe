@@ -24,6 +24,9 @@ class MyStoreViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            runCatching { storeRepository.refreshMyStores() }
+        }
+        viewModelScope.launch {
             storeRepository.myStoreList.collectLatest { stores ->
                 val uiList = stores.map { it.toMyStoreListItemUiModel() }
                 _storeList.value = uiList

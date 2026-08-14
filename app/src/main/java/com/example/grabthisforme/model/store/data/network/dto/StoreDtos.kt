@@ -32,13 +32,28 @@ data class StoreStatisticsDto(
 )
 
 data class StoreGoodsCategoryDto(
+    val groupId: Long,
     val category: String = "",
+    val sortOrder: Int = 0,
     val goods: List<GoodsDto> = emptyList()
 )
 
 data class StoreDto(
-    val identity: StoreIdentityDto,
-    val location: StoreLocationDto = StoreLocationDto(),
-    val commercialInfo: StoreCommercialInfoDto = StoreCommercialInfoDto(),
-    val statistics: StoreStatisticsDto = StoreStatisticsDto()
+    val id: Long,
+    val ownerId: Long = 0L,
+    val name: String = "",
+    val type: String = "",
+    val address: String = "",
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val phone: String? = null,
+    val businessHours: String? = null,
+    val minOrderAmount: BigDecimal = BigDecimal.ZERO,
+    val deliveryFee: BigDecimal = BigDecimal.ZERO,
+    val isOpen: Boolean = true,
+    val pic: String? = null,
+    val rating: Float = 0.0f,
+    val salesVolume: Long = 0L,
+    val tags: List<String> = emptyList(),
+    val categories: List<StoreGoodsCategoryDto> = emptyList()
 )

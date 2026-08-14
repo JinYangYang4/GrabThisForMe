@@ -5,6 +5,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
+import com.example.grabthisforme.model.order.data.network.api.PurchaseItemRequest
+import com.example.grabthisforme.model.order.data.network.dto.PurchaseResultDto
+import com.example.grabthisforme.model.order.mapper.toDomain
 
 @Singleton
 class OrderRepository @Inject constructor(
@@ -40,5 +43,20 @@ class OrderRepository @Inject constructor(
 
     suspend fun deleteOrderById(orderId: String) {
         localRepository.deleteOrderById(orderId)
+    }
+
+    suspend fun purchase(
+        clientPurchaseId: String,
+        userCouponId: String? = null,
+        items: List<PurchaseItemRequest>
+    ): PurchaseResultDto {
+        val result = remoteRepository.purchase(clientPurchaseId, userCouponId, items)
+        localRepository.saveOrders(result.records.map { it.toDomain() })
+        return result
+    }
+
+    suspend fun refreshPurchaseHistory() {
+        val orders = remoteRepository.listPurchaseHistory().map { it.toDomain() }
+        localRepository.replacePurchaseHistory(orders)
     }
 }

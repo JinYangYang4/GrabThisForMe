@@ -49,7 +49,7 @@ class CreateGoodsViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val goods = Goods(
-                    id = System.currentTimeMillis(),
+                    id = 0L,
                     storeId = storeId,
                     name = parsed.name,
                     message = parsed.description,
@@ -61,8 +61,7 @@ class CreateGoodsViewModel @Inject constructor(
                     stock = parsed.stock,
                     pic = parsed.imageUrl
                 )
-                goodsRepository.saveGoods(goods)
-                goods
+                goodsRepository.createGoods(goods)
             }.onSuccess { goods ->
                 _createResult.postValue(
                     CreateGoodsResult(

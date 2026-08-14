@@ -13,10 +13,15 @@ import com.example.grabthisforme.activity.fragment_misc.storeFragment.ui_model.t
 import com.example.grabthisforme.model.goods.domain.Goods
 import com.example.grabthisforme.model.store.data.repository.StoreRepository
 import com.example.grabthisforme.model.store.domain.Store
+import com.example.grabthisforme.model.order.data.network.api.PurchaseItemRequest
+import com.example.grabthisforme.model.order.data.repository.OrderRepository
+import com.example.grabthisforme.model.coupon.data.network.dto.UserCouponDto
+import com.example.grabthisforme.model.coupon.data.repository.CouponRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.Locale
+import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -36,7 +41,9 @@ import kotlinx.coroutines.flow.first
 @HiltViewModel
 class StoreViewModel @Inject constructor(
     private val searchDao: SearchDao,
-    private val storeRepository: StoreRepository
+    private val storeRepository: StoreRepository,
+    private val orderRepository: OrderRepository,
+    private val couponRepository: CouponRepository
 ) : ViewModel() {
     private val _searchHistoryList = MutableLiveData<MutableList<SearchContent>>()
     val searchHistoryList: LiveData<MutableList<SearchContent>> get() = _searchHistoryList
@@ -60,6 +67,9 @@ class StoreViewModel @Inject constructor(
     private val _storeNoticeText = MutableLiveData("")
     private val _storeDeliveryText = MutableLiveData("")
     private val _storeBusinessHoursText = MutableLiveData("")
+    private val _purchaseResult = MutableLiveData<PurchaseUiResult>()
+    private val _purchaseInProgress = MutableLiveData(false)
+    private val _couponSelection = MutableLiveData<CouponSelectionEvent>()
     private val selectedCategory = MutableStateFlow(Store.CATEGORY_ALL)
     private val selectedStoreId = MutableStateFlow<Long?>(null)
 
@@ -78,6 +88,9 @@ class StoreViewModel @Inject constructor(
     val storeNoticeText: LiveData<String> get() = _storeNoticeText
     val storeDeliveryText: LiveData<String> get() = _storeDeliveryText
     val storeBusinessHoursText: LiveData<String> get() = _storeBusinessHoursText
+    val purchaseResult: LiveData<PurchaseUiResult> get() = _purchaseResult
+    val purchaseInProgress: LiveData<Boolean> get() = _purchaseInProgress
+    val couponSelection: LiveData<CouponSelectionEvent> get() = _couponSelection
     val currentSelectedCategory: StateFlow<String> = selectedCategory
 
     val currentStore: StateFlow<Store?> = selectedStoreId
@@ -147,6 +160,9 @@ class StoreViewModel @Inject constructor(
     fun loadStore(storeId: Long) {
         selectedStoreId.value = storeId.takeIf { it > 0L }
         selectedCategory.value = Store.CATEGORY_ALL
+        if (storeId > 0L) {
+            viewModelScope.launch { runCatching { storeRepository.refreshStore(storeId) } }
+        }
     }
 
     fun selectCategory(category: String) {
@@ -191,6 +207,65 @@ class StoreViewModel @Inject constructor(
         _currentAlreadySelectList.value = emptyList()
         _priceTotal.value = 0.0
         _priceTotalText.value = "¥0.00"
+    }
+
+    fun prepareCheckout() {
+        if (_purchaseInProgress.value == true) return
+        val selected = _currentAlreadySelectList.value.orEmpty()
+        val storeId = selectedStoreId.value
+        if (selected.isEmpty() || storeId == null) {
+            _purchaseResult.value = PurchaseUiResult(false, "请先选择商品")
+            return
+        }
+        _purchaseInProgress.value = true
+        viewModelScope.launch {
+            runCatching { couponRepository.listApplicable(storeId, _priceTotal.value ?: 0.0) }
+                .onSuccess { _couponSelection.postValue(CouponSelectionEvent(it)) }
+                .onFailure {
+                    _purchaseResult.postValue(PurchaseUiResult(false, it.message ?: "加载可用优惠券失败"))
+                }
+            _purchaseInProgress.postValue(false)
+        }
+    }
+
+    fun checkoutSelectedGoods(userCouponId: String? = null) {
+        if (_purchaseInProgress.value == true) return
+        val selected = _currentAlreadySelectList.value.orEmpty()
+        if (selected.isEmpty()) {
+            _purchaseResult.value = PurchaseUiResult(false, "请先选择商品")
+            return
+        }
+        _purchaseInProgress.value = true
+        viewModelScope.launch {
+            runCatching {
+                orderRepository.purchase(
+                    clientPurchaseId = UUID.randomUUID().toString(),
+                    userCouponId = userCouponId,
+                    items = selected.map { PurchaseItemRequest(it.goodsId, it.selectedCount) }
+                )
+            }.onSuccess { result ->
+                clearSelectedGoods()
+                selectedStoreId.value?.let { storeId ->
+                    runCatching { storeRepository.refreshStore(storeId) }
+                }
+                _purchaseResult.postValue(
+                    PurchaseUiResult(
+                        success = true,
+                        message = if (result.discountAmount > 0) {
+                            "购买成功，优惠 ¥${String.format(Locale.getDefault(), "%.2f", result.discountAmount)}，实付 ¥${String.format(Locale.getDefault(), "%.2f", result.totalAmount)}"
+                        } else {
+                            "购买成功，实付 ¥${String.format(Locale.getDefault(), "%.2f", result.totalAmount)}"
+                        },
+                        purchaseId = result.purchaseId
+                    )
+                )
+            }.onFailure { error ->
+                _purchaseResult.postValue(
+                    PurchaseUiResult(false, error.message ?: "购买失败，请稍后重试")
+                )
+            }
+            _purchaseInProgress.postValue(false)
+        }
     }
 
     fun setMySelectGoosView(isOpen: Boolean) {
@@ -345,3 +420,15 @@ class StoreViewModel @Inject constructor(
         }
     }
 }
+
+data class PurchaseUiResult(
+    val success: Boolean,
+    val message: String,
+    val purchaseId: String? = null,
+    val eventId: Long = System.currentTimeMillis()
+)
+
+data class CouponSelectionEvent(
+    val coupons: List<UserCouponDto>,
+    val eventId: Long = System.nanoTime()
+)
